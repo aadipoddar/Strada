@@ -1,0 +1,117 @@
+name: Deploy for Android
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  version-check:
+    uses: ./.github/workflows/version-checks.yml
+
+  build:
+    runs-on: windows-latest
+    needs: version-check
+    if: needs.version-check.outputs.should-deploy == 'true'
+
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    
+    - name: Install .NET MAUI Workload
+      run: dotnet workload install maui --skip-sign-check
+    
+    - name: Create Secrets.local_secrets.cs
+      run: |
+        $secretsContent = @"
+        namespace StradaLibrary.DataAccess;
+
+        public static partial class Secrets
+        {
+            static Secrets()
+            {
+                AzureConnectionString = "${{ secrets.AzureConnectionString }}";
+
+                AzureBlobStorageConnectionString = "${{ secrets.AzureBlobStorageConnectionString }}";
+                AzureBlobStorageAccountKey = "${{ secrets.AzureBlobStorageAccountKey }}";
+
+                SyncfusionLicense = "${{ secrets.SyncfusionLicense }}";
+
+                EmailPassword = "${{ secrets.EmailPassword }}";
+                ToEmail = "${{ secrets.ToEmail }}";
+            }
+        }
+        "@
+        Set-Content -Path "StradaLibrary/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
+    
+    - name: Setup Keystore
+      run: |
+        # Decode base64 keystore and save it
+        $keystoreBase64 = "${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
+        $keystoreBytes = [System.Convert]::FromBase64String($keystoreBase64)
+        $keystorePath = "Strada/Strada/strada.keystore"
+        [System.IO.File]::WriteAllBytes($keystorePath, $keystoreBytes)
+        echo "Keystore created at: $keystorePath"
+    
+    - name: Restore dependencies
+      run: dotnet restore Strada/Strada/Strada.csproj
+    
+    - name: Build Signed Android APK
+      run: |
+        dotnet publish Strada/Strada/Strada.csproj `
+          -f net10.0-android `
+          -c Release `
+          -p:AndroidPackageFormat=apk `
+          -p:AndroidKeyStore=true `
+          -p:AndroidSigningKeyStore=strada.keystore `
+          -p:AndroidSigningKeyAlias=Strada `
+          -p:AndroidSigningKeyPass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
+          -p:AndroidSigningStorePass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
+          -o Strada/Strada/publish/android
+    
+    - name: Find and Rename APK
+      id: find-apk
+      run: |
+        $apkPath = Get-ChildItem -Path "Strada/Strada/publish/android" -Filter "*.apk" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+        echo "APK found at: $apkPath"
+        
+        # Rename to match UpdateManager expectations: Strada.apk
+        Copy-Item $apkPath -Destination "Strada.apk"
+        echo "APK renamed to: Strada.apk"
+    
+    - name: Upload Android Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-release
+        path: Strada.apk
+
+  deploy:
+    runs-on: windows-latest
+    needs: [version-check, build]
+    if: needs.version-check.outputs.should-deploy == 'true'
+    permissions:
+      contents: write
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: android-release
+    
+    - name: Upload APK to Existing Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.version-check.outputs.current-version }}
+        files: Strada.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Deployment Summary
+      run: |
+        echo "🚀 Successfully deployed Strada Android APK to release ${{ needs.version-check.outputs.current-version }}"

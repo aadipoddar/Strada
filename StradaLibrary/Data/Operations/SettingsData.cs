@@ -1,0 +1,16 @@
+﻿using StradaLibrary.DataAccess;
+using StradaLibrary.Models.Operations;
+
+namespace StradaLibrary.Data.Operations;
+
+public static class SettingsData
+{
+	public static async Task<SettingsModel> LoadSettingsByKey(string Key, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+        (await SqlDataAccess.LoadData<SettingsModel, dynamic>(OperationNames.LoadSettingsByKey, new { Key }, sqlDataAccessTransaction)).FirstOrDefault();
+
+    public static async Task UpdateSettings(SettingsModel settingsModel) =>
+            await SqlDataAccess.SaveData(OperationNames.UpdateSettings, settingsModel);
+
+    public static async Task ResetSettings() =>
+            await SqlDataAccess.ExecuteProcedure(OperationNames.ResetSettings);
+}

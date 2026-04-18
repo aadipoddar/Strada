@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="DBStrada/DBStrada.sqlproj" Id="9670a550-f96b-4c47-86ad-aeb06eedd8bc">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="ExcelImport/ExcelImport.csproj" Id="516e3792-3957-46c8-bac0-136644883afa" />
+  <Project Path="Strada/Strada.Shared/Strada.Shared.csproj" />
+  <Project Path="Strada/Strada.Web/Strada.Web.csproj" />
+  <Project Path="Strada/Strada/Strada.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="StradaLibrary/StradaLibrary.csproj" />
+</Solution>

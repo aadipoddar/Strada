@@ -1,0 +1,101 @@
+name: Deploy to Azure Web App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  version-check:
+    uses: ./.github/workflows/version-checks.yml
+
+  build:
+    runs-on: ubuntu-latest
+    needs: version-check
+    if: needs.version-check.outputs.should-deploy == 'true'
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore StradaLibrary
+        run: dotnet restore StradaLibrary/StradaLibrary.csproj
+
+      - name: Restore Strada.Shared
+        run: dotnet restore Strada/Strada.Shared/Strada.Shared.csproj
+
+      - name: Restore Strada.Web
+        run: dotnet restore Strada/Strada.Web/Strada.Web.csproj
+
+      - name: Create Secrets.local_secrets.cs
+        run: |
+          $secretsContent = @"
+          namespace StradaLibrary.DataAccess;
+
+          public static partial class Secrets
+          {
+              static Secrets()
+              {
+                  AzureConnectionString = "${{ secrets.AzureConnectionString }}";
+
+                  AzureBlobStorageConnectionString = "${{ secrets.AzureBlobStorageConnectionString }}";
+                  AzureBlobStorageAccountKey = "${{ secrets.AzureBlobStorageAccountKey }}";
+
+                  SyncfusionLicense = "${{ secrets.SyncfusionLicense }}";
+
+                  EmailPassword = "${{ secrets.EmailPassword }}";
+                  ToEmail = "${{ secrets.ToEmail }}";
+              }
+          }
+          "@
+          Set-Content -Path "StradaLibrary/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
+        shell: pwsh
+
+      - name: Build StradaLibrary
+        run: dotnet build StradaLibrary/StradaLibrary.csproj --configuration Release --no-restore
+
+      - name: Build Strada.Shared
+        run: dotnet build Strada/Strada.Shared/Strada.Shared.csproj --configuration Release --no-restore
+
+      - name: Build Strada.Web
+        run: dotnet build Strada/Strada.Web/Strada.Web.csproj --configuration Release --no-restore
+
+      - name: Publish Strada.Web
+        run: dotnet publish Strada/Strada.Web/Strada.Web.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [version-check, build]
+    if: needs.version-check.outputs.should-deploy == 'true'
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'strada'
+          slot-name: 'Production'
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AA7D8C888E9D42C58BC300240511EDC2 }}
+      
+      - name: Deployment Summary
+        run: |
+          echo "🚀 Successfully deployed Strada version ${{ needs.version-check.outputs.current-version }} to Azure"

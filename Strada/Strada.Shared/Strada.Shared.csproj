@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Strada.Shared.csproj.lscache" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.6" />
+    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="33.1.49" />
+    <PackageReference Include="Syncfusion.Blazor.Calendars" Version="33.1.49" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="33.1.49" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="33.1.49" />
+    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="33.1.49" />
+    <PackageReference Include="Syncfusion.Blazor.Notifications" Version="33.1.49" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="33.1.49" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="33.1.49" />
+    <PackageReference Include="Toolbelt.Blazor.HotKeys2" Version="6.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\StradaLibrary\StradaLibrary.csproj" />
+  </ItemGroup>
+
+</Project>
