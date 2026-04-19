@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.FinancialAccounting;
 using StradaLibrary.Data.Accounts.Masters;
@@ -470,20 +469,10 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		}
 	}
 
-	public async ValueTask DisposeAsync()
+	public ValueTask DisposeAsync()
 	{
-		if (_autoRefreshCts is not null)
-		{
-			await _autoRefreshCts.CancelAsync();
-			_autoRefreshCts.Dispose();
-		}
-
-		_autoRefreshTimer?.Dispose();
-
-		if (_hotKeysContext is not null)
-			await _hotKeysContext.DisposeAsync();
-
 		GC.SuppressFinalize(this);
+		return ((IAsyncDisposable)HotKeys).DisposeAsync();
 	}
 	#endregion
 }

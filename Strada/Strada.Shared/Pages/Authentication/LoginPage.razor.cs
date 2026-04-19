@@ -176,11 +176,9 @@ public partial class LoginPage : IAsyncDisposable
 		NavigationManager.NavigateTo(PageRouteNames.LoginWithCode, true);
 	}
 
-	public async ValueTask DisposeAsync()
+	public ValueTask DisposeAsync()
 	{
-		if (_hotKeysContext is not null)
-			await _hotKeysContext.DisposeAsync();
-
 		GC.SuppressFinalize(this);
+		return ((IAsyncDisposable)HotKeys).DisposeAsync();
 	}
 }
