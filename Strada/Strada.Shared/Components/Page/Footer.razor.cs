@@ -1,7 +1,6 @@
 using System.Reflection;
 
 using Microsoft.AspNetCore.Components;
-using StradaLibrary.DataAccess;
 
 namespace Strada.Shared.Components.Page;
 

@@ -69,7 +69,7 @@ else
 				<!-- Accounts -->
 				@if (_user.Accounts)
 				{
-					<ButtonCard Title="Accounts" Description="Access accounting dashboard" Color="purple"
+					<FolderCard Title="Accounts" Description="Access accounting dashboard"
 								OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard)">
 						<IconContent>
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
@@ -78,11 +78,11 @@ else
 								<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
 							</svg>
 						</IconContent>
-					</ButtonCard>
+					</FolderCard>
 				}
 
 				<!-- Operations -->
-				<ButtonCard Title="Operations" Description="Access operations dashboard" Color="indigo"
+				<FolderCard Title="Operations" Description="Access operations dashboard"
 							OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OperationsDashboard)">
 					<IconContent>
 						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
@@ -91,12 +91,12 @@ else
 							<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
 						</svg>
 					</IconContent>
-				</ButtonCard>
+				</FolderCard>
 
 				<!-- Reports -->
 				@if (Factor != "Phone" && Factor != "Tablet" && _user.Reports)
 				{
-					<ButtonCard Title="Reports" Description="Access reports dashboard" Color="teal"
+					<FolderCard Title="Reports" Description="Access reports dashboard"
 								OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportsDashboard)">
 						<IconContent>
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
@@ -107,7 +107,7 @@ else
 								<path d="M8 17v-3" />
 							</svg>
 						</IconContent>
-					</ButtonCard>
+					</FolderCard>
 				}
 			</div>
 

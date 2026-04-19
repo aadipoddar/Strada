@@ -2,7 +2,7 @@
 
 public enum CodeType
 {
-	Accounting,
+	FinancialAccounting,
 	Ledger
 }
 

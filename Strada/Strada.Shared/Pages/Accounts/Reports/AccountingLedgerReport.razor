@@ -1,0 +1,461 @@
+@attribute [Route(PageRouteNames.AccountingLedgerReport)]
+
+@using StradaLibrary.Models.Accounts.FinancialAccounting
+@using StradaLibrary.Models.Accounts.Masters
+
+<PageTitle>Financial Ledger Report - Strada</PageTitle>
+
+@if (_isLoading || _user is null)
+{
+	<AnimatedLoader Visible="true" />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Financial Ledger Report">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
+										   Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected"
+								OnOpen='async () => await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0)' />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Refresh Data (Ctrl + R / F5)" IconCss="e-icons e-refresh" Id="Refresh"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")"
+										  IconCss="e-icons e-table" Id="ToggleDetailsView" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
+							<MenuItems>
+								<MenuItem Text="Transaction History Report" Id="TransactionHistory" Disabled="@_isProcessing" />
+								<MenuItem Text="Trial Balance" Id="TrialBalance" Disabled="@_isProcessing" />
+								<MenuItem Text="Profit & Loss" Id="ProfitLoss" Disabled="@_isProcessing" />
+								<MenuItem Text="Balance Sheet" Id="BalanceSheet" Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Periods" IconCss="e-icons e-clock">
+							<MenuItems>
+								<MenuItem Text="Today" Id="PeriodToday" Disabled="@_isProcessing" />
+								<MenuItem Text="Previous Day" Id="PeriodPreviousDay" Disabled="@_isProcessing" />
+								<MenuItem Text="Next Day" Id="PeriodNextDay" Disabled="@_isProcessing" />
+								<MenuItem Text="Current Month" Id="PeriodCurrentMonth" Disabled="@_isProcessing" />
+								<MenuItem Text="Previous Month" Id="PeriodPreviousMonth" Disabled="@_isProcessing" />
+								<MenuItem Text="Next Month" Id="PeriodNextMonth" Disabled="@_isProcessing" />
+								<MenuItem Text="Current FY" Id="PeriodCurrentFinancialYear" Disabled="@_isProcessing" />
+								<MenuItem Text="Previous FY" Id="PeriodPreviousFinancialYear" Disabled="@_isProcessing" />
+								<MenuItem Text="Next FY" Id="PeriodNextFinancialYear" Disabled="@_isProcessing" />
+								<MenuItem Text="All Time" Id="PeriodAllTime" Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
+							<MenuItems>
+								<MenuItem Text="View (Alt + O)" IconCss="e-icons e-eye" Id="ViewSelected"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Alt + P)" IconCss="e-icons e-export-pdf" Id="DownloadSelectedPdf"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Alt + E)" IconCss="e-icons e-export-excel"
+										  Id="DownloadSelectedExcel" Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<!-- Main Content Container -->
+		<div class="page-container">
+
+			<!-- Filters Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+						</svg>
+						<h2 class="section-title">Filters</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="filters-container">
+						<div class="filters-grid">
+							<!-- Date Range -->
+							<div class="form-field">
+								<label class="field-label">Date Range</label>
+								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
+												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
+									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
+								</SfDateRangePicker>
+							</div>
+
+							<!-- Company -->
+							<div class="form-field">
+								<label class="field-label">Company</label>
+								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedCompany"
+												TValue="CompanyModel" TItem="CompanyModel" DataSource="@_companies"
+												Placeholder="All Companies" AllowFiltering="true"
+												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+									<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
+														ValueChange="OnCompanyChanged" />
+									<AutoCompleteFieldSettings Value="Name" />
+								</SfAutoComplete>
+							</div>
+
+							<!-- Ledger -->
+							<div class="form-field">
+								<label class="field-label">Ledger</label>
+								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedLedger" TValue="LedgerModel"
+												TItem="LedgerModel" DataSource="@_ledgers" Placeholder="All Ledgers"
+												AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+									<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel"
+														ValueChange="OnLedgerChanged" />
+									<AutoCompleteFieldSettings Value="Name" />
+								</SfAutoComplete>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- Report Grid Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<line x1="8" y1="6" x2="21" y2="6" />
+							<line x1="8" y1="12" x2="21" y2="12" />
+							<line x1="8" y1="18" x2="21" y2="18" />
+							<line x1="3" y1="6" x2="3.01" y2="6" />
+							<line x1="3" y1="12" x2="3.01" y2="12" />
+							<line x1="3" y1="18" x2="3.01" y2="18" />
+						</svg>
+						<h2 class="section-title">Ledger Transactions</h2>
+					</div>
+				</div>
+				<div class="section-body grid-body">
+					<SfGrid ID="_sfGrid" @ref="_sfGrid" TValue="FinancialAccountingLedgerOverviewModel"
+							DataSource="_transactionOverviews" AllowTextWrap="true" AllowPaging="true" AllowSorting="true"
+							AllowResizing="true" AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true"
+							GridLines="GridLine.Horizontal" CssClass="professional-grid" AllowGrouping="true"
+							ContextMenuItems="@_gridContextMenuItems" Toolbar="@(new List<string>() { "Search" })">
+
+						<GridEvents TValue="FinancialAccountingLedgerOverviewModel"
+									ContextMenuItemClicked="OnGridContextMenuItemClicked" />
+						<GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+						<GridAggregates>
+							<GridAggregate>
+								<GridAggregateColumns>
+									<GridAggregateColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.LedgerName)"
+														 Type="AggregateType.Count">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Entries: @aggregate.Count</strong>
+											</div>
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Entries: @aggregate.Count</strong>
+											</div>
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Entries: @aggregate.Count</strong>
+											</div>
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.Debit)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-debit">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-debit">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-debit">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.Credit)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-credit">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-credit">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-credit">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn
+										Field="@nameof(FinancialAccountingLedgerOverviewModel.ReferenceAmount)"
+										Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+								</GridAggregateColumns>
+							</GridAggregate>
+						</GridAggregates>
+
+						<GridColumns>
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.LedgerName)"
+										HeaderText="Ledger" Width="350" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.LedgerCode)" HeaderText="Code"
+										Width="120" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.AccountTypeName)"
+										HeaderText="Account Type" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.GroupName)" HeaderText="Group"
+										Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.TransactionNo)"
+										HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.TransactionDateTime)"
+										HeaderText="Date" Width="130" Format="dd/MM/yyyy" Type="ColumnType.Date" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.CompanyName)"
+										HeaderText="Company" Width="180"
+										Visible="@(_showAllColumns && (_selectedCompany is null || _selectedCompany.Id <= 0))" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.ReferenceType)"
+										HeaderText="Ref Type" Width="130" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.ReferenceNo)"
+										HeaderText="Ref No" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.ReferenceDateTime)"
+										HeaderText="Ref Date" Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime"
+										Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.ReferenceAmount)"
+										HeaderText="Ref Amt" Width="130" Format="N2" TextAlign="TextAlign.Right"
+										Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.Debit)" HeaderText="Debit"
+										Width="140" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var detailItem = (context as FinancialAccountingLedgerOverviewModel);
+										<span class="grid-debit">@(detailItem.Debit?.ToString("N2") ?? "-")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.Credit)" HeaderText="Credit"
+										Width="140" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var detailItem = (context as FinancialAccountingLedgerOverviewModel);
+										<span class="grid-credit">@(detailItem.Credit?.ToString("N2") ?? "-")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.AccountingRemarks)"
+										HeaderText="Accounting Remarks" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.Remarks)"
+										HeaderText="Ledger Remarks" Width="500" />
+						</GridColumns>
+					</SfGrid>
+				</div>
+			</div>
+
+			<!-- Trial Balance Summary Section (Shown when Ledger is selected) -->
+			@if (_selectedLedger?.Id > 0 && _selectedTrialBalance != null)
+			{
+				<div class="section-card trial-balance-summary">
+					<div class="section-header">
+						<div class="section-title-wrapper">
+							<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+								 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+								 stroke-linejoin="round">
+								<rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+								<line x1="8" y1="21" x2="16" y2="21" />
+								<line x1="12" y1="17" x2="12" y2="21" />
+								<line x1="7" y1="7" x2="7" y2="11" />
+								<line x1="12" y1="7" x2="12" y2="11" />
+								<line x1="17" y1="7" x2="17" y2="11" />
+							</svg>
+							<div class="section-title-with-details">
+								<h2 class="section-title">@_selectedTrialBalance.LedgerName</h2>
+								<div class="ledger-badges">
+									<span class="badge badge-group">@_selectedTrialBalance.GroupName</span>
+									<span class="badge badge-account">@_selectedTrialBalance.AccountTypeName</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="section-body">
+						<div class="trial-balance-grid">
+							<BalanceInfoCard Label="Opening Balance" Value="@($"₹{_selectedTrialBalance.OpeningBalance:N2}")"
+											 Breakdown="@($"Dr: ₹{_selectedTrialBalance.OpeningDebit:N2} • Cr: ₹{_selectedTrialBalance.OpeningCredit:N2}")"
+											 Variant="BalanceInfoCard.CardVariant.Opening">
+								<Icon>
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+										 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+										 stroke-linejoin="round">
+										<circle cx="12" cy="12" r="10" />
+										<polyline points="12 6 12 12 16 14" />
+									</svg>
+								</Icon>
+							</BalanceInfoCard>
+
+							<BalanceInfoCard Label="Period Debit" Value="@($"₹{_selectedTrialBalance.Debit:N2}")"
+											 Variant="BalanceInfoCard.CardVariant.Debit">
+								<Icon>
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+										 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+										 stroke-linejoin="round">
+										<line x1="12" y1="5" x2="12" y2="19" />
+										<polyline points="19 12 12 19 5 12" />
+									</svg>
+								</Icon>
+							</BalanceInfoCard>
+
+							<BalanceInfoCard Label="Period Credit" Value="@($"₹{_selectedTrialBalance.Credit:N2}")"
+											 Variant="BalanceInfoCard.CardVariant.Credit">
+								<Icon>
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+										 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+										 stroke-linejoin="round">
+										<line x1="12" y1="19" x2="12" y2="5" />
+										<polyline points="5 12 12 5 19 12" />
+									</svg>
+								</Icon>
+							</BalanceInfoCard>
+
+							<BalanceInfoCard Label="Closing Balance" Value="@($"₹{_selectedTrialBalance.ClosingBalance:N2}")"
+											 Breakdown="@($"Dr: ₹{_selectedTrialBalance.ClosingDebit:N2} • Cr: ₹{_selectedTrialBalance.ClosingCredit:N2}")"
+											 Variant="BalanceInfoCard.CardVariant.Closing">
+								<Icon>
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+										 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+										 stroke-linejoin="round">
+										<rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+										<line x1="1" y1="10" x2="23" y2="10" />
+									</svg>
+								</Icon>
+							</BalanceInfoCard>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<ToastNotification @ref="_toastNotification" />
+
+<style>
+	/* Trial Balance Summary Section */
+	.trial-balance-summary {
+		background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+	}
+
+	.section-title-with-details {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.ledger-badges {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.trial-balance-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 14px;
+	}
+
+	.badge {
+		display: inline-block;
+		padding: 3px 8px;
+		border-radius: 4px;
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.2px;
+	}
+
+	.badge-group {
+		background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+		color: #1e40af;
+		border: 1px solid #bfdbfe;
+	}
+
+	.badge-account {
+		background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+		color: #166534;
+		border: 1px solid #bbf7d0;
+	}
+</style>

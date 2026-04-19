@@ -1,0 +1,462 @@
+using Strada.Shared.Components.Dialog;
+using StradaLibrary.Data.Accounts.Masters;
+using StradaLibrary.Data.Operations;
+using StradaLibrary.Exports.Accounts.Masters;
+using StradaLibrary.Exports.Utils;
+using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Operations;
+using Syncfusion.Blazor.Grids;
+
+namespace Strada.Shared.Pages.Accounts.Masters;
+
+public partial class CompanyPage : IAsyncDisposable
+{
+	private UserModel _user;
+	private HotKeysContext _hotKeysContext;
+	private bool _isLoading = true;
+	private bool _isProcessing = false;
+	private bool _showDeleted = false;
+
+	private CompanyModel _company = new();
+
+	private List<CompanyModel> _companies = [];
+	private List<StateUTModel> _stateUTs = [];
+	private readonly List<ContextMenuItemModel> _companyGridContextMenuItems =
+	[
+		new() { Text = "Edit (Insert)", Id = "EditCompany", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverCompany", IconCss = "e-icons e-trash", Target = ".e-content" }
+	];
+
+	private SfGrid<CompanyModel> _sfGrid;
+	private DeleteConfirmationDialog _deleteConfirmationDialog;
+	private RecoverConfirmationDialog _recoverConfirmationDialog;
+
+	private int _deleteCompanyId = 0;
+	private string _deleteCompanyName = string.Empty;
+
+	private int _recoverCompanyId = 0;
+	private string _recoverCompanyName = string.Empty;
+
+	private ToastNotification _toastNotification;
+
+	#region Load Data
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender)
+			return;
+
+		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
+		await LoadData();
+		_isLoading = false;
+		StateHasChanged();
+	}
+
+	private async Task LoadData()
+	{
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveCompany, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
+
+		_companies = await CommonData.LoadTableData<CompanyModel>(AccountNames.Company);
+		_stateUTs = await CommonData.LoadTableData<StateUTModel>(AccountNames.StateUT);
+
+		if (!_showDeleted)
+			_companies = [.. _companies.Where(c => c.Status)];
+
+		if (_sfGrid is not null)
+			await _sfGrid.Refresh();
+	}
+	#endregion
+
+	#region Saving
+	private async Task ValidateForm()
+	{
+		if (!_user.Admin)
+			throw new Exception("You do not have permission to perform this action.");
+
+		_company.Name = _company.Name?.Trim() ?? "";
+		_company.Name = _company.Name?.ToUpper() ?? "";
+
+		_company.Code = _company.Code?.Trim() ?? "";
+		_company.Code = _company.Code?.ToUpper() ?? "";
+
+		_company.GSTNo = _company.GSTNo?.Trim() ?? "";
+		_company.GSTNo = _company.GSTNo?.ToUpper() ?? "";
+
+		_company.PANNo = _company.PANNo?.Trim() ?? "";
+		_company.PANNo = _company.PANNo?.ToUpper() ?? "";
+
+		_company.CINNo = _company.CINNo?.Trim() ?? "";
+		_company.CINNo = _company.CINNo?.ToUpper() ?? "";
+
+		_company.Alias = _company.Alias?.Trim() ?? "";
+		_company.Alias = _company.Alias?.ToUpper() ?? "";
+
+		_company.Phone = _company.Phone?.Trim() ?? "";
+		_company.Email = _company.Email?.Trim() ?? "";
+		_company.Address = _company.Address?.Trim() ?? "";
+
+		_company.Remarks = _company.Remarks?.Trim() ?? "";
+		_company.Status = true;
+
+		if (string.IsNullOrWhiteSpace(_company.Name))
+			throw new Exception("Company name is required. Please enter a valid company name.");
+
+		if (string.IsNullOrWhiteSpace(_company.Code))
+			throw new Exception("Company code is required. Please enter a valid company code.");
+
+		if (_company.StateUTId <= 0)
+			throw new Exception("State/UT is required. Please select a valid State/UT.");
+
+		if (string.IsNullOrWhiteSpace(_company.GSTNo)) _company.GSTNo = null;
+		if (string.IsNullOrWhiteSpace(_company.PANNo)) _company.PANNo = null;
+		if (string.IsNullOrWhiteSpace(_company.CINNo)) _company.CINNo = null;
+		if (string.IsNullOrWhiteSpace(_company.Alias)) _company.Alias = null;
+		if (string.IsNullOrWhiteSpace(_company.Phone)) _company.Phone = null;
+		if (string.IsNullOrWhiteSpace(_company.Email)) _company.Email = null;
+		if (string.IsNullOrWhiteSpace(_company.Address)) _company.Address = null;
+		if (string.IsNullOrWhiteSpace(_company.Remarks)) _company.Remarks = null;
+
+		if (!string.IsNullOrWhiteSpace(_company.Phone) && !Helper.ValidatePhoneNumber(_company.Phone))
+			throw new Exception("Invalid phone number format. Please enter a valid phone number.");
+
+		if (!string.IsNullOrWhiteSpace(_company.Email) && !Helper.ValidateEmail(_company.Email))
+			throw new Exception("Invalid email format. Please enter a valid email address.");
+
+		if (_company.Id > 0)
+		{
+			var existingCompany = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Name.Equals(_company.Name, StringComparison.OrdinalIgnoreCase));
+			if (existingCompany is not null)
+				throw new Exception($"Company name '{_company.Name}' already exists. Please choose a different name.");
+
+			var existingCode = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Code.Equals(_company.Code, StringComparison.OrdinalIgnoreCase));
+			if (existingCode is not null)
+				throw new Exception($"Company code '{_company.Code}' already exists. Please choose a different code.");
+
+			if (!string.IsNullOrWhiteSpace(_company.Phone))
+			{
+				var duplicatePhoneCompany = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Phone.Equals(_company.Phone, StringComparison.OrdinalIgnoreCase));
+				if (duplicatePhoneCompany is not null)
+					throw new Exception($"Phone number '{_company.Phone}' is already associated with another company. Please use a different phone number.");
+			}
+
+			if (!string.IsNullOrWhiteSpace(_company.Email))
+			{
+				var duplicateEmailCompany = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Email.Equals(_company.Email, StringComparison.OrdinalIgnoreCase));
+				if (duplicateEmailCompany is not null)
+					throw new Exception($"Email '{_company.Email}' is already associated with another company. Please use a different email address.");
+			}
+		}
+		else
+		{
+			var existingCompany = _companies.FirstOrDefault(_ => _.Name.Equals(_company.Name, StringComparison.OrdinalIgnoreCase));
+			if (existingCompany is not null)
+				throw new Exception($"Company name '{_company.Name}' already exists. Please choose a different name.");
+
+			var existingCode = _companies.FirstOrDefault(_ => _.Code.Equals(_company.Code, StringComparison.OrdinalIgnoreCase));
+			if (existingCode is not null)
+				throw new Exception($"Company code '{_company.Code}' already exists. Please choose a different code.");
+
+			if (!string.IsNullOrWhiteSpace(_company.Phone))
+			{
+				var duplicatePhoneCompany = _companies.FirstOrDefault(_ => _.Phone.Equals(_company.Phone, StringComparison.OrdinalIgnoreCase));
+				if (duplicatePhoneCompany is not null)
+					throw new Exception($"Phone number '{_company.Phone}' is already associated with another company. Please use a different phone number.");
+			}
+
+			if (!string.IsNullOrWhiteSpace(_company.Email))
+			{
+				var duplicateEmailCompany = _companies.FirstOrDefault(_ => _.Email.Equals(_company.Email, StringComparison.OrdinalIgnoreCase));
+				if (duplicateEmailCompany is not null)
+					throw new Exception($"Email '{_company.Email}' is already associated with another company. Please use a different email address.");
+			}
+		}
+	}
+
+	private async Task SaveCompany()
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
+
+			await ValidateForm();
+			await CompanyData.InsertCompany(_company);
+
+			await _toastNotification.ShowAsync("Success", $"Company '{_company.Name}' has been saved successfully.", ToastType.Success);
+			NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+		}
+	}
+	#endregion
+
+	#region Actions
+	private void OnEditCompany(CompanyModel company)
+	{
+		_company = new()
+		{
+			Id = company.Id,
+			Name = company.Name,
+			Code = company.Code,
+			StateUTId = company.StateUTId,
+			GSTNo = company.GSTNo,
+			PANNo = company.PANNo,
+			CINNo = company.CINNo,
+			Alias = company.Alias,
+			Phone = company.Phone,
+			Email = company.Email,
+			Address = company.Address,
+			Remarks = company.Remarks,
+			Status = company.Status
+		};
+
+		StateHasChanged();
+	}
+
+	private async Task ConfirmDelete()
+	{
+		try
+		{
+			_isProcessing = true;
+			await _deleteConfirmationDialog.HideAsync();
+
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
+
+			var company = _companies.FirstOrDefault(c => c.Id == _deleteCompanyId)
+				?? throw new Exception("Company not found.");
+
+			company.Status = false;
+			await CompanyData.InsertCompany(company);
+
+			await _toastNotification.ShowAsync("Success", $"Company '{company.Name}' has been deleted successfully.", ToastType.Success);
+			NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"Failed to delete Company: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			_deleteCompanyId = 0;
+			_deleteCompanyName = string.Empty;
+		}
+	}
+
+	private async Task ConfirmRecover()
+	{
+		try
+		{
+			_isProcessing = true;
+			await _recoverConfirmationDialog.HideAsync();
+
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
+
+			var company = _companies.FirstOrDefault(c => c.Id == _recoverCompanyId)
+				?? throw new Exception("Company not found.");
+
+			company.Status = true;
+			await CompanyData.InsertCompany(company);
+
+			await _toastNotification.ShowAsync("Success", $"Company '{company.Name}' has been recovered successfully.", ToastType.Success);
+			NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"Failed to recover Company: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			_recoverCompanyId = 0;
+			_recoverCompanyName = string.Empty;
+		}
+	}
+	#endregion
+
+	#region Exporting
+	private async Task ExportExcel()
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+
+			var (stream, fileName) = await CompanyExport.ExportMaster(_companies, ReportExportType.Excel);
+			await SaveAndViewService.SaveAndView(fileName, stream);
+
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+
+	private async Task ExportPdf()
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+
+			var (stream, fileName) = await CompanyExport.ExportMaster(_companies, ReportExportType.PDF);
+			await SaveAndViewService.SaveAndView(fileName, stream);
+
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+	#endregion
+
+	#region Utilities
+	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
+	{
+		switch (args.Item.Id)
+		{
+			case "NewCompany":
+				ResetPage();
+				break;
+			case "SaveCompany":
+				await SaveCompany();
+				break;
+			case "ToggleDeleted":
+				await ToggleDeleted();
+				break;
+			case "ExportExcel":
+				await ExportExcel();
+				break;
+			case "ExportPdf":
+				await ExportPdf();
+				break;
+			case "EditSelected":
+				await EditSelectedItem();
+				break;
+			case "DeleteRecoverSelected":
+				await DeleteSelectedItem();
+				break;
+		}
+	}
+
+	private async Task OnCompanyGridContextMenuItemClicked(ContextMenuClickEventArgs<CompanyModel> args)
+	{
+		switch (args.Item.Id)
+		{
+			case "EditCompany":
+				await EditSelectedItem();
+				break;
+			case "DeleteRecoverCompany":
+				await DeleteSelectedItem();
+				break;
+		}
+	}
+
+	private async Task EditSelectedItem()
+	{
+		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
+		if (selectedRecords.Count > 0)
+			OnEditCompany(selectedRecords[0]);
+	}
+
+	private async Task DeleteSelectedItem()
+	{
+		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
+		if (selectedRecords.Count > 0)
+		{
+			if (selectedRecords[0].Status)
+				await ShowDeleteConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
+			else
+				await ShowRecoverConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
+		}
+	}
+
+	private async Task ShowDeleteConfirmation(int id, string name)
+	{
+		_deleteCompanyId = id;
+		_deleteCompanyName = name;
+		await _deleteConfirmationDialog.ShowAsync();
+	}
+
+	private async Task CancelDelete()
+	{
+		_deleteCompanyId = 0;
+		_deleteCompanyName = string.Empty;
+		await _deleteConfirmationDialog.HideAsync();
+	}
+
+	private async Task ShowRecoverConfirmation(int id, string name)
+	{
+		_recoverCompanyId = id;
+		_recoverCompanyName = name;
+		await _recoverConfirmationDialog.ShowAsync();
+	}
+
+	private async Task CancelRecover()
+	{
+		_recoverCompanyId = 0;
+		_recoverCompanyName = string.Empty;
+		await _recoverConfirmationDialog.HideAsync();
+	}
+
+	private async Task ToggleDeleted()
+	{
+		_showDeleted = !_showDeleted;
+		await LoadData();
+		StateHasChanged();
+	}
+
+	private void ResetPage() =>
+		NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
+
+	private void NavigateBack() =>
+		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_hotKeysContext is not null)
+			await _hotKeysContext.DisposeAsync();
+
+		GC.SuppressFinalize(this);
+	}
+	#endregion
+}

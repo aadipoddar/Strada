@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +30,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\StradaLibrary\StradaLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Strada.Shared.Services" />
+    <Using Include="StradaLibrary.Data.Common" />
+    <Using Include="StradaLibrary.DataAccess" />
+    <Using Include="Toolbelt.Blazor.HotKeys2" />
   </ItemGroup>
 
 </Project>

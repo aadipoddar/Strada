@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using StradaLibrary.Data.Common;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Operations;
 
 namespace Strada.Shared.Services;
 
 public static class AuthenticationService
 {
-	public static async Task<UserModel> ValidateUser(IDataStorageService dataStorageService, NavigationManager navigationManager, IVibrationService vibrationService, Enum userRoles = null)
+	public static async Task<UserModel> ValidateUser(IDataStorageService dataStorageService, NavigationManager navigationManager, IVibrationService vibrationService, List<UserRoles> userRoles = null)
 	{
 		var userData = await dataStorageService.SecureGetAsync(StorageFileNames.UserDataFileName);
 		if (string.IsNullOrEmpty(userData))
@@ -31,13 +29,14 @@ public static class AuthenticationService
 
 		if (userRoles is not null)
 		{
-			var hasPermission = userRoles switch
+			var hasPermission = userRoles.All(role => role switch
 			{
-				UserRoles.Admin => user.Admin,
 				UserRoles.Accounts => user.Accounts,
 				UserRoles.Fleet => user.Fleet,
+				UserRoles.Reports => user.Reports,
+				UserRoles.Admin => user.Admin,
 				_ => false
-			};
+			});
 
 			if (!hasPermission)
 				await Logout(dataStorageService, navigationManager, vibrationService);
@@ -59,6 +58,6 @@ public static class AuthenticationService
 		if (FormFactor.GetFormFactor() == "Web")
 			await JSRuntime.InvokeVoidAsync("open", route, "_blank");
 		else
-			NavigationManager.NavigateTo(route);
+			NavigationManager.NavigateTo(route, true);
 	}
 }
