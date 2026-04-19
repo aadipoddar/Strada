@@ -1,10 +1,10 @@
 ﻿CREATE TABLE [dbo].[Vehicle]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [Code] VARCHAR(500) NOT NULL UNIQUE, 
-    [ShortCode] VARCHAR(500) NOT NULL, 
-    [ChasisCode] VARCHAR(500) NOT NULL UNIQUE, 
-    [EngineCode] VARCHAR(500) NOT NULL UNIQUE, 
+    [Code] VARCHAR(250) NOT NULL UNIQUE, 
+    [ShortCode] VARCHAR(250) NOT NULL, 
+    [ChasisCode] VARCHAR(250) NOT NULL UNIQUE, 
+    [EngineCode] VARCHAR(250) NOT NULL UNIQUE, 
     [VehicleTypeId] INT NOT NULL, 
     [PurchaseDate] DATETIME NOT NULL, 
     [OpeningHour] MONEY NULL, 

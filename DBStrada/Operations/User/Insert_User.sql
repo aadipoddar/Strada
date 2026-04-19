@@ -1,19 +1,20 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_User]
 	@Id INT OUTPUT,
-	@Name VARCHAR(250),
+	@Name VARCHAR(MAX),
 	@Phone VARCHAR(10),
-	@Password VARCHAR(250),
-	@Email VARCHAR(250) = NULL,
-	@Accounts BIT = 0,
-	@Fleet BIT = 0,
-	@Admin BIT = 0,
-	@Remarks VARCHAR(MAX) = NULL,
-	@Status BIT = 1,
-	@FailedAttempts INT = 0,
-	@CodeResends INT = 0,
-	@LastCode INT = NULL,
-	@LastCodeDeviceId VARCHAR(MAX) = NULL,
-	@LastCodeDateTime DATETIME = NULL
+	@Email VARCHAR(250),
+	@Password VARCHAR(MAX),
+	@Accounts BIT,
+	@Fleet BIT,
+	@Reports BIT,
+	@Admin BIT,
+	@Remarks VARCHAR(MAX),
+	@Status BIT,
+	@FailedAttempts INT,
+	@CodeResends INT,
+	@LastCode INT,
+	@LastCodeDeviceId VARCHAR(MAX),
+	@LastCodeDateTime DATETIME
 AS
 BEGIN
 	IF @Id = 0
@@ -21,11 +22,12 @@ BEGIN
 		INSERT INTO [dbo].[User]
 		(
 			[Name],
-			[Password],
 			[Phone],
 			[Email],
+			[Password],
 			[Accounts],
 			[Fleet],
+			[Reports],
 			[Admin],
 			[Remarks],
 			[Status]
@@ -33,11 +35,12 @@ BEGIN
 		VALUES
 		(
 			@Name,
-			@Password,
 			@Phone,
 			@Email,
+			@Password,
 			@Accounts,
 			@Fleet,
+			@Reports,
 			@Admin,
 			@Remarks,
 			@Status
@@ -50,11 +53,12 @@ BEGIN
 		UPDATE [dbo].[User]
 		SET 
 			[Name] = @Name,
-			[Password] = @Password,
 			[Phone] = @Phone,
 			[Email] = @Email,
+			[Password] = @Password,
 			[Accounts] = @Accounts,
 			[Fleet] = @Fleet,
+			[Reports] = @Reports,
 			[Admin] = @Admin,
 			[Remarks] = @Remarks,
 			[Status] = @Status,

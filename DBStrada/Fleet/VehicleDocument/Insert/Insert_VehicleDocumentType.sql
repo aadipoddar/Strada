@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_VehicleDocumentType]
 	@Id INT OUTPUT,
-	@Name VARCHAR(500),
+	@Name VARCHAR(250),
 	@Code VARCHAR(10),
 	@Rate MONEY,
 	@Remarks VARCHAR(MAX),

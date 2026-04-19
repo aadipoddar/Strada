@@ -2,6 +2,7 @@
 using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Accounts.FinancialAccounting;
+using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Operations;

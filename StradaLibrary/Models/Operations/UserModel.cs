@@ -5,10 +5,11 @@ public class UserModel
     public int Id { get; set; }
     public string Name { get; set; }
     public string Phone { get; set; }
-    public string Password { get; set; }
     public string? Email { get; set; }
+    public string Password { get; set; }
     public bool Accounts { get; set; }
     public bool Fleet { get; set; }
+    public bool Reports { get; set; }
     public bool Admin { get; set; }
     public string? Remarks { get; set; }
     public bool Status { get; set; }
@@ -21,7 +22,8 @@ public class UserModel
 
 public enum UserRoles
 {
-    Admin,
     Accounts,
-    Fleet
+    Fleet,
+    Reports,
+    Admin
 }

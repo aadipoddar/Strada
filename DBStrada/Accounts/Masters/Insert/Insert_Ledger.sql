@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_Ledger]
 	@Id INT OUTPUT,
-	@Name VARCHAR(500),
+	@Name VARCHAR(250),
 	@GroupId INT,
 	@AccountTypeId INT,
 	@Code VARCHAR(10),

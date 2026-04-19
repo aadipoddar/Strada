@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_VehicleDocument]
 	@Id INT OUTPUT,
-	@TransactionNo VARCHAR(500),
+	@TransactionNo VARCHAR(100),
 	@TransactionDateTime DATETIME,
 	@FinancialYearId INT,
 	@VehicleDocumentTypeId INT,

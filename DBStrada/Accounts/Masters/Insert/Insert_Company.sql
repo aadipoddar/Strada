@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_Company]
 	@Id INT OUTPUT,
-	@Name VARCHAR(500),
+	@Name VARCHAR(250),
 	@Code VARCHAR(10),
 	@StateUTId INT,
 	@GSTNo VARCHAR(MAX) = NULL,

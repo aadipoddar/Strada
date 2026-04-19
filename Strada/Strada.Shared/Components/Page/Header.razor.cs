@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
+using Strada.Shared.Services;
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
 
@@ -166,7 +168,7 @@ public partial class Header : IAsyncDisposable
     protected override async Task OnInitializedAsync()
     {
         _user = new UserModel { Name = "aa", Id = 1 };
-        // _user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, NotificationService, VibrationService);
+        _user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService);
         LoadRoutes();
     }
 
@@ -181,10 +183,9 @@ public partial class Header : IAsyncDisposable
 
     private void NavigateToHome() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
-    private async Task Logout()
-    {
-        // await AuthenticationService.Logout(DataStorageService, NavigationManager, NotificationService, VibrationService);
-    }
+
+    private async Task Logout() =>
+        await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
 
     public async ValueTask DisposeAsync()
     {

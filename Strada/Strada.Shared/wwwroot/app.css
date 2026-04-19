@@ -45,13 +45,13 @@ a,
     color: #006bb7;
 }
 
-    .btn:focus,
-    .btn:active:focus,
-    .btn-link.nav-link:focus,
-    .form-control:focus,
-    .form-check-input:focus {
-        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-    }
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
 
 h1:focus {
     outline: none;
@@ -78,9 +78,9 @@ h1:focus {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 /* ================================================================
    3. PAGE LAYOUT & CONTAINERS
@@ -89,7 +89,7 @@ h1:focus {
     padding: 16px 32px;
     width: 100%;
     margin: 0 auto;
-    background: linear-gradient(135deg, #ffeef5 0%, #fff5f9 100%);
+    background: linear-gradient(135deg, #f7f8fa 0%, #eef2f5 100%);
     flex: 1;
 }
 
@@ -234,68 +234,68 @@ h1:focus {
     width: 100%;
 }
 
-    .custom-autocomplete .e-input-group,
-    .custom-datepicker .e-input-group,
-    .custom-textbox .e-input-group,
-    .custom-numeric .e-input-group,
-    .custom-daterange .e-input-group {
-        border: 1px solid var(--gray-300);
-        border-radius: var(--border-radius);
-        background: var(--bg-white);
-        transition: all 0.2s ease;
-        height: 40px;
-    }
+.custom-autocomplete .e-input-group,
+.custom-datepicker .e-input-group,
+.custom-textbox .e-input-group,
+.custom-numeric .e-input-group,
+.custom-daterange .e-input-group {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    background: var(--bg-white);
+    transition: all 0.2s ease;
+    height: 40px;
+}
 
-        .custom-autocomplete .e-input-group:hover,
-        .custom-datepicker .e-input-group:hover,
-        .custom-textbox .e-input-group:hover,
-        .custom-numeric .e-input-group:not(.e-disabled):hover,
-        .custom-daterange .e-input-group:hover {
-            border-color: var(--gray-400);
-        }
+.custom-autocomplete .e-input-group:hover,
+.custom-datepicker .e-input-group:hover,
+.custom-textbox .e-input-group:hover,
+.custom-numeric .e-input-group:not(.e-disabled):hover,
+.custom-daterange .e-input-group:hover {
+    border-color: var(--gray-400);
+}
 
-        .custom-autocomplete .e-input-group.e-input-focus,
-        .custom-datepicker .e-input-group.e-input-focus,
-        .custom-textbox .e-input-group.e-input-focus,
-        .custom-numeric .e-input-group.e-input-focus,
-        .custom-daterange .e-input-group.e-input-focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
+.custom-autocomplete .e-input-group.e-input-focus,
+.custom-datepicker .e-input-group.e-input-focus,
+.custom-textbox .e-input-group.e-input-focus,
+.custom-numeric .e-input-group.e-input-focus,
+.custom-daterange .e-input-group.e-input-focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
 
-        .custom-autocomplete .e-input-group input,
-        .custom-datepicker .e-input-group input,
-        .custom-textbox .e-input-group input,
-        .custom-textbox .e-input-group textarea,
-        .custom-numeric .e-input-group input,
-        .custom-daterange .e-input-group input {
-            font-size: 14px;
-            color: var(--gray-800);
-            padding: 8px 12px;
-        }
+.custom-autocomplete .e-input-group input,
+.custom-datepicker .e-input-group input,
+.custom-textbox .e-input-group input,
+.custom-textbox .e-input-group textarea,
+.custom-numeric .e-input-group input,
+.custom-daterange .e-input-group input {
+    font-size: 14px;
+    color: var(--gray-800);
+    padding: 8px 12px;
+}
 
-        .custom-numeric .e-input-group input {
-            text-align: right;
-        }
+.custom-numeric .e-input-group input {
+    text-align: right;
+}
 
-            .custom-autocomplete .e-input-group input::placeholder,
-            .custom-datepicker .e-input-group input::placeholder,
-            .custom-textbox .e-input-group input::placeholder,
-            .custom-textbox .e-input-group textarea::placeholder,
-            .custom-numeric .e-input-group input::placeholder,
-            .custom-daterange .e-input-group input::placeholder {
-                color: var(--gray-400);
-            }
+.custom-autocomplete .e-input-group input::placeholder,
+.custom-datepicker .e-input-group input::placeholder,
+.custom-textbox .e-input-group input::placeholder,
+.custom-textbox .e-input-group textarea::placeholder,
+.custom-numeric .e-input-group input::placeholder,
+.custom-daterange .e-input-group input::placeholder {
+    color: var(--gray-400);
+}
 
 .readonly-field .e-input-group {
     background: var(--gray-50);
     cursor: not-allowed;
 }
 
-    .readonly-field .e-input-group input {
-        color: var(--gray-500);
-        font-weight: 500;
-    }
+.readonly-field .e-input-group input {
+    color: var(--gray-500);
+    font-weight: 500;
+}
 
 /* ================================================================
    8. SYNCFUSION DROPDOWNS & AUTOCOMPLETE
@@ -325,81 +325,81 @@ h1:focus {
     border: none;
 }
 
-    .professional-grid .e-gridheader {
-        background: linear-gradient(to bottom, var(--gray-50) 0%, var(--gray-100) 100%);
-        border-bottom: 2px solid var(--gray-200);
-    }
+.professional-grid .e-gridheader {
+    background: linear-gradient(to bottom, var(--gray-50) 0%, var(--gray-100) 100%);
+    border-bottom: 2px solid var(--gray-200);
+}
 
-    .professional-grid .e-headercell {
-        background: transparent;
-        color: var(--gray-600);
-        font-weight: 600;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        border-right: 1px solid var(--gray-200);
-        padding: 12px 8px;
-    }
+.professional-grid .e-headercell {
+    background: transparent;
+    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-right: 1px solid var(--gray-200);
+    padding: 12px 8px;
+}
 
-        .professional-grid .e-headercell:last-child,
-        .professional-grid .e-rowcell:last-child,
-        .professional-grid .e-summarycell:last-child {
-            border-right: none;
-        }
+.professional-grid .e-headercell:last-child,
+.professional-grid .e-rowcell:last-child,
+.professional-grid .e-summarycell:last-child {
+    border-right: none;
+}
 
-    .professional-grid .e-gridcontent {
-        background: var(--bg-white);
-    }
+.professional-grid .e-gridcontent {
+    background: var(--bg-white);
+}
 
-    .professional-grid .e-row {
-        transition: background-color 0.2s ease;
-    }
+.professional-grid .e-row {
+    transition: background-color 0.2s ease;
+}
 
-        .professional-grid .e-row:hover,
-        .professional-grid .e-row.e-altrow:hover {
-            background-color: var(--gray-50);
-        }
+.professional-grid .e-row:hover,
+.professional-grid .e-row.e-altrow:hover {
+    background-color: var(--gray-50);
+}
 
-        .professional-grid .e-row.e-altrow {
-            background-color: var(--bg-light);
-        }
+.professional-grid .e-row.e-altrow {
+    background-color: var(--bg-light);
+}
 
-    .professional-grid .e-rowcell {
-        border-right: 1px solid var(--gray-100);
-        border-bottom: 1px solid var(--gray-100);
-        padding: 10px 8px;
-        font-size: 13px;
-        color: var(--gray-800);
-    }
+.professional-grid .e-rowcell {
+    border-right: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--gray-100);
+    padding: 10px 8px;
+    font-size: 13px;
+    color: var(--gray-800);
+}
 
-    .professional-grid .e-gridfooter {
-        background-color: var(--bg-summary) !important;
-        border-top: 2px solid var(--gray-300);
-    }
+.professional-grid .e-gridfooter {
+    background-color: var(--bg-summary) !important;
+    border-top: 2px solid var(--gray-300);
+}
 
-    .professional-grid .e-summarycell {
-        background-color: var(--bg-summary) !important;
-        font-weight: 600;
-        color: var(--gray-800);
-        padding: 12px 8px;
-        border-right: 1px solid var(--gray-300);
-    }
+.professional-grid .e-summarycell {
+    background-color: var(--bg-summary) !important;
+    font-weight: 600;
+    color: var(--gray-800);
+    padding: 12px 8px;
+    border-right: 1px solid var(--gray-300);
+}
 
-    .professional-grid .e-emptyrow {
-        text-align: center;
-        padding: 48px 24px;
-        color: var(--gray-400);
-        font-size: 14px;
-    }
+.professional-grid .e-emptyrow {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--gray-400);
+    font-size: 14px;
+}
 
-    .e-grid .e-gridfooter,
-    .e-grid .e-summaryrow,
-    .e-grid .e-summaryrow .e-summarycell,
-    .professional-grid .e-gridfooter,
-    .professional-grid .e-summaryrow,
-    .professional-grid .e-summarycell {
-        background-color: var(--bg-summary) !important;
-    }
+.e-grid .e-gridfooter,
+.e-grid .e-summaryrow,
+.e-grid .e-summaryrow .e-summarycell,
+.professional-grid .e-gridfooter,
+.professional-grid .e-summaryrow,
+.professional-grid .e-summarycell {
+    background-color: var(--bg-summary) !important;
+}
 
 /* ================================================================
    10. GRID CELL VALUES & AGGREGATES
@@ -440,10 +440,10 @@ h1:focus {
     color: var(--gray-600);
 }
 
-    .aggregate-label strong,
-    .aggregate-value strong {
-        font-weight: 700;
-    }
+.aggregate-label strong,
+.aggregate-value strong {
+    font-weight: 700;
+}
 
 .aggregate-value {
     text-align: right;
@@ -451,23 +451,23 @@ h1:focus {
     color: var(--gray-800);
 }
 
-    .aggregate-value.aggregate-discount,
-    .aggregate-value.aggregate-debit {
-        color: var(--red);
-    }
+.aggregate-value.aggregate-discount,
+.aggregate-value.aggregate-debit {
+    color: var(--red);
+}
 
-    .aggregate-value.aggregate-credit {
-        color: var(--green);
-    }
+.aggregate-value.aggregate-credit {
+    color: var(--green);
+}
 
-    .aggregate-value.aggregate-total {
-        color: var(--dark-blue);
-        font-size: 14px;
-    }
+.aggregate-value.aggregate-total {
+    color: var(--dark-blue);
+    font-size: 14px;
+}
 
-        .aggregate-value.aggregate-total strong {
-            font-size: 15px;
-        }
+.aggregate-value.aggregate-total strong {
+    font-size: 15px;
+}
 
 /* ================================================================
    11. FILTERS & REPORT LAYOUTS
@@ -529,13 +529,13 @@ h1:focus {
     margin-bottom: 16px;
 }
 
-    .two-column-layout > :first-child {
-        flex: 0 0 75%;
-    }
+.two-column-layout> :first-child {
+    flex: 0 0 75%;
+}
 
-    .two-column-layout > :last-child {
-        flex: 0 0 calc(25% - 16px);
-    }
+.two-column-layout> :last-child {
+    flex: 0 0 calc(25% - 16px);
+}
 
 /* Transaction Number with Auto-generate Checkbox */
 .transaction-no-wrapper {
@@ -544,9 +544,9 @@ h1:focus {
     align-items: stretch;
 }
 
-    .transaction-no-wrapper > :first-child {
-        flex: 1;
-    }
+.transaction-no-wrapper> :first-child {
+    flex: 1;
+}
 
 /* Financial Grid Layout */
 .financial-grid {
@@ -605,9 +605,9 @@ h1:focus {
     align-items: stretch;
 }
 
-    .date-year-wrapper > * {
-        flex: 1;
-    }
+.date-year-wrapper>* {
+    flex: 1;
+}
 
 /* Reference Wrapper */
 .reference-wrapper {
@@ -616,9 +616,9 @@ h1:focus {
     align-items: stretch;
 }
 
-    .reference-wrapper > :first-child {
-        flex: 1;
-    }
+.reference-wrapper> :first-child {
+    flex: 1;
+}
 
 .reference-actions {
     display: flex;
@@ -638,10 +638,10 @@ h1:focus {
     white-space: nowrap;
 }
 
-    .checkbox-wrapper .custom-checkbox {
-        font-size: 13px;
-        font-weight: 500;
-    }
+.checkbox-wrapper .custom-checkbox {
+    font-size: 13px;
+    font-weight: 500;
+}
 
 /* ================================================================
    13. CART INPUT SECTION
@@ -654,9 +654,9 @@ h1:focus {
     margin-bottom: 12px;
 }
 
-    .cart-input-row:last-child {
-        margin-bottom: 0;
-    }
+.cart-input-row:last-child {
+    margin-bottom: 0;
+}
 
 .cart-field-wide {
     grid-column: span 2;
@@ -673,6 +673,6 @@ h1:focus {
     margin-bottom: 16px;
 }
 
-    .dashboard-grid:last-child {
-        margin-bottom: 0;
-    }
+.dashboard-grid:last-child {
+    margin-bottom: 0;
+}

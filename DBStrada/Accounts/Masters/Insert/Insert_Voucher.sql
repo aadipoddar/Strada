@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_Voucher]
 	@Id INT OUTPUT,
-	@Name VARCHAR(500),
+	@Name VARCHAR(250),
 	@Remarks VARCHAR(MAX),
 	@Status BIT
 AS

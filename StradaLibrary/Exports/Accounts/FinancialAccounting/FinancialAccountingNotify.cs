@@ -1,5 +1,6 @@
 using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
+using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 
@@ -19,7 +20,7 @@ internal static class FinancialAccountingNotify
     {
         var accounting = await CommonData.LoadTableDataById<FinancialAccountingOverviewModel>(AccountNames.FinancialAccountingOverview, accountingId);
 
-        var emailData = new MailingUtil.TransactionEmailData
+        var emailData = new TransactionMailing.TransactionEmailData
         {
             TransactionType = "Accounting",
             TransactionNo = accounting.TransactionNo,
@@ -60,6 +61,6 @@ internal static class FinancialAccountingNotify
             emailData.Attachments = new Dictionary<MemoryStream, string> { { pdfStream, pdfFileName } };
         }
 
-        await MailingUtil.SendTransactionEmail(emailData);
+        await TransactionMailing.SendTransactionEmail(emailData);
     }
 }

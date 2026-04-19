@@ -1,4 +1,4 @@
-﻿namespace StradaLibrary.Data.Common;
+﻿namespace StradaLibrary.Data.Operations;
 
 public static class PageRouteNames
 {

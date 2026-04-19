@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Strada.Shared.Services;
-using StradaLibrary.DataAccess;
+using StradaLibrary.Data.Operations;
 
 namespace Strada.Web.Services;
 

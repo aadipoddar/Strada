@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_Group]
 	@Id INT OUTPUT,
-	@Name VARCHAR(500),
+	@Name VARCHAR(250),
 	@NatureId INT,
 	@Remarks VARCHAR(MAX),
 	@Status BIT

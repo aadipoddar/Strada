@@ -77,6 +77,7 @@
     <Folder Include="Fleet\VehicleDocument\Insert" />
     <Folder Include="Fleet\VehicleDocument\Load" />
     <Folder Include="Fleet\VehicleDocument\Table" />
+    <Folder Include="PublishLocations" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -128,5 +129,9 @@
     <Build Include="Fleet\VehicleDocument\Load\VehicleDocument_Overview.sql" />
     <Build Include="Fleet\VehicleDocument\Table\VehicleDocument.sql" />
     <Build Include="Fleet\VehicleDocument\Table\VehicleDocumentType.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DBStrada.publish.xml" />
+    <None Include="PublishLocations\LocalStrada.publish.xml" />
   </ItemGroup>
 </Project>

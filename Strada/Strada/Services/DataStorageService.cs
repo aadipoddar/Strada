@@ -1,5 +1,5 @@
 ﻿using Strada.Shared.Services;
-using StradaLibrary.DataAccess;
+using StradaLibrary.Data.Operations;
 
 namespace Strada.Services;
 

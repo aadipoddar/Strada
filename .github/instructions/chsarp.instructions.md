@@ -206,7 +206,7 @@ This application **ALWAYS** uses Syncfusion Blazor components. When writing C# c
 - **Dependency Injection**: Register services appropriately for each project type
 - **Configuration**: Use appsettings.json for Web, MauiProgram.cs for MAUI
 - **Data Models**: Keep models in `StradaLibrary/Models` for consistency
-- **Export Logic**: Implement export functionality in `StradaLibrary/Exporting`
+- **Export Logic**: Implement export functionality in `StradaLibrary/Exports`
 - **Styling Consistency**: Reuse global styles from `Strada.Shared/wwwroot/app.css` when available instead of duplicating local page styles
 - **CSS Cleanup**: Remove unused CSS and stale style rules introduced by UI changes in the same update
 

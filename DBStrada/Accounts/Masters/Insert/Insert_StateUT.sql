@@ -1,6 +1,6 @@
 CREATE PROCEDURE [dbo].[Insert_StateUT]
 	@Id INT OUTPUT,
-	@Name VARCHAR(500),
+	@Name VARCHAR(250),
 	@UnionTerritory BIT,
 	@Remarks VARCHAR(MAX) = NULL,
 	@Status BIT

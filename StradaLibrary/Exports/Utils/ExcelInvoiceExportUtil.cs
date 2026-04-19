@@ -57,7 +57,7 @@ public static class ExcelInvoiceExportUtil
             // Set document properties
             workbook.BuiltInDocumentProperties.Title = $"{invoiceData.InvoiceType} - {invoiceData.TransactionNo}";
             workbook.BuiltInDocumentProperties.Subject = invoiceData.InvoiceType;
-            workbook.BuiltInDocumentProperties.Author = "PrimeBakes";
+            workbook.BuiltInDocumentProperties.Author = "Strada";
 
             int currentRow = 1;
 
@@ -124,7 +124,7 @@ public static class ExcelInvoiceExportUtil
         // Try to load and insert logo from embedded resources
         try
         {
-            const string logoResourceName = "PrimeBakesLibrary.Exporting.Resources.logo_full.png";
+            const string logoResourceName = "StradaLibrary.Exports.Resources.logo_full.png";
             using Stream imageStream = typeof(ExcelInvoiceExportUtil).Assembly.GetManifestResourceStream(logoResourceName);
 
             if (imageStream is not null)

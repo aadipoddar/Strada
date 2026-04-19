@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[VehicleDocument]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [TransactionNo] VARCHAR(500) NOT NULL UNIQUE,
+    [TransactionNo] VARCHAR(100) NOT NULL UNIQUE,
     [TransactionDateTime] DATETIME NOT NULL,
     [FinancialYearId] INT NOT NULL,
 	[VehicleDocumentTypeId] INT NOT NULL,

@@ -1,15 +1,15 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_Vehicle]
 	@Id INT OUTPUT,
-	@Code VARCHAR(500),
-	@ShortCode VARCHAR(500),
-	@ChasisCode VARCHAR(500),
-	@EngineCode VARCHAR(500),
+	@Code VARCHAR(250),
+	@ShortCode VARCHAR(250),
+	@ChasisCode VARCHAR(250),
+	@EngineCode VARCHAR(250),
 	@VehicleTypeId INT,
 	@PurchaseDate DATETIME,
-	@OpeningHour MONEY = NULL,
-	@OpeningKM MONEY = NULL,
+	@OpeningHour MONEY,
+	@OpeningKM MONEY,
 	@Remarks VARCHAR(MAX),
-	@Status BIT = 1
+	@Status BIT
 AS
 BEGIN
 	IF @Id = 0

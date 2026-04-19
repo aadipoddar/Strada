@@ -130,7 +130,7 @@ public static class UpdaterManager
 		};
 		client.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
 		if (withUserAgent)
-			client.DefaultRequestHeaders.UserAgent.ParseAdd("PrimeBakes-Updater");
+			client.DefaultRequestHeaders.UserAgent.ParseAdd("Strada-Updater");
 		return client;
 	}
 }

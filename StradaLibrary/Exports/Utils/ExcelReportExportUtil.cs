@@ -71,7 +71,7 @@ public static class ExcelReportExportUtil
                 // Apply document properties
                 workbook.BuiltInDocumentProperties.Title = reportTitle;
                 workbook.BuiltInDocumentProperties.Subject = worksheetName;
-                workbook.BuiltInDocumentProperties.Author = "Prime Bakes";
+                workbook.BuiltInDocumentProperties.Author = "Strada";
 
                 // Get column info from data type if not provided
                 columnSettings ??= GetDefaultColumnSettings<T>();
