@@ -81,20 +81,40 @@ else
 					</FolderCard>
 				}
 
+				<!-- Fleet -->
+				@if (_user.Fleet)
+				{
+					<FolderCard Title="Fleet" Description="Access fleet dashboard"
+							OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetDashboard)">
+						<IconContent>
+							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+								 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M10 17h4V5H2v12h3" />
+								<path d="M14 9h4l4 4v4h-3" />
+								<circle cx="7.5" cy="17.5" r="2.5" />
+								<circle cx="17.5" cy="17.5" r="2.5" />
+							</svg>
+						</IconContent>
+					</FolderCard>
+				}
+
 				<!-- Operations -->
-				<FolderCard Title="Operations" Description="Access operations dashboard"
-							OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OperationsDashboard)">
-					<IconContent>
-						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-							 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<circle cx="12" cy="12" r="3" />
-							<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-						</svg>
-					</IconContent>
-				</FolderCard>
+				@if (_user.Reports)
+				{
+					<FolderCard Title="Operations" Description="Access operations dashboard"
+								OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OperationsDashboard)">
+						<IconContent>
+							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+								 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="3" />
+								<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+							</svg>
+						</IconContent>
+					</FolderCard>
+				}
 
 				<!-- Reports -->
-				@if (Factor != "Phone" && Factor != "Tablet" && _user.Reports)
+				@if (_user.Reports)
 				{
 					<FolderCard Title="Reports" Description="Access reports dashboard"
 								OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportsDashboard)">

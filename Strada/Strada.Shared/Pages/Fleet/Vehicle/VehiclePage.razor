@@ -1,3 +1,220 @@
-﻿<h3>VehiclePage</h3>
+﻿@attribute [Route(PageRouteNames.VehicleMaster)]
+
+@using StradaLibrary.Models.Accounts.Masters
+@using StradaLibrary.Models.Fleet.Vehicle
+
+<PageTitle>Vehicle - Strada</PageTitle>
+
+@if (_isLoading || _user is null)
+{
+	<AnimatedLoader Visible="true" />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Vehicle Management">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
+										   Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewVehicle"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveVehicle"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
+										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
+							<MenuItems>
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<div class="page-container">
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
+						</svg>
+						<h2 class="section-title">Vehicle Details</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">
+								Code <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_vehicle.Code" Placeholder="Enter vehicle code"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Short Code <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_vehicle.ShortCode" Placeholder="Enter short code"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Chasis Code</label>
+							<SfTextBox @bind-Value="_vehicle.ChasisCode" Placeholder="Enter chasis code"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Engine Code</label>
+							<SfTextBox @bind-Value="_vehicle.EngineCode" Placeholder="Enter engine code"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Vehicle Type <span class="required">*</span>
+							</label>
+							<SfDropDownList TValue="int" TItem="VehicleTypeModel" Placeholder="Select vehicle type"
+											DataSource="@_vehicleTypes" @bind-Value="_vehicle.VehicleTypeId"
+											FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox">
+								<DropDownListFieldSettings Text="Name" Value="Id" />
+							</SfDropDownList>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Company <span class="required">*</span>
+							</label>
+							<SfDropDownList TValue="int" TItem="CompanyModel" Placeholder="Select company"
+											DataSource="@_companies" @bind-Value="_vehicle.CompanyId"
+											FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox">
+								<DropDownListFieldSettings Text="Name" Value="Id" />
+							</SfDropDownList>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Purchase Date <span class="required">*</span>
+							</label>
+							<SfDatePicker @bind-Value="_vehicle.PurchaseDate" Placeholder="Select purchase date"
+										  FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Format="dd-MMM-yyyy" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Opening KM <span class="required">*</span>
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicle.OpeningKM" Placeholder="Enter opening KM"
+											  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" Min="0" Format="N2" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Remarks</label>
+							<SfTextBox @bind-Value="_vehicle.Remarks" Placeholder="Enter remarks (optional)"
+									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M9 11l3 3L22 4" />
+							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+						</svg>
+						<h2 class="section-title">Vehicles List</h2>
+					</div>
+				</div>
+				<div class="section-body grid-body">
+					<SfGrid @ref="_sfGrid" DataSource="@_vehicles" AllowPaging="true" AllowSorting="true"
+							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleGridContextMenuItems">
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
+						<GridEvents TValue="VehicleModel" ContextMenuItemClicked="OnVehicleGridContextMenuItemClicked" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+						<GridColumns>
+							<GridColumn Field="@nameof(VehicleModel.Id)" HeaderText="ID" Width="80"
+										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleModel.Code)" HeaderText="Code" Width="150" />
+							<GridColumn Field="@nameof(VehicleModel.ShortCode)" HeaderText="Short Code" Width="150" />
+							<GridColumn Field="@nameof(VehicleModel.ChasisCode)" HeaderText="Chasis Code" Width="160" />
+							<GridColumn Field="@nameof(VehicleModel.EngineCode)" HeaderText="Engine Code" Width="160" />
+							<GridColumn Field="@nameof(VehicleModel.VehicleTypeId)" HeaderText="Vehicle Type" Width="180">
+								<Template>
+									@{
+										var vehicle = (context as VehicleModel);
+										var vehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == vehicle.VehicleTypeId);
+										<span>@(vehicleType is not null ? vehicleType.Name : "N/A")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(VehicleModel.CompanyId)" HeaderText="Company" Width="220">
+								<Template>
+									@{
+										var vehicle = (context as VehicleModel);
+										var company = _companies.FirstOrDefault(c => c.Id == vehicle.CompanyId);
+										<span>@(company is not null ? company.Name : "N/A")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(VehicleModel.PurchaseDate)" HeaderText="Purchase Date" Width="150"
+										Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleModel.OpeningKM)" HeaderText="Opening KM" Width="140"
+										Format="N2" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleModel.Remarks)" HeaderText="Remarks" Width="250" />
+							<GridColumn Field="@nameof(VehicleModel.Status)" HeaderText="Status" Width="110"
+										TextAlign="TextAlign.Center" Visible="_showDeleted">
+								<Template>
+									@{
+										var vehicle = (context as VehicleModel);
+										<span class="@(vehicle.Status ? string.Empty : "grid-debit")">@(vehicle.Status ? "Active" : "Deleted")</span>
+									}
+								</Template>
+							</GridColumn>
+						</GridColumns>
+					</SfGrid>
+				</div>
+			</div>
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle" IdentifierLabel="Code"
+						  IdentifierValue="@_deleteVehicleCode" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  OnCancel="CancelDelete" />
+
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle"
+					   IdentifierLabel="Code" IdentifierValue="@_recoverVehicleCode" Disabled="@_isProcessing"
+					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+
+<ToastNotification @ref="_toastNotification" />
 
 

@@ -1,0 +1,220 @@
+@attribute [Route(PageRouteNames.VehicleDocument)]
+
+@using StradaLibrary.Models.Accounts.Masters
+@using StradaLibrary.Models.Fleet.Vehicle
+@using StradaLibrary.Models.Fleet.VehicleDocument
+
+<PageTitle>Vehicle Document - Strada</PageTitle>
+
+@if (_isLoading || _user is null)
+{
+	<AnimatedLoader Visible="true" />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Vehicle Document Entry">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
+										   Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
+										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
+							<MenuItems>
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<div class="page-container">
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+							 stroke-linecap="round" stroke-linejoin="round">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+							<polyline points="14 2 14 8 20 8" />
+							<line x1="16" y1="13" x2="8" y2="13" />
+							<line x1="16" y1="17" x2="8" y2="17" />
+						</svg>
+						<h2 class="section-title">Transaction Summary</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">
+								Transaction No <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_vehicleDocument.TransactionNo" Placeholder="Enter transaction number"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Transaction Date <span class="required">*</span>
+							</label>
+							<SfDatePicker @bind-Value="_vehicleDocument.TransactionDateTime" TValue="DateTime"
+										  Format="dd-MMM-yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
+										  CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Document Type <span class="required">*</span>
+							</label>
+							<SfAutoComplete TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel"
+											Value="@(_vehicleDocumentTypes.FirstOrDefault(v => v.Id == _vehicleDocument.VehicleDocumentTypeId))"
+											DataSource="@_vehicleDocumentTypes"
+											Placeholder="Select document type" FloatLabelType="FloatLabelType.Never"
+											AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+											CssClass="custom-autocomplete">
+								<AutoCompleteEvents TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel"
+													ValueChange="OnVehicleDocumentTypeChanged" />
+								<AutoCompleteFieldSettings Value="Name" />
+							</SfAutoComplete>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Vehicle <span class="required">*</span>
+							</label>
+							<SfAutoComplete TValue="VehicleModel" TItem="VehicleModel"
+											Value="@(_vehicles.FirstOrDefault(v => v.Id == _vehicleDocument.VehicleId))"
+											DataSource="@_vehicles" Placeholder="Select vehicle"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+											CssClass="custom-autocomplete">
+								<AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel" ValueChange="OnVehicleChanged" />
+								<AutoCompleteFieldSettings Value="Code" />
+							</SfAutoComplete>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Current KM
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicleDocument.CurrentKM" TValue="decimal" Min="0"
+											  ShowSpinButton="false" Placeholder="0.00"
+											  FloatLabelType="FloatLabelType.Never" Format="N2"
+											  CssClass="custom-numeric editable-field" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Rate <span class="required">*</span>
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicleDocument.Rate" TValue="decimal" Min="0"
+											  ShowSpinButton="false" Placeholder="0.00"
+											  FloatLabelType="FloatLabelType.Never" Format="N2"
+											  CssClass="custom-numeric editable-field" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Renewal Date <span class="required">*</span>
+							</label>
+							<SfDatePicker @bind-Value="_vehicleDocument.RenewalDate" Placeholder="Select renewal date"
+										  FloatLabelType="FloatLabelType.Never" CssClass="custom-datepicker"
+										  Format="dd-MMM-yyyy" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Remarks</label>
+							<SfTextBox @bind-Value="_vehicleDocument.Remarks" Placeholder="Enter remarks (optional)"
+									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M9 11l3 3L22 4" />
+							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+						</svg>
+						<h2 class="section-title">Vehicle Document Transactions</h2>
+					</div>
+				</div>
+				<div class="section-body grid-body">
+					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDocuments" AllowPaging="true" AllowSorting="true"
+							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleDocumentGridContextMenuItems">
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
+						<GridEvents TValue="VehicleDocumentOverviewModel" ContextMenuItemClicked="OnVehicleDocumentGridContextMenuItemClicked" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+						<GridColumns>
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Id)" HeaderText="ID" Width="80"
+										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.TransactionNo)" HeaderText="Transaction No" Width="180" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.TransactionDateTime)" HeaderText="Transaction Date" Width="150"
+										Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="170" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.VehicleDocumentType)" HeaderText="Document Type" Width="200" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Vehicle)" HeaderText="Vehicle" Width="150" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.CurrentKM)" HeaderText="Current KM" Width="140"
+										Format="N2" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Rate)" HeaderText="Rate" Width="140"
+										Format="N2" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.RenewalDate)" HeaderText="Renewal Date" Width="150"
+										Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Remarks)" HeaderText="Remarks" Width="250" />
+							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Status)" HeaderText="Status" Width="110"
+										TextAlign="TextAlign.Center" Visible="_showDeleted">
+								<Template>
+									@{
+										var vehicleDocument = (context as VehicleDocumentOverviewModel);
+										<span class="@(vehicleDocument.Status ? string.Empty : "grid-debit")">@(vehicleDocument.Status ? "Active" : "Deleted")</span>
+									}
+								</Template>
+							</GridColumn>
+						</GridColumns>
+					</SfGrid>
+				</div>
+			</div>
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Document" IdentifierLabel="Transaction No"
+						  IdentifierValue="@_deleteVehicleDocumentTransactionNo" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  OnCancel="CancelDelete" />
+
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Document"
+						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverVehicleDocumentTransactionNo" Disabled="@_isProcessing"
+						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+
+<ToastNotification @ref="_toastNotification" />

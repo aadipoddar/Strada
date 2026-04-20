@@ -123,10 +123,9 @@ else
                                                   CssClass="custom-datepicker">
                                         <DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
                                     </SfDatePicker>
-                                    <SfTextBox
-                                    Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-                                    Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
-                                    CssClass="custom-textbox readonly-field" />
+                                    <SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+                                               Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+                                               CssClass="custom-textbox readonly-field" />
                                 </div>
                             </div>
 
@@ -155,7 +154,8 @@ else
                                         {
                                             <div class="reference-actions">
                                                 <IconButton Icon="IconType.View" Variant="ButtonVariant.View"
-                                                            Size="ButtonSize.Small" Title="View Transaction" OnClick="ViewReferenceTransaction" />
+                                                            Size="ButtonSize.Small" Title="View Transaction"
+                                                            OnClick="ViewReferenceTransaction" />
                                                 <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Small"
                                                             Title="Export PDF Transaction" OnClick="ExportReferencePDF" />
                                             </div>

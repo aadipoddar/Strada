@@ -5,6 +5,8 @@ using StradaLibrary.Exports.Accounts.Masters;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Fleet.Vehicle;
+using StradaLibrary.Models.Fleet.VehicleDocument;
 using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Common;
@@ -97,6 +99,14 @@ public static class GenerateCodes
 					var ledger = await CommonData.LoadTableDataByCode<LedgerModel>(AccountNames.Ledger, code, sqlDataAccessTransaction);
 					isDuplicate = ledger is not null;
 					break;
+				case CodeType.VehicleType:
+					var vehicleType = await CommonData.LoadTableDataByCode<VehicleTypeModel>(FleetNames.VehicleType, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleType is not null;
+					break;
+				case CodeType.VehicleDocumentType:
+					var vehicleDocumentType = await CommonData.LoadTableDataByCode<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleDocumentType is not null;
+					break;
 			}
 
 			if (!isDuplicate)
@@ -160,5 +170,51 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{ledgerPrefix}00001", 5, CodeType.Ledger, sqlDataAccessTransaction);
+	}
+
+	public static async Task<string> GenerateVehicleTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType, sqlDataAccessTransaction);
+		var vehicleTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTypeCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastVehicleType = vehicleTypes.OrderByDescending(vt => vt.Id).FirstOrDefault();
+		if (lastVehicleType is not null)
+		{
+			var lastVehicleTypeCode = lastVehicleType.Code;
+			if (lastVehicleTypeCode.StartsWith(vehicleTypePrefix))
+			{
+				var lastNumberPart = lastVehicleTypeCode[vehicleTypePrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{vehicleTypePrefix}{nextNumber:D5}", 5, CodeType.VehicleType, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{vehicleTypePrefix}00001", 5, CodeType.VehicleType, sqlDataAccessTransaction);
+	}
+
+	public static async Task<string> GenerateVehicleDocumentTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var vehicleDocumentTypes = await CommonData.LoadTableData<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, sqlDataAccessTransaction);
+		var vehicleDocumentTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.DocumentTypeCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastVehicleDocumentType = vehicleDocumentTypes.OrderByDescending(vdt => vdt.Id).FirstOrDefault();
+		if (lastVehicleDocumentType is not null)
+		{
+			var lastVehicleDocumentTypeCode = lastVehicleDocumentType.Code;
+			if (lastVehicleDocumentTypeCode.StartsWith(vehicleDocumentTypePrefix))
+			{
+				var lastNumberPart = lastVehicleDocumentTypeCode[vehicleDocumentTypePrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{vehicleDocumentTypePrefix}{nextNumber:D5}", 5, CodeType.VehicleDocumentType, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{vehicleDocumentTypePrefix}00001", 5, CodeType.VehicleDocumentType, sqlDataAccessTransaction);
 	}
 }

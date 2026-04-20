@@ -8,8 +8,7 @@ public class VehicleDocumentModel
     public int FinancialYearId { get; set; }
     public int VehicleDocumentTypeId { get; set; }
     public int VehicleId { get; set; }
-    public decimal? CurrentHour { get; set; }
-    public decimal? CurrentKM { get; set; }
+    public decimal CurrentKM { get; set; }
     public decimal Rate { get; set; }
     public DateTime RenewalDate { get; set; }
     public string? Remarks { get; set; }
@@ -35,7 +34,6 @@ public class VehicleDocumentOverviewModel
     public string VehicleDocumentType { get; set; }
     public int VehicleId { get; set; }
     public string Vehicle { get; set; }
-    public decimal? CurrentHour { get; set; }
     public decimal? CurrentKM { get; set; }
     public decimal Rate { get; set; }
     public DateTime RenewalDate { get; set; }

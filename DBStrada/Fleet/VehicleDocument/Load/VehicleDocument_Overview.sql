@@ -11,7 +11,6 @@
 		[dt].[Name] AS VehicleDocumentType,
 		[d].[VehicleId],
 		[v].[Code] AS Vehicle,
-		[d].[CurrentHour],
 		[d].[CurrentKM],
 		[d].[Rate],
 		[d].[RenewalDate],

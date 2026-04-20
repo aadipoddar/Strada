@@ -37,6 +37,9 @@ public static class PageRouteNames
 	#region Fleet
 	public const string FleetDashboard = "/fleet";
 
+	public const string VehicleMaster = "/fleet/vehicle";
+	public const string VehicleTypeMaster = "/fleet/vehicle-type";
+	public const string VehicleDocumentTypeMaster = "/fleet/vehicle-document-type";
 	public const string VehicleDocument = "/fleet/vehicle-document";
 	#endregion
 }

@@ -1,8 +1,8 @@
-﻿@attribute [Route(PageRouteNames.VehicleTypeMaster)]
+@attribute [Route(PageRouteNames.VehicleDocumentTypeMaster)]
 
-@using StradaLibrary.Models.Fleet.Vehicle
+@using StradaLibrary.Models.Fleet.VehicleDocument
 
-<PageTitle>Vehicle Type - Strada</PageTitle>
+<PageTitle>Vehicle Document Type - Strada</PageTitle>
 
 @if (_isLoading || _user is null)
 {
@@ -11,18 +11,18 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="Vehicle Type Management">
+		<Header Title="Vehicle Document Type Management">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-										   Easing="ease" />
+									   Easing="ease" />
 					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewVehicleType"
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewVehicleDocumentType"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveVehicleType"
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveVehicleDocumentType"
 										  Disabled="@_isProcessing" />
 								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
 										  Id="ToggleDeleted" Disabled="@_isProcessing" />
@@ -58,16 +58,16 @@ else
 							 stroke-linejoin="round">
 							<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
 						</svg>
-						<h2 class="section-title">Vehicle Type Details</h2>
+						<h2 class="section-title">Vehicle Document Type Details</h2>
 					</div>
 				</div>
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
 							<label class="field-label">
-								Vehicle Type Name <span class="required">*</span>
+								Document Type Name <span class="required">*</span>
 							</label>
-							<SfTextBox @bind-Value="_vehicleType.Name" Placeholder="Enter vehicle type name"
+							<SfTextBox @bind-Value="_vehicleDocumentType.Name" Placeholder="Enter document type name"
 									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
 						</div>
 
@@ -75,13 +75,21 @@ else
 							<label class="field-label">
 								Code <span class="required">*</span>
 							</label>
-							<SfTextBox @bind-Value="_vehicleType.Code" Placeholder="Auto-generated"
+							<SfTextBox @bind-Value="_vehicleDocumentType.Code" Placeholder="Auto-generated"
 									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
 						</div>
 
 						<div class="form-field">
+							<label class="field-label">
+								Rate <span class="required">*</span>
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicleDocumentType.Rate" Placeholder="Enter rate"
+											  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" Min="0" Format="N2" />
+						</div>
+
+						<div class="form-field">
 							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_vehicleType.Remarks" Placeholder="Enter remarks (optional)"
+							<SfTextBox @bind-Value="_vehicleDocumentType.Remarks" Placeholder="Enter remarks (optional)"
 									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
 						</div>
 					</div>
@@ -97,28 +105,30 @@ else
 							<path d="M9 11l3 3L22 4" />
 							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
 						</svg>
-						<h2 class="section-title">Vehicle Types List</h2>
+						<h2 class="section-title">Vehicle Document Types List</h2>
 					</div>
 				</div>
 				<div class="section-body grid-body">
-					<SfGrid @ref="_sfGrid" DataSource="@_vehicleTypes" AllowPaging="true" AllowSorting="true"
+					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDocumentTypes" AllowPaging="true" AllowSorting="true"
 							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleTypeGridContextMenuItems">
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleDocumentTypeGridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-						<GridEvents TValue="VehicleTypeModel" ContextMenuItemClicked="OnVehicleTypeGridContextMenuItemClicked" />
+						<GridEvents TValue="VehicleDocumentTypeModel" ContextMenuItemClicked="OnVehicleDocumentTypeGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleTypeModel.Id)" HeaderText="ID" Width="80"
+							<GridColumn Field="@nameof(VehicleDocumentTypeModel.Id)" HeaderText="ID" Width="80"
 										TextAlign="TextAlign.Center" />
-							<GridColumn Field="@nameof(VehicleTypeModel.Name)" HeaderText="Vehicle Type Name" Width="300" />
-							<GridColumn Field="@nameof(VehicleTypeModel.Code)" HeaderText="Code" Width="150" />
-							<GridColumn Field="@nameof(VehicleTypeModel.Remarks)" HeaderText="Remarks" Width="400" />
-							<GridColumn Field="@nameof(VehicleTypeModel.Status)" HeaderText="Status" Width="110"
+							<GridColumn Field="@nameof(VehicleDocumentTypeModel.Name)" HeaderText="Document Type Name" Width="300" />
+							<GridColumn Field="@nameof(VehicleDocumentTypeModel.Code)" HeaderText="Code" Width="150" />
+							<GridColumn Field="@nameof(VehicleDocumentTypeModel.Rate)" HeaderText="Rate" Width="140" Format="N2"
+										TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleDocumentTypeModel.Remarks)" HeaderText="Remarks" Width="400" />
+							<GridColumn Field="@nameof(VehicleDocumentTypeModel.Status)" HeaderText="Status" Width="110"
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var vehicleType = (context as VehicleTypeModel);
-										<span class="@(vehicleType.Status ? string.Empty : "grid-debit")">@(vehicleType.Status ? "Active" : "Deleted")</span>
+										var vehicleDocumentType = (context as VehicleDocumentTypeModel);
+										<span class="@(vehicleDocumentType.Status ? string.Empty : "grid-debit")">@(vehicleDocumentType.Status ? "Active" : "Deleted")</span>
 									}
 								</Template>
 							</GridColumn>
@@ -132,14 +142,12 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Type" IdentifierLabel="Vehicle Type Name"
-						  IdentifierValue="@_deleteVehicleTypeName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Document Type" IdentifierLabel="Document Type Name"
+						  IdentifierValue="@_deleteVehicleDocumentTypeName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
 						  OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Type"
-						   IdentifierLabel="Vehicle Type Name" IdentifierValue="@_recoverVehicleTypeName" Disabled="@_isProcessing"
-						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Document Type"
+					   IdentifierLabel="Document Type Name" IdentifierValue="@_recoverVehicleDocumentTypeName" Disabled="@_isProcessing"
+					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />
-
-

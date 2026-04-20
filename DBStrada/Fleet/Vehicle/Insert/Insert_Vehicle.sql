@@ -4,10 +4,10 @@
 	@ShortCode VARCHAR(250),
 	@ChasisCode VARCHAR(250),
 	@EngineCode VARCHAR(250),
-	@VehicleTypeId INT,
 	@PurchaseDate DATETIME,
-	@OpeningHour MONEY,
 	@OpeningKM MONEY,
+	@VehicleTypeId INT,
+	@CompanyId INT,
 	@Remarks VARCHAR(MAX),
 	@Status BIT
 AS
@@ -20,10 +20,10 @@ BEGIN
 			[ShortCode],
 			[ChasisCode],
 			[EngineCode],
-			[VehicleTypeId],
 			[PurchaseDate],
-			[OpeningHour],
 			[OpeningKM],
+			[VehicleTypeId],
+			[CompanyId],
 			[Remarks],
 			[Status]
 		)
@@ -33,10 +33,10 @@ BEGIN
 			@ShortCode,
 			@ChasisCode,
 			@EngineCode,
-			@VehicleTypeId,
 			@PurchaseDate,
-			@OpeningHour,
 			@OpeningKM,
+			@VehicleTypeId,
+			@CompanyId,
 			@Remarks,
 			@Status
 		);
@@ -52,10 +52,10 @@ BEGIN
 			[ShortCode] = @ShortCode,
 			[ChasisCode] = @ChasisCode,
 			[EngineCode] = @EngineCode,
-			[VehicleTypeId] = @VehicleTypeId,
 			[PurchaseDate] = @PurchaseDate,
-			[OpeningHour] = @OpeningHour,
 			[OpeningKM] = @OpeningKM,
+			[VehicleTypeId] = @VehicleTypeId,
+			[CompanyId] = @CompanyId,
 			[Remarks] = @Remarks,
 			[Status] = @Status
 		WHERE [Id] = @Id;

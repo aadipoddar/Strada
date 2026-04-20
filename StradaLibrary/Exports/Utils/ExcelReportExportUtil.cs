@@ -651,7 +651,8 @@ public static class ExcelReportExportUtil
 
                     // Apply appropriate formatting
                     var setting = columnSettings[columnName];
-                    worksheet.Range[cellAddress].CellStyle.NumberFormat = ConvertToExcelFormat(setting.Format);
+                    if (!string.IsNullOrWhiteSpace(setting.Format))
+                        worksheet.Range[cellAddress].CellStyle.NumberFormat = ConvertToExcelFormat(setting.Format);
                     worksheet.Range[cellAddress].CellStyle.Font.Bold = true;
                     worksheet.Range[cellAddress].CellStyle.Color = Color.FromArgb(219, 234, 254); // Light blue background
                     worksheet.Range[cellAddress].CellStyle.Font.RGBColor = Color.FromArgb(30, 64, 175); // Dark blue text
