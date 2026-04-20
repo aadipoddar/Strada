@@ -2,19 +2,16 @@ using Microsoft.AspNetCore.Components;
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.Vehicle;
-using StradaLibrary.Data.Fleet.VehicleDocument;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleDocument;
 using StradaLibrary.Models.Operations;
-using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 
-namespace Strada.Shared.Pages.Fleet.VehicleDocument;
+namespace Strada.Shared.Pages.Fleet.Vehicle;
 
 public partial class VehicleDocumentPage : IAsyncDisposable
 {

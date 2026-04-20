@@ -1,7 +1,7 @@
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.VehicleDocument;
 
-namespace StradaLibrary.Data.Fleet.VehicleDocument;
+namespace StradaLibrary.Data.Fleet.Vehicle;
 
 public static class VehicleDocumentTypeData
 {

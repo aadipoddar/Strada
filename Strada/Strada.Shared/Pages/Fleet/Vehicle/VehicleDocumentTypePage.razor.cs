@@ -1,5 +1,5 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Fleet.VehicleDocument;
+using StradaLibrary.Data.Fleet.Vehicle;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
 using StradaLibrary.Exports.Utils;
@@ -7,7 +7,7 @@ using StradaLibrary.Models.Fleet.VehicleDocument;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
 
-namespace Strada.Shared.Pages.Fleet.VehicleDocument;
+namespace Strada.Shared.Pages.Fleet.Vehicle;
 
 public partial class VehicleDocumentTypePage : IAsyncDisposable
 {

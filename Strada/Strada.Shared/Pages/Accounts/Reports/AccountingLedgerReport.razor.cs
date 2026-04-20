@@ -471,6 +471,14 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 
 	public ValueTask DisposeAsync()
 	{
+		if (_autoRefreshCts is not null)
+		{
+			_autoRefreshCts.CancelAsync();
+			_autoRefreshCts.Dispose();
+		}
+
+		_autoRefreshTimer?.Dispose();
+
 		GC.SuppressFinalize(this);
 		return ((IAsyncDisposable)HotKeys).DisposeAsync();
 	}

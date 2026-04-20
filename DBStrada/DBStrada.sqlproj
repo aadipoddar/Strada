@@ -73,11 +73,8 @@
     <Folder Include="Accounts\FinancialAccounting\Table" />
     <Folder Include="Accounts\Masters\Load" />
     <Folder Include="Accounts\Masters\Table" />
-    <Folder Include="Fleet\VehicleDocument" />
-    <Folder Include="Fleet\VehicleDocument\Insert" />
-    <Folder Include="Fleet\VehicleDocument\Load" />
-    <Folder Include="Fleet\VehicleDocument\Table" />
     <Folder Include="PublishLocations" />
+    <Folder Include="Fleet\Vehicle\Load" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -124,11 +121,11 @@
     <Build Include="Accounts\Masters\Table\Nature.sql" />
     <Build Include="Accounts\Masters\Table\StateUT.sql" />
     <Build Include="Accounts\Masters\Table\Voucher.sql" />
-    <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocument.sql" />
-    <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocumentType.sql" />
-    <Build Include="Fleet\VehicleDocument\Load\VehicleDocument_Overview.sql" />
-    <Build Include="Fleet\VehicleDocument\Table\VehicleDocument.sql" />
-    <Build Include="Fleet\VehicleDocument\Table\VehicleDocumentType.sql" />
+    <Build Include="Fleet\Vehicle\Insert\Insert_VehicleDocumentType.sql" />
+    <Build Include="Fleet\Vehicle\Insert\Insert_VehicleDocument.sql" />
+    <Build Include="Fleet\Vehicle\Load\VehicleDocument_Overview.sql" />
+    <Build Include="Fleet\Vehicle\Table\VehicleDocument.sql" />
+    <Build Include="Fleet\Vehicle\Table\VehicleDocumentType.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />
