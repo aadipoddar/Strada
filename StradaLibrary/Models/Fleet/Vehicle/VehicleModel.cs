@@ -14,12 +14,3 @@ public class VehicleModel
     public string? Remarks { get; set; }
     public bool Status { get; set; }
 }
-
-public class VehicleTypeModel
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Code { get; set; }
-    public string? Remarks { get; set; }
-    public bool Status { get; set; }
-}

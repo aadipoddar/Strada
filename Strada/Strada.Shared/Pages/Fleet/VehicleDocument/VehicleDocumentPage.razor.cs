@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Fleet.Vehicle;
+using StradaLibrary.Data.Fleet.VehicleDocument;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
 using StradaLibrary.Exports.Utils;
@@ -11,7 +11,7 @@ using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 
-namespace Strada.Shared.Pages.Fleet.Vehicle;
+namespace Strada.Shared.Pages.Fleet.VehicleDocument;
 
 public partial class VehicleDocumentPage : IAsyncDisposable
 {
