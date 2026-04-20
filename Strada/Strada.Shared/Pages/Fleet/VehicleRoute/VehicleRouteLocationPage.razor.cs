@@ -63,7 +63,7 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
 			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
 
-		_routeLocationsAll = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.RouteLocation);
+		_routeLocationsAll = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
 		_routeLocations = [.. _routeLocationsAll];
 
 		if (!_showDeleted)

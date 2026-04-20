@@ -109,7 +109,7 @@ public static class GenerateCodes
 					isDuplicate = vehicleDocumentType is not null;
 					break;
 				case CodeType.RouteLocation:
-					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.RouteLocation, code, sqlDataAccessTransaction);
+					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
 					isDuplicate = routeLocation is not null;
 					break;
 				case CodeType.OMC:
@@ -232,7 +232,7 @@ public static class GenerateCodes
 
 	public static async Task<string> GenerateRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.RouteLocation, sqlDataAccessTransaction);
+		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, sqlDataAccessTransaction);
 		var routeLocationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.RouteLocationCodePrefix, sqlDataAccessTransaction)).Value;
 
 		var lastRouteLocation = routeLocations.OrderByDescending(rl => rl.Id).FirstOrDefault();
