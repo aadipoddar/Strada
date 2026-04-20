@@ -67,6 +67,50 @@ else
 						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
 							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
 							 stroke-linejoin="round">
+							<path d="M12 21s-6-4.35-6-10a6 6 0 0 1 12 0c0 5.65-6 10-6 10z" />
+							<circle cx="12" cy="11" r="2" />
+						</svg>
+						<h2 class="section-title">Vehicle Routes</h2>
+					</div>
+					<p class="section-subtitle">Manage vehicle route location and OMC catalog</p>
+				</div>
+				<div class="section-body">
+					<div class="dashboard-grid">
+						<FileCard Title="Vehicle Route Location" Description="Manage vehicle route location catalog"
+								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleRouteLocationMaster)">
+							<IconContent>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									 stroke-linejoin="round">
+									<path d="M12 21s-6-4.35-6-10a6 6 0 0 1 12 0c0 5.65-6 10-6 10z" />
+									<circle cx="12" cy="11" r="2" />
+								</svg>
+							</IconContent>
+						</FileCard>
+
+						<FileCard Title="Vehicle OMC" Description="Manage OMC catalog"
+								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleOMCMaster)">
+							<IconContent>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									 stroke-linejoin="round">
+									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+									<polyline points="14 2 14 8 20 8" />
+									<line x1="8" y1="13" x2="16" y2="13" />
+									<line x1="8" y1="17" x2="13" y2="17" />
+								</svg>
+							</IconContent>
+						</FileCard>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
 							<path d="M21 8v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" />
 							<path d="M1 3h22v5H1z" />
 							<path d="M12 12v6" />
@@ -113,5 +157,3 @@ else
 		<Footer />
 	</div>
 }
-
-

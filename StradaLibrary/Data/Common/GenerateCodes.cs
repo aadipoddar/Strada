@@ -7,6 +7,7 @@ using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleDocument;
+using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Common;
@@ -107,6 +108,14 @@ public static class GenerateCodes
 					var vehicleDocumentType = await CommonData.LoadTableDataByCode<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleDocumentType is not null;
 					break;
+				case CodeType.RouteLocation:
+					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.RouteLocation, code, sqlDataAccessTransaction);
+					isDuplicate = routeLocation is not null;
+					break;
+				case CodeType.OMC:
+					var omc = await CommonData.LoadTableDataByCode<OMCModel>(FleetNames.OMC, code, sqlDataAccessTransaction);
+					isDuplicate = omc is not null;
+					break;
 			}
 
 			if (!isDuplicate)
@@ -125,6 +134,7 @@ public static class GenerateCodes
 		return code;
 	}
 
+	#region Accounts
 	public static async Task<string> GenerateFinancialAccountingTransactionNo(FinancialAccountingModel accounting, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, accounting.FinancialYearId, sqlDataAccessTransaction);
@@ -171,7 +181,9 @@ public static class GenerateCodes
 
 		return await CheckDuplicateCode($"{ledgerPrefix}00001", 5, CodeType.Ledger, sqlDataAccessTransaction);
 	}
+	#endregion
 
+	#region Fleet
 	public static async Task<string> GenerateVehicleTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType, sqlDataAccessTransaction);
@@ -217,4 +229,51 @@ public static class GenerateCodes
 
 		return await CheckDuplicateCode($"{vehicleDocumentTypePrefix}00001", 5, CodeType.VehicleDocumentType, sqlDataAccessTransaction);
 	}
+
+	public static async Task<string> GenerateRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.RouteLocation, sqlDataAccessTransaction);
+		var routeLocationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.RouteLocationCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastRouteLocation = routeLocations.OrderByDescending(rl => rl.Id).FirstOrDefault();
+		if (lastRouteLocation is not null)
+		{
+			var lastRouteLocationCode = lastRouteLocation.Code;
+			if (lastRouteLocationCode.StartsWith(routeLocationPrefix))
+			{
+				var lastNumberPart = lastRouteLocationCode[routeLocationPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{routeLocationPrefix}{nextNumber:D5}", 5, CodeType.RouteLocation, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{routeLocationPrefix}00001", 5, CodeType.RouteLocation, sqlDataAccessTransaction);
+	}
+
+	public static async Task<string> GenerateOMCCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC, sqlDataAccessTransaction);
+		var omcPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastOmc = omcs.OrderByDescending(o => o.Id).FirstOrDefault();
+		if (lastOmc is not null)
+		{
+			var lastOmcCode = lastOmc.Code;
+			if (lastOmcCode.StartsWith(omcPrefix))
+			{
+				var lastNumberPart = lastOmcCode[omcPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{omcPrefix}{nextNumber:D5}", 5, CodeType.OMC, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{omcPrefix}00001", 5, CodeType.OMC, sqlDataAccessTransaction);
+	}
+	#endregion
 }

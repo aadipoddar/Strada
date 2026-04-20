@@ -69,6 +69,14 @@ public static class AccountNames
 
 public static class FleetNames
 {
+	#region Vehicle Route
+	public static string RouteLocation => "RouteLocation";
+	public static string OMC => "OMC";
+
+	public static string InsertVehicleRouteLocation => "Insert_VehicleRouteLocation";
+	public static string InsertOMC => "Insert_OMC";
+	#endregion
+
 	#region Vehicle Document
 	public static string VehicleDocumentType => "VehicleDocumentType";
 	public static string VehicleDocument => "VehicleDocument";

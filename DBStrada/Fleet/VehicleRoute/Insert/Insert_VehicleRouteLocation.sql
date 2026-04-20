@@ -1,19 +1,17 @@
-﻿CREATE PROCEDURE [dbo].[Insert_VehicleDocumentType]
+CREATE PROCEDURE [dbo].[Insert_VehicleRouteLocation]
 	@Id INT OUTPUT,
 	@Name VARCHAR(250),
 	@Code VARCHAR(10),
-	@Rate MONEY,
 	@Remarks VARCHAR(MAX),
-	@Status BIT
+	@Status BIT = 1
 AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[VehicleDocumentType]
+		INSERT INTO [dbo].[VehicleRouteLocation]
 		(
 			[Name],
 			[Code],
-			[Rate],
 			[Remarks],
 			[Status]
 		)
@@ -21,24 +19,22 @@ BEGIN
 		(
 			@Name,
 			@Code,
-			@Rate,
 			@Remarks,
 			@Status
 		);
+
 		SET @Id = SCOPE_IDENTITY();
 	END
 
 	ELSE
 	BEGIN
-		UPDATE [dbo].[VehicleDocumentType]
+		UPDATE [dbo].[VehicleRouteLocation]
 		SET
 			[Name] = @Name,
 			[Code] = @Code,
-			[Rate] = @Rate,
 			[Remarks] = @Remarks,
 			[Status] = @Status
-		WHERE
-			[Id] = @Id;
+		WHERE [Id] = @Id;
 	END
 
 	SELECT @Id AS Id;

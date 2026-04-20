@@ -19,6 +19,8 @@ public static class SettingsKeys
 
 	public static string VehicleTypeCodePrefix => "VehicleTypeCodePrefix";
 	public static string DocumentTypeCodePrefix => "DocumentTypeCodePrefix";
+	public static string RouteLocationCodePrefix => "RouteLocationCodePrefix";
+	public static string OMCCodePrefix => "OMCCodePrefix";
 
 	public static string FinancialAccountingTransactionPrefix => "FinancialAccountingTransactionPrefix";
 

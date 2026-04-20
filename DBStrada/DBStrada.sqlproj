@@ -74,11 +74,9 @@
     <Folder Include="Accounts\Masters\Load" />
     <Folder Include="Accounts\Masters\Table" />
     <Folder Include="PublishLocations" />
-    <Folder Include="Fleet\Vehicle\Load" />
-    <Folder Include="Fleet\VehicleTrip" />
-    <Folder Include="Fleet\VehicleTrip\Insert" />
-    <Folder Include="Fleet\VehicleTrip\Load" />
-    <Folder Include="Fleet\VehicleTrip\Table" />
+    <Folder Include="Fleet\VehicleRoute" />
+    <Folder Include="Fleet\VehicleRoute\Insert" />
+    <Folder Include="Fleet\VehicleRoute\Table" />
     <Folder Include="Fleet\VehicleDocument" />
     <Folder Include="Fleet\VehicleDocument\Table" />
     <Folder Include="Fleet\VehicleDocument\Insert" />
@@ -112,8 +110,12 @@
     <Build Include="Accounts\FinancialAccounting\Insert\Insert_FinancialAccountingDetail.sql" />
     <Build Include="Fleet\Vehicle\Insert\Insert_Vehicle.sql" />
     <Build Include="Fleet\Vehicle\Insert\Insert_VehicleType.sql" />
+    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteLocation.sql" />
+    <Build Include="Fleet\VehicleRoute\Insert\Insert_OMC.sql" />
     <Build Include="Fleet\Vehicle\Table\Vehicle.sql" />
     <Build Include="Fleet\Vehicle\Table\VehicleType.sql" />
+    <Build Include="Fleet\VehicleRoute\Table\VehicleRouteLocation.sql" />
+    <Build Include="Fleet\VehicleRoute\Table\OMC.sql" />
     <Build Include="Accounts\FinancialAccounting\Load\Load_FinancialAccounting_By_Voucher_Reference.sql" />
     <Build Include="Accounts\FinancialAccounting\Table\FinancialAccounting.sql" />
     <Build Include="Accounts\FinancialAccounting\Table\FinancialAccountingDetail.sql" />
@@ -129,11 +131,6 @@
     <Build Include="Accounts\Masters\Table\Nature.sql" />
     <Build Include="Accounts\Masters\Table\StateUT.sql" />
     <Build Include="Accounts\Masters\Table\Voucher.sql" />
-    <Build Include="Fleet\Vehicle\Insert\Insert_VehicleDocumentType.sql" />
-    <Build Include="Fleet\Vehicle\Insert\Insert_VehicleDocument.sql" />
-    <Build Include="Fleet\Vehicle\Load\VehicleDocument_Overview.sql" />
-    <Build Include="Fleet\Vehicle\Table\VehicleDocument.sql" />
-    <Build Include="Fleet\Vehicle\Table\VehicleDocumentType.sql" />
     <Build Include="Fleet\VehicleDocument\Table\VehicleDocument.sql" />
     <Build Include="Fleet\VehicleDocument\Table\VehicleDocumentType.sql" />
     <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocument.sql" />
@@ -143,5 +140,8 @@
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />
     <None Include="PublishLocations\AzureStrada.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="DBStrada.refactorlog" />
   </ItemGroup>
 </Project>

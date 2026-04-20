@@ -1,0 +1,143 @@
+@attribute [Route(PageRouteNames.VehicleOMCMaster)]
+
+@using StradaLibrary.Models.Fleet.VehicleRoute
+
+<PageTitle>OMC - Strada</PageTitle>
+
+@if (_isLoading || _user is null)
+{
+	<AnimatedLoader Visible="true" />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="OMC Management">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
+									   Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewOMC"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveOMC"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
+										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
+							<MenuItems>
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<div class="page-container">
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
+						</svg>
+						<h2 class="section-title">OMC Details</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">
+								OMC Name <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_omc.Name" Placeholder="Enter OMC name"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Code <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_omc.Code" Placeholder="Auto-generated"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Remarks</label>
+							<SfTextBox @bind-Value="_omc.Remarks" Placeholder="Enter remarks (optional)"
+									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M9 11l3 3L22 4" />
+							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+						</svg>
+						<h2 class="section-title">OMC List</h2>
+					</div>
+				</div>
+				<div class="section-body grid-body">
+					<SfGrid @ref="_sfGrid" DataSource="@_omcs" AllowPaging="true" AllowSorting="true"
+							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_omcGridContextMenuItems">
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
+						<GridEvents TValue="OMCModel" ContextMenuItemClicked="OnOMCGridContextMenuItemClicked" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+						<GridColumns>
+							<GridColumn Field="@nameof(OMCModel.Id)" HeaderText="ID" Width="80"
+										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(OMCModel.Name)" HeaderText="OMC Name" Width="300" />
+							<GridColumn Field="@nameof(OMCModel.Code)" HeaderText="Code" Width="150" />
+							<GridColumn Field="@nameof(OMCModel.Remarks)" HeaderText="Remarks" Width="400" />
+							<GridColumn Field="@nameof(OMCModel.Status)" HeaderText="Status" Width="110"
+										TextAlign="TextAlign.Center" Visible="_showDeleted">
+								<Template>
+									@{
+										var omc = (context as OMCModel);
+										<span class="@(omc.Status ? string.Empty : "grid-debit")">@(omc.Status ? "Active" : "Deleted")</span>
+									}
+								</Template>
+							</GridColumn>
+						</GridColumns>
+					</SfGrid>
+				</div>
+			</div>
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="OMC" IdentifierLabel="OMC Name"
+						  IdentifierValue="@_deleteOMCName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  OnCancel="CancelDelete" />
+
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="OMC"
+					   IdentifierLabel="OMC Name" IdentifierValue="@_recoverOMCName" Disabled="@_isProcessing"
+					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+
+<ToastNotification @ref="_toastNotification" />
