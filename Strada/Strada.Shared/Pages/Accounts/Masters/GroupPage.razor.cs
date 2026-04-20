@@ -138,16 +138,10 @@ public partial class GroupPage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditGroup(GroupModel group)
+    private async Task OnEditGroup(GroupModel group)
     {
-        _group = new()
-        {
-            Id = group.Id,
-            Name = group.Name,
-            NatureId = group.NatureId,
-            Remarks = group.Remarks,
-            Status = group.Status
-        };
+        _group = await CommonData.LoadTableDataById<GroupModel>(AccountNames.Group, group.Id)
+            ?? throw new Exception("Group not found.");
 
         StateHasChanged();
     }
@@ -317,7 +311,7 @@ public partial class GroupPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditGroup(selectedRecords[0]);
+            await OnEditGroup(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()

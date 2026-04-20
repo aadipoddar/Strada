@@ -196,22 +196,10 @@ public partial class VehiclePage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private void OnEditVehicle(VehicleModel vehicle)
+	private async Task OnEditVehicle(VehicleModel vehicle)
 	{
-		_vehicle = new()
-		{
-			Id = vehicle.Id,
-			Code = vehicle.Code,
-			ShortCode = vehicle.ShortCode,
-			ChasisCode = vehicle.ChasisCode,
-			EngineCode = vehicle.EngineCode,
-			PurchaseDate = vehicle.PurchaseDate,
-			OpeningKM = vehicle.OpeningKM,
-			VehicleTypeId = vehicle.VehicleTypeId,
-			CompanyId = vehicle.CompanyId,
-			Remarks = vehicle.Remarks,
-			Status = vehicle.Status
-		};
+		_vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, vehicle.Id)
+			?? throw new Exception("Vehicle not found.");
 
 		StateHasChanged();
 	}
@@ -381,7 +369,7 @@ public partial class VehiclePage : IAsyncDisposable
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
-			OnEditVehicle(selectedRecords[0]);
+			await OnEditVehicle(selectedRecords[0]);
 	}
 
 	private async Task DeleteSelectedItem()

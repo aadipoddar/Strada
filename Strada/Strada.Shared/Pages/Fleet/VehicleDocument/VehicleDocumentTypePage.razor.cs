@@ -155,17 +155,10 @@ public partial class VehicleDocumentTypePage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private void OnEditVehicleDocumentType(VehicleDocumentTypeModel vehicleDocumentType)
+	private async Task OnEditVehicleDocumentType(VehicleDocumentTypeModel vehicleDocumentType)
 	{
-		_vehicleDocumentType = new()
-		{
-			Id = vehicleDocumentType.Id,
-			Name = vehicleDocumentType.Name,
-			Code = vehicleDocumentType.Code,
-			Rate = vehicleDocumentType.Rate,
-			Remarks = vehicleDocumentType.Remarks,
-			Status = vehicleDocumentType.Status
-		};
+		_vehicleDocumentType = await CommonData.LoadTableDataById<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, vehicleDocumentType.Id)
+			?? throw new Exception("Vehicle Document Type not found.");
 
 		StateHasChanged();
 	}
@@ -335,7 +328,7 @@ public partial class VehicleDocumentTypePage : IAsyncDisposable
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
-			OnEditVehicleDocumentType(selectedRecords[0]);
+			await OnEditVehicleDocumentType(selectedRecords[0]);
 	}
 
 	private async Task DeleteSelectedItem()

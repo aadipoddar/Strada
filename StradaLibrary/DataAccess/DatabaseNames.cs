@@ -73,10 +73,12 @@ public static class FleetNames
 	public static string VehicleRouteLocation => "VehicleRouteLocation";
 	public static string VehicleRoute => "VehicleRoute";
 	public static string OMC => "OMC";
+	public static string VehicleDriver => "VehicleDriver";
 
 	public static string InsertVehicleRouteLocation => "Insert_VehicleRouteLocation";
 	public static string InsertVehicleRoute => "Insert_VehicleRoute";
 	public static string InsertOMC => "Insert_OMC";
+	public static string InsertVehicleDriver => "Insert_VehicleDriver";
 	#endregion
 
 	#region Vehicle Document

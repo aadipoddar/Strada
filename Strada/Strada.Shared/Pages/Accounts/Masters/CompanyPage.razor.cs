@@ -208,24 +208,10 @@ public partial class CompanyPage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private void OnEditCompany(CompanyModel company)
+	private async Task OnEditCompany(CompanyModel company)
 	{
-		_company = new()
-		{
-			Id = company.Id,
-			Name = company.Name,
-			Code = company.Code,
-			StateUTId = company.StateUTId,
-			GSTNo = company.GSTNo,
-			PANNo = company.PANNo,
-			CINNo = company.CINNo,
-			Alias = company.Alias,
-			Phone = company.Phone,
-			Email = company.Email,
-			Address = company.Address,
-			Remarks = company.Remarks,
-			Status = company.Status
-		};
+		_company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, company.Id)
+			?? throw new Exception("Company not found.");
 
 		StateHasChanged();
 	}
@@ -395,7 +381,7 @@ public partial class CompanyPage : IAsyncDisposable
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
-			OnEditCompany(selectedRecords[0]);
+			await OnEditCompany(selectedRecords[0]);
 	}
 
 	private async Task DeleteSelectedItem()

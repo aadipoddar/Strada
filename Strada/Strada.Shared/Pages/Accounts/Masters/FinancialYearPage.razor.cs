@@ -44,8 +44,8 @@ public partial class FinancialYearPage : IAsyncDisposable
         if (!firstRender)
             return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
-		await LoadData();
+        _user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
+        await LoadData();
         _isLoading = false;
         StateHasChanged();
     }
@@ -134,134 +134,126 @@ public partial class FinancialYearPage : IAsyncDisposable
             _isProcessing = false;
         }
     }
-	#endregion
+    #endregion
 
-	#region Actions
-	private void OnEditFinancialYear(FinancialYearModel financialYear)
-	{
-		_financialYear = new()
-		{
-			Id = financialYear.Id,
-			StartDate = financialYear.StartDate,
-			EndDate = financialYear.EndDate,
-			YearNo = financialYear.YearNo,
-			Remarks = financialYear.Remarks,
-			Locked = financialYear.Locked,
-			Status = financialYear.Status
-		};
+    #region Actions
+    private async Task OnEditFinancialYear(FinancialYearModel financialYear)
+    {
+        _financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, financialYear.Id)
+            ?? throw new Exception("Financial Year not found.");
 
-		StateHasChanged();
-	}
+        StateHasChanged();
+    }
 
-	private static string GetFinancialYearName(FinancialYearModel fy) =>
-		$"{fy.StartDate:dd-MMM-yyyy} to {fy.EndDate:dd-MMM-yyyy}";
+    private static string GetFinancialYearName(FinancialYearModel fy) =>
+        $"{fy.StartDate:dd-MMM-yyyy} to {fy.EndDate:dd-MMM-yyyy}";
 
-	private void AutoGenerateNextYear()
-	{
-		if (_financialYears.Count == 0)
-		{
-			// No existing financial years, start with a default
-			_financialYear.StartDate = new DateOnly(DateTime.Now.Year, 4, 1);
-			_financialYear.EndDate = new DateOnly(DateTime.Now.Year + 1, 3, 31);
-			_financialYear.YearNo = 1;
-		}
-		else
-		{
-			// Find the latest financial year by end date
-			var latestYear = _financialYears
-				.Where(fy => fy.Status)
-				.OrderByDescending(fy => fy.EndDate)
-				.FirstOrDefault();
+    private void AutoGenerateNextYear()
+    {
+        if (_financialYears.Count == 0)
+        {
+            // No existing financial years, start with a default
+            _financialYear.StartDate = new DateOnly(DateTime.Now.Year, 4, 1);
+            _financialYear.EndDate = new DateOnly(DateTime.Now.Year + 1, 3, 31);
+            _financialYear.YearNo = 1;
+        }
+        else
+        {
+            // Find the latest financial year by end date
+            var latestYear = _financialYears
+                .Where(fy => fy.Status)
+                .OrderByDescending(fy => fy.EndDate)
+                .FirstOrDefault();
 
-			if (latestYear != null)
-			{
-				// Generate next year based on latest
-				_financialYear.StartDate = latestYear.EndDate.AddDays(1);
-				_financialYear.EndDate = latestYear.EndDate.AddYears(1);
-				_financialYear.YearNo = latestYear.YearNo + 1;
-			}
-			else
-			{
-				// Fallback if no active years exist
-				_financialYear.StartDate = new DateOnly(DateTime.Now.Year, 4, 1);
-				_financialYear.EndDate = new DateOnly(DateTime.Now.Year + 1, 3, 31);
-				_financialYear.YearNo = 1;
-			}
-		}
+            if (latestYear != null)
+            {
+                // Generate next year based on latest
+                _financialYear.StartDate = latestYear.EndDate.AddDays(1);
+                _financialYear.EndDate = latestYear.EndDate.AddYears(1);
+                _financialYear.YearNo = latestYear.YearNo + 1;
+            }
+            else
+            {
+                // Fallback if no active years exist
+                _financialYear.StartDate = new DateOnly(DateTime.Now.Year, 4, 1);
+                _financialYear.EndDate = new DateOnly(DateTime.Now.Year + 1, 3, 31);
+                _financialYear.YearNo = 1;
+            }
+        }
 
-		_financialYear.Locked = false;
-		_financialYear.Remarks = string.Empty;
-		_financialYear.Id = 0;
-		_financialYear.Status = true;
+        _financialYear.Locked = false;
+        _financialYear.Remarks = string.Empty;
+        _financialYear.Id = 0;
+        _financialYear.Status = true;
 
-		StateHasChanged();
-	}
+        StateHasChanged();
+    }
 
-	private async Task ConfirmDelete()
-	{
-		try
-		{
-			_isProcessing = true;
-			await _deleteConfirmationDialog.HideAsync();
+    private async Task ConfirmDelete()
+    {
+        try
+        {
+            _isProcessing = true;
+            await _deleteConfirmationDialog.HideAsync();
 
-			if (!_user.Admin)
-				throw new Exception("You do not have permission to perform this action.");
+            if (!_user.Admin)
+                throw new Exception("You do not have permission to perform this action.");
 
-			var financialYear = _financialYears.FirstOrDefault(g => g.Id == _deleteFinancialYearId)
-				?? throw new Exception("Financial Year not found.");
+            var financialYear = _financialYears.FirstOrDefault(g => g.Id == _deleteFinancialYearId)
+                ?? throw new Exception("Financial Year not found.");
 
-			financialYear.Status = false;
-			await FinancialYearData.InsertFinancialYear(financialYear);
+            financialYear.Status = false;
+            await FinancialYearData.InsertFinancialYear(financialYear);
 
-			await _toastNotification.ShowAsync("Success", $"Financial Year '{_deleteFinancialYearName}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.FinancialYearMaster, true);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete Financial Year: {ex.Message}", ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-			_deleteFinancialYearId = 0;
-			_deleteFinancialYearName = string.Empty;
-		}
-	}
+            await _toastNotification.ShowAsync("Success", $"Financial Year '{_deleteFinancialYearName}' has been deleted successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.FinancialYearMaster, true);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("Error", $"Failed to delete Financial Year: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+            _deleteFinancialYearId = 0;
+            _deleteFinancialYearName = string.Empty;
+        }
+    }
 
-	private async Task ConfirmRecover()
-	{
-		try
-		{
-			_isProcessing = true;
-			await _recoverConfirmationDialog.HideAsync();
+    private async Task ConfirmRecover()
+    {
+        try
+        {
+            _isProcessing = true;
+            await _recoverConfirmationDialog.HideAsync();
 
-			if (!_user.Admin)
-				throw new Exception("You do not have permission to perform this action.");
+            if (!_user.Admin)
+                throw new Exception("You do not have permission to perform this action.");
 
-			var financialYear = _financialYears.FirstOrDefault(g => g.Id == _recoverFinancialYearId)
-				?? throw new Exception("Financial Year not found.");
+            var financialYear = _financialYears.FirstOrDefault(g => g.Id == _recoverFinancialYearId)
+                ?? throw new Exception("Financial Year not found.");
 
-			financialYear.Status = true;
-			await FinancialYearData.InsertFinancialYear(financialYear);
+            financialYear.Status = true;
+            await FinancialYearData.InsertFinancialYear(financialYear);
 
-			await _toastNotification.ShowAsync("Success", $"Financial Year '{_recoverFinancialYearName}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.FinancialYearMaster, true);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover Financial Year: {ex.Message}", ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-			_recoverFinancialYearId = 0;
-			_recoverFinancialYearName = string.Empty;
-		}
-	}
-	#endregion
+            await _toastNotification.ShowAsync("Success", $"Financial Year '{_recoverFinancialYearName}' has been recovered successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.FinancialYearMaster, true);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("Error", $"Failed to recover Financial Year: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+            _recoverFinancialYearId = 0;
+            _recoverFinancialYearName = string.Empty;
+        }
+    }
+    #endregion
 
-	#region Exporting
-	private async Task ExportExcel()
+    #region Exporting
+    private async Task ExportExcel()
     {
         if (_isProcessing)
             return;
@@ -270,17 +262,17 @@ public partial class FinancialYearPage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await FinancialYearExport.ExportMaster(_financialYears, ReportExportType.Excel);
+            var (stream, fileName) = await FinancialYearExport.ExportMaster(_financialYears, ReportExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, stream);
 
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
+            await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+        }
         catch (Exception ex)
         {
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
+            await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+        }
         finally
         {
             _isProcessing = false;
@@ -297,27 +289,27 @@ public partial class FinancialYearPage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await FinancialYearExport.ExportMaster(_financialYears, ReportExportType.PDF);
+            var (stream, fileName) = await FinancialYearExport.ExportMaster(_financialYears, ReportExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, stream);
 
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
+            await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+        }
         catch (Exception ex)
         {
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
+            await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+        }
         finally
         {
             _isProcessing = false;
             StateHasChanged();
         }
     }
-	#endregion
+    #endregion
 
-	#region Utilities
-	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
+    #region Utilities
+    private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
     {
         switch (args.Item.Id)
         {
@@ -365,7 +357,7 @@ public partial class FinancialYearPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditFinancialYear(selectedRecords[0]);
+            await OnEditFinancialYear(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()

@@ -18,61 +18,12 @@ else
 						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
 							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
 							 stroke-linejoin="round">
-							<path d="M10 17h4V5H2v12h3" />
-							<path d="M14 9h4l4 4v4h-3" />
-							<circle cx="7.5" cy="17.5" r="2.5" />
-							<circle cx="17.5" cy="17.5" r="2.5" />
-						</svg>
-						<h2 class="section-title">Vehicle Masters</h2>
-					</div>
-					<p class="section-subtitle">Manage fleet vehicle and vehicle type catalog</p>
-				</div>
-				<div class="section-body">
-					<div class="dashboard-grid">
-						<FileCard Title="Vehicle" Description="Manage vehicle records"
-								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleMaster)">
-							<IconContent>
-								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-									 stroke-linejoin="round">
-									<path d="M10 17h4V5H2v12h3" />
-									<path d="M14 9h4l4 4v4h-3" />
-									<circle cx="7.5" cy="17.5" r="2.5" />
-									<circle cx="17.5" cy="17.5" r="2.5" />
-								</svg>
-							</IconContent>
-						</FileCard>
-
-						<FileCard Title="Vehicle Type" Description="Manage vehicle type catalog"
-								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster)">
-							<IconContent>
-								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-									 stroke-linejoin="round">
-									<path d="M3 7h18" />
-									<path d="M6 3h12v4H6z" />
-									<path d="M8 11v10" />
-									<path d="M12 11v10" />
-									<path d="M16 11v10" />
-								</svg>
-							</IconContent>
-						</FileCard>
-					</div>
-				</div>
-			</div>
-
-			<div class="section-card">
-				<div class="section-header">
-					<div class="section-title-wrapper">
-						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-							 stroke-linejoin="round">
 							<path d="M12 21s-6-4.35-6-10a6 6 0 0 1 12 0c0 5.65-6 10-6 10z" />
 							<circle cx="12" cy="11" r="2" />
 						</svg>
 						<h2 class="section-title">Vehicle Routes</h2>
 					</div>
-					<p class="section-subtitle">Manage vehicle route, route location and OMC catalog</p>
+					<p class="section-subtitle">Manage vehicle route, route location, OMC and driver catalog</p>
 				</div>
 				<div class="section-body">
 					<div class="dashboard-grid">
@@ -111,6 +62,67 @@ else
 									<polyline points="14 2 14 8 20 8" />
 									<line x1="8" y1="13" x2="16" y2="13" />
 									<line x1="8" y1="17" x2="13" y2="17" />
+								</svg>
+							</IconContent>
+						</FileCard>
+
+						<FileCard Title="Vehicle Driver" Description="Manage vehicle driver catalog"
+								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster)">
+							<IconContent>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									 stroke-linejoin="round">
+									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+									<circle cx="12" cy="7" r="4" />
+								</svg>
+							</IconContent>
+						</FileCard>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M10 17h4V5H2v12h3" />
+							<path d="M14 9h4l4 4v4h-3" />
+							<circle cx="7.5" cy="17.5" r="2.5" />
+							<circle cx="17.5" cy="17.5" r="2.5" />
+						</svg>
+						<h2 class="section-title">Vehicle Masters</h2>
+					</div>
+					<p class="section-subtitle">Manage fleet vehicle and vehicle type catalog</p>
+				</div>
+				<div class="section-body">
+					<div class="dashboard-grid">
+						<FileCard Title="Vehicle" Description="Manage vehicle records"
+								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleMaster)">
+							<IconContent>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									 stroke-linejoin="round">
+									<path d="M10 17h4V5H2v12h3" />
+									<path d="M14 9h4l4 4v4h-3" />
+									<circle cx="7.5" cy="17.5" r="2.5" />
+									<circle cx="17.5" cy="17.5" r="2.5" />
+								</svg>
+							</IconContent>
+						</FileCard>
+
+						<FileCard Title="Vehicle Type" Description="Manage vehicle type catalog"
+								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster)">
+							<IconContent>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									 stroke-linejoin="round">
+									<path d="M3 7h18" />
+									<path d="M6 3h12v4H6z" />
+									<path d="M8 11v10" />
+									<path d="M12 11v10" />
+									<path d="M16 11v10" />
 								</svg>
 							</IconContent>
 						</FileCard>

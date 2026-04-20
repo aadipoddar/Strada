@@ -166,17 +166,10 @@ public partial class VehicleRoutePage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private void OnEditVehicleRoute(VehicleRouteModel vehicleRoute)
+	private async Task OnEditVehicleRoute(VehicleRouteModel vehicleRoute)
 	{
-		_vehicleRoute = new()
-		{
-			Id = vehicleRoute.Id,
-			FromLocationId = vehicleRoute.FromLocationId,
-			ToLocationId = vehicleRoute.ToLocationId,
-			Code = vehicleRoute.Code,
-			Remarks = vehicleRoute.Remarks,
-			Status = vehicleRoute.Status
-		};
+		_vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, vehicleRoute.Id)
+			?? throw new Exception("Vehicle Route not found.");
 		_selectedFromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.FromLocationId);
 		_selectedToLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.ToLocationId);
 
@@ -348,7 +341,7 @@ public partial class VehicleRoutePage : IAsyncDisposable
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
-			OnEditVehicleRoute(selectedRecords[0]);
+			await OnEditVehicleRoute(selectedRecords[0]);
 	}
 
 	private async Task DeleteSelectedItem()

@@ -133,15 +133,10 @@ public partial class VoucherPage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditVoucher(VoucherModel voucher)
+    private async Task OnEditVoucher(VoucherModel voucher)
     {
-        _voucher = new()
-        {
-            Id = voucher.Id,
-            Name = voucher.Name,
-            Remarks = voucher.Remarks,
-            Status = voucher.Status
-        };
+        _voucher = await CommonData.LoadTableDataById<VoucherModel>(AccountNames.Voucher, voucher.Id)
+            ?? throw new Exception("Voucher not found.");
 
         StateHasChanged();
     }
@@ -311,7 +306,7 @@ public partial class VoucherPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditVoucher(selectedRecords[0]);
+            await OnEditVoucher(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()

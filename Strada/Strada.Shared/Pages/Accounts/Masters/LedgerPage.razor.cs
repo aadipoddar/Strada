@@ -207,26 +207,10 @@ public partial class LedgerPage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditLedger(LedgerModel ledger)
+    private async Task OnEditLedger(LedgerModel ledger)
     {
-        _ledger = new()
-        {
-            Id = ledger.Id,
-            Name = ledger.Name,
-            Code = ledger.Code,
-            GroupId = ledger.GroupId,
-            AccountTypeId = ledger.AccountTypeId,
-            StateUTId = ledger.StateUTId,
-            GSTNo = ledger.GSTNo,
-            PANNo = ledger.PANNo,
-            CINNo = ledger.CINNo,
-            Alias = ledger.Alias,
-            Phone = ledger.Phone,
-            Email = ledger.Email,
-            Address = ledger.Address,
-            Remarks = ledger.Remarks,
-            Status = ledger.Status
-        };
+        _ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, ledger.Id)
+            ?? throw new Exception("Ledger not found.");
 
         StateHasChanged();
     }
@@ -410,7 +394,7 @@ public partial class LedgerPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditLedger(selectedRecords[0]);
+            await OnEditLedger(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()

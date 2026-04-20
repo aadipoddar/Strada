@@ -189,16 +189,10 @@ public partial class StateUTPage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditStateUT(StateUTModel stateUT)
+    private async Task OnEditStateUT(StateUTModel stateUT)
     {
-        _stateUT = new()
-        {
-            Id = stateUT.Id,
-            Name = stateUT.Name,
-            Remarks = stateUT.Remarks,
-            UnionTerritory = stateUT.UnionTerritory,
-            Status = stateUT.Status
-        };
+        _stateUT = await CommonData.LoadTableDataById<StateUTModel>(AccountNames.StateUT, stateUT.Id)
+            ?? throw new Exception("State/UT not found.");
 
         StateHasChanged();
     }
@@ -312,7 +306,7 @@ public partial class StateUTPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditStateUT(selectedRecords[0]);
+            await OnEditStateUT(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()
@@ -370,8 +364,8 @@ public partial class StateUTPage : IAsyncDisposable
 
     public ValueTask DisposeAsync()
     {
-		GC.SuppressFinalize(this);
-		return ((IAsyncDisposable)HotKeys).DisposeAsync();
-	}
+        GC.SuppressFinalize(this);
+        return ((IAsyncDisposable)HotKeys).DisposeAsync();
+    }
     #endregion
 }

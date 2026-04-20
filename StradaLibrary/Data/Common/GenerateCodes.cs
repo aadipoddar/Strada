@@ -116,6 +116,10 @@ public static class GenerateCodes
 					var omc = await CommonData.LoadTableDataByCode<OMCModel>(FleetNames.OMC, code, sqlDataAccessTransaction);
 					isDuplicate = omc is not null;
 					break;
+				case CodeType.VehicleDriver:
+					var vehicleDriver = await CommonData.LoadTableDataByCode<VehicleDriverModel>(FleetNames.VehicleDriver, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleDriver is not null;
+					break;
 			}
 
 			if (!isDuplicate)
@@ -274,6 +278,29 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{omcPrefix}00001", 5, CodeType.OMC, sqlDataAccessTransaction);
+	}
+
+	public static async Task<string> GenerateVehicleDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver, sqlDataAccessTransaction);
+		var vehicleDriverPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleDriverCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastVehicleDriver = vehicleDrivers.OrderByDescending(vd => vd.Id).FirstOrDefault();
+		if (lastVehicleDriver is not null)
+		{
+			var lastVehicleDriverCode = lastVehicleDriver.Code;
+			if (lastVehicleDriverCode.StartsWith(vehicleDriverPrefix))
+			{
+				var lastNumberPart = lastVehicleDriverCode[vehicleDriverPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{vehicleDriverPrefix}{nextNumber:D5}", 5, CodeType.VehicleDriver, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{vehicleDriverPrefix}00001", 5, CodeType.VehicleDriver, sqlDataAccessTransaction);
 	}
 	#endregion
 }

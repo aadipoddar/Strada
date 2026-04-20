@@ -7,7 +7,8 @@ public enum CodeType
 	VehicleType,
 	VehicleDocumentType,
 	RouteLocation,
-	OMC
+	OMC,
+	VehicleDriver
 }
 
 public class DecodeTransactionNoModel

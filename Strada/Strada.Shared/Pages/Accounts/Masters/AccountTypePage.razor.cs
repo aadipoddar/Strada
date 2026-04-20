@@ -189,15 +189,10 @@ public partial class AccountTypePage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditAccountType(AccountTypeModel accountType)
+    private async Task OnEditAccountType(AccountTypeModel accountType)
     {
-        _accountType = new()
-        {
-            Id = accountType.Id,
-            Name = accountType.Name,
-            Remarks = accountType.Remarks,
-            Status = accountType.Status
-        };
+        _accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, accountType.Id)
+            ?? throw new Exception("Account Type not found.");
 
         StateHasChanged();
     }
@@ -311,7 +306,7 @@ public partial class AccountTypePage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditAccountType(selectedRecords[0]);
+            await OnEditAccountType(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()

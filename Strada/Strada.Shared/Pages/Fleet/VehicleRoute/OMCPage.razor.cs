@@ -152,16 +152,10 @@ public partial class OMCPage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private void OnEditOMC(OMCModel omc)
+	private async Task OnEditOMC(OMCModel omc)
 	{
-		_omc = new()
-		{
-			Id = omc.Id,
-			Name = omc.Name,
-			Code = omc.Code,
-			Remarks = omc.Remarks,
-			Status = omc.Status
-		};
+		_omc = await CommonData.LoadTableDataById<OMCModel>(FleetNames.OMC, omc.Id)
+			?? throw new Exception("OMC not found.");
 
 		StateHasChanged();
 	}
@@ -331,7 +325,7 @@ public partial class OMCPage : IAsyncDisposable
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
-			OnEditOMC(selectedRecords[0]);
+			await OnEditOMC(selectedRecords[0]);
 	}
 
 	private async Task DeleteSelectedItem()
