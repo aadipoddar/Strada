@@ -112,6 +112,10 @@ public static class GenerateCodes
 					var omc = await CommonData.LoadTableDataByCode<OMCModel>(FleetNames.OMC, code, sqlDataAccessTransaction);
 					isDuplicate = omc is not null;
 					break;
+				case CodeType.OMCCard:
+					var omcCard = await CommonData.LoadTableDataByCode<OMCCardModel>(FleetNames.OMCCard, code, sqlDataAccessTransaction);
+					isDuplicate = omcCard is not null;
+					break;
 				case CodeType.VehicleRouteLocation:
 					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
 					isDuplicate = routeLocation is not null;
@@ -259,6 +263,29 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{omcPrefix}00001", 5, CodeType.OMC, sqlDataAccessTransaction);
+	}
+
+	public static async Task<string> GenerateOMCCardCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard, sqlDataAccessTransaction);
+		var omcCardPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCardCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastOmcCard = omcCards.OrderByDescending(oc => oc.Id).FirstOrDefault();
+		if (lastOmcCard is not null)
+		{
+			var lastOmcCardCode = lastOmcCard.Code;
+			if (lastOmcCardCode.StartsWith(omcCardPrefix))
+			{
+				var lastNumberPart = lastOmcCardCode[omcCardPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{omcCardPrefix}{nextNumber:D5}", 5, CodeType.OMCCard, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{omcCardPrefix}00001", 5, CodeType.OMCCard, sqlDataAccessTransaction);
 	}
 
 	public static async Task<string> GenerateRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)

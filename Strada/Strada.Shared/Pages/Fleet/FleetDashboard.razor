@@ -23,7 +23,7 @@ else
 						</svg>
 						<h2 class="section-title">Vehicle Routes</h2>
 					</div>
-					<p class="section-subtitle">Manage vehicle route, route location, expense type, OMC and driver catalog</p>
+					<p class="section-subtitle">Manage vehicle route, route location, expense type, OMC, OMC card and driver catalog</p>
 				</div>
 				<div class="section-body">
 					<div class="dashboard-grid">
@@ -37,6 +37,19 @@ else
 									<polyline points="14 2 14 8 20 8" />
 									<line x1="8" y1="13" x2="16" y2="13" />
 									<line x1="8" y1="17" x2="13" y2="17" />
+								</svg>
+							</IconContent>
+						</FileCard>
+
+						<FileCard Title="Vehicle OMC Card" Description="Manage OMC card catalog"
+								  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleOMCCardMaster)">
+							<IconContent>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+									 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									 stroke-linejoin="round">
+									<rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+									<line x1="2" y1="10" x2="22" y2="10" />
+									<line x1="6" y1="15" x2="10" y2="15" />
 								</svg>
 							</IconContent>
 						</FileCard>
