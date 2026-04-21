@@ -80,6 +80,9 @@
     <Folder Include="Fleet\VehicleDocument" />
     <Folder Include="Fleet\VehicleDocument\Table" />
     <Folder Include="Fleet\VehicleDocument\Insert" />
+    <Folder Include="Fleet\VehicleTrip" />
+    <Folder Include="Fleet\VehicleTrip\Table" />
+    <Folder Include="Fleet\VehicleTrip\Insert" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -138,6 +141,10 @@
     <Build Include="Fleet\VehicleDocument\Table\VehicleDocumentType.sql" />
     <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocument.sql" />
     <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocumentType.sql" />
+    <Build Include="Fleet\VehicleTrip\Table\VehicleTrip.sql" />
+    <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTrip.sql" />
+    <Build Include="Fleet\VehicleRoute\Table\VehicleRouteExpenseType.sql" />
+    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteExpenseType.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

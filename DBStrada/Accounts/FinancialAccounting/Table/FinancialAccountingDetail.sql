@@ -10,7 +10,7 @@
     [Credit] MONEY NULL, 
     [Remarks] VARCHAR(MAX) NULL, 
     [Status] BIT NOT NULL DEFAULT 1, 
-    CONSTRAINT [FK_FinancialAccountingDetails_ToAccounting] FOREIGN KEY ([MasterId]) REFERENCES [FinancialAccounting](Id), 
-    CONSTRAINT [FK_FinancialAccountingDetails_ToLedger] FOREIGN KEY (LedgerId) REFERENCES [Ledger](Id)
+    CONSTRAINT [FK_FinancialAccountingDetails_ToAccounting] FOREIGN KEY ([MasterId]) REFERENCES [FinancialAccounting]([Id]), 
+    CONSTRAINT [FK_FinancialAccountingDetails_ToLedger] FOREIGN KEY ([LedgerId]) REFERENCES [Ledger]([Id])
 
 )

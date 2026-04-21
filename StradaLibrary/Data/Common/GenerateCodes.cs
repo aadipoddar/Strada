@@ -108,17 +108,21 @@ public static class GenerateCodes
 					var vehicleDocumentType = await CommonData.LoadTableDataByCode<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleDocumentType is not null;
 					break;
-				case CodeType.RouteLocation:
-					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
-					isDuplicate = routeLocation is not null;
-					break;
 				case CodeType.OMC:
 					var omc = await CommonData.LoadTableDataByCode<OMCModel>(FleetNames.OMC, code, sqlDataAccessTransaction);
 					isDuplicate = omc is not null;
 					break;
+				case CodeType.VehicleRouteLocation:
+					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
+					isDuplicate = routeLocation is not null;
+					break;
 				case CodeType.VehicleDriver:
 					var vehicleDriver = await CommonData.LoadTableDataByCode<VehicleDriverModel>(FleetNames.VehicleDriver, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleDriver is not null;
+					break;
+				case CodeType.VehicleRouteExpenseType:
+					var vehicleRouteExpenseType = await CommonData.LoadTableDataByCode<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleRouteExpenseType is not null;
 					break;
 			}
 
@@ -234,29 +238,6 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{vehicleDocumentTypePrefix}00001", 5, CodeType.VehicleDocumentType, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
-	{
-		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, sqlDataAccessTransaction);
-		var routeLocationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.RouteLocationCodePrefix, sqlDataAccessTransaction)).Value;
-
-		var lastRouteLocation = routeLocations.OrderByDescending(rl => rl.Id).FirstOrDefault();
-		if (lastRouteLocation is not null)
-		{
-			var lastRouteLocationCode = lastRouteLocation.Code;
-			if (lastRouteLocationCode.StartsWith(routeLocationPrefix))
-			{
-				var lastNumberPart = lastRouteLocationCode[routeLocationPrefix.Length..];
-				if (int.TryParse(lastNumberPart, out int lastNumber))
-				{
-					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{routeLocationPrefix}{nextNumber:D5}", 5, CodeType.RouteLocation, sqlDataAccessTransaction);
-				}
-			}
-		}
-
-		return await CheckDuplicateCode($"{routeLocationPrefix}00001", 5, CodeType.RouteLocation, sqlDataAccessTransaction);
-	}
-
 	public static async Task<string> GenerateOMCCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC, sqlDataAccessTransaction);
@@ -280,6 +261,29 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{omcPrefix}00001", 5, CodeType.OMC, sqlDataAccessTransaction);
 	}
 
+	public static async Task<string> GenerateRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, sqlDataAccessTransaction);
+		var routeLocationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteLocationCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastRouteLocation = routeLocations.OrderByDescending(rl => rl.Id).FirstOrDefault();
+		if (lastRouteLocation is not null)
+		{
+			var lastRouteLocationCode = lastRouteLocation.Code;
+			if (lastRouteLocationCode.StartsWith(routeLocationPrefix))
+			{
+				var lastNumberPart = lastRouteLocationCode[routeLocationPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{routeLocationPrefix}{nextNumber:D5}", 5, CodeType.VehicleRouteLocation, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{routeLocationPrefix}00001", 5, CodeType.VehicleRouteLocation, sqlDataAccessTransaction);
+	}
+
 	public static async Task<string> GenerateVehicleDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver, sqlDataAccessTransaction);
@@ -301,6 +305,29 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{vehicleDriverPrefix}00001", 5, CodeType.VehicleDriver, sqlDataAccessTransaction);
+	}
+
+	public static async Task<string> GenerateVehicleRouteExpenseTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var vehicleRouteExpenseTypes = await CommonData.LoadTableData<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType, sqlDataAccessTransaction);
+		var vehicleRouteExpenseTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteExpenseTypeCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastVehicleRouteExpenseType = vehicleRouteExpenseTypes.OrderByDescending(v => v.Id).FirstOrDefault();
+		if (lastVehicleRouteExpenseType is not null)
+		{
+			var lastVehicleRouteExpenseTypeCode = lastVehicleRouteExpenseType.Code;
+			if (lastVehicleRouteExpenseTypeCode.StartsWith(vehicleRouteExpenseTypePrefix))
+			{
+				var lastNumberPart = lastVehicleRouteExpenseTypeCode[vehicleRouteExpenseTypePrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{vehicleRouteExpenseTypePrefix}{nextNumber:D5}", 5, CodeType.VehicleRouteExpenseType, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{vehicleRouteExpenseTypePrefix}00001", 5, CodeType.VehicleRouteExpenseType, sqlDataAccessTransaction);
 	}
 	#endregion
 }

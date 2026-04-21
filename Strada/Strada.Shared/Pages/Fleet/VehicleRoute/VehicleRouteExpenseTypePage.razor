@@ -1,0 +1,143 @@
+@attribute [Route(PageRouteNames.VehicleRouteExpenseTypeMaster)]
+
+@using StradaLibrary.Models.Fleet.VehicleRoute
+
+<PageTitle>Vehicle Route Expense Type - Strada</PageTitle>
+
+@if (_isLoading || _user is null)
+{
+	<AnimatedLoader Visible="true" />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Vehicle Route Expense Type Management">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
+									   Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewVehicleRouteExpenseType"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveVehicleRouteExpenseType"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
+										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
+							<MenuItems>
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<div class="page-container">
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
+						</svg>
+						<h2 class="section-title">Vehicle Route Expense Type Details</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">
+								Vehicle Route Expense Type Name <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_vehicleRouteExpenseType.Name" Placeholder="Enter Vehicle Route Expense Type name"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Code <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_vehicleRouteExpenseType.Code" Placeholder="Auto-generated"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Remarks</label>
+							<SfTextBox @bind-Value="_vehicleRouteExpenseType.Remarks" Placeholder="Enter remarks (optional)"
+									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M9 11l3 3L22 4" />
+							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+						</svg>
+						<h2 class="section-title">Vehicle Route Expense Type List</h2>
+					</div>
+				</div>
+				<div class="section-body grid-body">
+					<SfGrid @ref="_sfGrid" DataSource="@_vehicleRouteExpenseTypes" AllowPaging="true" AllowSorting="true"
+							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleRouteExpenseTypeGridContextMenuItems">
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
+						<GridEvents TValue="VehicleRouteExpenseTypeModel" ContextMenuItemClicked="OnVehicleRouteExpenseTypeGridContextMenuItemClicked" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+						<GridColumns>
+							<GridColumn Field="@nameof(VehicleRouteExpenseTypeModel.Id)" HeaderText="ID" Width="80"
+										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleRouteExpenseTypeModel.Name)" HeaderText="OMC Name" Width="300" />
+							<GridColumn Field="@nameof(VehicleRouteExpenseTypeModel.Code)" HeaderText="Code" Width="150" />
+							<GridColumn Field="@nameof(VehicleRouteExpenseTypeModel.Remarks)" HeaderText="Remarks" Width="400" />
+							<GridColumn Field="@nameof(VehicleRouteExpenseTypeModel.Status)" HeaderText="Status" Width="110"
+										TextAlign="TextAlign.Center" Visible="_showDeleted">
+								<Template>
+									@{
+										var vehicleRouteExpenseType = (context as VehicleRouteExpenseTypeModel);
+										<span class="@(vehicleRouteExpenseType.Status ? string.Empty : "grid-debit")">@(vehicleRouteExpenseType.Status ? "Active" : "Deleted")</span>
+									}
+								</Template>
+							</GridColumn>
+						</GridColumns>
+					</SfGrid>
+				</div>
+			</div>
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Route Expense Type" IdentifierLabel="Vehicle Route Expense Type Name"
+						  IdentifierValue="@_deleteVehicleRouteExpenseTypeName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  OnCancel="CancelDelete" />
+
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Route Expense Type"
+					   IdentifierLabel="Vehicle Route Expense Type Name" IdentifierValue="@_recoverVehicleRouteExpenseTypeName" Disabled="@_isProcessing"
+					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+
+<ToastNotification @ref="_toastNotification" />

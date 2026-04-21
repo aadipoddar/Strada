@@ -6,9 +6,10 @@ public enum CodeType
 	Ledger,
 	VehicleType,
 	VehicleDocumentType,
-	RouteLocation,
 	OMC,
-	VehicleDriver
+	VehicleRouteLocation,
+	VehicleDriver,
+	VehicleRouteExpenseType
 }
 
 public class DecodeTransactionNoModel

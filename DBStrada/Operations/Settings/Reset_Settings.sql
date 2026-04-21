@@ -11,11 +11,12 @@ BEGIN
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'LedgerCodePrefix'				, N'LD'		, N'Prefix for Ledger Codes')
 	
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleTypeCodePrefix'			, N'VHTY'	, N'Prefix for Vehicle Type Codes')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'DocumentTypeCodePrefix'			, N'DCTY'	, N'Prefix for Document Type Codes')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'RouteLocationCodePrefix'			, N'RTLC'	, N'Prefix for Route Location Codes')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'OMCCodePrefix'					, N'OMC'	, N'Prefix for OMC Codes')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleDriverCodePrefix'			, N'VHDR'	, N'Prefix for Vehicle Driver Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleTypeCodePrefix'				, N'VHTY'	, N'Prefix for Vehicle Type Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'DocumentTypeCodePrefix'				, N'DCTY'	, N'Prefix for Document Type Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'OMCCodePrefix'						, N'OMC'	, N'Prefix for OMC Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleRouteLocationCodePrefix'		, N'VHRL'	, N'Prefix for Route Location Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleDriverCodePrefix'				, N'VHDR'	, N'Prefix for Vehicle Driver Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleRouteExpenseTypeCodePrefix'	, N'VREX'	, N'Prefix for Vehicle Route Expense Type Codes')
 	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'ACCT'	, N'Prefix for Financial Accounting Transaction Numbers')
 

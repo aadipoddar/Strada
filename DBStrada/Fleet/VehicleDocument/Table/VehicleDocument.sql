@@ -18,9 +18,9 @@
 	[LastModifiedBy] INT NULL,
 	[LastModifiedAt] DATETIME NULL, 
 	[LastModifiedFromPlatform] VARCHAR(MAX) NULL, 
-    CONSTRAINT [FK_VehicleDocument_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [FinancialYear](Id),
-    CONSTRAINT [FK_VehicleDocument_ToVehicleDocumentType] FOREIGN KEY ([VehicleDocumentTypeId]) REFERENCES [VehicleDocumentType](Id), 
-    CONSTRAINT [FK_VehicleDocument_ToVehicle] FOREIGN KEY ([VehicleId]) REFERENCES [Vehicle](Id),
-    CONSTRAINT [FK_VehicleDocument_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
+    CONSTRAINT [FK_VehicleDocument_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [FinancialYear]([Id]),
+    CONSTRAINT [FK_VehicleDocument_ToVehicleDocumentType] FOREIGN KEY ([VehicleDocumentTypeId]) REFERENCES [VehicleDocumentType]([Id]), 
+    CONSTRAINT [FK_VehicleDocument_ToVehicle] FOREIGN KEY ([VehicleId]) REFERENCES [Vehicle]([Id]),
+    CONSTRAINT [FK_VehicleDocument_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 	CONSTRAINT [FK_VehicleDocument_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])
 )
