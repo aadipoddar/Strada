@@ -104,6 +104,18 @@ public partial class VehicleRoutePage : IAsyncDisposable
 		if (_vehicleRoute.FromLocationId == _vehicleRoute.ToLocationId)
 			throw new Exception("From location and to location cannot be the same.");
 
+		if (_vehicleRoute.EstimatedHours < 0)
+			throw new Exception("Estimated hours must be greater than zero.");
+
+		if (_vehicleRoute.EstimatedDistance < 0)
+			throw new Exception("Estimated distance must be greater than zero.");
+
+		if (_vehicleRoute.EstimatedFuelConsumption < 0)
+			throw new Exception("Estimated fuel consumption must be greater than zero.");
+
+		if (_vehicleRoute.EstimatedCost < 0)
+			throw new Exception("Estimated cost must be greater than zero.");
+
 		VehicleRouteModel existingVehicleRouteByLocationPair;
 		if (_vehicleRoute.Id > 0)
 			existingVehicleRouteByLocationPair = _vehicleRoutesAll.FirstOrDefault(_ => _.Id != _vehicleRoute.Id && _.FromLocationId == _vehicleRoute.FromLocationId && _.ToLocationId == _vehicleRoute.ToLocationId);

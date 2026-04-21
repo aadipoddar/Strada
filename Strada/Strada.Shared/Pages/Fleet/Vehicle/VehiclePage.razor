@@ -96,22 +96,30 @@ else
 							<label class="field-label">
 								Vehicle Type <span class="required">*</span>
 							</label>
-							<SfDropDownList TValue="int" TItem="VehicleTypeModel" Placeholder="Select vehicle type"
-											DataSource="@_vehicleTypes" @bind-Value="_vehicle.VehicleTypeId"
-											FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox">
-								<DropDownListFieldSettings Text="Name" Value="Id" />
-							</SfDropDownList>
+							<SfAutoComplete TItem="VehicleTypeModel" TValue="VehicleTypeModel"
+											@bind-Value="_selectedVehicleType"
+											DataSource="@_vehicleTypes" Placeholder="Select vehicle type"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											AllowCustom="false"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+											CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+							</SfAutoComplete>
 						</div>
 
 						<div class="form-field">
 							<label class="field-label">
 								Company <span class="required">*</span>
 							</label>
-							<SfDropDownList TValue="int" TItem="CompanyModel" Placeholder="Select company"
-											DataSource="@_companies" @bind-Value="_vehicle.CompanyId"
-											FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox">
-								<DropDownListFieldSettings Text="Name" Value="Id" />
-							</SfDropDownList>
+							<SfAutoComplete TItem="CompanyModel" TValue="CompanyModel"
+											@bind-Value="_selectedCompany"
+											DataSource="@_companies" Placeholder="Select company"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											AllowCustom="false"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+											CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+							</SfAutoComplete>
 						</div>
 
 						<div class="form-field">

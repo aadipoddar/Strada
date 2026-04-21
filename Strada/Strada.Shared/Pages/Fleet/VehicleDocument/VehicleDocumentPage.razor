@@ -26,6 +26,8 @@ else
 										  Disabled="@_isProcessing" />
 								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
 										  Disabled="@_isProcessing" />
+								<MenuItem Text="Upload Document (Ctrl + U)" IconCss="e-icons e-upload" Id="UploadDocument"
+										  Disabled="@_isProcessing" />
 								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
 										  Id="ToggleDeleted" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
@@ -172,29 +174,44 @@ else
 							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
 							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleDocumentGridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-						<GridEvents TValue="VehicleDocumentOverviewModel" ContextMenuItemClicked="OnVehicleDocumentGridContextMenuItemClicked" />
+						<GridEvents TValue="VehicleDocumentModel" ContextMenuItemClicked="OnVehicleDocumentGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Id)" HeaderText="ID" Width="80"
+							<GridColumn Field="@nameof(VehicleDocumentModel.Id)" HeaderText="ID" Width="80"
 										TextAlign="TextAlign.Center" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.TransactionNo)" HeaderText="Transaction No" Width="180" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.TransactionDateTime)" HeaderText="Transaction Date" Width="150"
+							<GridColumn Field="@nameof(VehicleDocumentModel.TransactionNo)" HeaderText="Transaction No" Width="180" />
+							<GridColumn Field="@nameof(VehicleDocumentModel.TransactionDateTime)" HeaderText="Transaction Date" Width="150"
 										Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="170" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.VehicleDocumentType)" HeaderText="Document Type" Width="200" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Vehicle)" HeaderText="Vehicle" Width="150" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.CurrentKM)" HeaderText="Current KM" Width="140"
+							<GridColumn Field="@nameof(VehicleDocumentModel.VehicleDocumentTypeId)" HeaderText="Document Type" Width="200">
+								<Template>
+									@{
+										var vehicleDocument = (context as VehicleDocumentModel);
+										var documentType = _vehicleDocumentTypes.FirstOrDefault(vdt => vdt.Id == vehicleDocument.VehicleDocumentTypeId);
+										<span>@(documentType is not null ? documentType.Name : "N/A")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(VehicleDocumentModel.VehicleId)" HeaderText="Vehicle" Width="150">
+								<Template>
+									@{
+										var vehicleDocument = (context as VehicleDocumentModel);
+										var vehicle = _vehicles.FirstOrDefault(v => v.Id == vehicleDocument.VehicleId);
+										<span>@(vehicle is not null ? vehicle.Code : "N/A")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(VehicleDocumentModel.CurrentKM)" HeaderText="Current KM" Width="140"
 										Format="N2" TextAlign="TextAlign.Right" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Rate)" HeaderText="Rate" Width="140"
+							<GridColumn Field="@nameof(VehicleDocumentModel.Rate)" HeaderText="Rate" Width="140"
 										Format="N2" TextAlign="TextAlign.Right" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.RenewalDate)" HeaderText="Renewal Date" Width="150"
+							<GridColumn Field="@nameof(VehicleDocumentModel.RenewalDate)" HeaderText="Next Renewal Date" Width="150"
 										Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Remarks)" HeaderText="Remarks" Width="250" />
-							<GridColumn Field="@nameof(VehicleDocumentOverviewModel.Status)" HeaderText="Status" Width="110"
+							<GridColumn Field="@nameof(VehicleDocumentModel.Remarks)" HeaderText="Remarks" Width="250" />
+							<GridColumn Field="@nameof(VehicleDocumentModel.Status)" HeaderText="Status" Width="110"
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var vehicleDocument = (context as VehicleDocumentOverviewModel);
+										var vehicleDocument = (context as VehicleDocumentModel);
 										<span class="@(vehicleDocument.Status ? string.Empty : "grid-debit")">@(vehicleDocument.Status ? "Active" : "Deleted")</span>
 									}
 								</Template>
@@ -208,6 +225,14 @@ else
 		<Footer />
 	</div>
 }
+
+<DocumentUploadDialog Title="Upload Original Document"
+					  InfoMessage="Document will be uploaded only when you save the transaction."
+					  ExistingDocumentUrl="@_vehicleDocument.DocumentUrl"
+					  ShowInterpretButton="false" @bind-IsVisible="_isUploadDialogVisible"
+					  OnFileChange="OnUploaderFileChange" OnFileRemove="OnRemoveFile"
+					  OnDownloadClick="DownloadExistingDocument" OnRemoveClick="MarkDocumentForRemoval"
+					  OnClose="CloseUploadDialog" />
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Document" IdentifierLabel="Transaction No"
 						  IdentifierValue="@_deleteVehicleDocumentTransactionNo" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"

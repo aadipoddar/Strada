@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.VehicleDocument;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
@@ -10,6 +10,7 @@ using StradaLibrary.Models.Fleet.VehicleDocument;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Fleet.VehicleDocument;
 
@@ -21,10 +22,13 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showDeleted = false;
+	private bool _isUploadDialogVisible = false;
 
 	private VehicleDocumentModel _vehicleDocument = new() { TransactionDateTime = DateTime.Now, RenewalDate = DateTime.Now.AddYears(1) };
+	private IBrowserFile _pendingDocumentFile;
+	private string _documentUrlToDelete = string.Empty;
 
-	private List<VehicleDocumentOverviewModel> _vehicleDocuments = [];
+	private List<VehicleDocumentModel> _vehicleDocuments = [];
 	private List<VehicleDocumentTypeModel> _vehicleDocumentTypes = [];
 	private List<VehicleModel> _vehicles = [];
 	private readonly List<ContextMenuItemModel> _vehicleDocumentGridContextMenuItems =
@@ -33,7 +37,7 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverVehicleDocument", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private SfGrid<VehicleDocumentOverviewModel> _sfGrid;
+	private SfGrid<VehicleDocumentModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
@@ -59,6 +63,7 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	{
 		_hotKeysContext = HotKeys.CreateContext()
 			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.U, UploadDocument, "Upload document", Exclude.None)
 			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
 			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
 			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
@@ -73,7 +78,7 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_vehicles = [.. _vehicles.OrderBy(v => v.Code)];
 
-		_vehicleDocuments = await CommonData.LoadTableData<VehicleDocumentOverviewModel>(FleetNames.VehicleDocumentOverview);
+		_vehicleDocuments = await CommonData.LoadTableData<VehicleDocumentModel>(FleetNames.VehicleDocument);
 		if (!_showDeleted)
 			_vehicleDocuments = [.. _vehicleDocuments.Where(vd => vd.Status)];
 
@@ -105,69 +110,6 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		_vehicleDocument.TransactionNo = _vehicleDocument.TransactionNo?.Trim() ?? string.Empty;
-		_vehicleDocument.TransactionNo = _vehicleDocument.TransactionNo.ToUpper();
-
-		_vehicleDocument.Remarks = _vehicleDocument.Remarks?.Trim() ?? string.Empty;
-		_vehicleDocument.Status = true;
-
-		if (string.IsNullOrWhiteSpace(_vehicleDocument.TransactionNo))
-			throw new Exception("Transaction No is required. Please enter a valid transaction number.");
-
-		if (_vehicleDocument.VehicleDocumentTypeId <= 0)
-			throw new Exception("Document Type is required. Please select a valid document type.");
-
-		if (_vehicleDocument.VehicleId <= 0)
-			throw new Exception("Vehicle is required. Please select a valid vehicle.");
-
-		if (_vehicleDocument.Rate < 0)
-			throw new Exception("Rate must be a positive value.");
-
-		if (_vehicleDocument.CurrentKM < 0)
-			throw new Exception("Current KM cannot be negative.");
-
-		if (_vehicleDocument.RenewalDate < _vehicleDocument.TransactionDateTime)
-			throw new Exception("Renewal Date cannot be earlier than Transaction Date.");
-
-		if (_vehicleDocument.Id > 0)
-		{
-			var duplicateTransaction = _vehicleDocuments.FirstOrDefault(vd => vd.Id != _vehicleDocument.Id && vd.TransactionNo.Equals(_vehicleDocument.TransactionNo, StringComparison.OrdinalIgnoreCase));
-			if (duplicateTransaction is not null)
-				throw new Exception($"Transaction No '{_vehicleDocument.TransactionNo}' already exists. Please enter a different transaction number.");
-
-			var existingVehicleDocument = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, _vehicleDocument.Id)
-				?? throw new Exception("Vehicle Document transaction not found for updating.");
-
-			await FinancialYearData.ValidateFinancialYear(existingVehicleDocument.TransactionDateTime);
-		}
-		else
-		{
-			var duplicateTransaction = _vehicleDocuments.FirstOrDefault(vd => vd.TransactionNo.Equals(_vehicleDocument.TransactionNo, StringComparison.OrdinalIgnoreCase));
-			if (duplicateTransaction is not null)
-				throw new Exception($"Transaction No '{_vehicleDocument.TransactionNo}' already exists. Please enter a different transaction number.");
-		}
-
-		await FinancialYearData.ValidateFinancialYear(_vehicleDocument.TransactionDateTime);
-		var financialYear = await FinancialYearData.LoadFinancialYearByDateTime(_vehicleDocument.TransactionDateTime);
-		_vehicleDocument.FinancialYearId = financialYear.Id;
-
-		_vehicleDocument.Remarks = _vehicleDocument.Remarks?.Trim() ?? string.Empty;
-		if (string.IsNullOrWhiteSpace(_vehicleDocument.Remarks))
-			_vehicleDocument.Remarks = null;
-
-		var currentDateTime = await CommonData.LoadCurrentDateTime();
-		_vehicleDocument.Status = true;
-		_vehicleDocument.TransactionDateTime = DateOnly.FromDateTime(_vehicleDocument.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
-		_vehicleDocument.CreatedBy = _user.Id;
-		_vehicleDocument.CreatedAt = currentDateTime;
-		_vehicleDocument.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-		_vehicleDocument.LastModifiedBy = null;
-		_vehicleDocument.LastModifiedAt = null;
-		_vehicleDocument.LastModifiedFromPlatform = null;
-	}
-
 	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
@@ -179,8 +121,21 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await ValidateForm();
-			await VehicleDocumentData.InsertVehicleDocument(_vehicleDocument);
+			var currentDateTime = await CommonData.LoadCurrentDateTime();
+			_vehicleDocument.Status = true;
+			_vehicleDocument.TransactionDateTime = DateOnly.FromDateTime(_vehicleDocument.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+			_vehicleDocument.CreatedBy = _user.Id;
+			_vehicleDocument.CreatedAt = currentDateTime;
+			_vehicleDocument.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			_vehicleDocument.LastModifiedBy = null;
+			_vehicleDocument.LastModifiedAt = null;
+			_vehicleDocument.LastModifiedFromPlatform = null;
+
+			await VehicleDocumentData.SaveTransaction(
+				_vehicleDocument,
+				_pendingDocumentFile?.OpenReadStream(maxAllowedSize: 52428800),
+				_pendingDocumentFile?.Name,
+				_documentUrlToDelete);
 
 			await _toastNotification.ShowAsync("Success", $"Vehicle Document transaction '{_vehicleDocument.TransactionNo}' has been saved successfully.", ToastType.Success);
 			NavigationManager.NavigateTo(PageRouteNames.VehicleDocument, true);
@@ -197,10 +152,13 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditVehicleDocument(VehicleDocumentOverviewModel vehicleDocument)
+	private async Task OnEditVehicleDocument(VehicleDocumentModel vehicleDocument)
 	{
 		_vehicleDocument = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, vehicleDocument.Id)
 			?? throw new Exception("Vehicle Document transaction not found for editing.");
+		_pendingDocumentFile = null;
+		_documentUrlToDelete = string.Empty;
+		_isUploadDialogVisible = false;
 		StateHasChanged();
 	}
 
@@ -335,6 +293,74 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	}
 	#endregion
 
+	#region Uploading Document
+	private void UploadDocument()
+	{
+		if (_isProcessing)
+			return;
+
+		_isUploadDialogVisible = true;
+		StateHasChanged();
+	}
+
+	private void CloseUploadDialog()
+	{
+		_isUploadDialogVisible = false;
+		StateHasChanged();
+	}
+
+	private async Task OnUploaderFileChange(UploadChangeEventArgs args)
+	{
+		if (args.Files is null || args.Files.Count == 0 || args.Files[0].File is null)
+			return;
+
+		_pendingDocumentFile = args.Files[0].File;
+		await _toastNotification.ShowAsync("Document Selected", $"'{_pendingDocumentFile.Name}' will be uploaded when you save the transaction.", ToastType.Info);
+	}
+
+	private Task OnRemoveFile(RemovingEventArgs args)
+	{
+		_pendingDocumentFile = null;
+		return Task.CompletedTask;
+	}
+
+	private async Task DownloadExistingDocument()
+	{
+		try
+		{
+			if (string.IsNullOrWhiteSpace(_vehicleDocument.DocumentUrl))
+				return;
+
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+
+			var (stream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(_vehicleDocument.DocumentUrl);
+			var fileName = _vehicleDocument.DocumentUrl.Split('/').Last();
+			await SaveAndViewService.SaveAndView(fileName, stream);
+
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+	}
+
+	private async Task MarkDocumentForRemoval()
+	{
+		if (string.IsNullOrWhiteSpace(_vehicleDocument.DocumentUrl))
+		{
+			_pendingDocumentFile = null;
+			return;
+		}
+
+		_documentUrlToDelete = _vehicleDocument.DocumentUrl;
+		_vehicleDocument.DocumentUrl = null;
+		_pendingDocumentFile = null;
+
+		await _toastNotification.ShowAsync("Document Removed", "Document will be removed when you save the transaction.", ToastType.Info);
+	}
+	#endregion
+
 	#region Utilities
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
@@ -345,6 +371,9 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 				break;
 			case "SaveTransaction":
 				await SaveTransaction();
+				break;
+			case "UploadDocument":
+				UploadDocument();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -364,7 +393,7 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 		}
 	}
 
-	private async Task OnVehicleDocumentGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleDocumentOverviewModel> args)
+	private async Task OnVehicleDocumentGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleDocumentModel> args)
 	{
 		switch (args.Item.Id)
 		{

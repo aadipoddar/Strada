@@ -19,6 +19,8 @@ public partial class VehiclePage : IAsyncDisposable
 	private bool _showDeleted = false;
 
 	private VehicleModel _vehicle = new() { PurchaseDate = DateTime.Today };
+	private VehicleTypeModel _selectedVehicleType;
+	private CompanyModel _selectedCompany;
 
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleTypeModel> _vehicleTypes = [];
@@ -68,6 +70,8 @@ public partial class VehiclePage : IAsyncDisposable
 		_vehicles = await CommonData.LoadTableData<VehicleModel>(FleetNames.Vehicle);
 		_vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType);
 		_companies = await CommonData.LoadTableData<CompanyModel>(AccountNames.Company);
+		_selectedVehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == _vehicle.VehicleTypeId);
+		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _vehicle.CompanyId);
 
 		if (!_showDeleted)
 			_vehicles = [.. _vehicles.Where(v => v.Status)];
@@ -82,6 +86,9 @@ public partial class VehiclePage : IAsyncDisposable
 	{
 		if (!_user.Admin)
 			throw new Exception("You do not have permission to perform this action.");
+
+		_vehicle.VehicleTypeId = _selectedVehicleType?.Id ?? 0;
+		_vehicle.CompanyId = _selectedCompany?.Id ?? 0;
 
 		_vehicle.Code = _vehicle.Code?.Trim() ?? "";
 		_vehicle.Code = _vehicle.Code?.ToUpper() ?? "";
@@ -200,6 +207,8 @@ public partial class VehiclePage : IAsyncDisposable
 	{
 		_vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, vehicle.Id)
 			?? throw new Exception("Vehicle not found.");
+		_selectedVehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == _vehicle.VehicleTypeId);
+		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _vehicle.CompanyId);
 
 		StateHasChanged();
 	}

@@ -69,7 +69,5 @@ public static class BlobStorageAccess
 
 public enum BlobStorageContainers
 {
-    purchase,
-    purchasereturn,
-	document
+    vehicledocument
 }

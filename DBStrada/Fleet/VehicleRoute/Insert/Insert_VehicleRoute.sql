@@ -3,6 +3,10 @@ CREATE PROCEDURE [dbo].[Insert_VehicleRoute]
 	@FromLocationId INT,
 	@ToLocationId INT,
 	@Code VARCHAR(10),
+	@EstimatedHours INT,
+	@EstimatedDistance INT,
+	@EstimatedFuelConsumption INT,
+	@EstimatedCost MONEY,
 	@Remarks VARCHAR(MAX),
 	@Status BIT = 1
 AS
@@ -14,6 +18,10 @@ BEGIN
 			[FromLocationId],
 			[ToLocationId],
 			[Code],
+			[EstimatedHours],
+			[EstimatedDistance],
+			[EstimatedFuelConsumption],
+			[EstimatedCost],
 			[Remarks],
 			[Status]
 		)
@@ -22,6 +30,10 @@ BEGIN
 			@FromLocationId,
 			@ToLocationId,
 			@Code,
+			@EstimatedHours,
+			@EstimatedDistance,
+			@EstimatedFuelConsumption,
+			@EstimatedCost,
 			@Remarks,
 			@Status
 		);
@@ -36,6 +48,10 @@ BEGIN
 			[FromLocationId] = @FromLocationId,
 			[ToLocationId] = @ToLocationId,
 			[Code] = @Code,
+			[EstimatedHours] = @EstimatedHours,
+			[EstimatedDistance] = @EstimatedDistance,
+			[EstimatedFuelConsumption] = @EstimatedFuelConsumption,
+			[EstimatedCost] = @EstimatedCost,
 			[Remarks] = @Remarks,
 			[Status] = @Status
 		WHERE [Id] = @Id;

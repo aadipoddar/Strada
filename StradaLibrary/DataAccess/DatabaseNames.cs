@@ -87,8 +87,6 @@ public static class FleetNames
 
 	public static string InsertDocumentType => "Insert_VehicleDocumentType";
 	public static string InsertDocument => "Insert_VehicleDocument";
-
-	public static string VehicleDocumentOverview => "VehicleDocument_Overview";
 	#endregion
 
 	#region Vehicle

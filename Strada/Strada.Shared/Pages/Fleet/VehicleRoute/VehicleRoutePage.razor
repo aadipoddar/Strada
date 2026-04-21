@@ -100,6 +100,46 @@ else
 						</div>
 
 						<div class="form-field">
+							<label class="field-label">
+								Estimated Hours <span class="required">*</span>
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicleRoute.EstimatedHours" TValue="int" Min="0"
+										  ShowSpinButton="false" Placeholder="Enter estimated hours"
+										  FloatLabelType="FloatLabelType.Never" Format="N0"
+										  CssClass="custom-numeric" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Estimated Distance <span class="required">*</span>
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicleRoute.EstimatedDistance" TValue="int" Min="0"
+										  ShowSpinButton="false" Placeholder="Enter estimated distance"
+										  FloatLabelType="FloatLabelType.Never" Format="N0"
+										  CssClass="custom-numeric" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Estimated Fuel Consumption <span class="required">*</span>
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicleRoute.EstimatedFuelConsumption" TValue="int" Min="0"
+										  ShowSpinButton="false" Placeholder="Enter estimated fuel consumption"
+										  FloatLabelType="FloatLabelType.Never" Format="N0"
+										  CssClass="custom-numeric" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								Estimated Cost <span class="required">*</span>
+							</label>
+							<SfNumericTextBox @bind-Value="_vehicleRoute.EstimatedCost" TValue="decimal" Min="0"
+										  ShowSpinButton="false" Placeholder="Enter estimated cost"
+										  FloatLabelType="FloatLabelType.Never" Format="N2"
+										  CssClass="custom-numeric" />
+						</div>
+
+						<div class="form-field">
 							<label class="field-label">Remarks</label>
 							<SfTextBox @bind-Value="_vehicleRoute.Remarks" Placeholder="Enter remarks (optional)"
 									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
@@ -149,6 +189,14 @@ else
 								</Template>
 							</GridColumn>
 							<GridColumn Field="@nameof(VehicleRouteModel.Code)" HeaderText="Code" Width="150" />
+							<GridColumn Field="@nameof(VehicleRouteModel.EstimatedHours)" HeaderText="Estimated Hours" Width="160"
+										Format="N0" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleRouteModel.EstimatedDistance)" HeaderText="Estimated Distance" Width="170"
+										Format="N0" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleRouteModel.EstimatedFuelConsumption)" HeaderText="Estimated Fuel" Width="160"
+										Format="N0" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleRouteModel.EstimatedCost)" HeaderText="Estimated Cost" Width="160"
+										Format="N2" TextAlign="TextAlign.Right" />
 							<GridColumn Field="@nameof(VehicleRouteModel.Remarks)" HeaderText="Remarks" Width="300" />
 							<GridColumn Field="@nameof(VehicleRouteModel.Status)" HeaderText="Status" Width="110"
 										TextAlign="TextAlign.Center" Visible="_showDeleted">

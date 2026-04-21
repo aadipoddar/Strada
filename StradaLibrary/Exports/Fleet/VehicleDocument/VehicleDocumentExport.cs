@@ -1,5 +1,8 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
+using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleDocument;
 
 namespace StradaLibrary.Exports.Fleet.VehicleDocument;
@@ -7,17 +10,21 @@ namespace StradaLibrary.Exports.Fleet.VehicleDocument;
 public static class VehicleDocumentExport
 {
 	public static async Task<(MemoryStream stream, string fileName)> ExportTransaction(
-		IEnumerable<VehicleDocumentOverviewModel> vehicleDocumentData,
+		IEnumerable<VehicleDocumentModel> vehicleDocumentData,
 		ReportExportType exportType)
 	{
+		var financialYears = await CommonData.LoadTableData<FinancialYearModel>(AccountNames.FinancialYear);
+		var vehicleDocumentTypes = await CommonData.LoadTableData<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType);
+		var vehicles = await CommonData.LoadTableData<VehicleModel>(FleetNames.Vehicle);
+
 		var enrichedData = vehicleDocumentData.Select(vehicleDocument => new
 		{
 			vehicleDocument.Id,
 			vehicleDocument.TransactionNo,
 			vehicleDocument.TransactionDateTime,
-			vehicleDocument.FinancialYear,
-			vehicleDocument.VehicleDocumentType,
-			vehicleDocument.Vehicle,
+			FinancialYear = financialYears.FirstOrDefault(fy => fy.Id == vehicleDocument.FinancialYearId)?.YearNo,
+			VehicleDocumentType = vehicleDocumentTypes.FirstOrDefault(vdt => vdt.Id == vehicleDocument.VehicleDocumentTypeId)?.Name,
+			Vehicle = vehicles.FirstOrDefault(v => v.Id == vehicleDocument.VehicleId)?.Code,
 			vehicleDocument.CurrentKM,
 			vehicleDocument.Rate,
 			vehicleDocument.RenewalDate,
@@ -28,34 +35,34 @@ public static class VehicleDocumentExport
 
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{
-			[nameof(VehicleDocumentOverviewModel.Id)] = new() { DisplayName = "ID", Alignment = CellAlignment.Center, IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.TransactionNo)] = new() { DisplayName = "Transaction No", Alignment = CellAlignment.Left, IsRequired = true, IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.TransactionDateTime)] = new() { DisplayName = "Transaction Date", Alignment = CellAlignment.Center, Format = "dd-MMM-yyyy", IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Center, IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.VehicleDocumentType)] = new() { DisplayName = "Document Type", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.Vehicle)] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.CurrentKM)] = new() { DisplayName = "Current KM", Alignment = CellAlignment.Right, Format = "#,##0.00", IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.Rate)] = new() { DisplayName = "Rate", Alignment = CellAlignment.Right, Format = "#,##0.00", IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.RenewalDate)] = new() { DisplayName = "Renewal Date", Alignment = CellAlignment.Center, Format = "dd-MMM-yyyy", IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.DocumentUrl)] = new() { DisplayName = "Document URL", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleDocumentOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(VehicleDocumentModel.Id)] = new() { DisplayName = "ID", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.TransactionNo)] = new() { DisplayName = "Transaction No", Alignment = CellAlignment.Left, IsRequired = true, IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.TransactionDateTime)] = new() { DisplayName = "Transaction Date", Alignment = CellAlignment.Center, Format = "dd-MMM-yyyy", IncludeInTotal = false },
+			["FinancialYear"] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			["VehicleDocumentType"] = new() { DisplayName = "Document Type", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			["Vehicle"] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.CurrentKM)] = new() { DisplayName = "Current KM", Alignment = CellAlignment.Right, Format = "#,##0.00", IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.Rate)] = new() { DisplayName = "Rate", Alignment = CellAlignment.Right, Format = "#,##0.00", IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.RenewalDate)] = new() { DisplayName = "Renewal Date", Alignment = CellAlignment.Center, Format = "dd-MMM-yyyy", IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.DocumentUrl)] = new() { DisplayName = "Document URL", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleDocumentModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder =
 		[
-			nameof(VehicleDocumentOverviewModel.Id),
-			nameof(VehicleDocumentOverviewModel.TransactionNo),
-			nameof(VehicleDocumentOverviewModel.TransactionDateTime),
-			nameof(VehicleDocumentOverviewModel.FinancialYear),
-			nameof(VehicleDocumentOverviewModel.VehicleDocumentType),
-			nameof(VehicleDocumentOverviewModel.Vehicle),
-			nameof(VehicleDocumentOverviewModel.CurrentKM),
-			nameof(VehicleDocumentOverviewModel.Rate),
-			nameof(VehicleDocumentOverviewModel.RenewalDate),
-			nameof(VehicleDocumentOverviewModel.Remarks),
-			nameof(VehicleDocumentOverviewModel.DocumentUrl),
-			nameof(VehicleDocumentOverviewModel.Status)
+			nameof(VehicleDocumentModel.Id),
+			nameof(VehicleDocumentModel.TransactionNo),
+			nameof(VehicleDocumentModel.TransactionDateTime),
+			"FinancialYear",
+			"VehicleDocumentType",
+			"Vehicle",
+			nameof(VehicleDocumentModel.CurrentKM),
+			nameof(VehicleDocumentModel.Rate),
+			nameof(VehicleDocumentModel.RenewalDate),
+			nameof(VehicleDocumentModel.Remarks),
+			nameof(VehicleDocumentModel.DocumentUrl),
+			nameof(VehicleDocumentModel.Status)
 		];
 
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
