@@ -20,9 +20,9 @@ else
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewOMCCard"
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveOMCCard"
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
 										  Disabled="@_isProcessing" />
 								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
 										  Id="ToggleDeleted" Disabled="@_isProcessing" />
@@ -35,9 +35,9 @@ else
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
 										  Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
@@ -65,21 +65,6 @@ else
 					<div class="form-grid">
 						<div class="form-field">
 							<label class="field-label">
-								OMC Name <span class="required">*</span>
-							</label>
-							<SfAutoComplete TItem="OMCModel" TValue="OMCModel"
-											@bind-Value="_selectedOMC"
-											DataSource="@_omcs" Placeholder="Select OMC"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											AllowCustom="false"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-											CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-							</SfAutoComplete>
-						</div>
-
-						<div class="form-field">
-							<label class="field-label">
 								OMC Card Number <span class="required">*</span>
 							</label>
 							<SfTextBox @bind-Value="_omcCard.CardNumber" Placeholder="Enter OMC card number"
@@ -92,6 +77,21 @@ else
 							</label>
 							<SfTextBox @bind-Value="_omcCard.Code" Placeholder="Auto-generated"
 									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">
+								OMC Name <span class="required">*</span>
+							</label>
+							<SfAutoComplete TItem="OMCModel" TValue="OMCModel"
+											@bind-Value="_selectedOMC"
+											DataSource="@_omcs" Placeholder="Select OMC"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											AllowCustom="false"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+											CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+							</SfAutoComplete>
 						</div>
 
 						<div class="form-field">
@@ -128,33 +128,31 @@ else
 				<div class="section-body grid-body">
 					<SfGrid @ref="_sfGrid" DataSource="@_omcCards" AllowPaging="true" AllowSorting="true"
 							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_omcCardGridContextMenuItems">
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-						<GridEvents TValue="OMCCardModel" ContextMenuItemClicked="OnOMCCardGridContextMenuItemClicked" />
+						<GridEvents TValue="OMCCardModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
-							<GridColumn Field="@nameof(OMCCardModel.Id)" HeaderText="ID" Width="80"
-										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(OMCCardModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(OMCCardModel.CardNumber)" HeaderText="OMC Card Number" Width="300" />
+							<GridColumn Field="@nameof(OMCCardModel.Code)" HeaderText="Code" Width="150" />
 							<GridColumn Field="@nameof(OMCCardModel.OMCId)" HeaderText="OMC Name" Width="250">
 								<Template>
 									@{
-										var omcCard = (context as OMCCardModel);
-										var omc = _omcs.FirstOrDefault(o => o.Id == omcCard.OMCId);
+										var item = (context as OMCCardModel);
+										var omc = _omcs.FirstOrDefault(o => o.Id == item.OMCId);
 										<span>@(omc is not null ? omc.Name : "N/A")</span>
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(OMCCardModel.CardNumber)" HeaderText="OMC Card Number" Width="300" />
-							<GridColumn Field="@nameof(OMCCardModel.Code)" HeaderText="Code" Width="150" />
-							<GridColumn Field="@nameof(OMCCardModel.OpeningBalance)" HeaderText="Opening Balance" Width="180"
-										TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(OMCCardModel.OpeningBalance)" HeaderText="Opening Balance" Width="180" TextAlign="TextAlign.Right" Format="N2" />
 							<GridColumn Field="@nameof(OMCCardModel.Remarks)" HeaderText="Remarks" Width="400" />
 							<GridColumn Field="@nameof(OMCCardModel.Status)" HeaderText="Status" Width="110"
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var omcCard = (context as OMCCardModel);
-										<span class="@(omcCard.Status ? string.Empty : "grid-debit")">@(omcCard.Status ? "Active" : "Deleted")</span>
+										var item = (context as OMCCardModel);
+										<span class="@(item.Status ? string.Empty : "grid-debit")">@(item.Status ? "Active" : "Deleted")</span>
 									}
 								</Template>
 							</GridColumn>
@@ -169,11 +167,11 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="OMC Card" IdentifierLabel="OMC Card Number"
-						  IdentifierValue="@_deleteOMCCardName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
 						  OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="OMC Card"
-					   IdentifierLabel="OMC Card Number" IdentifierValue="@_recoverOMCCardName" Disabled="@_isProcessing"
+					   IdentifierLabel="OMC Card Number" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
 					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

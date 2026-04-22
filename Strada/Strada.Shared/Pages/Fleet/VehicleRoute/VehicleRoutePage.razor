@@ -20,9 +20,9 @@ else
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewVehicleRoute"
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveVehicleRoute"
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
 										  Disabled="@_isProcessing" />
 								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
 										  Id="ToggleDeleted" Disabled="@_isProcessing" />
@@ -35,9 +35,9 @@ else
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
 										  Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
@@ -163,9 +163,9 @@ else
 				<div class="section-body grid-body">
 					<SfGrid @ref="_sfGrid" DataSource="@_vehicleRoutes" AllowPaging="true" AllowSorting="true"
 							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleRouteGridContextMenuItems">
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-						<GridEvents TValue="VehicleRouteModel" ContextMenuItemClicked="OnVehicleRouteGridContextMenuItemClicked" />
+						<GridEvents TValue="VehicleRouteModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
 							<GridColumn Field="@nameof(VehicleRouteModel.Id)" HeaderText="ID" Width="80"
@@ -173,8 +173,8 @@ else
 							<GridColumn Field="@nameof(VehicleRouteModel.FromLocationId)" HeaderText="From Location" Width="250">
 								<Template>
 									@{
-										var vehicleRoute = (context as VehicleRouteModel);
-										var fromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == vehicleRoute.FromLocationId);
+										var item = (context as VehicleRouteModel);
+										var fromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == item.FromLocationId);
 										<span>@(fromLocation is not null ? fromLocation.Name : "N/A")</span>
 									}
 								</Template>
@@ -182,8 +182,8 @@ else
 							<GridColumn Field="@nameof(VehicleRouteModel.ToLocationId)" HeaderText="To Location" Width="250">
 								<Template>
 									@{
-										var vehicleRoute = (context as VehicleRouteModel);
-										var toLocation = _routeLocations.FirstOrDefault(rl => rl.Id == vehicleRoute.ToLocationId);
+										var item = (context as VehicleRouteModel);
+										var toLocation = _routeLocations.FirstOrDefault(rl => rl.Id == item.ToLocationId);
 										<span>@(toLocation is not null ? toLocation.Name : "N/A")</span>
 									}
 								</Template>
@@ -202,8 +202,8 @@ else
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var vehicleRoute = (context as VehicleRouteModel);
-										<span class="@(vehicleRoute.Status ? string.Empty : "grid-debit")">@(vehicleRoute.Status ? "Active" : "Deleted")</span>
+										var item = (context as VehicleRouteModel);
+										<span class="@(item.Status ? string.Empty : "grid-debit")">@(item.Status ? "Active" : "Deleted")</span>
 									}
 								</Template>
 							</GridColumn>
@@ -218,11 +218,11 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Route" IdentifierLabel="Code"
-						  IdentifierValue="@_deleteVehicleRouteCode" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
 						  OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Route"
-					   IdentifierLabel="Code" IdentifierValue="@_recoverVehicleRouteCode" Disabled="@_isProcessing"
+					   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
 					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

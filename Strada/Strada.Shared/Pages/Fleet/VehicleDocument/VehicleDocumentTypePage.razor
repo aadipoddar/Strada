@@ -20,9 +20,9 @@ else
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewVehicleDocumentType"
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveVehicleDocumentType"
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
 										  Disabled="@_isProcessing" />
 								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
 										  Id="ToggleDeleted" Disabled="@_isProcessing" />
@@ -35,9 +35,9 @@ else
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
 										  Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
@@ -111,9 +111,9 @@ else
 				<div class="section-body grid-body">
 					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDocumentTypes" AllowPaging="true" AllowSorting="true"
 							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleDocumentTypeGridContextMenuItems">
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-						<GridEvents TValue="VehicleDocumentTypeModel" ContextMenuItemClicked="OnVehicleDocumentTypeGridContextMenuItemClicked" />
+						<GridEvents TValue="VehicleDocumentTypeModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
 							<GridColumn Field="@nameof(VehicleDocumentTypeModel.Id)" HeaderText="ID" Width="80"
@@ -127,8 +127,8 @@ else
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var vehicleDocumentType = (context as VehicleDocumentTypeModel);
-										<span class="@(vehicleDocumentType.Status ? string.Empty : "grid-debit")">@(vehicleDocumentType.Status ? "Active" : "Deleted")</span>
+										var item = (context as VehicleDocumentTypeModel);
+										<span class="@(item.Status ? string.Empty : "grid-debit")">@(item.Status ? "Active" : "Deleted")</span>
 									}
 								</Template>
 							</GridColumn>
@@ -143,11 +143,11 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Document Type" IdentifierLabel="Document Type Name"
-						  IdentifierValue="@_deleteVehicleDocumentTypeName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
 						  OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Document Type"
-					   IdentifierLabel="Document Type Name" IdentifierValue="@_recoverVehicleDocumentTypeName" Disabled="@_isProcessing"
+					   IdentifierLabel="Document Type Name" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
 					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

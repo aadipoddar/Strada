@@ -36,27 +36,20 @@ public static class VehicleDocumentData
 		if (vehicleDocument.RenewalDate < vehicleDocument.TransactionDateTime)
 			throw new Exception("Renewal Date cannot be earlier than Transaction Date.");
 
+		var vehicleDocumentsAll = await CommonData.LoadTableData<VehicleDocumentModel>(FleetNames.VehicleDocument);
+
+		var existingByTransactionNo = vehicleDocumentsAll.FirstOrDefault(vt => vt.Id != vehicleDocument.Id && vt.TransactionNo.Equals(vehicleDocument.TransactionNo, StringComparison.OrdinalIgnoreCase));
+		if (existingByTransactionNo is not null)
+			throw new Exception($"Vehicle Document transaction number '{vehicleDocument.TransactionNo}' already exists. Please choose a different transaction number.");
+
 		if (vehicleDocument.Id > 0)
 		{
-			var vehicleDocuments = await CommonData.LoadTableData<VehicleDocumentModel>(FleetNames.VehicleDocument);
-
-			var duplicateTransaction = vehicleDocuments.FirstOrDefault(vd => vd.Id != vehicleDocument.Id && vd.TransactionNo.Equals(vehicleDocument.TransactionNo, StringComparison.OrdinalIgnoreCase));
-			if (duplicateTransaction is not null)
-				throw new Exception($"Transaction No '{vehicleDocument.TransactionNo}' already exists. Please enter a different transaction number.");
-
 			var existingVehicleDocument = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, vehicleDocument.Id)
 				?? throw new Exception("Vehicle Document transaction not found for updating.");
 
 			await FinancialYearData.ValidateFinancialYear(existingVehicleDocument.TransactionDateTime);
 		}
-		else
-		{
-			var vehicleDocuments = await CommonData.LoadTableData<VehicleDocumentModel>(FleetNames.VehicleDocument);
-			var duplicateTransaction = vehicleDocuments.FirstOrDefault(vd => vd.TransactionNo.Equals(vehicleDocument.TransactionNo, StringComparison.OrdinalIgnoreCase));
-			if (duplicateTransaction is not null)
-				throw new Exception($"Transaction No '{vehicleDocument.TransactionNo}' already exists. Please enter a different transaction number.");
-		}
-
+		
 		await FinancialYearData.ValidateFinancialYear(vehicleDocument.TransactionDateTime);
 		var financialYear = await FinancialYearData.LoadFinancialYearByDateTime(vehicleDocument.TransactionDateTime);
 		vehicleDocument.FinancialYearId = financialYear.Id;

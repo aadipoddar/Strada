@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRouteNames.VehicleMaster)]
+@attribute [Route(PageRouteNames.VehicleMaster)]
 
 @using StradaLibrary.Models.Accounts.Masters
 @using StradaLibrary.Models.Fleet.Vehicle
@@ -21,9 +21,9 @@ else
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewVehicle"
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveVehicle"
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
 										  Disabled="@_isProcessing" />
 								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
 										  Id="ToggleDeleted" Disabled="@_isProcessing" />
@@ -36,9 +36,9 @@ else
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
 										  Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
@@ -162,9 +162,9 @@ else
 				<div class="section-body grid-body">
 					<SfGrid @ref="_sfGrid" DataSource="@_vehicles" AllowPaging="true" AllowSorting="true"
 							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleGridContextMenuItems">
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-						<GridEvents TValue="VehicleModel" ContextMenuItemClicked="OnVehicleGridContextMenuItemClicked" />
+						<GridEvents TValue="VehicleModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
 							<GridColumn Field="@nameof(VehicleModel.Id)" HeaderText="ID" Width="80"
@@ -176,8 +176,8 @@ else
 							<GridColumn Field="@nameof(VehicleModel.VehicleTypeId)" HeaderText="Vehicle Type" Width="180">
 								<Template>
 									@{
-										var vehicle = (context as VehicleModel);
-										var vehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == vehicle.VehicleTypeId);
+										var item = (context as VehicleModel);
+										var vehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == item.VehicleTypeId);
 										<span>@(vehicleType is not null ? vehicleType.Name : "N/A")</span>
 									}
 								</Template>
@@ -185,8 +185,8 @@ else
 							<GridColumn Field="@nameof(VehicleModel.CompanyId)" HeaderText="Company" Width="220">
 								<Template>
 									@{
-										var vehicle = (context as VehicleModel);
-										var company = _companies.FirstOrDefault(c => c.Id == vehicle.CompanyId);
+										var item = (context as VehicleModel);
+										var company = _companies.FirstOrDefault(c => c.Id == item.CompanyId);
 										<span>@(company is not null ? company.Name : "N/A")</span>
 									}
 								</Template>
@@ -200,8 +200,8 @@ else
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var vehicle = (context as VehicleModel);
-										<span class="@(vehicle.Status ? string.Empty : "grid-debit")">@(vehicle.Status ? "Active" : "Deleted")</span>
+										var item = (context as VehicleModel);
+										<span class="@(item.Status ? string.Empty : "grid-debit")">@(item.Status ? "Active" : "Deleted")</span>
 									}
 								</Template>
 							</GridColumn>
@@ -216,13 +216,11 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle" IdentifierLabel="Code"
-						  IdentifierValue="@_deleteVehicleCode" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
 						  OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle"
-					   IdentifierLabel="Code" IdentifierValue="@_recoverVehicleCode" Disabled="@_isProcessing"
+					   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
 					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />
-
-

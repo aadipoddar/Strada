@@ -20,9 +20,9 @@ else
                     <MenuItems>
                         <MenuItem Text="File" IconCss="e-icons e-folder">
                             <MenuItems>
-                                <MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewFinancialYear"
+                                <MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
                                           Disabled="@_isProcessing" />
-                                <MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveFinancialYear"
+                                <MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
                                           Disabled="@_isProcessing" />
                                 <MenuItem Text="Auto Generate Next Year" IconCss="e-icons e-refresh" Id="AutoGenerateNextYear"
                                           Disabled="@_isProcessing" />
@@ -37,9 +37,9 @@ else
                         </MenuItem>
                         <MenuItem Text="Transaction" IconCss="e-icons e-chart">
                             <MenuItems>
-                                <MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+                                <MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
                                           Disabled="@_isProcessing" />
-                                <MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+                                <MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
                                           Disabled="@_isProcessing" />
                             </MenuItems>
                         </MenuItem>
@@ -125,9 +125,9 @@ else
                 <div class="section-body grid-body">
                     <SfGrid @ref="_sfGrid" DataSource="@_financialYears" AllowPaging="true" AllowSorting="true"
                             AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-                            Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_financialYearGridContextMenuItems">
+                            Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
                         <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-                        <GridEvents TValue="FinancialYearModel" ContextMenuItemClicked="OnFinancialYearGridContextMenuItemClicked" />
+                        <GridEvents TValue="FinancialYearModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
                         <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
                         <GridColumns>
                             <GridColumn Field="@nameof(FinancialYearModel.Id)" HeaderText="ID" Width="80"
@@ -143,10 +143,10 @@ else
                                         TextAlign="TextAlign.Center">
                                 <Template>
                                     @{
-                                        var financialYear = (context as FinancialYearModel);
+                                        var item = (context as FinancialYearModel);
                                         <div class="grid-checkbox"
-                                             style="@(financialYear.Locked ? "color: #f59e0b; background: #fef3c7;" : "color: #64748b; background: #f1f5f9;")">
-                                            @(financialYear.Locked ? "🔒" : "🔓")
+                                             style="@(item.Locked ? "color: #f59e0b; background: #fef3c7;" : "color: #64748b; background: #f1f5f9;")">
+                                            @(item.Locked ? "🔒" : "🔓")
                                         </div>
                                     }
                                 </Template>
@@ -155,8 +155,8 @@ else
                                         TextAlign="TextAlign.Center" Visible="_showDeleted">
                                 <Template>
                                     @{
-                                        var financialYear = (context as FinancialYearModel);
-                                        <span class="@(financialYear.Status ? string.Empty : "grid-debit")">@(financialYear.Status ? "Active" : "Deleted")</span>
+                                        var item = (context as FinancialYearModel);
+                                        <span class="@(item.Status ? string.Empty : "grid-debit")">@(item.Status ? "Active" : "Deleted")</span>
                                     }
                                 </Template>
                             </GridColumn>
@@ -171,11 +171,11 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Financial Year" IdentifierLabel="Period"
-                          IdentifierValue="@_deleteFinancialYearName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+                          IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
                           OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Financial Year" IdentifierLabel="Period"
-                           IdentifierValue="@_recoverFinancialYearName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover"
+                           IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover"
                            OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

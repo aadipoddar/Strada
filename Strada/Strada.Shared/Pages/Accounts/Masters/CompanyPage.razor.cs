@@ -21,21 +21,21 @@ public partial class CompanyPage : IAsyncDisposable
 
 	private List<CompanyModel> _companies = [];
 	private List<StateUTModel> _stateUTs = [];
-	private readonly List<ContextMenuItemModel> _companyGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
-		new() { Text = "Edit (Insert)", Id = "EditCompany", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverCompany", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<CompanyModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-	private int _deleteCompanyId = 0;
-	private string _deleteCompanyName = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-	private int _recoverCompanyId = 0;
-	private string _recoverCompanyName = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -46,23 +46,20 @@ public partial class CompanyPage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
+		await InitializePage();
+	}
+
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
 		await LoadData();
+
 		_isLoading = false;
 		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveCompany, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
-
 		_companies = await CommonData.LoadTableData<CompanyModel>(AccountNames.Company);
 		_stateUTs = await CommonData.LoadTableData<StateUTModel>(AccountNames.StateUT);
 
@@ -75,111 +72,7 @@ public partial class CompanyPage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		if (!_user.Admin)
-			throw new Exception("You do not have permission to perform this action.");
-
-		_company.Name = _company.Name?.Trim() ?? "";
-		_company.Name = _company.Name?.ToUpper() ?? "";
-
-		_company.Code = _company.Code?.Trim() ?? "";
-		_company.Code = _company.Code?.ToUpper() ?? "";
-
-		_company.GSTNo = _company.GSTNo?.Trim() ?? "";
-		_company.GSTNo = _company.GSTNo?.ToUpper() ?? "";
-
-		_company.PANNo = _company.PANNo?.Trim() ?? "";
-		_company.PANNo = _company.PANNo?.ToUpper() ?? "";
-
-		_company.CINNo = _company.CINNo?.Trim() ?? "";
-		_company.CINNo = _company.CINNo?.ToUpper() ?? "";
-
-		_company.Alias = _company.Alias?.Trim() ?? "";
-		_company.Alias = _company.Alias?.ToUpper() ?? "";
-
-		_company.Phone = _company.Phone?.Trim() ?? "";
-		_company.Email = _company.Email?.Trim() ?? "";
-		_company.Address = _company.Address?.Trim() ?? "";
-
-		_company.Remarks = _company.Remarks?.Trim() ?? "";
-		_company.Status = true;
-
-		if (string.IsNullOrWhiteSpace(_company.Name))
-			throw new Exception("Company name is required. Please enter a valid company name.");
-
-		if (string.IsNullOrWhiteSpace(_company.Code))
-			throw new Exception("Company code is required. Please enter a valid company code.");
-
-		if (_company.StateUTId <= 0)
-			throw new Exception("State/UT is required. Please select a valid State/UT.");
-
-		if (string.IsNullOrWhiteSpace(_company.GSTNo)) _company.GSTNo = null;
-		if (string.IsNullOrWhiteSpace(_company.PANNo)) _company.PANNo = null;
-		if (string.IsNullOrWhiteSpace(_company.CINNo)) _company.CINNo = null;
-		if (string.IsNullOrWhiteSpace(_company.Alias)) _company.Alias = null;
-		if (string.IsNullOrWhiteSpace(_company.Phone)) _company.Phone = null;
-		if (string.IsNullOrWhiteSpace(_company.Email)) _company.Email = null;
-		if (string.IsNullOrWhiteSpace(_company.Address)) _company.Address = null;
-		if (string.IsNullOrWhiteSpace(_company.Remarks)) _company.Remarks = null;
-
-		if (!string.IsNullOrWhiteSpace(_company.Phone) && !Helper.ValidatePhoneNumber(_company.Phone))
-			throw new Exception("Invalid phone number format. Please enter a valid phone number.");
-
-		if (!string.IsNullOrWhiteSpace(_company.Email) && !Helper.ValidateEmail(_company.Email))
-			throw new Exception("Invalid email format. Please enter a valid email address.");
-
-		if (_company.Id > 0)
-		{
-			var existingCompany = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Name.Equals(_company.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingCompany is not null)
-				throw new Exception($"Company name '{_company.Name}' already exists. Please choose a different name.");
-
-			var existingCode = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Code.Equals(_company.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingCode is not null)
-				throw new Exception($"Company code '{_company.Code}' already exists. Please choose a different code.");
-
-			if (!string.IsNullOrWhiteSpace(_company.Phone))
-			{
-				var duplicatePhoneCompany = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Phone.Equals(_company.Phone, StringComparison.OrdinalIgnoreCase));
-				if (duplicatePhoneCompany is not null)
-					throw new Exception($"Phone number '{_company.Phone}' is already associated with another company. Please use a different phone number.");
-			}
-
-			if (!string.IsNullOrWhiteSpace(_company.Email))
-			{
-				var duplicateEmailCompany = _companies.FirstOrDefault(_ => _.Id != _company.Id && _.Email.Equals(_company.Email, StringComparison.OrdinalIgnoreCase));
-				if (duplicateEmailCompany is not null)
-					throw new Exception($"Email '{_company.Email}' is already associated with another company. Please use a different email address.");
-			}
-		}
-		else
-		{
-			var existingCompany = _companies.FirstOrDefault(_ => _.Name.Equals(_company.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingCompany is not null)
-				throw new Exception($"Company name '{_company.Name}' already exists. Please choose a different name.");
-
-			var existingCode = _companies.FirstOrDefault(_ => _.Code.Equals(_company.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingCode is not null)
-				throw new Exception($"Company code '{_company.Code}' already exists. Please choose a different code.");
-
-			if (!string.IsNullOrWhiteSpace(_company.Phone))
-			{
-				var duplicatePhoneCompany = _companies.FirstOrDefault(_ => _.Phone.Equals(_company.Phone, StringComparison.OrdinalIgnoreCase));
-				if (duplicatePhoneCompany is not null)
-					throw new Exception($"Phone number '{_company.Phone}' is already associated with another company. Please use a different phone number.");
-			}
-
-			if (!string.IsNullOrWhiteSpace(_company.Email))
-			{
-				var duplicateEmailCompany = _companies.FirstOrDefault(_ => _.Email.Equals(_company.Email, StringComparison.OrdinalIgnoreCase));
-				if (duplicateEmailCompany is not null)
-					throw new Exception($"Email '{_company.Email}' is already associated with another company. Please use a different email address.");
-			}
-		}
-	}
-
-	private async Task SaveCompany()
+	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
 			return;
@@ -188,17 +81,20 @@ public partial class CompanyPage : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await ValidateForm();
-			await CompanyData.InsertCompany(_company);
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-			await _toastNotification.ShowAsync("Success", $"Company '{_company.Name}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
+
+			await CompanyData.SaveTransaction(_company);
+
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -208,14 +104,6 @@ public partial class CompanyPage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditCompany(CompanyModel company)
-	{
-		_company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, company.Id)
-			?? throw new Exception("Company not found.");
-
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -226,24 +114,24 @@ public partial class CompanyPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var company = _companies.FirstOrDefault(c => c.Id == _deleteCompanyId)
-				?? throw new Exception("Company not found.");
+			var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			company.Status = false;
 			await CompanyData.InsertCompany(company);
 
-			await _toastNotification.ShowAsync("Success", $"Company '{company.Name}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete Company: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_deleteCompanyId = 0;
-			_deleteCompanyName = string.Empty;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
 		}
 	}
 
@@ -257,24 +145,24 @@ public partial class CompanyPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var company = _companies.FirstOrDefault(c => c.Id == _recoverCompanyId)
-				?? throw new Exception("Company not found.");
+			var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			company.Status = true;
 			await CompanyData.InsertCompany(company);
 
-			await _toastNotification.ShowAsync("Success", $"Company '{company.Name}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover Company: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_recoverCompanyId = 0;
-			_recoverCompanyName = string.Empty;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
 		}
 	}
 	#endregion
@@ -336,15 +224,26 @@ public partial class CompanyPage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
+
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewCompany":
+			case "NewTransaction":
 				ResetPage();
 				break;
-			case "SaveCompany":
-				await SaveCompany();
+			case "SaveTransaction":
+				await SaveTransaction();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -355,24 +254,24 @@ public partial class CompanyPage : IAsyncDisposable
 			case "ExportPdf":
 				await ExportPdf();
 				break;
-			case "EditSelected":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
 
-	private async Task OnCompanyGridContextMenuItemClicked(ContextMenuClickEventArgs<CompanyModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<CompanyModel> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCompany":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverCompany":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
@@ -380,11 +279,17 @@ public partial class CompanyPage : IAsyncDisposable
 	private async Task EditSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-		if (selectedRecords.Count > 0)
-			await OnEditCompany(selectedRecords[0]);
+		if (selectedRecords.Count == 0)
+			return;
+
+		_company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, selectedRecords[0].Id);
+		if (_company is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		StateHasChanged();
 	}
 
-	private async Task DeleteSelectedItem()
+	private async Task DeleteRecoverSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
@@ -398,29 +303,29 @@ public partial class CompanyPage : IAsyncDisposable
 
 	private async Task ShowDeleteConfirmation(int id, string name)
 	{
-		_deleteCompanyId = id;
-		_deleteCompanyName = name;
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelDelete()
 	{
-		_deleteCompanyId = 0;
-		_deleteCompanyName = string.Empty;
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
 		await _deleteConfirmationDialog.HideAsync();
 	}
 
 	private async Task ShowRecoverConfirmation(int id, string name)
 	{
-		_recoverCompanyId = id;
-		_recoverCompanyName = name;
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelRecover()
 	{
-		_recoverCompanyId = 0;
-		_recoverCompanyName = string.Empty;
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
 	}
 

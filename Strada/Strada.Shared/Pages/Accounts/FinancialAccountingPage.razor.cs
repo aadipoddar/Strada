@@ -289,7 +289,7 @@ public partial class FinancialAccountingPage : IAsyncDisposable
 			return;
 
 		_selectedCompany = args.Value;
-		_accounting.CompanyId = _selectedCompany.Id;
+		_accounting.CompanyId = args.Value.Id;
 
 		await SaveTransactionFile();
 	}
@@ -300,7 +300,7 @@ public partial class FinancialAccountingPage : IAsyncDisposable
 			return;
 
 		_selectedVoucher = args.Value;
-		_accounting.VoucherId = _selectedVoucher.Id;
+		_accounting.VoucherId = args.Value.Id;
 
 		await SaveTransactionFile();
 	}

@@ -19,9 +19,9 @@ else
                     <MenuItems>
                         <MenuItem Text="File" IconCss="e-icons e-folder">
                             <MenuItems>
-                                <MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewStateUT"
+                                <MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
                                           Disabled="@_isProcessing" />
-                                <MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveStateUT"
+                                <MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
                                           Disabled="@_isProcessing" />
                                 <MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
                                           Id="ToggleDeleted" Disabled="@_isProcessing" />
@@ -34,9 +34,9 @@ else
                         </MenuItem>
                         <MenuItem Text="Transaction" IconCss="e-icons e-chart">
                             <MenuItems>
-                                <MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+                                <MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
                                           Disabled="@_isProcessing" />
-                                <MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+                                <MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
                                           Disabled="@_isProcessing" />
                             </MenuItems>
                         </MenuItem>
@@ -107,9 +107,9 @@ else
                 <div class="section-body grid-body">
                     <SfGrid @ref="_sfGrid" DataSource="@_stateUTs" AllowPaging="true" AllowSorting="true"
                             AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-                            Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_stateUTGridContextMenuItems">
+                            Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
                         <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-                        <GridEvents TValue="StateUTModel" ContextMenuItemClicked="OnStateUTGridContextMenuItemClicked" />
+                        <GridEvents TValue="StateUTModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
                         <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
                         <GridColumns>
                             <GridColumn Field="@nameof(StateUTModel.Id)" HeaderText="ID" Width="80"
@@ -120,10 +120,10 @@ else
                                         Width="150" TextAlign="TextAlign.Center">
                                 <Template>
                                     @{
-                                        var stateUT = (context as StateUTModel);
+                                        var item = (context as StateUTModel);
                                         <div class="grid-checkbox"
-                                             style="@(stateUT.UnionTerritory ? "color: #10b981; background: #d1fae5;" : "color: #64748b; background: #f1f5f9;")">
-                                            @(stateUT.UnionTerritory ? "✓" : "✗")
+                                             style="@(item.UnionTerritory ? "color: #10b981; background: #d1fae5;" : "color: #64748b; background: #f1f5f9;")">
+                                            @(item.UnionTerritory ? "✓" : "✗")
                                         </div>
                                     }
                                 </Template>
@@ -132,8 +132,8 @@ else
                                         TextAlign="TextAlign.Center" Visible="_showDeleted">
                                 <Template>
                                     @{
-                                        var stateUT = (context as StateUTModel);
-                                        <span class="@(stateUT.Status ? string.Empty : "grid-debit")">@(stateUT.Status ? "Active" : "Deleted")</span>
+                                        var item = (context as StateUTModel);
+                                        <span class="@(item.Status ? string.Empty : "grid-debit")">@(item.Status ? "Active" : "Deleted")</span>
                                     }
                                 </Template>
                             </GridColumn>
@@ -148,10 +148,10 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="State/UT" IdentifierLabel="Name"
-                          IdentifierValue="@_deleteStateUTName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
+                          IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="State/UT" IdentifierLabel="Name"
-                           IdentifierValue="@_recoverStateUTName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover"
+                           IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover"
                            OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

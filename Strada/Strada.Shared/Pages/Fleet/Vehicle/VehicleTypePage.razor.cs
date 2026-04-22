@@ -1,4 +1,4 @@
-using Strada.Shared.Components.Dialog;
+﻿using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Fleet.Vehicle;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.Vehicle;
@@ -20,22 +20,21 @@ public partial class VehicleTypePage : IAsyncDisposable
 	private VehicleTypeModel _vehicleType = new();
 
 	private List<VehicleTypeModel> _vehicleTypes = [];
-	private List<VehicleTypeModel> _vehicleTypesAll = [];
-	private readonly List<ContextMenuItemModel> _vehicleTypeGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
-		new() { Text = "Edit (Insert)", Id = "EditVehicleType", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverVehicleType", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<VehicleTypeModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-	private int _deleteVehicleTypeId = 0;
-	private string _deleteVehicleTypeName = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-	private int _recoverVehicleTypeId = 0;
-	private string _recoverVehicleTypeName = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -46,25 +45,21 @@ public partial class VehicleTypePage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+		await InitializePage();
+	}
+
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
 		await LoadData();
+
 		_isLoading = false;
 		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveVehicleType, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
-
-		_vehicleTypesAll = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType);
-		_vehicleTypes = [.. _vehicleTypesAll];
+		_vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType);
 
 		if (!_showDeleted)
 			_vehicleTypes = [.. _vehicleTypes.Where(vt => vt.Status)];
@@ -75,52 +70,7 @@ public partial class VehicleTypePage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		if (!_user.Admin)
-			throw new Exception("You do not have permission to perform this action.");
-
-		_vehicleType.Name = _vehicleType.Name?.Trim() ?? "";
-		_vehicleType.Name = _vehicleType.Name?.ToUpper() ?? "";
-
-		_vehicleType.Code = _vehicleType.Code?.Trim() ?? "";
-		_vehicleType.Code = _vehicleType.Code?.ToUpper() ?? "";
-
-		_vehicleType.Remarks = _vehicleType.Remarks?.Trim() ?? "";
-		_vehicleType.Status = true;
-
-		if (string.IsNullOrWhiteSpace(_vehicleType.Name))
-			throw new Exception("Vehicle Type name is required. Please enter a valid vehicle type name.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleType.Code))
-			throw new Exception("Vehicle Type code is required. Please try again.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleType.Remarks))
-			_vehicleType.Remarks = null;
-
-		if (_vehicleType.Id > 0)
-		{
-			var existingVehicleTypeByName = _vehicleTypesAll.FirstOrDefault(_ => _.Id != _vehicleType.Id && _.Name.Equals(_vehicleType.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleTypeByName is not null)
-				throw new Exception($"Vehicle Type name '{_vehicleType.Name}' already exists. Please choose a different name.");
-
-			var existingVehicleTypeByCode = _vehicleTypesAll.FirstOrDefault(_ => _.Id != _vehicleType.Id && _.Code.Equals(_vehicleType.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleTypeByCode is not null)
-				throw new Exception($"Vehicle Type code '{_vehicleType.Code}' already exists. Please choose a different code.");
-		}
-		else
-		{
-			var existingVehicleTypeByName = _vehicleTypesAll.FirstOrDefault(_ => _.Name.Equals(_vehicleType.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleTypeByName is not null)
-				throw new Exception($"Vehicle Type name '{_vehicleType.Name}' already exists. Please choose a different name.");
-
-			var existingVehicleTypeByCode = _vehicleTypesAll.FirstOrDefault(_ => _.Code.Equals(_vehicleType.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleTypeByCode is not null)
-				throw new Exception($"Vehicle Type code '{_vehicleType.Code}' already exists. Please choose a different code.");
-		}
-	}
-
-	private async Task SaveVehicleType()
+	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
 			return;
@@ -129,20 +79,20 @@ public partial class VehicleTypePage : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			if (_vehicleType.Id == 0)
-				_vehicleType.Code = await GenerateCodes.GenerateVehicleTypeCode();
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-			await ValidateForm();
-			await VehicleTypeData.InsertVehicleType(_vehicleType);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Type '{_vehicleType.Name}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster, true);
+			await VehicleTypeData.SaveTransaction(_vehicleType);
+
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -152,14 +102,6 @@ public partial class VehicleTypePage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditVehicleType(VehicleTypeModel vehicleType)
-	{
-		_vehicleType = await CommonData.LoadTableDataById<VehicleTypeModel>(FleetNames.VehicleType, vehicleType.Id)
-			?? throw new Exception("Vehicle Type not found.");
-
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -170,24 +112,24 @@ public partial class VehicleTypePage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleType = _vehicleTypesAll.FirstOrDefault(vt => vt.Id == _deleteVehicleTypeId)
-				?? throw new Exception("Vehicle Type not found.");
+			var vehicleType = await CommonData.LoadTableDataById<VehicleTypeModel>(FleetNames.VehicleType, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleType.Status = false;
 			await VehicleTypeData.InsertVehicleType(vehicleType);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Type '{vehicleType.Name}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster, true);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete Vehicle Type: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_deleteVehicleTypeId = 0;
-			_deleteVehicleTypeName = string.Empty;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
 		}
 	}
 
@@ -201,24 +143,24 @@ public partial class VehicleTypePage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleType = _vehicleTypesAll.FirstOrDefault(vt => vt.Id == _recoverVehicleTypeId)
-				?? throw new Exception("Vehicle Type not found.");
+			var vehicleType = await CommonData.LoadTableDataById<VehicleTypeModel>(FleetNames.VehicleType, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleType.Status = true;
 			await VehicleTypeData.InsertVehicleType(vehicleType);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Type '{vehicleType.Name}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster, true);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover Vehicle Type: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_recoverVehicleTypeId = 0;
-			_recoverVehicleTypeName = string.Empty;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
 		}
 	}
 	#endregion
@@ -280,15 +222,26 @@ public partial class VehicleTypePage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
+
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewVehicleType":
+			case "NewTransaction":
 				ResetPage();
 				break;
-			case "SaveVehicleType":
-				await SaveVehicleType();
+			case "SaveTransaction":
+				await SaveTransaction();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -299,24 +252,24 @@ public partial class VehicleTypePage : IAsyncDisposable
 			case "ExportPdf":
 				await ExportPdf();
 				break;
-			case "EditSelected":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
 
-	private async Task OnVehicleTypeGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleTypeModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleTypeModel> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "EditVehicleType":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverVehicleType":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
@@ -324,11 +277,17 @@ public partial class VehicleTypePage : IAsyncDisposable
 	private async Task EditSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-		if (selectedRecords.Count > 0)
-			await OnEditVehicleType(selectedRecords[0]);
+		if (selectedRecords.Count == 0)
+			return;
+
+		_vehicleType = await CommonData.LoadTableDataById<VehicleTypeModel>(FleetNames.VehicleType, selectedRecords[0].Id);
+		if (_vehicleType is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		StateHasChanged();
 	}
 
-	private async Task DeleteSelectedItem()
+	private async Task DeleteRecoverSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
@@ -342,29 +301,29 @@ public partial class VehicleTypePage : IAsyncDisposable
 
 	private async Task ShowDeleteConfirmation(int id, string name)
 	{
-		_deleteVehicleTypeId = id;
-		_deleteVehicleTypeName = name;
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelDelete()
 	{
-		_deleteVehicleTypeId = 0;
-		_deleteVehicleTypeName = string.Empty;
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
 		await _deleteConfirmationDialog.HideAsync();
 	}
 
 	private async Task ShowRecoverConfirmation(int id, string name)
 	{
-		_recoverVehicleTypeId = id;
-		_recoverVehicleTypeName = name;
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelRecover()
 	{
-		_recoverVehicleTypeId = 0;
-		_recoverVehicleTypeName = string.Empty;
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
 	}
 
@@ -387,5 +346,4 @@ public partial class VehicleTypePage : IAsyncDisposable
 		return ((IAsyncDisposable)HotKeys).DisposeAsync();
 	}
 	#endregion
-
 }

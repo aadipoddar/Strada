@@ -20,22 +20,21 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 	private VehicleRouteLocationModel _routeLocation = new();
 
 	private List<VehicleRouteLocationModel> _routeLocations = [];
-	private List<VehicleRouteLocationModel> _routeLocationsAll = [];
-	private readonly List<ContextMenuItemModel> _routeLocationGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
-		new() { Text = "Edit (Insert)", Id = "EditRouteLocation", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverRouteLocation", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<VehicleRouteLocationModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-	private int _deleteRouteLocationId = 0;
-	private string _deleteRouteLocationName = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-	private int _recoverRouteLocationId = 0;
-	private string _recoverRouteLocationName = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -46,25 +45,21 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+		await InitializePage();
+	}
+
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
 		await LoadData();
+
 		_isLoading = false;
 		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveRouteLocation, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
-
-		_routeLocationsAll = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
-		_routeLocations = [.. _routeLocationsAll];
+		_routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
 
 		if (!_showDeleted)
 			_routeLocations = [.. _routeLocations.Where(rl => rl.Status)];
@@ -75,52 +70,7 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		if (!_user.Admin)
-			throw new Exception("You do not have permission to perform this action.");
-
-		_routeLocation.Name = _routeLocation.Name?.Trim() ?? "";
-		_routeLocation.Name = _routeLocation.Name?.ToUpper() ?? "";
-
-		_routeLocation.Code = _routeLocation.Code?.Trim() ?? "";
-		_routeLocation.Code = _routeLocation.Code?.ToUpper() ?? "";
-
-		_routeLocation.Remarks = _routeLocation.Remarks?.Trim() ?? "";
-		_routeLocation.Status = true;
-
-		if (string.IsNullOrWhiteSpace(_routeLocation.Name))
-			throw new Exception("Route Location name is required. Please enter a valid route location name.");
-
-		if (string.IsNullOrWhiteSpace(_routeLocation.Code))
-			throw new Exception("Route Location code is required. Please try again.");
-
-		if (string.IsNullOrWhiteSpace(_routeLocation.Remarks))
-			_routeLocation.Remarks = null;
-
-		if (_routeLocation.Id > 0)
-		{
-			var existingRouteLocationByName = _routeLocationsAll.FirstOrDefault(_ => _.Id != _routeLocation.Id && _.Name.Equals(_routeLocation.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingRouteLocationByName is not null)
-				throw new Exception($"Route Location name '{_routeLocation.Name}' already exists. Please choose a different name.");
-
-			var existingRouteLocationByCode = _routeLocationsAll.FirstOrDefault(_ => _.Id != _routeLocation.Id && _.Code.Equals(_routeLocation.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingRouteLocationByCode is not null)
-				throw new Exception($"Route Location code '{_routeLocation.Code}' already exists. Please choose a different code.");
-		}
-		else
-		{
-			var existingRouteLocationByName = _routeLocationsAll.FirstOrDefault(_ => _.Name.Equals(_routeLocation.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingRouteLocationByName is not null)
-				throw new Exception($"Route Location name '{_routeLocation.Name}' already exists. Please choose a different name.");
-
-			var existingRouteLocationByCode = _routeLocationsAll.FirstOrDefault(_ => _.Code.Equals(_routeLocation.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingRouteLocationByCode is not null)
-				throw new Exception($"Route Location code '{_routeLocation.Code}' already exists. Please choose a different code.");
-		}
-	}
-
-	private async Task SaveRouteLocation()
+	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
 			return;
@@ -129,20 +79,20 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			if (_routeLocation.Id == 0)
-				_routeLocation.Code = await GenerateCodes.GenerateRouteLocationCode();
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-			await ValidateForm();
-			await VehicleRouteLocationData.InsertRouteLocation(_routeLocation);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await _toastNotification.ShowAsync("Success", $"Route Location '{_routeLocation.Name}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteLocationMaster, true);
+			await VehicleRouteLocationData.SaveTransaction(_routeLocation);
+
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -152,14 +102,6 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditRouteLocation(VehicleRouteLocationModel routeLocation)
-	{
-		_routeLocation = await CommonData.LoadTableDataById<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, routeLocation.Id)
-			?? throw new Exception("Route Location not found.");
-
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -170,24 +112,24 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var routeLocation = _routeLocationsAll.FirstOrDefault(rl => rl.Id == _deleteRouteLocationId)
-				?? throw new Exception("Route Location not found.");
+			var routeLocation = await CommonData.LoadTableDataById<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			routeLocation.Status = false;
 			await VehicleRouteLocationData.InsertRouteLocation(routeLocation);
 
-			await _toastNotification.ShowAsync("Success", $"Route Location '{routeLocation.Name}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteLocationMaster, true);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete Route Location: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_deleteRouteLocationId = 0;
-			_deleteRouteLocationName = string.Empty;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
 		}
 	}
 
@@ -201,24 +143,24 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var routeLocation = _routeLocationsAll.FirstOrDefault(rl => rl.Id == _recoverRouteLocationId)
-				?? throw new Exception("Route Location not found.");
+			var routeLocation = await CommonData.LoadTableDataById<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			routeLocation.Status = true;
 			await VehicleRouteLocationData.InsertRouteLocation(routeLocation);
 
-			await _toastNotification.ShowAsync("Success", $"Route Location '{routeLocation.Name}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteLocationMaster, true);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover Route Location: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_recoverRouteLocationId = 0;
-			_recoverRouteLocationName = string.Empty;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
 		}
 	}
 	#endregion
@@ -280,15 +222,26 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
+
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewRouteLocation":
+			case "NewTransaction":
 				ResetPage();
 				break;
-			case "SaveRouteLocation":
-				await SaveRouteLocation();
+			case "SaveTransaction":
+				await SaveTransaction();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -299,24 +252,24 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 			case "ExportPdf":
 				await ExportPdf();
 				break;
-			case "EditSelected":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
 
-	private async Task OnRouteLocationGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRouteLocationModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRouteLocationModel> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "EditRouteLocation":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverRouteLocation":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
@@ -324,11 +277,17 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 	private async Task EditSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-		if (selectedRecords.Count > 0)
-			await OnEditRouteLocation(selectedRecords[0]);
+		if (selectedRecords.Count == 0)
+			return;
+
+		_routeLocation = await CommonData.LoadTableDataById<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, selectedRecords[0].Id);
+		if (_routeLocation is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		StateHasChanged();
 	}
 
-	private async Task DeleteSelectedItem()
+	private async Task DeleteRecoverSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
@@ -342,29 +301,29 @@ public partial class VehicleRouteLocationPage : IAsyncDisposable
 
 	private async Task ShowDeleteConfirmation(int id, string name)
 	{
-		_deleteRouteLocationId = id;
-		_deleteRouteLocationName = name;
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelDelete()
 	{
-		_deleteRouteLocationId = 0;
-		_deleteRouteLocationName = string.Empty;
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
 		await _deleteConfirmationDialog.HideAsync();
 	}
 
 	private async Task ShowRecoverConfirmation(int id, string name)
 	{
-		_recoverRouteLocationId = id;
-		_recoverRouteLocationName = name;
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelRecover()
 	{
-		_recoverRouteLocationId = 0;
-		_recoverRouteLocationName = string.Empty;
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
 	}
 

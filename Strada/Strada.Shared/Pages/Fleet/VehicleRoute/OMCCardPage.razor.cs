@@ -21,23 +21,22 @@ public partial class OMCCardPage : IAsyncDisposable
 	private OMCModel _selectedOMC;
 
 	private List<OMCCardModel> _omcCards = [];
-	private List<OMCCardModel> _omcCardsAll = [];
 	private List<OMCModel> _omcs = [];
-	private readonly List<ContextMenuItemModel> _omcCardGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
-		new() { Text = "Edit (Insert)", Id = "EditOMCCard", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverOMCCard", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<OMCCardModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-	private int _deleteOMCCardId = 0;
-	private string _deleteOMCCardName = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-	private int _recoverOMCCardId = 0;
-	private string _recoverOMCCardName = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -48,26 +47,23 @@ public partial class OMCCardPage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+		await InitializePage();
+	}
+
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
 		await LoadData();
+
 		_isLoading = false;
 		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveOMCCard, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
-
-		_omcCardsAll = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
-		_omcCards = [.. _omcCardsAll];
+		_omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
 		_omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC);
+		_omcs = [.. _omcs.OrderBy(omc => omc.Name)];
 		_selectedOMC = _omcs.FirstOrDefault(omc => omc.Id == _omcCard.OMCId);
 
 		if (!_showDeleted)
@@ -79,59 +75,7 @@ public partial class OMCCardPage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		if (!_user.Admin)
-			throw new Exception("You do not have permission to perform this action.");
-
-		_omcCard.CardNumber = _omcCard.CardNumber?.Trim() ?? "";
-		_omcCard.CardNumber = _omcCard.CardNumber?.ToUpper() ?? "";
-		_omcCard.OMCId = _selectedOMC?.Id ?? 0;
-
-		_omcCard.Code = _omcCard.Code?.Trim() ?? "";
-		_omcCard.Code = _omcCard.Code?.ToUpper() ?? "";
-
-		_omcCard.Remarks = _omcCard.Remarks?.Trim() ?? "";
-		_omcCard.Status = true;
-
-		if (string.IsNullOrWhiteSpace(_omcCard.CardNumber))
-			throw new Exception("OMC card number is required. Please enter a valid OMC card number.");
-
-		if (string.IsNullOrWhiteSpace(_omcCard.Code))
-			throw new Exception("OMC card code is required. Please try again.");
-
-		if (_omcCard.OMCId <= 0)
-			throw new Exception("Associated OMC is required. Please select a valid OMC.");
-
-		if (_omcCard.OpeningBalance < 0)
-			throw new Exception("Opening balance cannot be negative.");
-
-		if (string.IsNullOrWhiteSpace(_omcCard.Remarks))
-			_omcCard.Remarks = null;
-
-		if (_omcCard.Id > 0)
-		{
-			var existingOMCByCardNumber = _omcCardsAll.FirstOrDefault(_ => _.Id != _omcCard.Id && _.CardNumber.Equals(_omcCard.CardNumber, StringComparison.OrdinalIgnoreCase));
-			if (existingOMCByCardNumber is not null)
-				throw new Exception($"OMC card number '{_omcCard.CardNumber}' already exists. Please choose a different card number.");
-
-			var existingOMCByCode = _omcCardsAll.FirstOrDefault(_ => _.Id != _omcCard.Id && _.Code.Equals(_omcCard.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingOMCByCode is not null)
-				throw new Exception($"OMC card code '{_omcCard.Code}' already exists. Please choose a different code.");
-		}
-		else
-		{
-			var existingOMCByCardNumber = _omcCardsAll.FirstOrDefault(_ => _.CardNumber.Equals(_omcCard.CardNumber, StringComparison.OrdinalIgnoreCase));
-			if (existingOMCByCardNumber is not null)
-				throw new Exception($"OMC card number '{_omcCard.CardNumber}' already exists. Please choose a different card number.");
-
-			var existingOMCByCode = _omcCardsAll.FirstOrDefault(_ => _.Code.Equals(_omcCard.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingOMCByCode is not null)
-				throw new Exception($"OMC card code '{_omcCard.Code}' already exists. Please choose a different code.");
-		}
-	}
-
-	private async Task SaveOMCCard()
+	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
 			return;
@@ -140,20 +84,22 @@ public partial class OMCCardPage : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			if (_omcCard.Id == 0)
-				_omcCard.Code = await GenerateCodes.GenerateOMCCardCode();
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-			await ValidateForm();
-			await OMCCardData.InsertOMCCard(_omcCard);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await _toastNotification.ShowAsync("Success", $"OMC Card '{_omcCard.CardNumber}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleOMCCardMaster, true);
+			_omcCard.OMCId = _selectedOMC?.Id ?? 0;
+
+			await OMCCardData.SaveTransaction(_omcCard);
+
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -163,15 +109,6 @@ public partial class OMCCardPage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditOMCCard(OMCCardModel omcCard)
-	{
-		_omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, omcCard.Id)
-			?? throw new Exception("OMC Card not found.");
-		_selectedOMC = _omcs.FirstOrDefault(omc => omc.Id == _omcCard.OMCId);
-
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -182,24 +119,24 @@ public partial class OMCCardPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var omcCard = _omcCardsAll.FirstOrDefault(o => o.Id == _deleteOMCCardId)
-				?? throw new Exception("OMC Card not found.");
+			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			omcCard.Status = false;
 			await OMCCardData.InsertOMCCard(omcCard);
 
-			await _toastNotification.ShowAsync("Success", $"OMC Card '{omcCard.CardNumber}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleOMCCardMaster, true);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete OMC Card: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_deleteOMCCardId = 0;
-			_deleteOMCCardName = string.Empty;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
 		}
 	}
 
@@ -213,24 +150,24 @@ public partial class OMCCardPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var omcCard = _omcCardsAll.FirstOrDefault(o => o.Id == _recoverOMCCardId)
-				?? throw new Exception("OMC Card not found.");
+			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			omcCard.Status = true;
 			await OMCCardData.InsertOMCCard(omcCard);
 
-			await _toastNotification.ShowAsync("Success", $"OMC Card '{omcCard.CardNumber}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleOMCCardMaster, true);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover OMC Card: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_recoverOMCCardId = 0;
-			_recoverOMCCardName = string.Empty;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
 		}
 	}
 	#endregion
@@ -292,15 +229,26 @@ public partial class OMCCardPage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
+
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewOMCCard":
+			case "NewTransaction":
 				ResetPage();
 				break;
-			case "SaveOMCCard":
-				await SaveOMCCard();
+			case "SaveTransaction":
+				await SaveTransaction();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -311,24 +259,24 @@ public partial class OMCCardPage : IAsyncDisposable
 			case "ExportPdf":
 				await ExportPdf();
 				break;
-			case "EditSelected":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
 
-	private async Task OnOMCCardGridContextMenuItemClicked(ContextMenuClickEventArgs<OMCCardModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<OMCCardModel> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "EditOMCCard":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverOMCCard":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
@@ -336,11 +284,19 @@ public partial class OMCCardPage : IAsyncDisposable
 	private async Task EditSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-		if (selectedRecords.Count > 0)
-			await OnEditOMCCard(selectedRecords[0]);
+		if (selectedRecords.Count == 0)
+			return;
+
+		_omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, selectedRecords[0].Id);
+		if (_omcCard is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		_selectedOMC = _omcs.FirstOrDefault(omc => omc.Id == _omcCard.OMCId);
+
+		StateHasChanged();
 	}
 
-	private async Task DeleteSelectedItem()
+	private async Task DeleteRecoverSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
@@ -354,29 +310,29 @@ public partial class OMCCardPage : IAsyncDisposable
 
 	private async Task ShowDeleteConfirmation(int id, string name)
 	{
-		_deleteOMCCardId = id;
-		_deleteOMCCardName = name;
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelDelete()
 	{
-		_deleteOMCCardId = 0;
-		_deleteOMCCardName = string.Empty;
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
 		await _deleteConfirmationDialog.HideAsync();
 	}
 
 	private async Task ShowRecoverConfirmation(int id, string name)
 	{
-		_recoverOMCCardId = id;
-		_recoverOMCCardName = name;
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelRecover()
 	{
-		_recoverOMCCardId = 0;
-		_recoverOMCCardName = string.Empty;
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
 	}
 

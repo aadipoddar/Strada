@@ -39,9 +39,9 @@ else
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelected"
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected"
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
 										  Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
@@ -92,14 +92,11 @@ else
 								Document Type <span class="required">*</span>
 							</label>
 							<SfAutoComplete TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel"
-											Value="@(_vehicleDocumentTypes.FirstOrDefault(v => v.Id == _vehicleDocument.VehicleDocumentTypeId))"
-											DataSource="@_vehicleDocumentTypes"
-											Placeholder="Select document type" FloatLabelType="FloatLabelType.Never"
-											AllowFiltering="true"
+											Value="@_selectedVehicleDocumentType" DataSource="@_vehicleDocumentTypes" Placeholder="Select document type"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
 											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
 											CssClass="custom-autocomplete">
-								<AutoCompleteEvents TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel"
-													ValueChange="OnVehicleDocumentTypeChanged" />
+								<AutoCompleteEvents TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel" ValueChange="OnVehicleDocumentTypeChanged" />
 								<AutoCompleteFieldSettings Value="Name" />
 							</SfAutoComplete>
 						</div>
@@ -109,8 +106,7 @@ else
 								Vehicle <span class="required">*</span>
 							</label>
 							<SfAutoComplete TValue="VehicleModel" TItem="VehicleModel"
-											Value="@(_vehicles.FirstOrDefault(v => v.Id == _vehicleDocument.VehicleId))"
-											DataSource="@_vehicles" Placeholder="Select vehicle"
+											Value="@_selectedVehicle" DataSource="@_vehicles" Placeholder="Select vehicle"
 											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
 											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
 											CssClass="custom-autocomplete">
@@ -172,9 +168,9 @@ else
 				<div class="section-body grid-body">
 					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDocuments" AllowPaging="true" AllowSorting="true"
 							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_vehicleDocumentGridContextMenuItems">
+							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-						<GridEvents TValue="VehicleDocumentModel" ContextMenuItemClicked="OnVehicleDocumentGridContextMenuItemClicked" />
+						<GridEvents TValue="VehicleDocumentModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
 							<GridColumn Field="@nameof(VehicleDocumentModel.Id)" HeaderText="ID" Width="80"
@@ -185,8 +181,8 @@ else
 							<GridColumn Field="@nameof(VehicleDocumentModel.VehicleDocumentTypeId)" HeaderText="Document Type" Width="200">
 								<Template>
 									@{
-										var vehicleDocument = (context as VehicleDocumentModel);
-										var documentType = _vehicleDocumentTypes.FirstOrDefault(vdt => vdt.Id == vehicleDocument.VehicleDocumentTypeId);
+										var item = (context as VehicleDocumentModel);
+										var documentType = _vehicleDocumentTypes.FirstOrDefault(vdt => vdt.Id == item.VehicleDocumentTypeId);
 										<span>@(documentType is not null ? documentType.Name : "N/A")</span>
 									}
 								</Template>
@@ -194,8 +190,8 @@ else
 							<GridColumn Field="@nameof(VehicleDocumentModel.VehicleId)" HeaderText="Vehicle" Width="150">
 								<Template>
 									@{
-										var vehicleDocument = (context as VehicleDocumentModel);
-										var vehicle = _vehicles.FirstOrDefault(v => v.Id == vehicleDocument.VehicleId);
+										var item = (context as VehicleDocumentModel);
+										var vehicle = _vehicles.FirstOrDefault(v => v.Id == item.VehicleId);
 										<span>@(vehicle is not null ? vehicle.Code : "N/A")</span>
 									}
 								</Template>
@@ -211,8 +207,8 @@ else
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var vehicleDocument = (context as VehicleDocumentModel);
-										<span class="@(vehicleDocument.Status ? string.Empty : "grid-debit")">@(vehicleDocument.Status ? "Active" : "Deleted")</span>
+										var item = (context as VehicleDocumentModel);
+										<span class="@(item.Status ? string.Empty : "grid-debit")">@(item.Status ? "Active" : "Deleted")</span>
 									}
 								</Template>
 							</GridColumn>
@@ -235,11 +231,11 @@ else
 					  OnClose="CloseUploadDialog" />
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Document" IdentifierLabel="Transaction No"
-						  IdentifierValue="@_deleteVehicleDocumentTransactionNo" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
+						  IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
 						  OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Document"
-						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverVehicleDocumentTransactionNo" Disabled="@_isProcessing"
+						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverTransactionNo" Disabled="@_isProcessing"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

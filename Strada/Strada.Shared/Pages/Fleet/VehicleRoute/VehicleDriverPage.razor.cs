@@ -20,22 +20,21 @@ public partial class VehicleDriverPage : IAsyncDisposable
 	private VehicleDriverModel _vehicleDriver = new();
 
 	private List<VehicleDriverModel> _vehicleDrivers = [];
-	private List<VehicleDriverModel> _vehicleDriversAll = [];
-	private readonly List<ContextMenuItemModel> _vehicleDriverGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
-		new() { Text = "Edit (Insert)", Id = "EditVehicleDriver", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverVehicleDriver", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<VehicleDriverModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-	private int _deleteVehicleDriverId = 0;
-	private string _deleteVehicleDriverName = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-	private int _recoverVehicleDriverId = 0;
-	private string _recoverVehicleDriverName = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -46,28 +45,24 @@ public partial class VehicleDriverPage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+		await InitializePage();
+	}
+
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
 		await LoadData();
+
 		_isLoading = false;
 		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveVehicleDriver, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
-
-		_vehicleDriversAll = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver);
-		_vehicleDrivers = [.. _vehicleDriversAll];
+		_vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver);
 
 		if (!_showDeleted)
-			_vehicleDrivers = [.. _vehicleDrivers.Where(vehicleDriver => vehicleDriver.Status)];
+			_vehicleDrivers = [.. _vehicleDrivers.Where(vd => vd.Status)];
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
@@ -75,68 +70,7 @@ public partial class VehicleDriverPage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		if (!_user.Admin)
-			throw new Exception("You do not have permission to perform this action.");
-
-		_vehicleDriver.Name = _vehicleDriver.Name?.Trim() ?? "";
-		_vehicleDriver.Name = _vehicleDriver.Name?.ToUpper() ?? "";
-
-		_vehicleDriver.Mobile = _vehicleDriver.Mobile?.Trim() ?? "";
-
-		_vehicleDriver.Code = _vehicleDriver.Code?.Trim() ?? "";
-		_vehicleDriver.Code = _vehicleDriver.Code?.ToUpper() ?? "";
-
-		_vehicleDriver.Remarks = _vehicleDriver.Remarks?.Trim() ?? "";
-		_vehicleDriver.Status = true;
-
-		if (string.IsNullOrWhiteSpace(_vehicleDriver.Name))
-			throw new Exception("Vehicle Driver name is required. Please enter a valid vehicle driver name.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleDriver.Mobile))
-			throw new Exception("Mobile is required. Please enter a valid mobile number.");
-
-		if (!_vehicleDriver.Mobile.ValidatePhoneNumber())
-			throw new Exception("Mobile must be exactly 10 numeric digits.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleDriver.Code))
-			throw new Exception("Vehicle Driver code is required. Please try again.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleDriver.Remarks))
-			_vehicleDriver.Remarks = null;
-
-		if (_vehicleDriver.Id > 0)
-		{
-			var existingVehicleDriverByName = _vehicleDriversAll.FirstOrDefault(_ => _.Id != _vehicleDriver.Id && _.Name.Equals(_vehicleDriver.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleDriverByName is not null)
-				throw new Exception($"Vehicle Driver name '{_vehicleDriver.Name}' already exists. Please choose a different name.");
-
-			var existingVehicleDriverByMobile = _vehicleDriversAll.FirstOrDefault(_ => _.Id != _vehicleDriver.Id && _.Mobile.Equals(_vehicleDriver.Mobile, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleDriverByMobile is not null)
-				throw new Exception($"Mobile '{_vehicleDriver.Mobile}' already exists. Please choose a different mobile number.");
-
-			var existingVehicleDriverByCode = _vehicleDriversAll.FirstOrDefault(_ => _.Id != _vehicleDriver.Id && _.Code.Equals(_vehicleDriver.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleDriverByCode is not null)
-				throw new Exception($"Vehicle Driver code '{_vehicleDriver.Code}' already exists. Please choose a different code.");
-		}
-		else
-		{
-			var existingVehicleDriverByName = _vehicleDriversAll.FirstOrDefault(_ => _.Name.Equals(_vehicleDriver.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleDriverByName is not null)
-				throw new Exception($"Vehicle Driver name '{_vehicleDriver.Name}' already exists. Please choose a different name.");
-
-			var existingVehicleDriverByMobile = _vehicleDriversAll.FirstOrDefault(_ => _.Mobile.Equals(_vehicleDriver.Mobile, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleDriverByMobile is not null)
-				throw new Exception($"Mobile '{_vehicleDriver.Mobile}' already exists. Please choose a different mobile number.");
-
-			var existingVehicleDriverByCode = _vehicleDriversAll.FirstOrDefault(_ => _.Code.Equals(_vehicleDriver.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleDriverByCode is not null)
-				throw new Exception($"Vehicle Driver code '{_vehicleDriver.Code}' already exists. Please choose a different code.");
-		}
-	}
-
-	private async Task SaveVehicleDriver()
+	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
 			return;
@@ -145,20 +79,20 @@ public partial class VehicleDriverPage : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			if (_vehicleDriver.Id == 0)
-				_vehicleDriver.Code = await GenerateCodes.GenerateVehicleDriverCode();
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-			await ValidateForm();
-			await VehicleDriverData.InsertVehicleDriver(_vehicleDriver);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Driver '{_vehicleDriver.Name}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster, true);
+			await VehicleDriverData.SaveTransaction(_vehicleDriver);
+
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -168,13 +102,6 @@ public partial class VehicleDriverPage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditVehicleDriver(VehicleDriverModel vehicleDriver)
-	{
-		_vehicleDriver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, vehicleDriver.Id)
-			?? throw new Exception("Vehicle Driver not found.");
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -185,24 +112,24 @@ public partial class VehicleDriverPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleDriver = _vehicleDriversAll.FirstOrDefault(vd => vd.Id == _deleteVehicleDriverId)
-				?? throw new Exception("Vehicle Driver not found.");
+			var vehicleDriver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleDriver.Status = false;
 			await VehicleDriverData.InsertVehicleDriver(vehicleDriver);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Driver '{vehicleDriver.Name}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster, true);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete Vehicle Driver: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_deleteVehicleDriverId = 0;
-			_deleteVehicleDriverName = string.Empty;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
 		}
 	}
 
@@ -216,24 +143,24 @@ public partial class VehicleDriverPage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleDriver = _vehicleDriversAll.FirstOrDefault(vd => vd.Id == _recoverVehicleDriverId)
-				?? throw new Exception("Vehicle Driver not found.");
+			var vehicleDriver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleDriver.Status = true;
 			await VehicleDriverData.InsertVehicleDriver(vehicleDriver);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Driver '{vehicleDriver.Name}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster, true);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover Vehicle Driver: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_recoverVehicleDriverId = 0;
-			_recoverVehicleDriverName = string.Empty;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
 		}
 	}
 	#endregion
@@ -295,15 +222,26 @@ public partial class VehicleDriverPage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
+
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewVehicleDriver":
+			case "NewTransaction":
 				ResetPage();
 				break;
-			case "SaveVehicleDriver":
-				await SaveVehicleDriver();
+			case "SaveTransaction":
+				await SaveTransaction();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -314,24 +252,24 @@ public partial class VehicleDriverPage : IAsyncDisposable
 			case "ExportPdf":
 				await ExportPdf();
 				break;
-			case "EditSelected":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
 
-	private async Task OnVehicleDriverGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleDriverModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleDriverModel> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "EditVehicleDriver":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverVehicleDriver":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
@@ -339,11 +277,17 @@ public partial class VehicleDriverPage : IAsyncDisposable
 	private async Task EditSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-		if (selectedRecords.Count > 0)
-			await OnEditVehicleDriver(selectedRecords[0]);
+		if (selectedRecords.Count == 0)
+			return;
+
+		_vehicleDriver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, selectedRecords[0].Id);
+		if (_vehicleDriver is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		StateHasChanged();
 	}
 
-	private async Task DeleteSelectedItem()
+	private async Task DeleteRecoverSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
@@ -357,29 +301,29 @@ public partial class VehicleDriverPage : IAsyncDisposable
 
 	private async Task ShowDeleteConfirmation(int id, string name)
 	{
-		_deleteVehicleDriverId = id;
-		_deleteVehicleDriverName = name;
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelDelete()
 	{
-		_deleteVehicleDriverId = 0;
-		_deleteVehicleDriverName = string.Empty;
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
 		await _deleteConfirmationDialog.HideAsync();
 	}
 
 	private async Task ShowRecoverConfirmation(int id, string name)
 	{
-		_recoverVehicleDriverId = id;
-		_recoverVehicleDriverName = name;
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelRecover()
 	{
-		_recoverVehicleDriverId = 0;
-		_recoverVehicleDriverName = string.Empty;
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
 	}
 

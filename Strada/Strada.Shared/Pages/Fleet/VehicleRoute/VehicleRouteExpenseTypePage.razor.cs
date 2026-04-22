@@ -20,22 +20,21 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 	private VehicleRouteExpenseTypeModel _vehicleRouteExpenseType = new();
 
 	private List<VehicleRouteExpenseTypeModel> _vehicleRouteExpenseTypes = [];
-	private List<VehicleRouteExpenseTypeModel> _vehicleRouteExpenseTypesAll = [];
-	private readonly List<ContextMenuItemModel> _vehicleRouteExpenseTypeGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
-		new() { Text = "Edit (Insert)", Id = "EditVehicleRouteExpenseType", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverVehicleRouteExpenseType", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<VehicleRouteExpenseTypeModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-	private int _deleteVehicleRouteExpenseTypeId = 0;
-	private string _deleteVehicleRouteExpenseTypeName = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-	private int _recoverVehicleRouteExpenseTypeId = 0;
-	private string _recoverVehicleRouteExpenseTypeName = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -46,25 +45,21 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+		await InitializePage();
+	}
+
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
 		await LoadData();
+
 		_isLoading = false;
 		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveVehicleRouteExpenseType, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
-
-		_vehicleRouteExpenseTypesAll = await CommonData.LoadTableData<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType);
-		_vehicleRouteExpenseTypes = [.. _vehicleRouteExpenseTypesAll];
+		_vehicleRouteExpenseTypes = await CommonData.LoadTableData<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType);
 
 		if (!_showDeleted)
 			_vehicleRouteExpenseTypes = [.. _vehicleRouteExpenseTypes.Where(v => v.Status)];
@@ -75,52 +70,7 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		if (!_user.Admin)
-			throw new Exception("You do not have permission to perform this action.");
-
-		_vehicleRouteExpenseType.Name = _vehicleRouteExpenseType.Name?.Trim() ?? "";
-		_vehicleRouteExpenseType.Name = _vehicleRouteExpenseType.Name?.ToUpper() ?? "";
-
-		_vehicleRouteExpenseType.Code = _vehicleRouteExpenseType.Code?.Trim() ?? "";
-		_vehicleRouteExpenseType.Code = _vehicleRouteExpenseType.Code?.ToUpper() ?? "";
-
-		_vehicleRouteExpenseType.Remarks = _vehicleRouteExpenseType.Remarks?.Trim() ?? "";
-		_vehicleRouteExpenseType.Status = true;
-
-		if (string.IsNullOrWhiteSpace(_vehicleRouteExpenseType.Name))
-			throw new Exception("Vehicle Route Expense Type name is required. Please enter a valid name.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleRouteExpenseType.Code))
-			throw new Exception("Vehicle Route Expense Type code is required. Please try again.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleRouteExpenseType.Remarks))
-			_vehicleRouteExpenseType.Remarks = null;
-
-		if (_vehicleRouteExpenseType.Id > 0)
-		{
-			var existingVehicleRouteExpenseTypeByName = _vehicleRouteExpenseTypesAll.FirstOrDefault(_ => _.Id != _vehicleRouteExpenseType.Id && _.Name.Equals(_vehicleRouteExpenseType.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleRouteExpenseTypeByName is not null)
-				throw new Exception($"Vehicle Route Expense Type name '{_vehicleRouteExpenseType.Name}' already exists. Please choose a different name.");
-
-			var existingVehicleRouteExpenseTypeByCode = _vehicleRouteExpenseTypesAll.FirstOrDefault(_ => _.Id != _vehicleRouteExpenseType.Id && _.Code.Equals(_vehicleRouteExpenseType.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleRouteExpenseTypeByCode is not null)
-				throw new Exception($"Vehicle Route Expense Type code '{_vehicleRouteExpenseType.Code}' already exists. Please choose a different code.");
-		}
-		else
-		{
-			var existingVehicleRouteExpenseTypeByName = _vehicleRouteExpenseTypesAll.FirstOrDefault(_ => _.Name.Equals(_vehicleRouteExpenseType.Name, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleRouteExpenseTypeByName is not null)
-				throw new Exception($"Vehicle Route Expense Type name '{_vehicleRouteExpenseType.Name}' already exists. Please choose a different name.");
-
-			var existingVehicleRouteExpenseTypeByCode = _vehicleRouteExpenseTypesAll.FirstOrDefault(_ => _.Code.Equals(_vehicleRouteExpenseType.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleRouteExpenseTypeByCode is not null)
-				throw new Exception($"Vehicle Route Expense Type code '{_vehicleRouteExpenseType.Code}' already exists. Please choose a different code.");
-		}
-	}
-
-	private async Task SaveVehicleRouteExpenseType()
+	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
 			return;
@@ -129,20 +79,20 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			if (_vehicleRouteExpenseType.Id == 0)
-				_vehicleRouteExpenseType.Code = await GenerateCodes.GenerateVehicleRouteExpenseTypeCode();
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-			await ValidateForm();
-			await VehicleRouteExpenseTypeData.InsertVehicleRouteExpenseType(_vehicleRouteExpenseType);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Route Expense Type '{_vehicleRouteExpenseType.Name}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteExpenseTypeMaster, true);
+			await VehicleRouteExpenseTypeData.SaveTransaction(_vehicleRouteExpenseType);
+
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -152,14 +102,6 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditVehicleRouteExpenseType(VehicleRouteExpenseTypeModel vehicleRouteExpenseType)
-	{
-		_vehicleRouteExpenseType = await CommonData.LoadTableDataById<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType, vehicleRouteExpenseType.Id)
-			?? throw new Exception("Vehicle Route Expense Type not found.");
-
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -170,24 +112,24 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleRouteExpenseType = _vehicleRouteExpenseTypesAll.FirstOrDefault(o => o.Id == _deleteVehicleRouteExpenseTypeId)
-				?? throw new Exception("Vehicle Route Expense Type not found.");
+			var vehicleRouteExpenseType = await CommonData.LoadTableDataById<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleRouteExpenseType.Status = false;
 			await VehicleRouteExpenseTypeData.InsertVehicleRouteExpenseType(vehicleRouteExpenseType);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Route Expense Type '{vehicleRouteExpenseType.Name}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteExpenseTypeMaster, true);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete Vehicle Route Expense Type: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_deleteVehicleRouteExpenseTypeId = 0;
-			_deleteVehicleRouteExpenseTypeName = string.Empty;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
 		}
 	}
 
@@ -201,24 +143,24 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleRouteExpenseType = _vehicleRouteExpenseTypesAll.FirstOrDefault(o => o.Id == _recoverVehicleRouteExpenseTypeId)
-				?? throw new Exception("Vehicle Route Expense Type not found.");
+			var vehicleRouteExpenseType = await CommonData.LoadTableDataById<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleRouteExpenseType.Status = true;
 			await VehicleRouteExpenseTypeData.InsertVehicleRouteExpenseType(vehicleRouteExpenseType);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Route Expense Type '{vehicleRouteExpenseType.Name}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteExpenseTypeMaster, true);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover Vehicle Route Expense Type: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_recoverVehicleRouteExpenseTypeId = 0;
-			_recoverVehicleRouteExpenseTypeName = string.Empty;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
 		}
 	}
 	#endregion
@@ -280,15 +222,26 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
+
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewOMC":
+			case "NewTransaction":
 				ResetPage();
 				break;
-			case "SaveVehicleRouteExpenseType":
-				await SaveVehicleRouteExpenseType();
+			case "SaveTransaction":
+				await SaveTransaction();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -299,24 +252,24 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 			case "ExportPdf":
 				await ExportPdf();
 				break;
-			case "EditSelected":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
 
-	private async Task OnVehicleRouteExpenseTypeGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRouteExpenseTypeModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRouteExpenseTypeModel> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "EditVehicleRouteExpenseType":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverVehicleRouteExpenseType":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
@@ -324,11 +277,17 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 	private async Task EditSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-		if (selectedRecords.Count > 0)
-			await OnEditVehicleRouteExpenseType(selectedRecords[0]);
+		if (selectedRecords.Count == 0)
+			return;
+
+		_vehicleRouteExpenseType = await CommonData.LoadTableDataById<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType, selectedRecords[0].Id);
+		if (_vehicleRouteExpenseType is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		StateHasChanged();
 	}
 
-	private async Task DeleteSelectedItem()
+	private async Task DeleteRecoverSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
@@ -342,29 +301,29 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 
 	private async Task ShowDeleteConfirmation(int id, string name)
 	{
-		_deleteVehicleRouteExpenseTypeId = id;
-		_deleteVehicleRouteExpenseTypeName = name;
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelDelete()
 	{
-		_deleteVehicleRouteExpenseTypeId = 0;
-		_deleteVehicleRouteExpenseTypeName = string.Empty;
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
 		await _deleteConfirmationDialog.HideAsync();
 	}
 
 	private async Task ShowRecoverConfirmation(int id, string name)
 	{
-		_recoverVehicleRouteExpenseTypeId = id;
-		_recoverVehicleRouteExpenseTypeName = name;
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelRecover()
 	{
-		_recoverVehicleRouteExpenseTypeId = 0;
-		_recoverVehicleRouteExpenseTypeName = string.Empty;
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
 	}
 
@@ -376,7 +335,7 @@ public partial class VehicleRouteExpenseTypePage : IAsyncDisposable
 	}
 
 	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.VehicleOMCMaster, true);
+		NavigationManager.NavigateTo(PageRouteNames.VehicleRouteExpenseTypeMaster, true);
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);

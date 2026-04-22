@@ -11,361 +11,339 @@ namespace Strada.Shared.Pages.Accounts.Masters;
 
 public partial class AccountTypePage : IAsyncDisposable
 {
-    private UserModel _user;
-    private HotKeysContext _hotKeysContext;
-    private bool _isLoading = true;
-    private bool _isProcessing = false;
-    private bool _showDeleted = false;
+	private UserModel _user;
+	private HotKeysContext _hotKeysContext;
+	private bool _isLoading = true;
+	private bool _isProcessing = false;
+	private bool _showDeleted = false;
 
-    private AccountTypeModel _accountType = new();
+	private AccountTypeModel _accountType = new();
 
-    private List<AccountTypeModel> _accountTypes = [];
-    private readonly List<ContextMenuItemModel> _accountTypeGridContextMenuItems =
-    [
-        new() { Text = "Edit (Insert)", Id = "EditAccountType", IconCss = "e-icons e-edit", Target = ".e-content" },
-        new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverAccountType", IconCss = "e-icons e-trash", Target = ".e-content" }
-    ];
+	private List<AccountTypeModel> _accountTypes = [];
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
+	[
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
+	];
 
-    private SfGrid<AccountTypeModel> _sfGrid;
-    private DeleteConfirmationDialog _deleteConfirmationDialog;
-    private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfGrid<AccountTypeModel> _sfGrid;
+	private DeleteConfirmationDialog _deleteConfirmationDialog;
+	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-    private int _deleteAccountTypeId = 0;
-    private string _deleteAccountTypeName = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-    private int _recoverAccountTypeId = 0;
-    private string _recoverAccountTypeName = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
-    private ToastNotification _toastNotification;
+	private ToastNotification _toastNotification;
 
-    #region Load Data
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-            return;
+	#region Load Data
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender)
+			return;
 
-        _user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
-        await LoadData();
-        _isLoading = false;
-        StateHasChanged();
-    }
+		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
+		await InitializePage();
+	}
 
-    private async Task LoadData()
-    {
-        _hotKeysContext = HotKeys.CreateContext()
-            .Add(ModCode.Ctrl, Code.S, SaveAccountType, "Save", Exclude.None)
-            .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-            .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-            .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-            .Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-            .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-            .Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-            .Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
+		await LoadData();
 
-        _accountTypes = await CommonData.LoadTableData<AccountTypeModel>(AccountNames.AccountType);
+		_isLoading = false;
+		StateHasChanged();
+	}
 
-        if (!_showDeleted)
-            _accountTypes = [.. _accountTypes.Where(at => at.Status)];
+	private async Task LoadData()
+	{
+		_accountTypes = await CommonData.LoadTableData<AccountTypeModel>(AccountNames.AccountType);
 
-        if (_sfGrid is not null)
-            await _sfGrid.Refresh();
-    }
-    #endregion
+		if (!_showDeleted)
+			_accountTypes = [.. _accountTypes.Where(at => at.Status)];
 
-    #region Saving
-    private async Task ValidateForm()
-    {
-        if (!_user.Admin)
-            throw new Exception("You do not have permission to perform this action.");
+		if (_sfGrid is not null)
+			await _sfGrid.Refresh();
+	}
+	#endregion
 
-        _accountType.Name = _accountType.Name?.Trim() ?? "";
-        _accountType.Name = _accountType.Name?.ToUpper() ?? "";
+	#region Saving
+	private async Task SaveTransaction()
+	{
+		if (_isProcessing)
+			return;
 
-        _accountType.Remarks = _accountType.Remarks?.Trim() ?? "";
-        _accountType.Status = true;
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
 
-        if (string.IsNullOrWhiteSpace(_accountType.Name))
-            throw new Exception("Account Type name is required. Please enter a valid account type name.");
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-        if (string.IsNullOrWhiteSpace(_accountType.Remarks))
-            _accountType.Remarks = null;
+			await _toastNotification.ShowAsync("Processing", "Please wait...", ToastType.Info);
 
-        if (_accountType.Id > 0)
-        {
-            var existingAccountType = _accountTypes.FirstOrDefault(_ => _.Id != _accountType.Id && _.Name.Equals(_accountType.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingAccountType is not null)
-                throw new Exception($"Account Type name '{_accountType.Name}' already exists. Please choose a different name.");
-        }
-        else
-        {
-            var existingAccountType = _accountTypes.FirstOrDefault(_ => _.Name.Equals(_accountType.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingAccountType is not null)
-                throw new Exception($"Account Type name '{_accountType.Name}' already exists. Please choose a different name.");
-        }
-    }
+			await AccountTypeData.SaveTransaction(_accountType);
 
-    private async Task SaveAccountType()
-    {
-        if (_isProcessing)
-            return;
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+		}
+	}
+	#endregion
 
-        try
-        {
-            _isProcessing = true;
-            StateHasChanged();
-            await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
+	#region Actions
+	private async Task ConfirmDelete()
+	{
+		try
+		{
+			_isProcessing = true;
+			await _deleteConfirmationDialog.HideAsync();
 
-            await ValidateForm();
-            await AccountTypeData.InsertAccountType(_accountType);
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-            await _toastNotification.ShowAsync("Success", $"Account Type '{_accountType.Name}' has been saved successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AccountTypeMaster, true);
-        }
-        catch (Exception ex)
-        {
-            await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
-        }
-        finally
-        {
-            _isProcessing = false;
-        }
-    }
-    #endregion
+			var accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
-    #region Exporting
-    private async Task ExportExcel()
-    {
-        if (_isProcessing)
-            return;
+			accountType.Status = false;
+			await AccountTypeData.InsertAccountType(accountType);
 
-        try
-        {
-            _isProcessing = true;
-            StateHasChanged();
-            await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
+		}
+	}
 
-            var (stream, fileName) = await AccountTypeExport.ExportMaster(_accountTypes, ReportExportType.Excel);
-            await SaveAndViewService.SaveAndView(fileName, stream);
+	private async Task ConfirmRecover()
+	{
+		try
+		{
+			_isProcessing = true;
+			await _recoverConfirmationDialog.HideAsync();
 
-            await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-        }
-        catch (Exception ex)
-        {
-            await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-        }
-        finally
-        {
-            _isProcessing = false;
-            StateHasChanged();
-        }
-    }
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-    private async Task ExportPdf()
-    {
-        if (_isProcessing)
-            return;
+			var accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
-        try
-        {
-            _isProcessing = true;
-            StateHasChanged();
-            await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+			accountType.Status = true;
+			await AccountTypeData.InsertAccountType(accountType);
 
-            var (stream, fileName) = await AccountTypeExport.ExportMaster(_accountTypes, ReportExportType.PDF);
-            await SaveAndViewService.SaveAndView(fileName, stream);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
+		}
+	}
+	#endregion
 
-            await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-        }
-        catch (Exception ex)
-        {
-            await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-        }
-        finally
-        {
-            _isProcessing = false;
-            StateHasChanged();
-        }
-    }
-    #endregion
+	#region Exporting
+	private async Task ExportExcel()
+	{
+		if (_isProcessing)
+			return;
 
-    #region Actions
-    private async Task OnEditAccountType(AccountTypeModel accountType)
-    {
-        _accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, accountType.Id)
-            ?? throw new Exception("Account Type not found.");
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-        StateHasChanged();
-    }
+			var (stream, fileName) = await AccountTypeExport.ExportMaster(_accountTypes, ReportExportType.Excel);
+			await SaveAndViewService.SaveAndView(fileName, stream);
 
-    private async Task ConfirmDelete()
-    {
-        try
-        {
-            _isProcessing = true;
-            await _deleteConfirmationDialog.HideAsync();
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
 
-            if (!_user.Admin)
-                throw new Exception("You do not have permission to perform this action.");
+	private async Task ExportPdf()
+	{
+		if (_isProcessing)
+			return;
 
-            var accountType = _accountTypes.FirstOrDefault(at => at.Id == _deleteAccountTypeId)
-                ?? throw new Exception("Account Type not found.");
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-            accountType.Status = false;
-            await AccountTypeData.InsertAccountType(accountType);
+			var (stream, fileName) = await AccountTypeExport.ExportMaster(_accountTypes, ReportExportType.PDF);
+			await SaveAndViewService.SaveAndView(fileName, stream);
 
-            await _toastNotification.ShowAsync("Success", $"Account Type '{accountType.Name}' has been deleted successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AccountTypeMaster, true);
-        }
-        catch (Exception ex)
-        {
-            await _toastNotification.ShowAsync("Error", $"Failed to delete Account Type: {ex.Message}", ToastType.Error);
-        }
-        finally
-        {
-            _isProcessing = false;
-            _deleteAccountTypeId = 0;
-            _deleteAccountTypeName = string.Empty;
-        }
-    }
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+	#endregion
 
-    private async Task ConfirmRecover()
-    {
-        try
-        {
-            _isProcessing = true;
-            await _recoverConfirmationDialog.HideAsync();
+	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
 
-            if (!_user.Admin)
-                throw new Exception("You do not have permission to perform this action.");
+	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
+	{
+		switch (args.Item.Id)
+		{
+			case "NewTransaction":
+				ResetPage();
+				break;
+			case "SaveTransaction":
+				await SaveTransaction();
+				break;
+			case "ToggleDeleted":
+				await ToggleDeleted();
+				break;
+			case "ExportExcel":
+				await ExportExcel();
+				break;
+			case "ExportPdf":
+				await ExportPdf();
+				break;
+			case "EditSelectedItem":
+				await EditSelectedItem();
+				break;
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
+				break;
+		}
+	}
 
-            var accountType = _accountTypes.FirstOrDefault(at => at.Id == _recoverAccountTypeId)
-                ?? throw new Exception("Account Type not found.");
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<AccountTypeModel> args)
+	{
+		switch (args.Item.Id)
+		{
+			case "EditSelectedItem":
+				await EditSelectedItem();
+				break;
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
+				break;
+		}
+	}
 
-            accountType.Status = true;
-            await AccountTypeData.InsertAccountType(accountType);
+	private async Task EditSelectedItem()
+	{
+		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
+		if (selectedRecords.Count == 0)
+			return;
 
-            await _toastNotification.ShowAsync("Success", $"Account Type '{accountType.Name}' has been recovered successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AccountTypeMaster, true);
-        }
-        catch (Exception ex)
-        {
-            await _toastNotification.ShowAsync("Error", $"Failed to recover Account Type: {ex.Message}", ToastType.Error);
-        }
-        finally
-        {
-            _isProcessing = false;
-            _recoverAccountTypeId = 0;
-            _recoverAccountTypeName = string.Empty;
-        }
-    }
-    #endregion
+		_accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, selectedRecords[0].Id);
+		if (_accountType is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
-    #region Utilities
-    private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
-    {
-        switch (args.Item.Id)
-        {
-            case "NewAccountType":
-                ResetPage();
-                break;
-            case "SaveAccountType":
-                await SaveAccountType();
-                break;
-            case "ToggleDeleted":
-                await ToggleDeleted();
-                break;
-            case "ExportExcel":
-                await ExportExcel();
-                break;
-            case "ExportPdf":
-                await ExportPdf();
-                break;
-            case "EditSelected":
-                await EditSelectedItem();
-                break;
-            case "DeleteRecoverSelected":
-                await DeleteSelectedItem();
-                break;
-        }
-    }
+		StateHasChanged();
+	}
 
-    private async Task OnAccountTypeGridContextMenuItemClicked(ContextMenuClickEventArgs<AccountTypeModel> args)
-    {
-        switch (args.Item.Id)
-        {
-            case "EditAccountType":
-                await EditSelectedItem();
-                break;
-            case "DeleteRecoverAccountType":
-                await DeleteSelectedItem();
-                break;
-        }
-    }
+	private async Task DeleteRecoverSelectedItem()
+	{
+		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
+		if (selectedRecords.Count > 0)
+		{
+			if (selectedRecords[0].Status)
+				await ShowDeleteConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
+			else
+				await ShowRecoverConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
+		}
+	}
 
-    private async Task EditSelectedItem()
-    {
-        var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-        if (selectedRecords.Count > 0)
-            await OnEditAccountType(selectedRecords[0]);
-    }
+	private async Task ShowDeleteConfirmation(int id, string name)
+	{
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
+		await _deleteConfirmationDialog.ShowAsync();
+	}
 
-    private async Task DeleteSelectedItem()
-    {
-        var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-        if (selectedRecords.Count > 0)
-        {
-            if (selectedRecords[0].Status)
-                await ShowDeleteConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
-            else
-                await ShowRecoverConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
-        }
-    }
+	private async Task CancelDelete()
+	{
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
+		await _deleteConfirmationDialog.HideAsync();
+	}
 
-    private async Task ShowDeleteConfirmation(int id, string name)
-    {
-        _deleteAccountTypeId = id;
-        _deleteAccountTypeName = name;
-        await _deleteConfirmationDialog.ShowAsync();
-    }
+	private async Task ShowRecoverConfirmation(int id, string name)
+	{
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
+		await _recoverConfirmationDialog.ShowAsync();
+	}
 
-    private async Task CancelDelete()
-    {
-        _deleteAccountTypeId = 0;
-        _deleteAccountTypeName = string.Empty;
-        await _deleteConfirmationDialog.HideAsync();
-    }
+	private async Task CancelRecover()
+	{
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
+		await _recoverConfirmationDialog.HideAsync();
+	}
 
-    private async Task ShowRecoverConfirmation(int id, string name)
-    {
-        _recoverAccountTypeId = id;
-        _recoverAccountTypeName = name;
-        await _recoverConfirmationDialog.ShowAsync();
-    }
+	private async Task ToggleDeleted()
+	{
+		_showDeleted = !_showDeleted;
+		await LoadData();
+		StateHasChanged();
+	}
 
-    private async Task CancelRecover()
-    {
-        _recoverAccountTypeId = 0;
-        _recoverAccountTypeName = string.Empty;
-        await _recoverConfirmationDialog.HideAsync();
-    }
+	private void ResetPage() =>
+		NavigationManager.NavigateTo(PageRouteNames.AccountTypeMaster, true);
 
-    private async Task ToggleDeleted()
-    {
-        _showDeleted = !_showDeleted;
-        await LoadData();
-        StateHasChanged();
-    }
+	private void NavigateBack() =>
+		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
-    private void ResetPage() =>
-        NavigationManager.NavigateTo(PageRouteNames.AccountTypeMaster, true);
-
-    private void NavigateBack() =>
-        NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
-
-    public ValueTask DisposeAsync()
-    {
-        GC.SuppressFinalize(this);
-        return ((IAsyncDisposable)HotKeys).DisposeAsync();
-    }
-    #endregion
+	public ValueTask DisposeAsync()
+	{
+		GC.SuppressFinalize(this);
+		return ((IAsyncDisposable)HotKeys).DisposeAsync();
+	}
+	#endregion
 }

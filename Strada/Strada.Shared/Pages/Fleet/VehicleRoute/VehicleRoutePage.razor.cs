@@ -22,23 +22,22 @@ public partial class VehicleRoutePage : IAsyncDisposable
 	private VehicleRouteLocationModel _selectedToLocation;
 
 	private List<VehicleRouteModel> _vehicleRoutes = [];
-	private List<VehicleRouteModel> _vehicleRoutesAll = [];
 	private List<VehicleRouteLocationModel> _routeLocations = [];
-	private readonly List<ContextMenuItemModel> _vehicleRouteGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
-		new() { Text = "Edit (Insert)", Id = "EditVehicleRoute", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverVehicleRoute", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<VehicleRouteModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-	private int _deleteVehicleRouteId = 0;
-	private string _deleteVehicleRouteCode = string.Empty;
+	private int _deleteTransactionId = 0;
+	private string _deleteTransactionName = string.Empty;
 
-	private int _recoverVehicleRouteId = 0;
-	private string _recoverVehicleRouteCode = string.Empty;
+	private int _recoverTransactionId = 0;
+	private string _recoverTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -49,25 +48,21 @@ public partial class VehicleRoutePage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+		await InitializePage();
+	}
+
+	private async Task InitializePage()
+	{
+		LoadHotKeys();
 		await LoadData();
+
 		_isLoading = false;
 		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveVehicleRoute, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteSelectedItem, "Delete / Recover selected", Exclude.None);
-
-		_vehicleRoutesAll = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute);
-		_vehicleRoutes = [.. _vehicleRoutesAll];
+		_vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute);
 		_routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
 		_selectedFromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.FromLocationId);
 		_selectedToLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.ToLocationId);
@@ -81,75 +76,7 @@ public partial class VehicleRoutePage : IAsyncDisposable
 	#endregion
 
 	#region Saving
-	private async Task ValidateForm()
-	{
-		if (!_user.Admin)
-			throw new Exception("You do not have permission to perform this action.");
-
-		_vehicleRoute.FromLocationId = _selectedFromLocation?.Id ?? 0;
-		_vehicleRoute.ToLocationId = _selectedToLocation?.Id ?? 0;
-
-		_vehicleRoute.Code = _vehicleRoute.Code?.Trim() ?? "";
-		_vehicleRoute.Code = _vehicleRoute.Code?.ToUpper() ?? "";
-
-		_vehicleRoute.Remarks = _vehicleRoute.Remarks?.Trim() ?? "";
-		_vehicleRoute.Status = true;
-
-		if (_vehicleRoute.FromLocationId <= 0)
-			throw new Exception("From location is required. Please select a valid from location.");
-
-		if (_vehicleRoute.ToLocationId <= 0)
-			throw new Exception("To location is required. Please select a valid to location.");
-
-		if (_vehicleRoute.FromLocationId == _vehicleRoute.ToLocationId)
-			throw new Exception("From location and to location cannot be the same.");
-
-		if (_vehicleRoute.EstimatedHours < 0)
-			throw new Exception("Estimated hours must be greater than zero.");
-
-		if (_vehicleRoute.EstimatedDistance < 0)
-			throw new Exception("Estimated distance must be greater than zero.");
-
-		if (_vehicleRoute.EstimatedFuelConsumption < 0)
-			throw new Exception("Estimated fuel consumption must be greater than zero.");
-
-		if (_vehicleRoute.EstimatedCost < 0)
-			throw new Exception("Estimated cost must be greater than zero.");
-
-		VehicleRouteModel existingVehicleRouteByLocationPair;
-		if (_vehicleRoute.Id > 0)
-			existingVehicleRouteByLocationPair = _vehicleRoutesAll.FirstOrDefault(_ => _.Id != _vehicleRoute.Id && _.FromLocationId == _vehicleRoute.FromLocationId && _.ToLocationId == _vehicleRoute.ToLocationId);
-		else
-			existingVehicleRouteByLocationPair = _vehicleRoutesAll.FirstOrDefault(_ => _.FromLocationId == _vehicleRoute.FromLocationId && _.ToLocationId == _vehicleRoute.ToLocationId);
-
-		if (existingVehicleRouteByLocationPair is not null)
-		{
-			var fromLocationName = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.FromLocationId)?.Name ?? _vehicleRoute.FromLocationId.ToString();
-			var toLocationName = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.ToLocationId)?.Name ?? _vehicleRoute.ToLocationId.ToString();
-			throw new Exception($"Vehicle route '{fromLocationName} -> {toLocationName}' already exists. Duplicate route entries are not allowed.");
-		}
-
-		if (string.IsNullOrWhiteSpace(_vehicleRoute.Code))
-			throw new Exception("Route code is required. Please enter a valid route code.");
-
-		if (string.IsNullOrWhiteSpace(_vehicleRoute.Remarks))
-			_vehicleRoute.Remarks = null;
-
-		if (_vehicleRoute.Id > 0)
-		{
-			var existingVehicleRouteByCode = _vehicleRoutesAll.FirstOrDefault(_ => _.Id != _vehicleRoute.Id && _.Code.Equals(_vehicleRoute.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleRouteByCode is not null)
-				throw new Exception($"Vehicle route code '{_vehicleRoute.Code}' already exists. Please choose a different code.");
-		}
-		else
-		{
-			var existingVehicleRouteByCode = _vehicleRoutesAll.FirstOrDefault(_ => _.Code.Equals(_vehicleRoute.Code, StringComparison.OrdinalIgnoreCase));
-			if (existingVehicleRouteByCode is not null)
-				throw new Exception($"Vehicle route code '{_vehicleRoute.Code}' already exists. Please choose a different code.");
-		}
-	}
-
-	private async Task SaveVehicleRoute()
+	private async Task SaveTransaction()
 	{
 		if (_isProcessing)
 			return;
@@ -158,17 +85,23 @@ public partial class VehicleRoutePage : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await ValidateForm();
-			await VehicleRouteData.InsertVehicleRoute(_vehicleRoute);
+			if (!_user.Admin)
+				throw new Exception("You do not have permission to perform this action.");
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Route '{_vehicleRoute.Code}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteMaster, true);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
+
+			_vehicleRoute.FromLocationId = _selectedFromLocation?.Id ?? 0;
+			_vehicleRoute.ToLocationId = _selectedToLocation?.Id ?? 0;
+
+			await VehicleRouteData.SaveTransaction(_vehicleRoute);
+
+			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Saving", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -178,16 +111,6 @@ public partial class VehicleRoutePage : IAsyncDisposable
 	#endregion
 
 	#region Actions
-	private async Task OnEditVehicleRoute(VehicleRouteModel vehicleRoute)
-	{
-		_vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, vehicleRoute.Id)
-			?? throw new Exception("Vehicle Route not found.");
-		_selectedFromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.FromLocationId);
-		_selectedToLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.ToLocationId);
-
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -198,24 +121,24 @@ public partial class VehicleRoutePage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleRoute = _vehicleRoutesAll.FirstOrDefault(vr => vr.Id == _deleteVehicleRouteId)
-				?? throw new Exception("Vehicle Route not found.");
+			var vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleRoute.Status = false;
 			await VehicleRouteData.InsertVehicleRoute(vehicleRoute);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Route '{vehicleRoute.Code}' has been deleted successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteMaster, true);
+			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to delete Vehicle Route: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Deleting", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_deleteVehicleRouteId = 0;
-			_deleteVehicleRouteCode = string.Empty;
+			_deleteTransactionId = 0;
+			_deleteTransactionName = string.Empty;
 		}
 	}
 
@@ -229,24 +152,24 @@ public partial class VehicleRoutePage : IAsyncDisposable
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleRoute = _vehicleRoutesAll.FirstOrDefault(vr => vr.Id == _recoverVehicleRouteId)
-				?? throw new Exception("Vehicle Route not found.");
+			var vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
 
 			vehicleRoute.Status = true;
 			await VehicleRouteData.InsertVehicleRoute(vehicleRoute);
 
-			await _toastNotification.ShowAsync("Success", $"Vehicle Route '{vehicleRoute.Code}' has been recovered successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleRouteMaster, true);
+			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to recover Vehicle Route: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Recovering", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isProcessing = false;
-			_recoverVehicleRouteId = 0;
-			_recoverVehicleRouteCode = string.Empty;
+			_recoverTransactionId = 0;
+			_recoverTransactionName = string.Empty;
 		}
 	}
 	#endregion
@@ -308,15 +231,26 @@ public partial class VehicleRoutePage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
+	private void LoadHotKeys() =>
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
+			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
+			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
+			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
+			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
+			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
+
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewVehicleRoute":
+			case "NewTransaction":
 				ResetPage();
 				break;
-			case "SaveVehicleRoute":
-				await SaveVehicleRoute();
+			case "SaveTransaction":
+				await SaveTransaction();
 				break;
 			case "ToggleDeleted":
 				await ToggleDeleted();
@@ -327,24 +261,24 @@ public partial class VehicleRoutePage : IAsyncDisposable
 			case "ExportPdf":
 				await ExportPdf();
 				break;
-			case "EditSelected":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
 
-	private async Task OnVehicleRouteGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRouteModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRouteModel> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "EditVehicleRoute":
+			case "EditSelectedItem":
 				await EditSelectedItem();
 				break;
-			case "DeleteRecoverVehicleRoute":
-				await DeleteSelectedItem();
+			case "DeleteRecoverSelectedItem":
+				await DeleteRecoverSelectedItem();
 				break;
 		}
 	}
@@ -352,11 +286,20 @@ public partial class VehicleRoutePage : IAsyncDisposable
 	private async Task EditSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
-		if (selectedRecords.Count > 0)
-			await OnEditVehicleRoute(selectedRecords[0]);
+		if (selectedRecords.Count == 0)
+			return;
+
+		_vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, selectedRecords[0].Id);
+		if (_vehicleRoute is null)
+			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		_selectedFromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.FromLocationId);
+		_selectedToLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.ToLocationId);
+
+		StateHasChanged();
 	}
 
-	private async Task DeleteSelectedItem()
+	private async Task DeleteRecoverSelectedItem()
 	{
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
@@ -368,31 +311,31 @@ public partial class VehicleRoutePage : IAsyncDisposable
 		}
 	}
 
-	private async Task ShowDeleteConfirmation(int id, string code)
+	private async Task ShowDeleteConfirmation(int id, string name)
 	{
-		_deleteVehicleRouteId = id;
-		_deleteVehicleRouteCode = code;
+		_deleteTransactionId = id;
+		_deleteTransactionName = name;
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelDelete()
 	{
-		_deleteVehicleRouteId = 0;
-		_deleteVehicleRouteCode = string.Empty;
+		_deleteTransactionId = 0;
+		_deleteTransactionName = string.Empty;
 		await _deleteConfirmationDialog.HideAsync();
 	}
 
-	private async Task ShowRecoverConfirmation(int id, string code)
+	private async Task ShowRecoverConfirmation(int id, string name)
 	{
-		_recoverVehicleRouteId = id;
-		_recoverVehicleRouteCode = code;
+		_recoverTransactionId = id;
+		_recoverTransactionName = name;
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 
 	private async Task CancelRecover()
 	{
-		_recoverVehicleRouteId = 0;
-		_recoverVehicleRouteCode = string.Empty;
+		_recoverTransactionId = 0;
+		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
 	}
 

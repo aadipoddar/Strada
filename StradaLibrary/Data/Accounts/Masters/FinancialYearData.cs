@@ -1,4 +1,4 @@
-﻿using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Accounts.Masters;
 
@@ -6,23 +6,61 @@ namespace StradaLibrary.Data.Accounts.Masters;
 
 public static class FinancialYearData
 {
-    public static async Task<int> InsertFinancialYear(FinancialYearModel financialYear) =>
-        (await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialYear, financialYear)).FirstOrDefault();
+	public static async Task<int> InsertFinancialYear(FinancialYearModel financialYear) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialYear, financialYear)).FirstOrDefault();
 
-    public static async Task<FinancialYearModel> LoadFinancialYearByDateTime(DateTime TransactionDateTime, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-        (await SqlDataAccess.LoadData<FinancialYearModel, dynamic>(AccountNames.LoadFinancialYearByDateTime, new { TransactionDateTime }, sqlDataAccessTransaction)).FirstOrDefault();
+	public static async Task<FinancialYearModel> LoadFinancialYearByDateTime(DateTime TransactionDateTime, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+		(await SqlDataAccess.LoadData<FinancialYearModel, dynamic>(AccountNames.LoadFinancialYearByDateTime, new { TransactionDateTime }, sqlDataAccessTransaction)).FirstOrDefault();
 
-    public static async Task ValidateFinancialYear(DateTime TransactionDateTime, SqlDataAccessTransaction sqlDataAccessTransaction = null)
-    {
-        var financialYear = await LoadFinancialYearByDateTime(TransactionDateTime, sqlDataAccessTransaction) ??
-            throw new InvalidOperationException("No financial year found for the given date.");
+	public static async Task ValidateFinancialYear(DateTime TransactionDateTime, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var financialYear = await LoadFinancialYearByDateTime(TransactionDateTime, sqlDataAccessTransaction) ??
+			throw new InvalidOperationException("No financial year found for the given date.");
 
-        if (financialYear.Locked)
-            throw new InvalidOperationException("The financial year for the given date is locked");
+		if (financialYear.Locked)
+			throw new InvalidOperationException("The financial year for the given date is locked");
 
-        if (!financialYear.Status)
-            throw new InvalidOperationException("The financial year for the given date is inactive.");
-    }
+		if (!financialYear.Status)
+			throw new InvalidOperationException("The financial year for the given date is inactive.");
+	}
+
+	private static async Task ValidateTransaction(FinancialYearModel financialYear)
+	{
+		financialYear.Remarks = financialYear.Remarks?.Trim() ?? string.Empty;
+		financialYear.Status = true;
+
+		if (financialYear.StartDate == default)
+			throw new Exception("Start date is required. Please select a valid start date.");
+
+		if (financialYear.EndDate == default)
+			throw new Exception("End date is required. Please select a valid end date.");
+
+		if (financialYear.EndDate <= financialYear.StartDate)
+			throw new Exception("End date must be after start date. Please select a valid end date.");
+
+		if (financialYear.YearNo <= 0)
+			throw new Exception("Year number must be greater than 0. Please enter a valid year number.");
+
+		if (string.IsNullOrWhiteSpace(financialYear.Remarks))
+			financialYear.Remarks = null;
+
+		var allFinancialYears = await CommonData.LoadTableData<FinancialYearModel>(AccountNames.FinancialYear);
+
+		var overlapping = allFinancialYears.FirstOrDefault(x =>
+			x.Id != financialYear.Id &&
+			((x.StartDate <= financialYear.StartDate && x.EndDate >= financialYear.StartDate) ||
+			 (x.StartDate <= financialYear.EndDate && x.EndDate >= financialYear.EndDate) ||
+			 (financialYear.StartDate <= x.StartDate && financialYear.EndDate >= x.EndDate)));
+
+		if (overlapping is not null)
+			throw new Exception($"Date range overlaps with existing financial year ({overlapping.StartDate:dd-MMM-yyyy} to {overlapping.EndDate:dd-MMM-yyyy}).");
+	}
+
+	public static async Task<int> SaveTransaction(FinancialYearModel financialYear)
+	{
+		await ValidateTransaction(financialYear);
+		return await InsertFinancialYear(financialYear);
+	}
 
 	public static async Task<(DateTime FromDate, DateTime ToDate)> GetDateRange(DateRangeType rangeType, DateTime referenceFromDate, DateTime referenceToDate)
 	{
