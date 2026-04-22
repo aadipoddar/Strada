@@ -20,7 +20,7 @@ public static class VehicleRouteLocationData
 			throw new Exception("Route Location name is required. Please enter a valid route location name.");
 
 		if (routeLocation.Id == 0)
-			routeLocation.Code = await GenerateCodes.GenerateRouteLocationCode();
+			routeLocation.Code = await GenerateCodes.GenerateVehicleRouteLocationCode();
 
 		if (string.IsNullOrWhiteSpace(routeLocation.Code))
 			throw new Exception("Route Location code is required. Please try again.");

@@ -286,10 +286,13 @@ public partial class VehicleRoutePage
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
 		{
-			if (selectedRecords[0].Status)
-				await ShowDeleteConfirmation(selectedRecords[0].Id, selectedRecords[0].Code);
+			var vehicleRoute = selectedRecords[0];
+			var locations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
+
+			if (vehicleRoute.Status)
+				await ShowDeleteConfirmation(vehicleRoute.Id, $"{locations.FirstOrDefault(l => l.Id == vehicleRoute.FromLocationId)?.Name} to {locations.FirstOrDefault(l => l.Id == vehicleRoute.ToLocationId)?.Name}");
 			else
-				await ShowRecoverConfirmation(selectedRecords[0].Id, selectedRecords[0].Code);
+				await ShowRecoverConfirmation(vehicleRoute.Id, $"{locations.FirstOrDefault(l => l.Id == vehicleRoute.FromLocationId)?.Name} to {locations.FirstOrDefault(l => l.Id == vehicleRoute.ToLocationId)?.Name}");
 		}
 	}
 

@@ -11,7 +11,6 @@ public static class VehicleRouteData
 
 	private static async Task ValidateTransaction(VehicleRouteModel vehicleRoute)
 	{
-		vehicleRoute.Code = vehicleRoute.Code?.Trim().ToUpper() ?? string.Empty;
 		vehicleRoute.Remarks = vehicleRoute.Remarks?.Trim() ?? string.Empty;
 		vehicleRoute.Status = true;
 
@@ -35,6 +34,9 @@ public static class VehicleRouteData
 
 		if (vehicleRoute.EstimatedCost < 0)
 			throw new Exception("Estimated cost must be greater than zero.");
+
+		if (vehicleRoute.Id == 0)
+			vehicleRoute.Code = await GenerateCodes.GenerateVehicleRouteCode();
 
 		if (string.IsNullOrWhiteSpace(vehicleRoute.Code))
 			throw new Exception("Route code is required. Please enter a valid route code.");

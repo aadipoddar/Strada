@@ -120,6 +120,10 @@ public static class GenerateCodes
 					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
 					isDuplicate = routeLocation is not null;
 					break;
+				case CodeType.VehicleRoute:
+					var vehicleRoute = await CommonData.LoadTableDataByCode<VehicleRouteModel>(FleetNames.VehicleRoute, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleRoute is not null;
+					break;
 				case CodeType.VehicleDriver:
 					var vehicleDriver = await CommonData.LoadTableDataByCode<VehicleDriverModel>(FleetNames.VehicleDriver, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleDriver is not null;
@@ -288,7 +292,7 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{omcCardPrefix}00001", 5, CodeType.OMCCard, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<string> GenerateVehicleRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, sqlDataAccessTransaction);
 		var routeLocationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteLocationCodePrefix, sqlDataAccessTransaction)).Value;
@@ -309,6 +313,29 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{routeLocationPrefix}00001", 5, CodeType.VehicleRouteLocation, sqlDataAccessTransaction);
+	}
+
+	public static async Task<string> GenerateVehicleRouteCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute, sqlDataAccessTransaction);
+		var vehicleRoutePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastVehicleRoute = vehicleRoutes.OrderByDescending(vr => vr.Id).FirstOrDefault();
+		if (lastVehicleRoute is not null)
+		{
+			var lastVehicleRouteCode = lastVehicleRoute.Code;
+			if (lastVehicleRouteCode.StartsWith(vehicleRoutePrefix))
+			{
+				var lastNumberPart = lastVehicleRouteCode[vehicleRoutePrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{vehicleRoutePrefix}{nextNumber:D5}", 5, CodeType.VehicleRoute, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{vehicleRoutePrefix}00001", 5, CodeType.VehicleRoute, sqlDataAccessTransaction);
 	}
 
 	public static async Task<string> GenerateVehicleDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
