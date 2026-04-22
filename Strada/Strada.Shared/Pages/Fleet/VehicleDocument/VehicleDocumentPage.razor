@@ -225,6 +225,7 @@ else
 <DocumentUploadDialog Title="Upload Original Document"
 					  InfoMessage="Document will be uploaded only when you save the transaction."
 					  ExistingDocumentUrl="@_vehicleDocument.DocumentUrl"
+					  PendingDocumentFileName="@_pendingDocumentFileName"
 					  ShowInterpretButton="false" @bind-IsVisible="_isUploadDialogVisible"
 					  OnFileChange="OnUploaderFileChange" OnFileRemove="OnRemoveFile"
 					  OnDownloadClick="DownloadExistingDocument" OnRemoveClick="MarkDocumentForRemoval"

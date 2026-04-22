@@ -15,36 +15,45 @@
         </Header>
         <Content>
             <div style="padding: 16px 20px 20px;">
-                @if (!string.IsNullOrEmpty(ExistingDocumentUrl))
+                @if (!string.IsNullOrEmpty(ExistingDocumentUrl) || !string.IsNullOrEmpty(PendingDocumentFileName))
                 {
-                    <div style="background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 10px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px;">
-                        <div style="width: 40px; height: 40px; background: #dcfce7; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    var displayName = !string.IsNullOrEmpty(ExistingDocumentUrl)
+                        ? ExistingDocumentUrl.Split('/').Last()
+                        : PendingDocumentFileName;
+                    var isPending = string.IsNullOrEmpty(ExistingDocumentUrl);
+                    <div style="background: @(isPending ? "#fffbeb" : "#f0fdf4"); border: 1.5px solid @(isPending ? "#fde68a" : "#bbf7d0"); border-radius: 10px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 40px; height: 40px; background: @(isPending ? "#fef3c7" : "#dcfce7"); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                 style="color: #16a34a;">
+                                 style="color: @(isPending ? "#d97706" : "#16a34a");">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                                 <polyline points="14 2 14 8 20 8" />
                             </svg>
                         </div>
                         <div style="min-width: 0; flex: 1;">
-                            <p style="margin: 0 0 2px; font-size: 13px; font-weight: 600; color: #15803d;">Document on file</p>
-                            <p style="margin: 0; font-size: 12px; color: #4ade80; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #64748b;">
-                                @(ExistingDocumentUrl.Split('/').Last())
+                            <p style="margin: 0 0 2px; font-size: 13px; font-weight: 600; color: @(isPending ? "#b45309" : "#15803d");">
+                                @(isPending ? "Pending upload (not yet saved)" : "Document on file")
+                            </p>
+                            <p style="margin: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #64748b;">
+                                @displayName
                             </p>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 8px;">
-                        <button class="doc-btn doc-btn-primary" @onclick="OnDownloadClick">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                            Download
-                        </button>
-                        @if (ShowInterpretButton)
+                        @if (!isPending)
+                        {
+                            <button class="doc-btn doc-btn-primary" @onclick="OnDownloadClick">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                Download
+                            </button>
+                        }
+                        @if (ShowInterpretButton && !isPending)
                         {
                             <button class="doc-btn doc-btn-info" @onclick="OnInterpretClick">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"

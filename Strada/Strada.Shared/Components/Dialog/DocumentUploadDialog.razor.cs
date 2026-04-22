@@ -11,6 +11,7 @@ public partial class DocumentUploadDialog
     [Parameter] public string Title { get; set; } = "Upload Original Document";
     [Parameter] public string InfoMessage { get; set; } = "Upload the original document for record keeping and future reference.";
     [Parameter] public string ExistingDocumentUrl { get; set; }
+    [Parameter] public string PendingDocumentFileName { get; set; }
     [Parameter] public bool ShowInterpretButton { get; set; } = false;
     [Parameter] public bool IsVisible { get; set; } = false;
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Fleet.VehicleDocument;
 using StradaLibrary.Data.Operations;
@@ -25,7 +24,8 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	private bool _isUploadDialogVisible = false;
 
 	private VehicleDocumentModel _vehicleDocument = new() { TransactionDateTime = DateTime.Now, RenewalDate = DateTime.Now.AddYears(1) };
-	private IBrowserFile _pendingDocumentFile;
+	private Stream _pendingDocumentStream;
+	private string _pendingDocumentFileName;
 	private string _documentUrlToDelete = string.Empty;
 	private VehicleDocumentTypeModel _selectedVehicleDocumentType;
 	private VehicleModel _selectedVehicle;
@@ -137,8 +137,8 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 
 			await VehicleDocumentData.SaveTransaction(
 				_vehicleDocument,
-				_pendingDocumentFile?.OpenReadStream(maxAllowedSize: 52428800),
-				_pendingDocumentFile?.Name,
+				_pendingDocumentStream,
+				_pendingDocumentFileName,
 				_documentUrlToDelete);
 
 			await _toastNotification.ShowAsync("Success", $"Vehicle Document transaction '{_vehicleDocument.TransactionNo}' has been saved successfully.", ToastType.Success);
@@ -160,7 +160,9 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	{
 		_vehicleDocument = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, vehicleDocument.Id)
 			?? throw new Exception("Vehicle Document transaction not found for editing.");
-		_pendingDocumentFile = null;
+		_pendingDocumentStream?.Dispose();
+		_pendingDocumentStream = null;
+		_pendingDocumentFileName = null;
 		_documentUrlToDelete = string.Empty;
 		_isUploadDialogVisible = false;
 		StateHasChanged();
@@ -318,13 +320,23 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 		if (args.Files is null || args.Files.Count == 0 || args.Files[0].File is null)
 			return;
 
-		_pendingDocumentFile = args.Files[0].File;
-		await _toastNotification.ShowAsync("Document Selected", $"'{_pendingDocumentFile.Name}' will be uploaded when you save the transaction.", ToastType.Info);
+		var file = args.Files[0].File;
+		var ms = new MemoryStream();
+		await file.OpenReadStream(maxAllowedSize: 52428800).CopyToAsync(ms);
+		ms.Position = 0;
+
+		_pendingDocumentStream?.Dispose();
+		_pendingDocumentStream = ms;
+		_pendingDocumentFileName = file.Name;
+
+		await _toastNotification.ShowAsync("Document Selected", $"'{_pendingDocumentFileName}' will be uploaded when you save the transaction.", ToastType.Info);
 	}
 
 	private Task OnRemoveFile(RemovingEventArgs args)
 	{
-		_pendingDocumentFile = null;
+		_pendingDocumentStream?.Dispose();
+		_pendingDocumentStream = null;
+		_pendingDocumentFileName = null;
 		return Task.CompletedTask;
 	}
 
@@ -353,13 +365,17 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	{
 		if (string.IsNullOrWhiteSpace(_vehicleDocument.DocumentUrl))
 		{
-			_pendingDocumentFile = null;
+			_pendingDocumentStream?.Dispose();
+			_pendingDocumentStream = null;
+			_pendingDocumentFileName = null;
 			return;
 		}
 
 		_documentUrlToDelete = _vehicleDocument.DocumentUrl;
 		_vehicleDocument.DocumentUrl = null;
-		_pendingDocumentFile = null;
+		_pendingDocumentStream?.Dispose();
+		_pendingDocumentStream = null;
+		_pendingDocumentFileName = null;
 
 		await _toastNotification.ShowAsync("Document Removed", "Document will be removed when you save the transaction.", ToastType.Info);
 	}
@@ -494,6 +510,7 @@ public partial class VehicleDocumentPage : IAsyncDisposable
 	public ValueTask DisposeAsync()
 	{
 		GC.SuppressFinalize(this);
+		_pendingDocumentStream?.Dispose();
 		return ((IAsyncDisposable)HotKeys).DisposeAsync();
 	}
 	#endregion
