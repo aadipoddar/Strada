@@ -14,7 +14,6 @@ namespace Strada.Shared.Pages.Accounts.Reports;
 
 public partial class BalanceSheetPage : IAsyncDisposable
 {
-    private HotKeysContext _hotKeysContext;
     private PeriodicTimer _autoRefreshTimer;
     private CancellationTokenSource _autoRefreshCts;
 
@@ -44,17 +43,16 @@ public partial class BalanceSheetPage : IAsyncDisposable
 
         await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
         await LoadData();
-        _isLoading = false;
-        StateHasChanged();
     }
 
     private async Task LoadData()
     {
-        LoadHotKeys();
         await LoadDates();
         await LoadCompanies();
         await LoadBalanceSheet();
         await StartAutoRefresh();
+        _isLoading = false;
+        StateHasChanged();
     }
 
     private async Task LoadDates()
@@ -146,15 +144,15 @@ public partial class BalanceSheetPage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
             // Export Assets Statement
             var (assetsStream, assetsFileName) = await BalanceSheetReportExport.ExportAssetsReport(
                     _assetsTrialBalance,
                     ReportExportType.Excel,
-					DateOnly.FromDateTime(_fromDate),
+                    DateOnly.FromDateTime(_fromDate),
                     DateOnly.FromDateTime(_toDate),
-					_showAllColumns,
+                    _showAllColumns,
                     _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
 
@@ -164,20 +162,20 @@ public partial class BalanceSheetPage : IAsyncDisposable
             var (liabilitiesStream, liabilitiesFileName) = await BalanceSheetReportExport.ExportLiabilitiesReport(
                     _liabilitiesTrialBalance,
                     ReportExportType.Excel,
-					DateOnly.FromDateTime(_fromDate),
+                    DateOnly.FromDateTime(_fromDate),
                     DateOnly.FromDateTime(_toDate),
-					_showAllColumns,
+                    _showAllColumns,
                     _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
 
             await SaveAndViewService.SaveAndView(liabilitiesFileName, liabilitiesStream);
 
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
+            await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+        }
         catch (Exception ex)
         {
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
+            await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+        }
         finally
         {
             _isProcessing = false;
@@ -194,9 +192,9 @@ public partial class BalanceSheetPage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+            DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
             // Export Assets Statement
@@ -223,12 +221,12 @@ public partial class BalanceSheetPage : IAsyncDisposable
 
             await SaveAndViewService.SaveAndView(liabilitiesFileName, liabilitiesStream);
 
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
+            await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+        }
         catch (Exception ex)
         {
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
+            await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+        }
         finally
         {
             _isProcessing = false;
@@ -238,19 +236,6 @@ public partial class BalanceSheetPage : IAsyncDisposable
     #endregion
 
     #region Utilities
-    private void LoadHotKeys()
-    {
-        _hotKeysContext = HotKeys.CreateContext()
-            .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-            .Add(ModCode.Ctrl, Code.N, () => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager), "New Transaction", Exclude.None)
-            .Add(ModCode.Ctrl, Code.R, LoadBalanceSheet, "Refresh Data", Exclude.None)
-            .Add(Code.F5, LoadBalanceSheet, "Refresh Data", Exclude.None)
-            .Add(ModCode.Ctrl, Code.Q, ToggleDetailsView, "Toggle Details", Exclude.None)
-            .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
-            .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export to Excel", Exclude.None)
-            .Add(ModCode.Alt, Code.F, () => AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager), "Open profit and loss report", Exclude.None);
-    }
-
     private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
     {
         switch (args.Item.Id)
@@ -352,18 +337,16 @@ public partial class BalanceSheetPage : IAsyncDisposable
         }
     }
 
-    public ValueTask DisposeAsync()
+    async ValueTask IAsyncDisposable.DisposeAsync()
     {
         if (_autoRefreshCts is not null)
         {
-            _autoRefreshCts.CancelAsync();
+            await _autoRefreshCts.CancelAsync();
             _autoRefreshCts.Dispose();
         }
 
         _autoRefreshTimer?.Dispose();
-
         GC.SuppressFinalize(this);
-        return ((IAsyncDisposable)HotKeys).DisposeAsync();
     }
     #endregion
 }

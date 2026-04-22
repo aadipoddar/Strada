@@ -6,13 +6,13 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Pdf;
 
 namespace Strada.Shared.Pages.Accounts.Masters;
 
-public partial class LedgerPage : IAsyncDisposable
+public partial class LedgerPage
 {
 	private UserModel _user;
-	private HotKeysContext _hotKeysContext;
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showDeleted = false;
@@ -48,16 +48,7 @@ public partial class LedgerPage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
-		await InitializePage();
-	}
-
-	private async Task InitializePage()
-	{
-		LoadHotKeys();
 		await LoadData();
-
-		_isLoading = false;
-		StateHasChanged();
 	}
 
 	private async Task LoadData()
@@ -72,6 +63,9 @@ public partial class LedgerPage : IAsyncDisposable
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
+
+		_isLoading = false;
+		StateHasChanged();
 	}
 	#endregion
 
@@ -228,17 +222,6 @@ public partial class LedgerPage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
-	private void LoadHotKeys() =>
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
-
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
@@ -337,7 +320,6 @@ public partial class LedgerPage : IAsyncDisposable
 	{
 		_showDeleted = !_showDeleted;
 		await LoadData();
-		StateHasChanged();
 	}
 
 	private void ResetPage() =>
@@ -345,11 +327,5 @@ public partial class LedgerPage : IAsyncDisposable
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
-
-	public ValueTask DisposeAsync()
-	{
-		GC.SuppressFinalize(this);
-		return ((IAsyncDisposable)HotKeys).DisposeAsync();
-	}
 	#endregion
 }

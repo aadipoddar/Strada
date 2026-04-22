@@ -1,7 +1,10 @@
-﻿@using StradaLibrary.DataAccess
-@attribute [Route(PageRouteNames.Login)]
+﻿@attribute [Route(PageRouteNames.Login)]
+
+@using StradaLibrary.DataAccess
 
 <PageTitle>Login - Strada</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.Enter OnHotkeyPressed="OnLoginClick" />
 
 <div class="login-container">
     <div class="login-card">

@@ -14,7 +14,6 @@ namespace Strada.Shared.Pages.Accounts.Reports;
 
 public partial class AccountingLedgerReport : IAsyncDisposable
 {
-	private HotKeysContext _hotKeysContext;
 	private PeriodicTimer _autoRefreshTimer;
 	private CancellationTokenSource _autoRefreshCts;
 
@@ -53,18 +52,17 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
 		await LoadData();
-		_isLoading = false;
-		StateHasChanged();
 	}
 
 	private async Task LoadData()
 	{
-		LoadHotKeys();
 		await LoadDates();
 		await LoadCompanies();
 		await LoadLedgers();
 		await LoadTransactionOverviews();
 		await StartAutoRefresh();
+		_isLoading = false;
+		StateHasChanged();
 	}
 
 	private async Task LoadDates()
@@ -328,21 +326,6 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 	#endregion
 
 	#region Utilities
-	private void LoadHotKeys()
-	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, () => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager), "New Transaction", Exclude.None)
-			.Add(ModCode.Ctrl, Code.R, LoadTransactionOverviews, "Refresh Data", Exclude.None)
-			.Add(Code.F5, LoadTransactionOverviews, "Refresh Data", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Q, ToggleDetailsView, "Toggle Details", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export to Excel", Exclude.None)
-			.Add(ModCode.Alt, Code.O, ViewSelectedTransaction, "Open Selected Transaction", Exclude.None)
-			.Add(ModCode.Alt, Code.P, ExportSelectedTransactionPdf, "Download Selected Transaction PDF Invoice", Exclude.None)
-			.Add(ModCode.Alt, Code.E, ExportSelectedTransactionExcel, "Download Selected Transaction Excel Invoice", Exclude.None);
-	}
-
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
@@ -469,18 +452,16 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		}
 	}
 
-	public ValueTask DisposeAsync()
+	async ValueTask IAsyncDisposable.DisposeAsync()
 	{
 		if (_autoRefreshCts is not null)
 		{
-			_autoRefreshCts.CancelAsync();
+			await _autoRefreshCts.CancelAsync();
 			_autoRefreshCts.Dispose();
 		}
 
 		_autoRefreshTimer?.Dispose();
-
 		GC.SuppressFinalize(this);
-		return ((IAsyncDisposable)HotKeys).DisposeAsync();
 	}
 	#endregion
 }

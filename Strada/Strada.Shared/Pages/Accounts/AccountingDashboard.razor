@@ -2,6 +2,8 @@
 
 <PageTitle>Accounting - Strada</PageTitle>
 
+<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => NavigationManager.NavigateTo(PageRouteNames.Dashboard)" />
+
 @if (_isLoading || _user is null)
 {
     <AnimatedLoader Visible="true" />

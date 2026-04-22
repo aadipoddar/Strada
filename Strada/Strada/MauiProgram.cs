@@ -6,7 +6,7 @@ using Strada.Services;
 using Strada.Shared.Services;
 using StradaLibrary.DataAccess;
 using Syncfusion.Blazor;
-using Toolbelt.Blazor.Extensions.DependencyInjection;
+using MudBlazor.Services;
 
 namespace Strada;
 
@@ -33,9 +33,10 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ISoundService, SoundService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
 
-		builder.Services.AddMauiBlazorWebView();
-		builder.Services.AddSyncfusionBlazor();
-		builder.Services.AddHotKeys2();
+		builder.Services
+			.AddSyncfusionBlazor()
+			.AddMudServices()
+			.AddMauiBlazorWebView();
 
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();

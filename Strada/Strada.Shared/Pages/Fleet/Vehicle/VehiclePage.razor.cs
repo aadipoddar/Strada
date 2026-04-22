@@ -10,10 +10,9 @@ using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Fleet.Vehicle;
 
-public partial class VehiclePage : IAsyncDisposable
+public partial class VehiclePage
 {
 	private UserModel _user;
-	private HotKeysContext _hotKeysContext;
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showDeleted = false;
@@ -50,18 +49,9 @@ public partial class VehiclePage : IAsyncDisposable
 			return;
 
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
-		await InitializePage();
-	}
-
-	private async Task InitializePage()
-	{
-		LoadHotKeys();
 		await LoadData();
-
-		_isLoading = false;
-		StateHasChanged();
 	}
-
+		
 	private async Task LoadData()
 	{
 		_vehicles = await CommonData.LoadTableData<VehicleModel>(FleetNames.Vehicle);
@@ -79,6 +69,9 @@ public partial class VehiclePage : IAsyncDisposable
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
+
+		_isLoading = false;
+		StateHasChanged();
 	}
 	#endregion
 
@@ -238,17 +231,6 @@ public partial class VehiclePage : IAsyncDisposable
 	#endregion
 
 	#region Utilities
-	private void LoadHotKeys() =>
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(ModCode.Ctrl, Code.S, SaveTransaction, "Save", Exclude.None)
-			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
-			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
-			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
-			.Add(ModCode.Ctrl, Code.Delete, ToggleDeleted, "Show/Hide Deleted", Exclude.None)
-			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
-			.Add(Code.Delete, DeleteRecoverSelectedItem, "Delete / Recover selected", Exclude.None);
-
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
@@ -299,7 +281,7 @@ public partial class VehiclePage : IAsyncDisposable
 		_vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, selectedRecords[0].Id);
 		if (_vehicle is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
-			
+
 		_selectedVehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == _vehicle.VehicleTypeId);
 		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _vehicle.CompanyId);
 
@@ -350,7 +332,6 @@ public partial class VehiclePage : IAsyncDisposable
 	{
 		_showDeleted = !_showDeleted;
 		await LoadData();
-		StateHasChanged();
 	}
 
 	private void ResetPage() =>
@@ -358,11 +339,5 @@ public partial class VehiclePage : IAsyncDisposable
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
-
-	public ValueTask DisposeAsync()
-	{
-		GC.SuppressFinalize(this);
-		return ((IAsyncDisposable)HotKeys).DisposeAsync();
-	}
 	#endregion
 }

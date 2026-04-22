@@ -7,22 +7,12 @@ using System.Reflection;
 
 namespace Strada.Shared.Components.Page;
 
-public partial class Header : IAsyncDisposable
+public partial class Header
 {
-	private HotKeysContext _hotKeysContext;
-
 	#region Search
 	private string _searchText = string.Empty;
 	private List<GlobalSearchItem> _searchItems = [];
 	private SfAutoComplete<string, GlobalSearchItem> _sfGlobalSearch;
-
-	private void LoadHotKeys()
-	{
-		_hotKeysContext = HotKeys.CreateContext()
-			.Add(Code.F2, FocusSearchBox, "Focus on search box", Exclude.None)
-			.Add(ModCode.Ctrl, Code.D, NavigateToHome, "Go to dashboard", Exclude.None)
-			.Add(ModCode.Ctrl, Code.L, Logout, "Logout", Exclude.None);
-	}
 
 	private async Task FocusSearchBox()
 	{
@@ -156,12 +146,6 @@ public partial class Header : IAsyncDisposable
 
 	private UserModel _user;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (!firstRender) return;
-		LoadHotKeys();
-	}
-
 	protected override async Task OnInitializedAsync()
 	{
 		_user = new UserModel { Name = "aa", Id = 1 };
@@ -183,12 +167,6 @@ public partial class Header : IAsyncDisposable
 
 	private async Task Logout() =>
 		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
-
-	public ValueTask DisposeAsync()
-	{
-		GC.SuppressFinalize(this);
-		return ((IAsyncDisposable)HotKeys).DisposeAsync();
-	}
 	#endregion
 }
 

@@ -5,6 +5,14 @@
 
 <PageTitle>Trial Balance - Strada</PageTitle>
 
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
+<MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTrialBalance" />
+<MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTrialBalance" />
+<MudBlazor.MudHotkey Key=JsKey.KeyQ KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDetailsView" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
+
 @if (_isLoading)
 {
 	<AnimatedLoader Visible="true" />
@@ -38,7 +46,7 @@ else
 						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
 							<MenuItems>
 								<MenuItem Text="Transaction History Report" Id="TransactionHistory" Disabled="@_isProcessing" />
-								<MenuItem Text="Ledger Report (Ctrl + I)" Id="LedgerReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Ledger Report" Id="LedgerReport" Disabled="@_isProcessing" />
 								<MenuItem Text="Profit & Loss" Id="ProfitLoss" Disabled="@_isProcessing" />
 								<MenuItem Text="Balance Sheet" Id="BalanceSheet" Disabled="@_isProcessing" />
 							</MenuItems>

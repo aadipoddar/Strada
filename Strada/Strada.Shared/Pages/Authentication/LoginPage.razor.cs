@@ -6,10 +6,8 @@ using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Authentication;
 
-public partial class LoginPage : IAsyncDisposable
+public partial class LoginPage
 {
-	private HotKeysContext _hotKeysContext;
-
 	private UserModel _user = new();
 
 	private bool _isVerifying = false;
@@ -38,9 +36,6 @@ public partial class LoginPage : IAsyncDisposable
 
 		try
 		{
-			_hotKeysContext = HotKeys.CreateContext()
-				.Add(Code.Enter, OnLoginClick, "Login", Exclude.None);
-
 			await DataStorageService.SecureRemoveAll();
 
 			_maxLoginAttempts = int.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.MaxLoginAttempts)).Value);
@@ -174,11 +169,5 @@ public partial class LoginPage : IAsyncDisposable
 			return;
 
 		NavigationManager.NavigateTo(PageRouteNames.LoginWithCode, true);
-	}
-
-	public ValueTask DisposeAsync()
-	{
-		GC.SuppressFinalize(this);
-		return ((IAsyncDisposable)HotKeys).DisposeAsync();
 	}
 }

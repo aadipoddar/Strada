@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.0.0.7</AssemblyVersion>
+    <AssemblyVersion>1.0.0.8</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,16 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.6" />
-    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="33.1.49" />
-    <PackageReference Include="Syncfusion.Blazor.Calendars" Version="33.1.49" />
-    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="33.1.49" />
-    <PackageReference Include="Syncfusion.Blazor.Grid" Version="33.1.49" />
-    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="33.1.49" />
-    <PackageReference Include="Syncfusion.Blazor.Notifications" Version="33.1.49" />
-    <PackageReference Include="Syncfusion.Blazor.Popups" Version="33.1.49" />
-    <PackageReference Include="Syncfusion.Blazor.Themes" Version="33.1.49" />
-    <PackageReference Include="Toolbelt.Blazor.HotKeys2" Version="6.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.7" />
+    <PackageReference Include="MudBlazor" Version="9.3.0" />
+    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="33.2.3" />
+    <PackageReference Include="Syncfusion.Blazor.Calendars" Version="33.2.3" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="33.2.3" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="33.2.3" />
+    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="33.2.3" />
+    <PackageReference Include="Syncfusion.Blazor.Notifications" Version="33.2.3" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="33.2.3" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="33.2.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +36,6 @@
     <Using Include="Strada.Shared.Services" />
     <Using Include="StradaLibrary.Data.Common" />
     <Using Include="StradaLibrary.DataAccess" />
-    <Using Include="Toolbelt.Blazor.HotKeys2" />
   </ItemGroup>
 
 </Project>
