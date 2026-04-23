@@ -5,6 +5,7 @@ using StradaLibrary.Exports.Accounts.Masters;
 using StradaLibrary.Exports.Fleet.Vehicle;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
 using StradaLibrary.Exports.Fleet.VehicleRoute;
+using StradaLibrary.Exports.Fleet.VehicleTrip;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
@@ -81,6 +82,13 @@ public static class GenerateCodes
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.LedgerMaster}";
 				decodeTransactionNoModel.PDFStream = await LedgerExport.ExportMaster(ledgers, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await LedgerExport.ExportMaster(ledgers, ReportExportType.Excel);
+				break;
+
+			case CodeType.VehicleTrip:
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<VehicleTripModel>(FleetNames.VehicleTrip, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleTrip}/{(decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id}";
+				decodeTransactionNoModel.PDFStream = await VehicleTripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id, InvoiceExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await VehicleTripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id, InvoiceExportType.Excel);
 				break;
 			case CodeType.VehicleType:
 				var vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType);

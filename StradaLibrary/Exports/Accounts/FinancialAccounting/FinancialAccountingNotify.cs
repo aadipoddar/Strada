@@ -13,10 +13,10 @@ internal static class FinancialAccountingNotify
         if (type == NotifyType.Created)
             return;
 
-        await AccountingMail(accountingId, type, previousInvoice);
+        await NotifyByMail(accountingId, type, previousInvoice);
     }
 
-    private static async Task AccountingMail(int accountingId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
+    private static async Task NotifyByMail(int accountingId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
     {
         var accounting = await CommonData.LoadTableDataById<FinancialAccountingOverviewModel>(AccountNames.FinancialAccountingOverview, accountingId);
 

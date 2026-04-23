@@ -23,7 +23,7 @@ public static class FinancialAccountingData
 	public static async Task<List<TrialBalanceModel>> LoadTrialBalanceByCompanyDate(int CompanyId, DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<TrialBalanceModel, dynamic>(AccountNames.LoadTrialBalanceByCompanyDate, new { CompanyId, StartDate, EndDate });
 
-	public static List<FinancialAccountingDetailModel> ConvertCartToDetails(List<FinancialAccountingItemCartModel> cart, int accountingId) =>
+	public static List<FinancialAccountingDetailModel> ConvertCartToDetails(List<FinancialAccountingItemCartModel> cart, int accountingId = 0) =>
 		[.. cart.Select(item => new FinancialAccountingDetailModel
 		{
 			Id = 0,
@@ -78,7 +78,7 @@ public static class FinancialAccountingData
 		accounting.Status = true;
 		var accountingDetails = await CommonData.LoadTableDataByMasterId<FinancialAccountingDetailModel>(AccountNames.FinancialAccountingDetail, accounting.Id);
 
-		await SaveTransaction(accounting, null, accountingDetails, false);
+		await SaveTransaction(accounting, accountingDetails, false);
 
 		await FinancialAccountingNotify.Notify(accounting.Id, NotifyType.Recovered);
 	}
@@ -120,10 +120,8 @@ public static class FinancialAccountingData
 		return accounting;
 	}
 
-	private static async Task<List<FinancialAccountingDetailModel>> ValidateTransactionDetails(FinancialAccountingModel accounting, List<FinancialAccountingItemCartModel> cart, List<FinancialAccountingDetailModel> accountingDetails = null, bool update = false, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	private static void ValidateTransactionDetails(FinancialAccountingModel accounting, List<FinancialAccountingDetailModel> accountingDetails)
 	{
-		accountingDetails ??= ConvertCartToDetails(cart, accounting.Id);
-
 		if (accountingDetails is null || accountingDetails.Count == 0)
 			throw new InvalidOperationException("The transaction must have at least one accounting detail item.");
 
@@ -135,11 +133,9 @@ public static class FinancialAccountingData
 
 		if (accountingDetails.Count != (accounting.TotalDebitLedgers + accounting.TotalCreditLedgers))
 			throw new InvalidOperationException("The number of accounting detail items does not match the transaction summary.");
-
-		return accountingDetails;
 	}
 
-	public static async Task<int> SaveTransaction(FinancialAccountingModel accounting, List<FinancialAccountingItemCartModel> cart, List<FinancialAccountingDetailModel> accountingDetails = null, bool showNotification = true, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<int> SaveTransaction(FinancialAccountingModel accounting, List<FinancialAccountingDetailModel> accountingDetails, bool showNotification = true, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		bool update = accounting.Id > 0;
 
@@ -154,7 +150,7 @@ public static class FinancialAccountingData
 			try
 			{
 				newSqlDataAccessTransaction.StartTransaction();
-				accounting.Id = await SaveTransaction(accounting, cart, accountingDetails, showNotification, newSqlDataAccessTransaction);
+				accounting.Id = await SaveTransaction(accounting, accountingDetails, showNotification, newSqlDataAccessTransaction);
 				newSqlDataAccessTransaction.CommitTransaction();
 			}
 			catch
@@ -170,8 +166,8 @@ public static class FinancialAccountingData
 		}
 
 		accounting = await ValidateTransaction(accounting, update, sqlDataAccessTransaction);
+		ValidateTransactionDetails(accounting, accountingDetails);
 		accounting.Id = await InsertFinancialAccounting(accounting, sqlDataAccessTransaction);
-		accountingDetails = await ValidateTransactionDetails(accounting, cart, accountingDetails, update, sqlDataAccessTransaction);
 		await SaveTransactionDetail(accounting, accountingDetails, update, sqlDataAccessTransaction);
 
 		return accounting.Id;

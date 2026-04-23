@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Components;
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.VehicleRoute;
+using StradaLibrary.Data.Fleet.VehicleTrip;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.Models.Accounts.FinancialAccounting;
+using StradaLibrary.Exports.Fleet.VehicleTrip;
+using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleRoute;
@@ -58,6 +60,12 @@ public partial class VehicleTripPage
 		new() { Text = "Delete (Del)", Id = "DeleteCart", IconCss = "e-icons e-delete" }
 	];
 
+	private readonly List<ContextMenuItemModel> _paymentsCartGridContextMenuItems =
+	[
+		new() { Text = "Edit", Id = "EditCart", IconCss = "e-icons e-edit" },
+		new() { Text = "Delete", Id = "DeleteCart", IconCss = "e-icons e-delete" }
+	];
+
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -96,7 +104,7 @@ public partial class VehicleTripPage
 		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_vehicleDrivers = await CommonData.LoadTableDataByStatus<VehicleDriverModel>(FleetNames.VehicleDriver);
-		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteLocationNames(); 
+		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteLocationNames();
 		_vehicleRouteLocations = await CommonData.LoadTableDataByStatus<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
 		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType);
 
@@ -191,7 +199,6 @@ public partial class VehicleTripPage
 			VehicleId = _selectedVehicle.Id,
 			DriverId = _selectedDriver.Id,
 			RouteId = _selectedRoute.Id,
-			ChallanDateTime = currentDateTime,
 			ChallanNo = string.Empty,
 			Quantity = 0,
 			TotalExpense = 0,
@@ -617,6 +624,10 @@ public partial class VehicleTripPage
 				item.Remarks = null;
 		}
 
+		_vehicleTrip.Remarks = _vehicleTrip.Remarks?.Trim();
+		if (string.IsNullOrWhiteSpace(_vehicleTrip.Remarks))
+			_vehicleTrip.Remarks = null;
+
 		_vehicleTrip.CompanyId = _selectedCompany.Id;
 		_vehicleTrip.OMCId = _selectedOMC.Id;
 		_vehicleTrip.VehicleId = _selectedVehicle.Id;
@@ -642,6 +653,15 @@ public partial class VehicleTripPage
 
 		if (Id is null)
 			_vehicleTrip.TransactionNo = await GenerateCodes.GenerateVehicleTripTransactionNo(_vehicleTrip);
+
+		var currentDateTime = await CommonData.LoadCurrentDateTime();
+		_vehicleTrip.Status = true;
+		_vehicleTrip.TransactionDateTime = DateOnly.FromDateTime(_vehicleTrip.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+		_vehicleTrip.LastModifiedAt = currentDateTime;
+		_vehicleTrip.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+		_vehicleTrip.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+		_vehicleTrip.CreatedBy = _user.Id;
+		_vehicleTrip.LastModifiedBy = _user.Id;
 	}
 
 	private async Task SaveTransactionFile()
@@ -675,6 +695,111 @@ public partial class VehicleTripPage
 			StateHasChanged();
 		}
 	}
+
+	private async Task SaveTransaction(bool savePDF = false, bool saveExcel = false)
+	{
+		if (_isProcessing || _isLoading)
+			return;
+
+		try
+		{
+			await SaveTransactionFile();
+			_isProcessing = true;
+
+			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
+
+			var expenses = VehicleTripData.ConvertExpensesCartToDetails(_expensesCart, _vehicleTrip.Id);
+			var payments = VehicleTripData.ConvertPaymentCartToDetails(_paymentsCart, _vehicleTrip.Id);
+			_vehicleTrip.Id = await VehicleTripData.SaveTransaction(_vehicleTrip, expenses, payments);
+
+			if (savePDF)
+			{
+				var (pdfStream, pdfFileName) = await VehicleTripInvoiceExport.ExportInvoice(_vehicleTrip.Id, InvoiceExportType.PDF);
+				await SaveAndViewService.SaveAndView(pdfFileName, pdfStream);
+			}
+
+			if (saveExcel)
+			{
+				var (excelStream, excelFileName) = await VehicleTripInvoiceExport.ExportInvoice(_vehicleTrip.Id, InvoiceExportType.Excel);
+				await SaveAndViewService.SaveAndView(excelFileName, excelStream);
+			}
+
+			await ResetPage();
+			await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Saving Transaction", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+		}
+	}
+	#endregion
+
+	#region Exporting
+	private async Task ExportPdfInvoice()
+	{
+		if (!Id.HasValue || Id.Value <= 0)
+		{
+			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
+			return;
+		}
+
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+
+			var decodeTransactionNo = await GenerateCodes.DecodeTransactionNo(_vehicleTrip.TransactionNo);
+			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
+
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+		}
+	}
+
+	private async Task ExportExcelInvoice()
+	{
+		if (!Id.HasValue || Id.Value <= 0)
+		{
+			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
+			return;
+		}
+
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+
+			var decodeTransactionNo = await GenerateCodes.DecodeTransactionNo(_vehicleTrip.TransactionNo);
+			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
+
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+		}
+	}
 	#endregion
 
 	#region Utilities
@@ -686,19 +811,19 @@ public partial class VehicleTripPage
 				await ResetPage();
 				break;
 			case "SaveTransaction":
-				// await SaveTransaction();
+				await SaveTransaction();
 				break;
 			case "SavePdfInvoice":
-				// await SaveTransaction(savePDF: true);
+				await SaveTransaction(savePDF: true);
 				break;
 			case "SaveExcelInvoice":
-				// await SaveTransaction(saveExcel: true);
+				await SaveTransaction(saveExcel: true);
 				break;
 			case "ExportPdfInvoice":
-				// await ExportPdfInvoice();
+				await ExportPdfInvoice();
 				break;
 			case "ExportExcelInvoice":
-				// await ExportExcelInvoice();
+				await ExportExcelInvoice();
 				break;
 			case "TransactionHistory":
 				// await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager);
@@ -722,7 +847,7 @@ public partial class VehicleTripPage
 		}
 	}
 
-	private async Task OnPaymentsCartGridContextMenuItemClicked(ContextMenuClickEventArgs<FinancialAccountingItemCartModel> args)
+	private async Task OnPaymentsCartGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleTripOMCCardPaymentsCartModel> args)
 	{
 		switch (args.Item.Id)
 		{

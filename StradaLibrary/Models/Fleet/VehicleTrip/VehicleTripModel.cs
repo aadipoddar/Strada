@@ -8,7 +8,6 @@ public class VehicleTripModel
 	public DateTime TransactionDateTime { get; set; }
 	public int FinancialYearId { get; set; }
 	public string ChallanNo { get; set; }
-	public DateTime ChallanDateTime { get; set; }
 	public int OMCId { get; set; }
 	public int VehicleId { get; set; }
 	public int DriverId { get; set; }

@@ -621,7 +621,8 @@ public partial class FinancialAccountingPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			_accounting.Id = await FinancialAccountingData.SaveTransaction(_accounting, _cart);
+			var accountingDetails = FinancialAccountingData.ConvertCartToDetails(_cart, _accounting.Id);
+			_accounting.Id = await FinancialAccountingData.SaveTransaction(_accounting, accountingDetails);
 
 			if (savePDF)
 			{
