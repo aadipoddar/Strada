@@ -14,6 +14,7 @@ public class VehicleTripModel
 	public int DriverId { get; set; }
 	public int RouteId { get; set; }
 	public decimal Quantity { get; set; }
+	public decimal TotalExpense { get; set; }
 	public string? Remarks { get; set; }
 	public int CreatedBy { get; set; }
 	public DateTime CreatedAt { get; set; }

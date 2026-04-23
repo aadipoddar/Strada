@@ -4,6 +4,7 @@ public enum CodeType
 {
 	FinancialAccounting,
 	Ledger,
+	VehicleTrip,
 	VehicleType,
 	VehicleDocumentType,
 	OMC,
@@ -11,7 +12,7 @@ public enum CodeType
 	VehicleRouteLocation,
 	VehicleRoute,
 	VehicleDriver,
-	VehicleRouteExpenseType
+	VehicleRouteExpenseType,
 }
 
 public class DecodeTransactionNoModel

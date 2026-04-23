@@ -316,7 +316,7 @@ public partial class OMCPage
 	}
 
 	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.VehicleOMCMaster, true);
+		NavigationManager.NavigateTo(PageRouteNames.OMCMaster, true);
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);

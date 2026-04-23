@@ -69,6 +69,16 @@ public static class AccountNames
 
 public static class FleetNames
 {
+	#region Vehicle Trip
+	public static string VehicleTrip => "VehicleTrip";
+	public static string VehicleTripExpenses => "VehicleTripExpenses";
+	public static string VehicleTripOMCCardPayments => "VehicleTripOMCCardPayments";
+
+	public static string InsertVehicleTrip => "Insert_VehicleTrip";
+	public static string InsertVehicleTripExpenses => "Insert_VehicleTripExpenses";
+	public static string InsertVehicleTripOMCCardPayments => "Insert_VehicleTripOMCCardPayments";
+	#endregion
+
 	#region Vehicle Route
 	public static string OMC => "OMC";
 	public static string OMCCard => "OMCCard";

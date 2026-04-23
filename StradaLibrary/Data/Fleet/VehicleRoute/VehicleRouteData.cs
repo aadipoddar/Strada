@@ -9,6 +9,34 @@ public static class VehicleRouteData
 	public static async Task<int> InsertVehicleRoute(VehicleRouteModel vehicleRoute) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleRoute, vehicleRoute)).FirstOrDefault();
 
+	public static async Task<List<VehicleRouteLocationNameModel>> LoadVehicleRouteLocationNames()
+	{
+		var routes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute);
+		routes = [.. routes.Where(r => r.Status)];
+		var locations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
+		List<VehicleRouteLocationNameModel> routeLocations = [];
+
+		foreach (var route in routes)
+			routeLocations.Add(new ()
+			{
+				Id = route.Id,
+				FromLocationId = route.FromLocationId,
+				FromLocationName = locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name ?? string.Empty,
+				ToLocationId = route.ToLocationId,
+				ToLocationName = locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name ?? string.Empty,
+				RouteDisplay = $"{locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name ?? route.FromLocationId.ToString()} - {locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name ?? route.ToLocationId.ToString()}",
+				Code = route.Code,
+				EstimatedHours = route.EstimatedHours,
+				EstimatedDistance = route.EstimatedDistance,
+				EstimatedFuelConsumption = route.EstimatedFuelConsumption,
+				EstimatedCost = route.EstimatedCost,
+				Remarks = route.Remarks,
+				Status = route.Status
+			});
+
+		return routeLocations;
+	}
+
 	private static async Task ValidateTransaction(VehicleRouteModel vehicleRoute)
 	{
 		vehicleRoute.Remarks = vehicleRoute.Remarks?.Trim() ?? string.Empty;

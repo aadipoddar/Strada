@@ -21,6 +21,7 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleRouteExpenseTypeCodePrefix'	, N'VREX'	, N'Prefix for Vehicle Route Expense Type Codes')
 	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'ACCT'	, N'Prefix for Financial Accounting Transaction Numbers')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleTripTransactionPrefix'			, N'VHTR'	, N'Prefix for Vehicle Trip Transaction Numbers')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PrimaryCompanyLinkingId'			, N'1'		, N'Company Id for the Primary Company Account')
 

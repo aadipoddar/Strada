@@ -325,7 +325,7 @@ public partial class OMCCardPage
 	}
 
 	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.VehicleOMCCardMaster, true);
+		NavigationManager.NavigateTo(PageRouteNames.OMCCardMaster, true);
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);

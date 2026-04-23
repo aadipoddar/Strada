@@ -148,6 +148,9 @@
     <Build Include="Fleet\VehicleTrip\Table\VehicleTripExpenses.sql" />
     <Build Include="Fleet\VehicleRoute\Table\OMCCard.sql" />
     <Build Include="Fleet\VehicleRoute\Insert\Insert_OMCCard.sql" />
+    <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTripExpenses.sql" />
+    <Build Include="Fleet\VehicleTrip\Table\VehicleTripOMCCardPayments.sql" />
+    <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTripOMCCardPayments.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />
