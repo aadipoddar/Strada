@@ -65,7 +65,7 @@ public static class ExcelInvoiceExportUtil
             currentRow = await DrawInvoiceHeader(worksheet, currentRow);
 
             // 2. Invoice Type and Number
-            currentRow = DrawInvoiceTitle(worksheet, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow, invoiceData.Outlet);
+            currentRow = DrawInvoiceTitle(worksheet, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow, invoiceData.OCM);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)

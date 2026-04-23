@@ -12,30 +12,20 @@ public static class VehicleTripInvoiceExport
 {
 	public static async Task<(MemoryStream stream, string fileName)> ExportInvoice(int transactionId, InvoiceExportType exportType)
 	{
-		var transaction = await CommonData.LoadTableDataById<VehicleTripModel>(FleetNames.VehicleTrip, transactionId) ??
+		var transaction = await CommonData.LoadTableDataById<VehicleTripOverviewModel>(FleetNames.VehicleTripOverview, transactionId) ??
 			throw new InvalidOperationException("Transaction not found.");
 
 		var expenses = await CommonData.LoadTableDataByMasterId<VehicleTripExpensesModel>(FleetNames.VehicleTripExpenses, transaction.Id);
 		var payments = await CommonData.LoadTableDataByMasterId<VehicleTripOMCCardPaymentsModel>(FleetNames.VehicleTripOMCCardPayments, transaction.Id);
-
-		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId) ??
-			throw new InvalidOperationException("Company information is missing.");
-
-		var omc = await CommonData.LoadTableDataById<OMCModel>(FleetNames.OMC, transaction.OMCId);
-		var vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, transaction.VehicleId);
-		var driver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, transaction.DriverId);
-		var route = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, transaction.RouteId);
-		var locations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
+		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
 		LedgerModel ledger = new()
 		{
-			Name = omc.Name,
-			Address = $"Challan: {transaction.ChallanNo}" +
-			$" \nFrom: {locations.FirstOrDefault(l => l.Id == route.FromLocationId).Name}" +
-			$" \nTo: {locations.FirstOrDefault(l => l.Id == route.ToLocationId).Name}" +
-			$" \nVehicle: {vehicle.Code}" +
-			$" \nDriver: {driver.Code}" +
-			$" \nDriver: {driver.Name}" +
+			Name = $"Challan: {transaction.ChallanNo}",
+			Address = $" \nFrom: {transaction.FromLocation}" +
+			$" \nTo: {transaction.ToLocation}" +
+			$" \nVehicle: {transaction.VehicleCode}" +
+			$" \nDriver: {transaction.DriverName} ({transaction.DriverMobile})" +
 			$" \nQuantity: {transaction.Quantity}",
 		};
 
@@ -62,7 +52,7 @@ public static class VehicleTripInvoiceExport
 			Company = company,
 			BillTo = ledger,
 			InvoiceType = "VEHICLE TRIP",
-			//Outlet = location?.Name ?? string.Empty,
+			OCM = transaction.OMCName,
 			TransactionNo = transaction.TransactionNo,
 			TransactionDateTime = transaction.TransactionDateTime,
 			TotalAmount = transaction.TotalExpense,

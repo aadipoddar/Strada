@@ -14,7 +14,7 @@ public class VehicleRouteModel
 	public bool Status { get; set; }
 }
 
-public class VehicleRouteLocationNameModel
+public class VehicleRouteOverviewModel
 {
 	public int Id { get; set; }
 	public int FromLocationId { get; set; }

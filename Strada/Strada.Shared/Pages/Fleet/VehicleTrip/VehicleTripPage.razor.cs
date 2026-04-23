@@ -29,8 +29,8 @@ public partial class VehicleTripPage
 	private FinancialYearModel _selectedFinancialYear = new();
 	private OMCModel _selectedOMC = new();
 	private VehicleModel _selectedVehicle = new();
-	private VehicleDriverModel _selectedDriver = new();
-	private VehicleRouteLocationNameModel _selectedRoute = new();
+	private VehicleDriverOverviewModel _selectedDriver = new();
+	private VehicleRouteOverviewModel _selectedRoute = new();
 	private VehicleRouteExpenseTypeModel _selectedExpenseType = null;
 	private OMCCardModel _selectedOMCCard = null;
 	private VehicleTripExpensesCartModel _selectedExpensesCart = new();
@@ -41,8 +41,8 @@ public partial class VehicleTripPage
 	private List<OMCModel> _omcs = [];
 	private List<OMCCardModel> _omcCards = [];
 	private List<VehicleModel> _vehicles = [];
-	private List<VehicleDriverModel> _vehicleDrivers = [];
-	private List<VehicleRouteLocationNameModel> _vehicleRoutes = [];
+	private List<VehicleDriverOverviewModel> _vehicleDrivers = [];
+	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
 	private List<VehicleRouteLocationModel> _vehicleRouteLocations = [];
 	private List<VehicleRouteExpenseTypeModel> _expenseTypes = [];
 	private List<VehicleTripExpensesCartModel> _expensesCart = [];
@@ -103,8 +103,8 @@ public partial class VehicleTripPage
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicleDrivers = await CommonData.LoadTableDataByStatus<VehicleDriverModel>(FleetNames.VehicleDriver);
-		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteLocationNames();
+		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
+		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
 		_vehicleRouteLocations = await CommonData.LoadTableDataByStatus<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
 		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType);
 
@@ -403,7 +403,7 @@ public partial class VehicleTripPage
 		await SaveTransactionFile();
 	}
 
-	private async Task OnVehicleDriverChanged(ChangeEventArgs<VehicleDriverModel, VehicleDriverModel> args)
+	private async Task OnVehicleDriverChanged(ChangeEventArgs<VehicleDriverOverviewModel, VehicleDriverOverviewModel> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;
@@ -414,7 +414,7 @@ public partial class VehicleTripPage
 		await SaveTransactionFile();
 	}
 
-	private async Task OnVehicleRouteChanged(ChangeEventArgs<VehicleRouteLocationNameModel, VehicleRouteLocationNameModel> args)
+	private async Task OnVehicleRouteChanged(ChangeEventArgs<VehicleRouteOverviewModel, VehicleRouteOverviewModel> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;

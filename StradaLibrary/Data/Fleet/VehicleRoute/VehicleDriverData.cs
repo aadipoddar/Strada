@@ -9,6 +9,20 @@ public static class VehicleDriverData
 	public static async Task<int> InsertVehicleDriver(VehicleDriverModel vehicleDriver) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleDriver, vehicleDriver)).FirstOrDefault();
 
+	public static async Task<List<VehicleDriverOverviewModel>> LoadVehicleDriverOverview()
+	{
+		var drivers = await CommonData.LoadTableDataByStatus<VehicleDriverModel>(FleetNames.VehicleDriver);
+		return [.. drivers.Select(d => new VehicleDriverOverviewModel
+		{
+			Id = d.Id,
+			Name = d.Name,
+			Mobile = d.Mobile,
+			Code = d.Code,
+			Remarks = d.Remarks,
+			Status = d.Status
+		})];
+	}
+
 	private static async Task ValidateTransaction(VehicleDriverModel vehicleDriver)
 	{
 		vehicleDriver.Name = vehicleDriver.Name?.Trim().ToUpper() ?? string.Empty;

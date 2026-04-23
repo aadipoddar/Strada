@@ -83,6 +83,7 @@
     <Folder Include="Fleet\VehicleTrip" />
     <Folder Include="Fleet\VehicleTrip\Table" />
     <Folder Include="Fleet\VehicleTrip\Insert" />
+    <Folder Include="Fleet\VehicleTrip\Load" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -151,6 +152,7 @@
     <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTripExpenses.sql" />
     <Build Include="Fleet\VehicleTrip\Table\VehicleTripOMCCardPayments.sql" />
     <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTripOMCCardPayments.sql" />
+    <Build Include="Fleet\VehicleTrip\Load\VehicleTrip_Overview.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

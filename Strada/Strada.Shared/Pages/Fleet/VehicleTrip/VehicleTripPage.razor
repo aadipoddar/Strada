@@ -175,13 +175,13 @@ else
 								<label class="field-label">
 									Route <span class="required">*</span>
 								</label>
-								<SfAutoComplete @bind-Value="_selectedRoute" TValue="VehicleRouteLocationNameModel" TItem="VehicleRouteLocationNameModel"
+								<SfAutoComplete @bind-Value="_selectedRoute" TValue="VehicleRouteOverviewModel" TItem="VehicleRouteOverviewModel"
 												DataSource="@_vehicleRoutes" Placeholder="Select a Route"
 												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
 												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
 												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="VehicleRouteLocationNameModel" TValue="VehicleRouteLocationNameModel" ValueChange="OnVehicleRouteChanged" />
-									<AutoCompleteFieldSettings Value="@nameof(VehicleRouteLocationNameModel.RouteDisplay)" />
+									<AutoCompleteEvents TItem="VehicleRouteOverviewModel" TValue="VehicleRouteOverviewModel" ValueChange="OnVehicleRouteChanged" />
+									<AutoCompleteFieldSettings Value="@nameof(VehicleRouteOverviewModel.RouteDisplay)" />
 								</SfAutoComplete>
 							</div>
 
@@ -205,13 +205,13 @@ else
 								<label class="field-label">
 									Driver <span class="required">*</span>
 								</label>
-								<SfAutoComplete @bind-Value="_selectedDriver" TValue="VehicleDriverModel" TItem="VehicleDriverModel"
+								<SfAutoComplete @bind-Value="_selectedDriver" TValue="VehicleDriverOverviewModel" TItem="VehicleDriverOverviewModel"
 												DataSource="@_vehicleDrivers" Placeholder="Select a Driver"
 												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
 												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
 												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="VehicleDriverModel" TValue="VehicleDriverModel" ValueChange="OnVehicleDriverChanged" />
-									<AutoCompleteFieldSettings Value="@nameof(VehicleDriverModel.Name)" />
+									<AutoCompleteEvents TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel" ValueChange="OnVehicleDriverChanged" />
+									<AutoCompleteFieldSettings Value="@nameof(VehicleDriverOverviewModel.DisplayName)" />
 								</SfAutoComplete>
 							</div>
 

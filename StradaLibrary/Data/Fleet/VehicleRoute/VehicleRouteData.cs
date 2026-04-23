@@ -9,12 +9,12 @@ public static class VehicleRouteData
 	public static async Task<int> InsertVehicleRoute(VehicleRouteModel vehicleRoute) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleRoute, vehicleRoute)).FirstOrDefault();
 
-	public static async Task<List<VehicleRouteLocationNameModel>> LoadVehicleRouteLocationNames()
+	public static async Task<List<VehicleRouteOverviewModel>> LoadVehicleRouteOverview()
 	{
 		var routes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute);
 		routes = [.. routes.Where(r => r.Status)];
 		var locations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
-		List<VehicleRouteLocationNameModel> routeLocations = [];
+		List<VehicleRouteOverviewModel> routeLocations = [];
 
 		foreach (var route in routes)
 			routeLocations.Add(new ()

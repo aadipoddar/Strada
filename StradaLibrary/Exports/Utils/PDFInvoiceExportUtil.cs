@@ -62,7 +62,7 @@ public static class PDFInvoiceExportUtil
             currentY = DrawInvoiceHeader(graphics, leftMargin, pageWidth, currentY);
 
             // 2. Invoice Type and Number
-            currentY = DrawInvoiceTitle(graphics, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY, invoiceData.Outlet);
+            currentY = DrawInvoiceTitle(graphics, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY, invoiceData.OCM);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)
@@ -196,7 +196,7 @@ public static class PDFInvoiceExportUtil
     /// <summary>
     /// Draw invoice type and number
     /// </summary>
-    private static float DrawInvoiceTitle(PdfGraphics graphics, string invoiceType, string invoiceNumber, DateTime transactionDateTime, float leftMargin, float pageWidth, float startY, string outlet = null)
+    private static float DrawInvoiceTitle(PdfGraphics graphics, string invoiceType, string invoiceNumber, DateTime transactionDateTime, float leftMargin, float pageWidth, float startY, string ocm = null)
     {
         float currentY = startY;
 
@@ -214,12 +214,12 @@ public static class PDFInvoiceExportUtil
 
         currentY += 16;
 
-        // Draw Outlet label and Invoice Date on same line
-        if (!string.IsNullOrWhiteSpace(outlet))
+        // Draw OCM label and Invoice Date on same line
+        if (!string.IsNullOrWhiteSpace(ocm))
         {
             PdfStandardFont outletFont = new(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
             PdfBrush outletBrush = new PdfSolidBrush(new PdfColor(100, 100, 100));
-            string outletText = $"Outlet: {outlet}";
+            string outletText = $"OCM: {ocm}";
             graphics.DrawString(outletText, outletFont, outletBrush, new PointF(leftMargin, currentY));
         }
 

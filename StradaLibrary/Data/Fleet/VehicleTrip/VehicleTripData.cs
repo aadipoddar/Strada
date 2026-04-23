@@ -129,7 +129,7 @@ public static class VehicleTripData
 
 			await FinancialYearData.ValidateFinancialYear(existingTrip.TransactionDateTime, sqlDataAccessTransaction);
 
-			var user = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, existingTrip.LastModifiedBy.Value, sqlDataAccessTransaction);
+			var user = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, trip.LastModifiedBy.Value, sqlDataAccessTransaction);
 			if (!user.Admin)
 				throw new InvalidOperationException("Only admin users can update a vehicle trip transaction.");
 
