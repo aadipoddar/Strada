@@ -2,6 +2,7 @@
 @attribute [Route(PageRouteNames.VehicleTrip + "/{Id:int}")]
 
 @using StradaLibrary.Models.Accounts.Masters
+@using StradaLibrary.Models.Fleet.OMC
 @using StradaLibrary.Models.Fleet.Vehicle
 @using StradaLibrary.Models.Fleet.VehicleRoute
 @using StradaLibrary.Models.Fleet.VehicleTrip
@@ -380,12 +381,12 @@ else
 					<div class="cart-input-row">
 						<!-- Expense Type -->
 						<div class="cart-field cart-field-wide">
-							<AutoCompleteWithAdd TItem="VehicleRouteExpenseTypeModel" TValue="VehicleRouteExpenseTypeModel"
+							<AutoCompleteWithAdd TItem="VehicleExpenseTypeModel" TValue="VehicleExpenseTypeModel"
 														 @ref="_sfExpenseTypeAutoComplete"
-														 FieldValue="@nameof(VehicleRouteExpenseTypeModel.Name)" @bind-Value="_selectedExpenseType"
+														 FieldValue="@nameof(VehicleExpenseTypeModel.Name)" @bind-Value="_selectedExpenseType"
 														 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
 														 ValueChange="OnExpensesTypeChanged"
-														 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.VehicleRouteExpenseTypeMaster" />
+														 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.VehicleExpenseTypeMaster" />
 						</div>
 
 						<!-- Amount -->
@@ -442,7 +443,7 @@ else
 							<GridAggregate>
 								<GridAggregateColumns>
 									<GridAggregateColumn
-										Field="@nameof(VehicleTripExpensesCartModel.VehicleRouteExpenseTypeName)"
+										Field="@nameof(VehicleTripExpensesCartModel.VehicleExpenseTypeName)"
 										Type="AggregateType.Count">
 										<FooterTemplate>
 											@{
@@ -470,7 +471,7 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.VehicleRouteExpenseTypeName)"
+							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.VehicleExpenseTypeName)"
 										HeaderText="Name" Width="200" />
 							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.Amount)" HeaderText="Amount" Width="130"
 										TextAlign="TextAlign.Right" Format="N2">

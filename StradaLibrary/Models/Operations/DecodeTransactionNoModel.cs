@@ -12,7 +12,7 @@ public enum CodeType
 	VehicleRouteLocation,
 	VehicleRoute,
 	VehicleDriver,
-	VehicleRouteExpenseType,
+	VehicleExpenseType,
 }
 
 public class DecodeTransactionNoModel

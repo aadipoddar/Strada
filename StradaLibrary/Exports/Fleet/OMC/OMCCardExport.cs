@@ -1,9 +1,9 @@
 using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.OMC;
 
-namespace StradaLibrary.Exports.Fleet.VehicleRoute;
+namespace StradaLibrary.Exports.Fleet.OMC;
 
 public static class OMCCardExport
 {

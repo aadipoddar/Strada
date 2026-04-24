@@ -1,8 +1,8 @@
 using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.OMC;
 
-namespace StradaLibrary.Data.Fleet.VehicleRoute;
+namespace StradaLibrary.Data.Fleet.OMC;
 
 public static class OMCData
 {

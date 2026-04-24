@@ -1,31 +1,31 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Fleet.VehicleRoute;
+using StradaLibrary.Data.Fleet.Vehicle;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.VehicleRoute;
+using StradaLibrary.Exports.Fleet.Vehicle;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
 
-namespace Strada.Shared.Pages.Fleet.VehicleRoute;
+namespace Strada.Shared.Pages.Fleet.Vehicle;
 
-public partial class OMCPage
+public partial class VehicleExpenseTypePage
 {
 	private UserModel _user;
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showDeleted = false;
 
-	private OMCModel _omc = new();
+	private VehicleExpenseTypeModel _vehicleExpenseType = new();
 
-	private List<OMCModel> _omcs = [];
+	private List<VehicleExpenseTypeModel> _vehicleExpenseTypes = [];
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private SfGrid<OMCModel> _sfGrid;
+	private SfGrid<VehicleExpenseTypeModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
@@ -49,10 +49,10 @@ public partial class OMCPage
 
 	private async Task LoadData()
 	{
-		_omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC);
+		_vehicleExpenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 
 		if (!_showDeleted)
-			_omcs = [.. _omcs.Where(omc => omc.Status)];
+			_vehicleExpenseTypes = [.. _vehicleExpenseTypes.Where(v => v.Status)];
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
@@ -78,7 +78,7 @@ public partial class OMCPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await OMCData.SaveTransaction(_omc);
+			await VehicleExpenseTypeData.SaveTransaction(_vehicleExpenseType);
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -105,11 +105,11 @@ public partial class OMCPage
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var omc = await CommonData.LoadTableDataById<OMCModel>(FleetNames.OMC, _deleteTransactionId)
+			var vehicleExpenseType = await CommonData.LoadTableDataById<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			omc.Status = false;
-			await OMCData.InsertOMC(omc);
+			vehicleExpenseType.Status = false;
+			await VehicleExpenseTypeData.InsertVehicleExpenseType(vehicleExpenseType);
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -136,11 +136,11 @@ public partial class OMCPage
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var omc = await CommonData.LoadTableDataById<OMCModel>(FleetNames.OMC, _recoverTransactionId)
+			var vehicleExpenseType = await CommonData.LoadTableDataById<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			omc.Status = true;
-			await OMCData.InsertOMC(omc);
+			vehicleExpenseType.Status = true;
+			await VehicleExpenseTypeData.InsertVehicleExpenseType(vehicleExpenseType);
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();
@@ -170,7 +170,7 @@ public partial class OMCPage
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await OMCExport.ExportMaster(_omcs, ReportExportType.Excel);
+			var (stream, fileName) = await VehicleExpenseTypeExport.ExportMaster(_vehicleExpenseTypes, ReportExportType.Excel);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -197,7 +197,7 @@ public partial class OMCPage
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await OMCExport.ExportMaster(_omcs, ReportExportType.PDF);
+			var (stream, fileName) = await VehicleExpenseTypeExport.ExportMaster(_vehicleExpenseTypes, ReportExportType.PDF);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -243,7 +243,7 @@ public partial class OMCPage
 		}
 	}
 
-	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<OMCModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleExpenseTypeModel> args)
 	{
 		switch (args.Item.Id)
 		{
@@ -262,8 +262,8 @@ public partial class OMCPage
 		if (selectedRecords.Count == 0)
 			return;
 
-		_omc = await CommonData.LoadTableDataById<OMCModel>(FleetNames.OMC, selectedRecords[0].Id);
-		if (_omc is null)
+		_vehicleExpenseType = await CommonData.LoadTableDataById<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, selectedRecords[0].Id);
+		if (_vehicleExpenseType is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
 		StateHasChanged();
@@ -316,7 +316,7 @@ public partial class OMCPage
 	}
 
 	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.OMCMaster, true);
+		NavigationManager.NavigateTo(PageRouteNames.VehicleExpenseTypeMaster, true);
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);

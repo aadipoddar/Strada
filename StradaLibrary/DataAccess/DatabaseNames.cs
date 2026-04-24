@@ -89,14 +89,14 @@ public static class FleetNames
 	public static string VehicleRouteLocation => "VehicleRouteLocation";
 	public static string VehicleRoute => "VehicleRoute";
 	public static string VehicleDriver => "VehicleDriver";
-	public static string VehicleRouteExpenseType => "VehicleRouteExpenseType";
+	public static string VehicleExpenseType => "VehicleExpenseType";
 
 	public static string InsertOMC => "Insert_OMC";
 	public static string InsertOMCCard => "Insert_OMCCard";
 	public static string InsertVehicleRouteLocation => "Insert_VehicleRouteLocation";
 	public static string InsertVehicleRoute => "Insert_VehicleRoute";
 	public static string InsertVehicleDriver => "Insert_VehicleDriver";
-	public static string InsertVehicleRouteExpenseType => "Insert_VehicleRouteExpenseType";
+	public static string InsertVehicleExpenseType => "Insert_VehicleExpenseType";
 	#endregion
 
 	#region Vehicle Document

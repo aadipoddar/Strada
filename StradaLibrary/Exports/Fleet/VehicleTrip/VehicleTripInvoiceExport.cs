@@ -2,7 +2,8 @@
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 
 namespace StradaLibrary.Exports.Fleet.VehicleTrip;
@@ -28,13 +29,13 @@ public static class VehicleTripInvoiceExport
 			$" \nQuantity: {transaction.Quantity}",
 		};
 
-		var expensetTypes = await CommonData.LoadTableData<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType);
+		var expensetTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 		var lineItems = expenses.Select(detail =>
 		{
 			return new VehicleTripExpensesCartModel
 			{
-				VehicleRouteExpenseTypeId = detail.VehicleRouteExpenseTypeId,
-				VehicleRouteExpenseTypeName = expensetTypes.FirstOrDefault(p => p.Id == detail.VehicleRouteExpenseTypeId).Name,
+				VehicleExpenseTypeId = detail.VehicleExpenseTypeId,
+				VehicleExpenseTypeName = expensetTypes.FirstOrDefault(p => p.Id == detail.VehicleExpenseTypeId).Name,
 				Amount = detail.Amount,
 				Remarks = detail.Remarks
 			};
@@ -67,7 +68,7 @@ public static class VehicleTripInvoiceExport
 		var columnSettings = new List<InvoiceColumnSetting>
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
-			new(nameof(VehicleTripExpensesCartModel.VehicleRouteExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(VehicleTripExpensesCartModel.VehicleExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
 			new(nameof(VehicleTripExpensesCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00")
 		};
 

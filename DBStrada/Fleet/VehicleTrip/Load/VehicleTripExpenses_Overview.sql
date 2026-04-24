@@ -2,7 +2,7 @@
 AS
 SELECT
     [te].[Id],
-	[te].[VehicleRouteExpenseTypeId],
+	[te].[VehicleExpenseTypeId],
 	[er].[Name] AS ExpenseTypeName,
 	[er].[Code] AS ExpenseTypeCode,
 	[te].[Amount] AS ExpenseAmount,
@@ -51,7 +51,7 @@ FROM
 INNER JOIN
 	[dbo].[VehicleTrip] t ON te.MasterId = t.Id
 INNER JOIN
-	[dbo].[VehicleRouteExpenseType] er ON te.VehicleRouteExpenseTypeId = er.Id
+	[dbo].[VehicleExpenseType] er ON te.[VehicleExpenseTypeId] = er.Id
 INNER JOIN
     [dbo].[Company] c ON t.CompanyId = c.Id
 INNER JOIN

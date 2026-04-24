@@ -24,7 +24,7 @@ public static class SettingsKeys
 	public static string VehicleRouteLocationCodePrefix => "VehicleRouteLocationCodePrefix";
 	public static string VehicleRouteCodePrefix => "VehicleRouteCodePrefix";
 	public static string VehicleDriverCodePrefix => "VehicleDriverCodePrefix";
-	public static string VehicleRouteExpenseTypeCodePrefix => "VehicleRouteExpenseTypeCodePrefix";
+	public static string VehicleExpenseTypeCodePrefix => "VehicleExpenseTypeCodePrefix";
 
 	public static string FinancialAccountingTransactionPrefix => "FinancialAccountingTransactionPrefix";
 	public static string VehicleTripTransactionPrefix => "VehicleTripTransactionPrefix";

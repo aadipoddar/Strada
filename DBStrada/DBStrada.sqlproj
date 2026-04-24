@@ -84,6 +84,10 @@
     <Folder Include="Fleet\VehicleTrip\Table" />
     <Folder Include="Fleet\VehicleTrip\Insert" />
     <Folder Include="Fleet\VehicleTrip\Load" />
+    <Folder Include="Fleet\VehicleRepair" />
+    <Folder Include="Fleet\OMC" />
+    <Folder Include="Fleet\OMC\Insert" />
+    <Folder Include="Fleet\OMC\Table" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -113,15 +117,10 @@
     <Build Include="Accounts\FinancialAccounting\Insert\Insert_FinancialAccountingDetail.sql" />
     <Build Include="Fleet\Vehicle\Insert\Insert_Vehicle.sql" />
     <Build Include="Fleet\Vehicle\Insert\Insert_VehicleType.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteLocation.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRoute.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_OMC.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleDriver.sql" />
     <Build Include="Fleet\Vehicle\Table\Vehicle.sql" />
     <Build Include="Fleet\Vehicle\Table\VehicleType.sql" />
     <Build Include="Fleet\VehicleRoute\Table\VehicleRouteLocation.sql" />
     <Build Include="Fleet\VehicleRoute\Table\VehicleRoute.sql" />
-    <Build Include="Fleet\VehicleRoute\Table\OMC.sql" />
     <Build Include="Fleet\VehicleRoute\Table\VehicleDriver.sql" />
     <Build Include="Accounts\FinancialAccounting\Load\Load_FinancialAccounting_By_Voucher_Reference.sql" />
     <Build Include="Accounts\FinancialAccounting\Table\FinancialAccounting.sql" />
@@ -144,17 +143,24 @@
     <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocumentType.sql" />
     <Build Include="Fleet\VehicleTrip\Table\VehicleTrip.sql" />
     <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTrip.sql" />
-    <Build Include="Fleet\VehicleRoute\Table\VehicleRouteExpenseType.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteExpenseType.sql" />
     <Build Include="Fleet\VehicleTrip\Table\VehicleTripExpenses.sql" />
-    <Build Include="Fleet\VehicleRoute\Table\OMCCard.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_OMCCard.sql" />
     <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTripExpenses.sql" />
     <Build Include="Fleet\VehicleTrip\Table\VehicleTripOMCCardPayments.sql" />
     <Build Include="Fleet\VehicleTrip\Insert\Insert_VehicleTripOMCCardPayments.sql" />
     <Build Include="Fleet\VehicleTrip\Load\VehicleTrip_Overview.sql" />
     <Build Include="Fleet\VehicleTrip\Load\VehicleTripExpenses_Overview.sql" />
     <Build Include="Fleet\VehicleTrip\Load\VehicleTripOMCCardPayments_Overview.sql" />
+    <Build Include="Fleet\VehicleRepair\VehicleRepair.sql" />
+    <Build Include="Fleet\VehicleRepair\VehicleRepairExpenses.sql" />
+    <Build Include="Fleet\Vehicle\Table\VehicleExpenseType.sql" />
+    <Build Include="Fleet\Vehicle\Insert\Insert_VehicleExpenseType.sql" />
+    <Build Include="Fleet\OMC\Table\OMC.sql" />
+    <Build Include="Fleet\OMC\Table\OMCCard.sql" />
+    <Build Include="Fleet\OMC\Insert\Insert_OMC.sql" />
+    <Build Include="Fleet\OMC\Insert\Insert_OMCCard.sql" />
+    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleDriver.sql" />
+    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRoute.sql" />
+    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteLocation.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

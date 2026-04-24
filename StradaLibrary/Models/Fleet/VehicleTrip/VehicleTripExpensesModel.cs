@@ -4,7 +4,7 @@ public class VehicleTripExpensesModel
 {
 	public int Id { get; set; }
 	public int MasterId { get; set; }
-	public int VehicleRouteExpenseTypeId { get; set; }
+	public int VehicleExpenseTypeId { get; set; }
 	public decimal Amount { get; set; }
 	public string? Remarks { get; set; }
 	public bool Status { get; set; }
@@ -12,8 +12,8 @@ public class VehicleTripExpensesModel
 
 public class VehicleTripExpensesCartModel
 {
-	public int VehicleRouteExpenseTypeId { get; set; }
-	public string VehicleRouteExpenseTypeName { get; set; }
+	public int VehicleExpenseTypeId { get; set; }
+	public string VehicleExpenseTypeName { get; set; }
 	public decimal Amount { get; set; }
 	public string? Remarks { get; set; }
 }
@@ -21,7 +21,7 @@ public class VehicleTripExpensesCartModel
 public class VehicleTripExpensesOverviewModel
 {
 	public int Id { get; set; }
-	public int VehicleRouteExpenseTypeId { get; set; }
+	public int VehicleExpenseTypeId { get; set; }
 	public string ExpenseTypeName { get; set; }
 	public string ExpenseTypeCode { get; set; }
 	public decimal ExpenseAmount { get; set; }

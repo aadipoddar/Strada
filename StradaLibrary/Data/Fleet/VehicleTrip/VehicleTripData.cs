@@ -4,8 +4,8 @@ using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Fleet.VehicleTrip;
 using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
+using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Operations;
 
@@ -26,7 +26,7 @@ public static class VehicleTripData
 		{
 			Id = 0,
 			MasterId = accountingId,
-			VehicleRouteExpenseTypeId = item.VehicleRouteExpenseTypeId,
+			VehicleExpenseTypeId = item.VehicleExpenseTypeId,
 			Amount = item.Amount,
 			Remarks = item.Remarks,
 			Status = true

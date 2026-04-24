@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_VehicleTripExpenses]
 	@Id INT OUTPUT,
 	@MasterId INT,
-	@VehicleRouteExpenseTypeId INT,
+	@VehicleExpenseTypeId INT,
 	@Amount MONEY,
 	@Remarks VARCHAR(MAX),
 	@Status BIT
@@ -12,14 +12,14 @@ BEGIN
 		INSERT INTO [dbo].[VehicleTripExpenses]
 		(
 			[MasterId],
-			[VehicleRouteExpenseTypeId],
+			[VehicleExpenseTypeId],
 			[Amount],
 			[Remarks],
 			[Status]
 		) VALUES
 		(
 			@MasterId,
-			@VehicleRouteExpenseTypeId,
+			@VehicleExpenseTypeId,
 			@Amount,
 			@Remarks,
 			@Status
@@ -33,7 +33,7 @@ BEGIN
 		UPDATE [dbo].[VehicleTripExpenses]
 		SET
 			[MasterId] = @MasterId,
-			[VehicleRouteExpenseTypeId] = @VehicleRouteExpenseTypeId,
+			[VehicleExpenseTypeId] = @VehicleExpenseTypeId,
 			[Amount] = @Amount,
 			[Remarks] = @Remarks,
 			[Status] = @Status

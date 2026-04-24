@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Insert_VehicleRouteExpenseType]
+﻿CREATE PROCEDURE [dbo].[Insert_VehicleExpenseType]
 	@Id INT OUTPUT,
 	@Name VARCHAR(MAX),
 	@Code VARCHAR(10),
@@ -8,7 +8,7 @@ AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[VehicleRouteExpenseType]
+		INSERT INTO [dbo].[VehicleExpenseType]
 		(
 			[Name],
 			[Code],
@@ -27,7 +27,7 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		UPDATE [dbo].[VehicleRouteExpenseType]
+		UPDATE [dbo].[VehicleExpenseType]
 		SET
 			[Name] = @Name,
 			[Code] = @Code,

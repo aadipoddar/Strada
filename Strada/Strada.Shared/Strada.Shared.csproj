@@ -38,4 +38,8 @@
     <Using Include="StradaLibrary.DataAccess" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Fleet\VehicleRepair\" />
+  </ItemGroup>
+
 </Project>

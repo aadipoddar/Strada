@@ -1,6 +1,6 @@
-namespace StradaLibrary.Models.Fleet.VehicleRoute;
+namespace StradaLibrary.Models.Fleet.OMC;
 
-public class VehicleRouteExpenseTypeModel
+public class OMCModel
 {
 	public int Id { get; set; }
 	public string Name { get; set; }
