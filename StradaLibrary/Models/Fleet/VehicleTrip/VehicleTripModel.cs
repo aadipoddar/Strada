@@ -42,9 +42,12 @@ public class VehicleTripOverviewModel
 	public int RouteId { get; set; }
 	public string FromLocation { get; set; }
 	public string ToLocation { get; set; }
+	public string RouteDisplay { get; set; }
 	public int DriverId { get; set; }
 	public string DriverName { get; set; }
 	public string DriverMobile { get; set; }
+	public string DriverDisplay { get; set; }
+
 	public decimal Quantity { get; set; }
 	public decimal EstimatedDistance { get; set; }
 	public decimal EstimatedHours { get; set; }

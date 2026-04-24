@@ -75,6 +75,8 @@ public static class FleetNames
 	public static string VehicleTripOMCCardPayments => "VehicleTripOMCCardPayments";
 
 	public static string VehicleTripOverview => "VehicleTrip_Overview";
+	public static string VehicleTripExpensesOverview => "VehicleTripExpenses_Overview";
+	public static string VehicleTripOMCCardPaymentsOverview => "VehicleTripOMCCardPayments_Overview";
 
 	public static string InsertVehicleTrip => "Insert_VehicleTrip";
 	public static string InsertVehicleTripExpenses => "Insert_VehicleTripExpenses";

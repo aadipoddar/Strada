@@ -43,7 +43,6 @@ public partial class VehicleTripPage
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleDriverOverviewModel> _vehicleDrivers = [];
 	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
-	private List<VehicleRouteLocationModel> _vehicleRouteLocations = [];
 	private List<VehicleRouteExpenseTypeModel> _expenseTypes = [];
 	private List<VehicleTripExpensesCartModel> _expensesCart = [];
 	private List<VehicleTripOMCCardPaymentsCartModel> _paymentsCart = [];
@@ -52,7 +51,7 @@ public partial class VehicleTripPage
 	private SfAutoComplete<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
 	private SfGrid<VehicleTripExpensesCartModel> _sfExpensesCartGrid;
 	private SfGrid<VehicleTripOMCCardPaymentsCartModel> _sfPaymentsCartGrid;
-	ToastNotification _toastNotification;
+	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =
 	[
@@ -105,7 +104,6 @@ public partial class VehicleTripPage
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
 		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
-		_vehicleRouteLocations = await CommonData.LoadTableDataByStatus<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
 		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType);
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
@@ -119,7 +117,6 @@ public partial class VehicleTripPage
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 		_vehicleDrivers = [.. _vehicleDrivers.OrderBy(s => s.Name)];
 		_vehicleRoutes = [.. _vehicleRoutes.OrderBy(s => s.Code)];
-		_vehicleRouteLocations = [.. _vehicleRouteLocations.OrderBy(s => s.Name)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
 
 		_selectedOMC = _omcs.FirstOrDefault();
@@ -826,10 +823,13 @@ public partial class VehicleTripPage
 				await ExportExcelInvoice();
 				break;
 			case "TransactionHistory":
-				// await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager);
+				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripReport, FormFactor, JSRuntime, NavigationManager);
 				break;
-			case "ItemReport":
-				// await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager);
+			case "ExpensesReport":
+				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripExpensesReport, FormFactor, JSRuntime, NavigationManager);
+				break;
+			case "PaymentsReport":
+				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 		}
 	}

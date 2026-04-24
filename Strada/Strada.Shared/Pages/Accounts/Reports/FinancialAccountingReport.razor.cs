@@ -159,7 +159,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
         await LoadTransactionOverviews();
     }
 
-    private async Task OnPartyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VoucherModel, VoucherModel> args)
+    private async Task OnVoucherChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VoucherModel, VoucherModel> args)
     {
         _selectedVoucher = args.Value;
         await LoadTransactionOverviews();

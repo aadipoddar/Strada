@@ -2,7 +2,6 @@
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 
@@ -22,7 +21,7 @@ public static class VehicleTripInvoiceExport
 		LedgerModel ledger = new()
 		{
 			Name = $"Challan: {transaction.ChallanNo}",
-			Address = $" \nFrom: {transaction.FromLocation}" +
+			Address = $"From: {transaction.FromLocation}" +
 			$" \nTo: {transaction.ToLocation}" +
 			$" \nVehicle: {transaction.VehicleCode}" +
 			$" \nDriver: {transaction.DriverName} ({transaction.DriverMobile})" +
@@ -32,11 +31,10 @@ public static class VehicleTripInvoiceExport
 		var expensetTypes = await CommonData.LoadTableData<VehicleRouteExpenseTypeModel>(FleetNames.VehicleRouteExpenseType);
 		var lineItems = expenses.Select(detail =>
 		{
-			var expense = expensetTypes.FirstOrDefault(p => p.Id == detail.VehicleRouteExpenseTypeId);
 			return new VehicleTripExpensesCartModel
 			{
 				VehicleRouteExpenseTypeId = detail.VehicleRouteExpenseTypeId,
-				VehicleRouteExpenseTypeName = expense?.Name ?? $"Expense #{detail.VehicleRouteExpenseTypeId}",
+				VehicleRouteExpenseTypeName = expensetTypes.FirstOrDefault(p => p.Id == detail.VehicleRouteExpenseTypeId).Name,
 				Amount = detail.Amount,
 				Remarks = detail.Remarks
 			};
