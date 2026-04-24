@@ -18,7 +18,7 @@
 
 @if (_isLoading || _user is null)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
@@ -98,31 +98,25 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Document Type <span class="required">*</span>
-							</label>
-							<SfAutoComplete TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel"
-											Value="@_selectedVehicleDocumentType" DataSource="@_vehicleDocumentTypes" Placeholder="Select document type"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-											CssClass="custom-autocomplete">
-								<AutoCompleteEvents TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel" ValueChange="OnVehicleDocumentTypeChanged" />
-								<AutoCompleteFieldSettings Value="Name" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel"
+												 @bind-Value="_selectedVehicleDocumentType"
+												 DataSource="@_vehicleDocumentTypes"
+												 Placeholder="Select Document Type"
+												 Label="Document Type" Required="true"
+												 ValueChange="OnVehicleDocumentTypeChanged"
+												 FieldValue="@nameof(VehicleDocumentTypeModel.Name)"
+												 AddNewRoute="@PageRouteNames.VehicleDocumentTypeMaster" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Vehicle <span class="required">*</span>
-							</label>
-							<SfAutoComplete TValue="VehicleModel" TItem="VehicleModel"
-											Value="@_selectedVehicle" DataSource="@_vehicles" Placeholder="Select vehicle"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-											CssClass="custom-autocomplete">
-								<AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel" ValueChange="OnVehicleChanged" />
-								<AutoCompleteFieldSettings Value="Code" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
+												 @bind-Value="_selectedVehicle"
+												 DataSource="@_vehicles"
+												 Placeholder="Select Vehicle"
+												 Label="Vehicle" Required="true"
+												 ValueChange="OnVehicleChanged"
+												 FieldValue="@nameof(VehicleModel.Code)"
+												 AddNewRoute="@PageRouteNames.VehicleMaster" />
 						</div>
 
 						<div class="form-field">

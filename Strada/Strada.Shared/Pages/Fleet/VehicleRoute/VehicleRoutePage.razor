@@ -15,7 +15,7 @@
 
 @if (_isLoading || _user is null)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
@@ -73,31 +73,23 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">
-								From Location <span class="required">*</span>
-							</label>
-							<SfAutoComplete TItem="VehicleRouteLocationModel" TValue="VehicleRouteLocationModel"
-										@bind-Value="_selectedFromLocation"
-										DataSource="@_routeLocations" Placeholder="Select from location"
-										FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-										FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-										CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="VehicleRouteLocationModel" TValue="VehicleRouteLocationModel"
+												 @bind-Value="_selectedFromLocation"
+												 DataSource="@_routeLocations"
+												 Placeholder="Select From Location"
+												 Label="From Location" Required="true"
+												 FieldValue="@nameof(VehicleRouteLocationModel.Name)"
+												 AddNewRoute="@PageRouteNames.VehicleRouteLocationMaster" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								To Location <span class="required">*</span>
-							</label>
-							<SfAutoComplete TItem="VehicleRouteLocationModel" TValue="VehicleRouteLocationModel"
-										@bind-Value="_selectedToLocation"
-										DataSource="@_routeLocations" Placeholder="Select to location"
-										FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-										FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-										CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="VehicleRouteLocationModel" TValue="VehicleRouteLocationModel"
+												 @bind-Value="_selectedToLocation"
+												 DataSource="@_routeLocations"
+												 Placeholder="Select To Location"
+												 Label="To Location" Required="true"
+												 FieldValue="@nameof(VehicleRouteLocationModel.Name)"
+												 AddNewRoute="@PageRouteNames.VehicleRouteLocationMaster" />
 						</div>
 
 						<div class="form-field">

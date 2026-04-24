@@ -21,7 +21,7 @@
 
 @if (_isLoading || _user is null)
 {
-    <AnimatedLoader Visible="true" />
+    <LoadingScreen />
 }
 else
 {
@@ -95,34 +95,26 @@ else
                         <div class="form-grid">
                             <!-- Company -->
                             <div class="form-field">
-                                <label class="field-label">
-                                    Company <span class="required">*</span>
-                                </label>
-                                <SfAutoComplete Value="@_selectedCompany" TValue="CompanyModel" TItem="CompanyModel"
-                                                DataSource="@_companies" Placeholder="Select a Company"
-                                                FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-                                                CssClass="custom-autocomplete">
-                                    <AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
-                                                        ValueChange="OnCompanyChanged" />
-                                    <AutoCompleteFieldSettings Value="Name" />
-                                </SfAutoComplete>
+                                <AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+                                                     @bind-Value="_selectedCompany"
+                                                     DataSource="@_companies"
+                                                     Placeholder="Select Company"
+                                                     Label="Company" Required="true"
+                                                     ValueChange="OnCompanyChanged"
+                                                     FieldValue="@nameof(CompanyModel.Name)"
+                                                     AddNewRoute="@PageRouteNames.CompanyMaster" />
                             </div>
 
                             <!-- Voucher -->
                             <div class="form-field">
-                                <label class="field-label">
-                                    Voucher <span class="required">*</span>
-                                </label>
-                                <SfAutoComplete Value="@_selectedVoucher" TValue="VoucherModel" TItem="VoucherModel"
-                                                DataSource="@_vouchers" Placeholder="Select a Voucher"
-                                                FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-                                                CssClass="custom-autocomplete">
-                                    <AutoCompleteEvents TItem="VoucherModel" TValue="VoucherModel"
-                                                        ValueChange="OnPartyChanged" />
-                                    <AutoCompleteFieldSettings Value="Name" />
-                                </SfAutoComplete>
+                                <AutoCompleteWithAdd TItem="VoucherModel" TValue="VoucherModel"
+                                                     @bind-Value="_selectedVoucher"
+                                                     DataSource="@_vouchers"
+                                                     Placeholder="Select Voucher"
+                                                     Label="Voucher" Required="true"
+                                                     ValueChange="OnVoucherChanged"
+                                                     FieldValue="@nameof(VoucherModel.Name)"
+                                                     AddNewRoute="@PageRouteNames.VoucherMaster" />
                             </div>
 
                             <!-- Transaction Date and Financial Year -->
@@ -250,19 +242,20 @@ else
                     <!-- Single Row: All Components -->
                     <div class="cart-input-row">
                         <div class="cart-field cart-field-wide">
-                            <label class="cart-label">Ledger <span class="required">*</span></label>
                             <div class="reference-wrapper">
-                                <SfAutoComplete @ref="_sfLedgerAutoComplete" Value="@_selectedLedger" TValue="LedgerModel?"
-                                                TItem="LedgerModel" DataSource="@_ledgers" Placeholder="Select Ledger (Ctrl + F)"
-                                                FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-                                                CssClass="custom-autocomplete">
-                                    <AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel?"
-                                                        ValueChange="OnItemChanged" />
-                                    <AutoCompleteFieldSettings Value="Name" />
-                                </SfAutoComplete>
-                                <IconButton Icon="IconType.Get" Variant="ButtonVariant.Get" Size="ButtonSize.Small"
-                                            Title="Get References" OnClick="GetReferences" />
+                                <AutoCompleteWithAdd @ref="_sfLedgerAutoComplete" TItem="LedgerModel" TValue="LedgerModel"
+                                                     @bind-Value="_selectedLedger"
+                                                     DataSource="@_ledgers"
+                                                     Placeholder="Select Ledger (Ctrl + F)"
+                                                     Label="Ledger" Required="true"
+                                                     ValueChange="OnItemChanged"
+                                                     FieldValue="@nameof(LedgerModel.Name)"
+                                                     AddNewRoute="@PageRouteNames.LedgerMaster" />
+
+                                <div class="reference-actions">
+                                    <IconButton Icon="IconType.Get" Variant="ButtonVariant.Get" Size="ButtonSize.Small"
+                                                Title="Get References" OnClick="GetReferences" />
+                                </div>
                             </div>
                         </div>
 

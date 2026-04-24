@@ -16,7 +16,7 @@
 
 @if (_isLoading)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
@@ -103,15 +103,14 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<label class="field-label">Company</label>
-								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedCompany"
-												TValue="CompanyModel" TItem="CompanyModel" DataSource="@_companies"
-												Placeholder="All Companies" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-									<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
-														ValueChange="OnCompanyChanged" />
-									<AutoCompleteFieldSettings Value="Name" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+												 @bind-Value="_selectedCompany"
+												 DataSource="@_companies"
+												 Placeholder="All Companies"
+												 Label="Company" Required="true"
+												 FieldValue="@nameof(CompanyModel.Name)"
+												 ValueChange="OnCompanyChanged"
+												 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 						</div>
 

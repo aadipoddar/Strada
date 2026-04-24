@@ -10,47 +10,63 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="() => _sfOMCCardAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]"
+					 OnHotkeyPressed="() => _sfOMCCardAutoComplete.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="AddExpensesToCart" />
-<MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="AddPaymentsToCart" />
-<MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction()" />
-<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
-<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" />
+<MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]"
+					 OnHotkeyPressed="AddPaymentsToCart" />
+<MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="() => SaveTransaction()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportPdfInvoice" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportExcelInvoice" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripReport, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripReport, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedExpensesCartItem" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="RemoveSelectedExpensesCartItem" />
 
 @if (_isLoading || _user is null)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
 	<div class="page-shell">
-		<Header Title="Create Sale">
+		<Header Title="Create Vehicle Trip">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
-					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
-					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" OnOpen='async () => await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0)' />
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
+										   Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected"
+								OnOpen='async () => await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0)' />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
+										  Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction" Disabled="@_isProcessing" />
-								<MenuItem Text="Save & PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="SavePdfInvoice" Disabled="@_isProcessing" />
-								<MenuItem Text="Save & Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="SaveExcelInvoice" Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Save & PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="SavePdfInvoice"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Save & Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="SaveExcelInvoice"
+										  Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Export PDF (Alt + P)" IconCss="e-icons e-export-pdf" Id="ExportPdfInvoice" Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
-								<MenuItem Text="Export Excel (Alt + E)" IconCss="e-icons e-export-excel" Id="ExportExcelInvoice" Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
+								<MenuItem Text="Export PDF (Alt + P)" IconCss="e-icons e-export-pdf" Id="ExportPdfInvoice"
+										  Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
+								<MenuItem Text="Export Excel (Alt + E)" IconCss="e-icons e-export-excel" Id="ExportExcelInvoice"
+										  Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
 							<MenuItems>
-								<MenuItem Text="Transaction History Report (Ctrl + H)" Id="TransactionHistory" Disabled="@_isProcessing" />
+								<MenuItem Text="Transaction History Report (Ctrl + H)" Id="TransactionHistory"
+										  Disabled="@_isProcessing" />
 								<MenuItem Text="Expenses Report" Id="ExpensesReport" Disabled="@_isProcessing" />
 								<MenuItem Text="Payments Report" Id="PaymentsReport" Disabled="@_isProcessing" />
 							</MenuItems>
@@ -65,7 +81,7 @@ else
 
 		<!-- Main Content Container -->
 		<div class="page-container">
-            
+
 			<!-- Top Section: Transaction Summary and Financial Summary Side by Side -->
 			<div class="two-column-layout">
 				<!-- Transaction Summary Section -->
@@ -89,18 +105,14 @@ else
 						<div class="form-grid">
 							<!-- Company -->
 							<div class="form-field">
-								<label class="field-label">
-									Company <span class="required">*</span>
-								</label>
-								<SfAutoComplete Value="@_selectedCompany" TValue="CompanyModel" TItem="CompanyModel"
-												DataSource="@_companies" Placeholder="Select a Company"
-												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
-														ValueChange="OnCompanyChanged" />
-									<AutoCompleteFieldSettings Value="@nameof(CompanyModel.Name)" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+												 @bind-Value="_selectedCompany"
+												 DataSource="@_companies"
+												 Placeholder="Select a Company"
+												 Label="Company" Required="true"
+												 ValueChange="OnCompanyChanged"
+												 FieldValue="@nameof(CompanyModel.Name)"
+												 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Transaction Date -->
@@ -109,13 +121,14 @@ else
 									Transaction Date <span class="required">*</span> / Financial Year
 								</label>
 								<div class="date-year-wrapper">
-									<SfDatePicker @bind-Value="_vehicleTrip.TransactionDateTime" TValue="DateTime" Format="dd/MM/yy"
-												  Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
+									<SfDatePicker @bind-Value="_vehicleTrip.TransactionDateTime" TValue="DateTime"
+												  Format="dd/MM/yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
 												  CssClass="custom-datepicker">
 									</SfDatePicker>
-									<SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-											   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
-											   CssClass="custom-textbox readonly-field" />
+									<SfTextBox
+									Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+									Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+									CssClass="custom-textbox readonly-field" />
 								</div>
 							</div>
 
@@ -140,32 +153,26 @@ else
 
 							<!-- OMC -->
 							<div class="form-field">
-								<label class="field-label">
-									OMC <span class="required">*</span>
-								</label>
-								<SfAutoComplete Value="@_selectedOMC" TValue="OMCModel" TItem="OMCModel"
-												DataSource="@_omcs" Placeholder="Select an OMC"
-												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="OMCModel" TValue="OMCModel" ValueChange="OnOMCChanged" />
-									<AutoCompleteFieldSettings Value="@nameof(OMCModel.Name)" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+												 @bind-Value="_selectedOMC"
+												 DataSource="@_omcs"
+												 Placeholder="Select an OMC"
+												 Label="OMC" Required="true"
+												 ValueChange="OnOMCChanged"
+												 FieldValue="@nameof(OMCModel.Name)"
+												 AddNewRoute="@PageRouteNames.OMCMaster" />
 							</div>
 
 							<!-- Vehicle -->
 							<div class="form-field">
-								<label class="field-label">
-									Vehicle <span class="required">*</span>
-								</label>
-								<SfAutoComplete @bind-Value="_selectedVehicle" TValue="VehicleModel" TItem="VehicleModel"
-												DataSource="@_vehicles" Placeholder="Select a Vehicle"
-												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel" ValueChange="OnVehicleChanged" />
-									<AutoCompleteFieldSettings Value="@nameof(VehicleModel.Code)" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
+												 @bind-Value="_selectedVehicle"
+												 DataSource="@_vehicles"
+												 Placeholder="Select a Vehicle"
+												 Label="Vehicle" Required="true"
+												 ValueChange="OnVehicleChanged"
+												 FieldValue="@nameof(VehicleModel.Code)"
+												 AddNewRoute="@PageRouteNames.VehicleMaster" />
 							</div>
 
 							<!-- Quantity -->
@@ -179,17 +186,14 @@ else
 
 							<!-- Route -->
 							<div class="form-field">
-								<label class="field-label">
-									Route <span class="required">*</span>
-								</label>
-								<SfAutoComplete @bind-Value="_selectedRoute" TValue="VehicleRouteOverviewModel" TItem="VehicleRouteOverviewModel"
-												DataSource="@_vehicleRoutes" Placeholder="Select a Route"
-												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="VehicleRouteOverviewModel" TValue="VehicleRouteOverviewModel" ValueChange="OnVehicleRouteChanged" />
-									<AutoCompleteFieldSettings Value="@nameof(VehicleRouteOverviewModel.RouteDisplay)" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="VehicleRouteOverviewModel" TValue="VehicleRouteOverviewModel"
+												 @bind-Value="_selectedRoute"
+												 DataSource="@_vehicleRoutes"
+												 Placeholder="Select a Route"
+												 Label="Route" Required="true"
+												 ValueChange="OnVehicleRouteChanged"
+												 FieldValue="@nameof(VehicleRouteOverviewModel.RouteDisplay)"
+												 AddNewRoute="@PageRouteNames.VehicleRouteMaster" />
 							</div>
 
 							<!-- Route Estimated Hours -->
@@ -198,28 +202,25 @@ else
 									Estimated Distance / Cost
 								</label>
 								<div class="date-year-wrapper">
-									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedDistance" Placeholder="Enter estimated distance..."
-													  FloatLabelType="FloatLabelType.Never" Readonly="true"
-													  CssClass="custom-numeric readonly-field" />
-									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedCost" Placeholder="Enter estimated cost..."
-													  FloatLabelType="FloatLabelType.Never" Readonly="true"
-													  CssClass="custom-numeric readonly-field" />
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedDistance"
+													  Placeholder="Enter estimated distance..." FloatLabelType="FloatLabelType.Never"
+													  Readonly="true" CssClass="custom-numeric readonly-field" />
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedCost"
+													  Placeholder="Enter estimated cost..." FloatLabelType="FloatLabelType.Never"
+													  Readonly="true" CssClass="custom-numeric readonly-field" />
 								</div>
 							</div>
 
 							<!-- Driver -->
 							<div class="form-field">
-								<label class="field-label">
-									Driver <span class="required">*</span>
-								</label>
-								<SfAutoComplete @bind-Value="_selectedDriver" TValue="VehicleDriverOverviewModel" TItem="VehicleDriverOverviewModel"
-												DataSource="@_vehicleDrivers" Placeholder="Select a Driver"
-												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel" ValueChange="OnVehicleDriverChanged" />
-									<AutoCompleteFieldSettings Value="@nameof(VehicleDriverOverviewModel.DisplayName)" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel"
+												 @bind-Value="_selectedDriver"
+												 DataSource="@_vehicleDrivers"
+												 Placeholder="Select a Driver"
+												 Label="Driver" Required="true"
+												 ValueChange="OnVehicleDriverChanged"
+												 FieldValue="@nameof(VehicleDriverOverviewModel.DisplayName)"
+												 AddNewRoute="@PageRouteNames.VehicleDriverMaster" />
 							</div>
 
 							<!-- Remarks -->
@@ -227,8 +228,9 @@ else
 								<label class="field-label">
 									Remarks / Narration
 								</label>
-								<SfTextBox @bind-Value="_vehicleTrip.Remarks" Multiline="true" Placeholder="Enter remarks..."
-										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+								<SfTextBox @bind-Value="_vehicleTrip.Remarks" Multiline="true"
+										   Placeholder="Enter remarks..." FloatLabelType="FloatLabelType.Never"
+										   CssClass="custom-textbox" />
 							</div>
 						</div>
 					</div>
@@ -264,22 +266,19 @@ else
 							<div class="cart-input-row">
 								<!-- OMC Card -->
 								<div class="cart-field cart-field-wide">
-									<label class="cart-label">OMC Card <span class="required">*</span></label>
-									<SfAutoComplete @ref="_sfOMCCardAutoComplete" Value="@_selectedOMCCard"
-													TValue="OMCCardModel" TItem="OMCCardModel"
-													DataSource="@_omcCards" Placeholder="Select OMC Card (Ctrl + Shift + F)"
-													FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-													FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-										<AutoCompleteEvents TItem="OMCCardModel" TValue="OMCCardModel" ValueChange="OnPaymentsTypeChanged" />
-										<AutoCompleteFieldSettings Value="@nameof(OMCCardModel.CardNumber)" />
-									</SfAutoComplete>
+									<AutoCompleteWithAdd TItem="OMCCardModel" TValue="OMCCardModel"
+														 @ref="_sfOMCCardAutoComplete"
+														 FieldValue="@nameof(OMCCardModel.CardNumber)" @bind-Value="_selectedOMCCard"
+														 DataSource="@_omcCards" Placeholder="Select OMC Card (Ctrl + Shift + F)"
+														 ValueChange="OnPaymentsTypeChanged"
+														 Label="OMC Card" Required="true" AddNewRoute="@PageRouteNames.OMCCardMaster" />
 								</div>
 
 								<!-- Amount -->
 								<div class="cart-field cart-field-wide">
 									<label class="cart-label">Amount <span class="required">*</span></label>
-									<SfNumericTextBox @bind-Value=@_selectedPaymentCart.Amount TValue="decimal" Min="0" ShowSpinButton="false"
-													  Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+									<SfNumericTextBox @bind-Value=@_selectedPaymentCart.Amount TValue="decimal" Min="0"
+													  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 													  CssClass="custom-numeric editable-field" />
 								</div>
 
@@ -293,22 +292,26 @@ else
 								<!-- Add Button -->
 								<div class="cart-field cart-field-wide">
 									<label class="cart-label">&nbsp;</label>
-									<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart"
-												OnClick="AddPaymentsToCart" />
+									<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add"
+												Title="Add to Cart" OnClick="AddPaymentsToCart" />
 								</div>
 							</div>
 
-							<SfGrid ID="_sfCartGrid" @ref="_sfPaymentsCartGrid" DataSource="_paymentsCart" AllowTextWrap="true" AllowPaging="false"
-									AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Horizontal"
-									CssClass="professional-grid" ContextMenuItems="@_paymentsCartGridContextMenuItems">
- 
-								<GridEvents TValue="VehicleTripOMCCardPaymentsCartModel" ContextMenuItemClicked="OnPaymentsCartGridContextMenuItemClicked" />
+							<SfGrid ID="_sfCartGrid" @ref="_sfPaymentsCartGrid" DataSource="_paymentsCart"
+									AllowTextWrap="true" AllowPaging="false" AllowSorting="true" AllowResizing="true"
+									AllowFiltering="true" GridLines="GridLine.Horizontal" CssClass="professional-grid"
+									ContextMenuItems="@_paymentsCartGridContextMenuItems">
+
+								<GridEvents TValue="VehicleTripOMCCardPaymentsCartModel"
+											ContextMenuItemClicked="OnPaymentsCartGridContextMenuItemClicked" />
 								<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 
 								<GridAggregates>
 									<GridAggregate>
 										<GridAggregateColumns>
-											<GridAggregateColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.OMCCardNumber)" Type="AggregateType.Count">
+											<GridAggregateColumn
+												Field="@nameof(VehicleTripOMCCardPaymentsCartModel.OMCCardNumber)"
+												Type="AggregateType.Count">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -318,7 +321,8 @@ else
 													</div>
 												</FooterTemplate>
 											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.Amount)" Type="AggregateType.Sum">
+											<GridAggregateColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.Amount)"
+																 Type="AggregateType.Sum">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -334,8 +338,10 @@ else
 								</GridAggregates>
 
 								<GridColumns>
-									<GridColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.OMCCardNumber)" HeaderText="Name" Width="200" />
-									<GridColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
+									<GridColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.OMCCardNumber)"
+												HeaderText="Name" Width="200" />
+									<GridColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.Amount)"
+												HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
 										<Template>
 											@{
 												var item = (context as dynamic);
@@ -343,7 +349,8 @@ else
 											}
 										</Template>
 									</GridColumn>
-									<GridColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+									<GridColumn Field="@nameof(VehicleTripOMCCardPaymentsCartModel.Remarks)"
+												HeaderText="Remarks" Width="150" />
 								</GridColumns>
 
 							</SfGrid>
@@ -351,7 +358,7 @@ else
 						</div>
 					</div>
 				</div>
-			
+
 			</div>
 
 			<!-- Add to Cart Section -->
@@ -373,22 +380,19 @@ else
 					<div class="cart-input-row">
 						<!-- Expense Type -->
 						<div class="cart-field cart-field-wide">
-							<label class="cart-label">Item <span class="required">*</span></label>
-							<SfAutoComplete @ref="_sfExpenseTypeAutoComplete" Value="@_selectedExpenseType"
-											TValue="VehicleRouteExpenseTypeModel" TItem="VehicleRouteExpenseTypeModel"
-											DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-								<AutoCompleteEvents TItem="VehicleRouteExpenseTypeModel" TValue="VehicleRouteExpenseTypeModel" ValueChange="OnExpensesTypeChanged" />
-								<AutoCompleteFieldSettings Value="@nameof(VehicleRouteExpenseTypeModel.Name)" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="VehicleRouteExpenseTypeModel" TValue="VehicleRouteExpenseTypeModel"
+														 @ref="_sfExpenseTypeAutoComplete"
+														 FieldValue="@nameof(VehicleRouteExpenseTypeModel.Name)" @bind-Value="_selectedExpenseType"
+														 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
+														 ValueChange="OnExpensesTypeChanged"
+														 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.VehicleRouteExpenseTypeMaster" />
 						</div>
 
 						<!-- Amount -->
 						<div class="cart-field">
 							<label class="cart-label">Amount <span class="required">*</span></label>
-							<SfNumericTextBox @bind-Value=@_selectedExpensesCart.Amount TValue="decimal" Min="0" ShowSpinButton="false"
-											  Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+							<SfNumericTextBox @bind-Value=@_selectedExpensesCart.Amount TValue="decimal" Min="0"
+											  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 											  CssClass="custom-numeric editable-field" />
 						</div>
 
@@ -409,7 +413,7 @@ else
 				</div>
 
 			</div>
-		
+
 			<!-- Expenses Cart Grid Section -->
 			<div class="section-card">
 				<div class="section-header">
@@ -425,18 +429,21 @@ else
 				</div>
 
 				<div class="section-body grid-body">
-					<SfGrid ID="_sfCartGrid" @ref="_sfExpensesCartGrid" DataSource="_expensesCart" AllowTextWrap="true" AllowPaging="false"
-							AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Horizontal"
-							CssClass="professional-grid" ContextMenuItems="@_expensesCartGridContextMenuItems"
-							Toolbar="@(new List<string>() { "Search" })">
+					<SfGrid ID="_sfCartGrid" @ref="_sfExpensesCartGrid" DataSource="_expensesCart" AllowTextWrap="true"
+							AllowPaging="false" AllowSorting="true" AllowResizing="true" AllowFiltering="true"
+							GridLines="GridLine.Horizontal" CssClass="professional-grid"
+							ContextMenuItems="@_expensesCartGridContextMenuItems" Toolbar="@(new List<string>() { "Search" })">
 
-						<GridEvents TValue="VehicleTripExpensesCartModel" ContextMenuItemClicked="OnExpensesCartGridContextMenuItemClicked" />
+						<GridEvents TValue="VehicleTripExpensesCartModel"
+									ContextMenuItemClicked="OnExpensesCartGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 
 						<GridAggregates>
 							<GridAggregate>
 								<GridAggregateColumns>
-									<GridAggregateColumn Field="@nameof(VehicleTripExpensesCartModel.VehicleRouteExpenseTypeName)" Type="AggregateType.Count">
+									<GridAggregateColumn
+										Field="@nameof(VehicleTripExpensesCartModel.VehicleRouteExpenseTypeName)"
+										Type="AggregateType.Count">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
@@ -446,7 +453,8 @@ else
 											</div>
 										</FooterTemplate>
 									</GridAggregateColumn>
-									<GridAggregateColumn Field="@nameof(VehicleTripExpensesCartModel.Amount)" Type="AggregateType.Sum">
+									<GridAggregateColumn Field="@nameof(VehicleTripExpensesCartModel.Amount)"
+														 Type="AggregateType.Sum">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
@@ -462,8 +470,10 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.VehicleRouteExpenseTypeName)" HeaderText="Name" Width="200" />
-							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
+							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.VehicleRouteExpenseTypeName)"
+										HeaderText="Name" Width="200" />
+							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.Amount)" HeaderText="Amount" Width="130"
+										TextAlign="TextAlign.Right" Format="N2">
 								<Template>
 									@{
 										var item = (context as dynamic);
@@ -471,13 +481,14 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.Remarks)" HeaderText="Remarks"
+										Width="150" />
 						</GridColumns>
 
 					</SfGrid>
 				</div>
 			</div>
-		
+
 		</div>
 
 		<Footer />

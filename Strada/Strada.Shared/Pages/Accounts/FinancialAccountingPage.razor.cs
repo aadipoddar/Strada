@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 using StradaLibrary.Data.Accounts.FinancialAccounting;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Operations;
@@ -40,7 +41,7 @@ public partial class FinancialAccountingPage
 		new() { Text = "Delete (Del)", Id = "DeleteCart", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private SfAutoComplete<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
+	private AutoCompleteWithAdd<LedgerModel, LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<FinancialAccountingItemCartModel> _sfCartGrid;
 
 	private ToastNotification _toastNotification;
@@ -290,7 +291,7 @@ public partial class FinancialAccountingPage
 		await SaveTransactionFile();
 	}
 
-	private async Task OnPartyChanged(ChangeEventArgs<VoucherModel, VoucherModel> args)
+	private async Task OnVoucherChanged(ChangeEventArgs<VoucherModel, VoucherModel> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;

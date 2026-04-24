@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.VehicleRoute;
 using StradaLibrary.Data.Fleet.VehicleTrip;
@@ -47,8 +48,8 @@ public partial class VehicleTripPage
 	private List<VehicleTripExpensesCartModel> _expensesCart = [];
 	private List<VehicleTripOMCCardPaymentsCartModel> _paymentsCart = [];
 
-	private SfAutoComplete<VehicleRouteExpenseTypeModel?, VehicleRouteExpenseTypeModel> _sfExpenseTypeAutoComplete;
-	private SfAutoComplete<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
+	private AutoCompleteWithAdd<VehicleRouteExpenseTypeModel?, VehicleRouteExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private AutoCompleteWithAdd<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
 	private SfGrid<VehicleTripExpensesCartModel> _sfExpensesCartGrid;
 	private SfGrid<VehicleTripOMCCardPaymentsCartModel> _sfPaymentsCartGrid;
 	private ToastNotification _toastNotification;

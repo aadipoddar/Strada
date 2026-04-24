@@ -5,20 +5,24 @@
 
 <PageTitle>Financial Ledger Report - Strada</PageTitle>
 
-<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" />
-<MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" />
+<MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="LoadTransactionOverviews" />
 <MudBlazor.MudHotkey Key=JsKey.KeyQ KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDetailsView" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
 <MudBlazor.MudHotkey Key=JsKey.KeyO KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ViewSelectedTransaction" />
-<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportSelectedTransactionPdf" />
-<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportSelectedTransactionExcel" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft]
+					 OnHotkeyPressed="ExportSelectedTransactionPdf" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft]
+					 OnHotkeyPressed="ExportSelectedTransactionExcel" />
 
 @if (_isLoading || _user is null)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
@@ -115,27 +119,26 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<label class="field-label">Company</label>
-								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedCompany"
-												TValue="CompanyModel" TItem="CompanyModel" DataSource="@_companies"
-												Placeholder="All Companies" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-									<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
-														ValueChange="OnCompanyChanged" />
-									<AutoCompleteFieldSettings Value="Name" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+												 @bind-Value="_selectedCompany"
+												 DataSource="@_companies"
+												 Placeholder="All Companies"
+												 Label="Company" Required="true"
+												 FieldValue="@nameof(CompanyModel.Name)"
+												 ValueChange="OnCompanyChanged"
+												 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Ledger -->
 							<div class="form-field">
-								<label class="field-label">Ledger</label>
-								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedLedger" TValue="LedgerModel"
-												TItem="LedgerModel" DataSource="@_ledgers" Placeholder="All Ledgers"
-												AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-									<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel"
-														ValueChange="OnLedgerChanged" />
-									<AutoCompleteFieldSettings Value="Name" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
+												 @bind-Value="_selectedLedger"
+												 DataSource="@_ledgers"
+												 Placeholder="All Ledgers"
+												 Label="Ledger" Required="true"
+												 FieldValue="@nameof(LedgerModel.Name)"
+												 ValueChange="OnLedgerChanged"
+												 AddNewRoute="@PageRouteNames.LedgerMaster" />
 							</div>
 						</div>
 

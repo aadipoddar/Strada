@@ -16,7 +16,7 @@
 
 @if (_isLoading || _user is null)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
@@ -39,8 +39,7 @@ else
 								<MenuItem Separator="true" />
 								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
 										  Disabled="@_isProcessing" />
-								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
@@ -102,33 +101,22 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Vehicle Type <span class="required">*</span>
-							</label>
-							<SfAutoComplete TItem="VehicleTypeModel" TValue="VehicleTypeModel"
-											@bind-Value="_selectedVehicleType"
-											DataSource="@_vehicleTypes" Placeholder="Select vehicle type"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											AllowCustom="false"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-											CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="VehicleTypeModel" TValue="VehicleTypeModel"
+												 @bind-Value="_selectedVehicleType"
+												 DataSource="@_vehicleTypes"
+												 Placeholder="Select vehicle type"
+												 Label="Vehicle Type" Required="true"
+												 AddNewRoute="@PageRouteNames.VehicleTypeMaster" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Company <span class="required">*</span>
-							</label>
-							<SfAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-											@bind-Value="_selectedCompany"
-											DataSource="@_companies" Placeholder="Select company"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											AllowCustom="false"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-											CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+												 @bind-Value="_selectedCompany"
+												 DataSource="@_companies"
+												 Placeholder="Select company"
+												 FieldValue="@nameof(CompanyModel.Name)"
+												 Label="Company" Required="true"
+												 AddNewRoute="@PageRouteNames.CompanyMaster" />
 						</div>
 
 						<div class="form-field">
@@ -229,7 +217,7 @@ else
 						  OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle"
-					   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
-					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+						   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
+						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

@@ -15,7 +15,7 @@
 
 @if (_isLoading || _user is null)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
@@ -89,18 +89,13 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								OMC Name <span class="required">*</span>
-							</label>
-							<SfAutoComplete TItem="OMCModel" TValue="OMCModel"
-											@bind-Value="_selectedOMC"
-											DataSource="@_omcs" Placeholder="Select OMC"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											AllowCustom="false"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-											CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-							</SfAutoComplete>
+							<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+												 @bind-Value="_selectedOMC"
+												 DataSource="@_omcs"
+												 Placeholder="Select OMC"
+												 Label="OMC" Required="true"
+												 FieldValue="@nameof(OMCModel.Name)"
+												 AddNewRoute="@PageRouteNames.OMCMaster" />
 						</div>
 
 						<div class="form-field">

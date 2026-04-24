@@ -5,7 +5,8 @@
 
 <PageTitle>Trial Balance - Strada</PageTitle>
 
-<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft]
+					 OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTrialBalance" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTrialBalance" />
@@ -15,7 +16,7 @@
 
 @if (_isLoading)
 {
-	<AnimatedLoader Visible="true" />
+	<LoadingScreen />
 }
 else
 {
@@ -102,40 +103,38 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<label class="field-label">Company</label>
-								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedCompany"
-												TValue="CompanyModel" TItem="CompanyModel" DataSource="@_companies"
-												Placeholder="All Companies" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-									<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
-														ValueChange="OnCompanyChanged" />
-									<AutoCompleteFieldSettings Value="Name" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+												 @bind-Value="_selectedCompany"
+												 DataSource="@_companies"
+												 Placeholder="All Companies"
+												 Label="Company" Required="true"
+												 ValueChange="OnCompanyChanged"
+												 FieldValue="@nameof(CompanyModel.Name)"
+												 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Group -->
 							<div class="form-field">
-								<label class="field-label">Group</label>
-								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedGroup" TValue="GroupModel"
-												TItem="GroupModel" DataSource="@_groups" Placeholder="All Groups" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-									<AutoCompleteEvents TItem="GroupModel" TValue="GroupModel"
-														ValueChange="OnGroupChanged" />
-									<AutoCompleteFieldSettings Value="Name" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="GroupModel" TValue="GroupModel"
+												 @bind-Value="_selectedGroup"
+												 DataSource="@_groups"
+												 Placeholder="All Groups"
+												 Label="Group" Required="true"
+												 ValueChange="OnGroupChanged"
+												 FieldValue="@nameof(GroupModel.Name)"
+												 AddNewRoute="@PageRouteNames.GroupMaster" />
 							</div>
 
 							<!-- Account Type -->
 							<div class="form-field">
-								<label class="field-label">Account Type</label>
-								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedAccountType"
-												TValue="AccountTypeModel" TItem="AccountTypeModel" DataSource="@_accountTypes"
-												Placeholder="All Account Types" AllowFiltering="true"
-												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-									<AutoCompleteEvents TItem="AccountTypeModel" TValue="AccountTypeModel"
-														ValueChange="OnAccountTypeChanged" />
-									<AutoCompleteFieldSettings Value="Name" />
-								</SfAutoComplete>
+								<AutoCompleteWithAdd TItem="AccountTypeModel" TValue="AccountTypeModel"
+												 @bind-Value="_selectedAccountType"
+												 DataSource="@_accountTypes"
+												 Placeholder="All Account Types"
+												 Label="Account Type" Required="true"
+												 ValueChange="OnAccountTypeChanged"
+												 FieldValue="@nameof(AccountTypeModel.Name)"
+												 AddNewRoute="@PageRouteNames.AccountTypeMaster" />
 							</div>
 						</div>
 
