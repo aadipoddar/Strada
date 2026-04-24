@@ -44,9 +44,7 @@ SELECT
 	[t].[LastModifiedBy],
 	[lm].[Name] AS LastModifiedByUserName,
 	[t].[LastModifiedAt],
-	[t].[LastModifiedFromPlatform],
-
-	[t].[Status]
+	[t].[LastModifiedFromPlatform]
 
 FROM
     [dbo].[VehicleTripOMCCardPayments] tp

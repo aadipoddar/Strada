@@ -12,7 +12,8 @@ public static class FinancialAccountingReportExport
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
         bool showAllColumns = true,
-        CompanyModel company = null,
+        bool showDeleted = false,
+		CompanyModel company = null,
         VoucherModel voucher = null)
     {
         var columnSettings = new Dictionary<string, ReportColumnSetting>
@@ -62,15 +63,12 @@ public static class FinancialAccountingReportExport
                 nameof(FinancialAccountingOverviewModel.LastModifiedByUserName),
                 nameof(FinancialAccountingOverviewModel.LastModifiedAt),
                 nameof(FinancialAccountingOverviewModel.LastModifiedFromPlatform),
-                nameof(FinancialAccountingOverviewModel.Status),
+                nameof(FinancialAccountingOverviewModel.Status)
             ];
 
-            if (company is not null)
-                columnOrder.Remove(nameof(FinancialAccountingOverviewModel.CompanyName));
-
-            if (voucher is not null)
-                columnOrder.Remove(nameof(FinancialAccountingOverviewModel.VoucherName));
-        }
+            if (!showDeleted)
+                columnOrder.Remove(nameof(FinancialAccountingOverviewModel.Status));
+		}
         else
         {
             columnOrder =
@@ -82,7 +80,7 @@ public static class FinancialAccountingReportExport
                 nameof(FinancialAccountingOverviewModel.TotalCreditAmount),
                 nameof(FinancialAccountingOverviewModel.TotalAmount)
             ];
-        }
+		}
 
         string fileName = $"ACCOUNTING_REPORT";
         if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
@@ -173,12 +171,6 @@ public static class FinancialAccountingReportExport
                 nameof(FinancialAccountingLedgerOverviewModel.AccountingRemarks),
                 nameof(FinancialAccountingLedgerOverviewModel.Remarks)
             ];
-
-            if (ledger is not null)
-                columnOrder.Remove(nameof(FinancialAccountingLedgerOverviewModel.LedgerName));
-
-            if (company is not null)
-                columnOrder.Remove(nameof(FinancialAccountingLedgerOverviewModel.CompanyName));
         }
         else
         {

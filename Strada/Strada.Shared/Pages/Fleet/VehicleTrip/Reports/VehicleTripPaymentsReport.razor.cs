@@ -14,7 +14,7 @@ using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Fleet.VehicleTrip.Reports;
 
-public partial class VehicleTripReport : IAsyncDisposable
+public partial class VehicleTripPaymentsReport : IAsyncDisposable
 {
 	private PeriodicTimer _autoRefreshTimer;
 	private CancellationTokenSource _autoRefreshCts;
@@ -24,7 +24,6 @@ public partial class VehicleTripReport : IAsyncDisposable
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
-	private bool _showDeleted = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
@@ -38,24 +37,15 @@ public partial class VehicleTripReport : IAsyncDisposable
 	private List<OMCModel> _omcs = [];
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
-	private List<VehicleTripOverviewModel> _transactionOverviews = [];
+	private List<VehicleTripOMCCardPaymentsOverviewModel> _transactionOverviews = [];
 
-	private string _deleteTransactionNo = string.Empty;
-	private int _deleteTransactionId = 0;
-	private string _recoverTransactionNo = string.Empty;
-	private int _recoverTransactionId = 0;
-
-	private DeleteConfirmationDialog _deleteConfirmationDialog;
-	private RecoverConfirmationDialog _recoverConfirmationDialog;
-
-	private SfGrid<VehicleTripOverviewModel> _sfGrid;
+	private SfGrid<VehicleTripOMCCardPaymentsOverviewModel> _sfGrid;
 	private ToastNotification _toastNotification;
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
 		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
-		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" }
 	];
 
 	#region Load Data
@@ -105,13 +95,10 @@ public partial class VehicleTripReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
 
-			_transactionOverviews = await CommonData.LoadTableDataByDate<VehicleTripOverviewModel>(
-				FleetNames.VehicleTripOverview,
+			_transactionOverviews = await CommonData.LoadTableDataByDate<VehicleTripOMCCardPaymentsOverviewModel>(
+				FleetNames.VehicleTripOMCCardPaymentsOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MinValue));
-
-			if (!_showDeleted)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.Status)];
 
 			if (_selectedCompany?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
@@ -201,13 +188,12 @@ public partial class VehicleTripReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleTripReportExport.ExportReport(
+			var (stream, fileName) = await VehicleTripReportExport.ExportPaymentsReport(
 				_transactionOverviews,
 				ReportExportType.Excel,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
-				_showDeleted,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
@@ -239,13 +225,12 @@ public partial class VehicleTripReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleTripReportExport.ExportReport(
+			var (stream, fileName) = await VehicleTripReportExport.ExportPaymentsReport(
 				_transactionOverviews,
 				ReportExportType.PDF,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
-				_showDeleted,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
@@ -324,132 +309,11 @@ public partial class VehicleTripReport : IAsyncDisposable
 	#region Actions
 	private async Task ViewSelectedTransaction()
 	{
-		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0 || !_sfGrid.SelectedRecords.First().Status)
+		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
 
 		var decodedTransactionNo = await GenerateCodes.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
-	}
-
-	private async Task ConfirmDelete()
-	{
-		if (_isProcessing || _deleteTransactionId == 0)
-			return;
-
-		try
-		{
-			if (!_user.Admin)
-				throw new UnauthorizedAccessException("You do not have permission to delete this transaction.");
-
-			await _deleteConfirmationDialog.HideAsync();
-			_isProcessing = true;
-			StateHasChanged();
-
-			await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
-
-			var trip = await CommonData.LoadTableDataById<VehicleTripModel>(FleetNames.VehicleTrip, _deleteTransactionId)
-				?? throw new Exception("Transaction not found.");
-			trip.Status = false;
-			trip.LastModifiedBy = _user.Id;
-			trip.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-			trip.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			await VehicleTripData.DeleteTransaction(trip);
-
-			await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error", $"An error occurred while deleting transaction: {ex.Message}", ToastType.Error);
-		}
-		finally
-		{
-			_deleteTransactionId = 0;
-			_deleteTransactionNo = string.Empty;
-			_isProcessing = false;
-			StateHasChanged();
-			await LoadTransactionOverviews();
-		}
-	}
-
-	private async Task ConfirmRecover()
-	{
-		if (_isProcessing || _recoverTransactionId == 0)
-			return;
-
-		try
-		{
-			if (!_user.Admin)
-				throw new UnauthorizedAccessException("You do not have permission to recover this transaction.");
-
-			await _recoverConfirmationDialog.HideAsync();
-			_isProcessing = true;
-			StateHasChanged();
-
-			await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
-
-			var trip = await CommonData.LoadTableDataById<VehicleTripModel>(FleetNames.VehicleTrip, _recoverTransactionId)
-				?? throw new Exception("Transaction not found.");
-			trip.Status = true;
-			trip.LastModifiedBy = _user.Id;
-			trip.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-			trip.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			await VehicleTripData.RecoverTransaction(trip);
-
-			await _toastNotification.ShowAsync("Success", $"Transaction {_recoverTransactionNo} has been recovered successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error", $"An error occurred while recovering transaction: {ex.Message}", ToastType.Error);
-		}
-		finally
-		{
-			_recoverTransactionId = 0;
-			_recoverTransactionNo = string.Empty;
-			_isProcessing = false;
-			StateHasChanged();
-			await LoadTransactionOverviews();
-		}
-	}
-
-	private async Task DeleteRecoverSelectedTransaction()
-	{
-		if (_sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
-			return;
-
-		if (_sfGrid.SelectedRecords.First().Status)
-			await ShowDeleteConfirmation();
-		else
-			await ShowRecoverConfirmation();
-	}
-
-	private async Task ShowDeleteConfirmation()
-	{
-		_deleteTransactionId = _sfGrid.SelectedRecords.First().Id;
-		_deleteTransactionNo = _sfGrid.SelectedRecords.First().TransactionNo;
-		StateHasChanged();
-		await _deleteConfirmationDialog.ShowAsync();
-	}
-
-	private async Task CancelDelete()
-	{
-		_deleteTransactionId = 0;
-		_deleteTransactionNo = string.Empty;
-		await _deleteConfirmationDialog.HideAsync();
-	}
-
-	private async Task ShowRecoverConfirmation()
-	{
-		_recoverTransactionId = _sfGrid.SelectedRecords.First().Id;
-		_recoverTransactionNo = _sfGrid.SelectedRecords.First().TransactionNo;
-		StateHasChanged();
-		await _recoverConfirmationDialog.ShowAsync();
-	}
-
-	private async Task CancelRecover()
-	{
-		_recoverTransactionId = 0;
-		_recoverTransactionNo = string.Empty;
-		await _recoverConfirmationDialog.HideAsync();
 	}
 	#endregion
 
@@ -463,9 +327,6 @@ public partial class VehicleTripReport : IAsyncDisposable
 				break;
 			case "Refresh":
 				await LoadTransactionOverviews();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
 				break;
 			case "ToggleDetailsView":
 				await ToggleDetailsView();
@@ -485,14 +346,11 @@ public partial class VehicleTripReport : IAsyncDisposable
 			case "DownloadSelectedExcel":
 				await ExportSelectedTransactionExcel();
 				break;
-			case "DeleteRecoverSelected":
-				await DeleteRecoverSelectedTransaction();
+			case "TransactionHistory":
+				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "ExpensesReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripExpensesReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "PaymentsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "PeriodToday":
 				await HandleDatesChanged(DateRangeType.Today);
@@ -527,7 +385,7 @@ public partial class VehicleTripReport : IAsyncDisposable
 		}
 	}
 
-	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleTripOverviewModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleTripOMCCardPaymentsOverviewModel> args)
 	{
 		switch (args.Item.Id)
 		{
@@ -542,10 +400,6 @@ public partial class VehicleTripReport : IAsyncDisposable
 			case "ExportExcel":
 				await ExportSelectedTransactionExcel();
 				break;
-
-			case "DeleteRecover":
-				await DeleteRecoverSelectedTransaction();
-				break;
 		}
 	}
 
@@ -557,14 +411,6 @@ public partial class VehicleTripReport : IAsyncDisposable
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
 	}
-
-	private async Task ToggleDeleted()
-	{
-		_showDeleted = !_showDeleted;
-		await LoadTransactionOverviews();
-		StateHasChanged();
-	}
-
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
 

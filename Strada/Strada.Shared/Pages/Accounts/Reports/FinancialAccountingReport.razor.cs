@@ -27,8 +27,8 @@ public partial class FinancialAccountingReport : IAsyncDisposable
     private DateTime _fromDate = DateTime.Now.Date;
     private DateTime _toDate = DateTime.Now.Date;
 
-    private CompanyModel _selectedCompany = new();
-    private VoucherModel _selectedVoucher = new();
+    private CompanyModel? _selectedCompany = null;
+    private VoucherModel? _selectedVoucher = null;
 
     private List<CompanyModel> _companies = [];
     private List<VoucherModel> _vouchers = [];
@@ -60,48 +60,29 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             return;
 
         _user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
-        await LoadData();
-    }
+		await InitializePage();
+	}
 
-    private async Task LoadData()
+    private async Task InitializePage()
     {
-        await LoadDates();
-        await LoadCompanies();
-        await LoadVouchers();
+        await LoadData();
         await LoadTransactionOverviews();
         await StartAutoRefresh();
+        
         _isLoading = false;
         StateHasChanged();
     }
 
-    private async Task LoadDates()
+    private async Task LoadData()
     {
         _fromDate = await CommonData.LoadCurrentDateTime();
         _toDate = _fromDate;
-    }
-
-    private async Task LoadCompanies()
-    {
+        
         _companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
-        _companies.Add(new()
-        {
-            Id = 0,
-            Name = "All Companies"
-        });
-        _companies = [.. _companies.OrderBy(s => s.Name)];
-        _selectedCompany = _companies.FirstOrDefault(_ => _.Id == 0);
-    }
-
-    private async Task LoadVouchers()
-    {
         _vouchers = await CommonData.LoadTableDataByStatus<VoucherModel>(AccountNames.Voucher);
-        _vouchers.Add(new()
-        {
-            Id = 0,
-            Name = "All Vouchers"
-        });
+        
+        _companies = [.. _companies.OrderBy(s => s.Name)];
         _vouchers = [.. _vouchers.OrderBy(s => s.Name)];
-        _selectedVoucher = _vouchers.FirstOrDefault(_ => _.Id == 0);
     }
 
     private async Task LoadTransactionOverviews()
@@ -190,6 +171,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
                 DateOnly.FromDateTime(_fromDate),
                 DateOnly.FromDateTime(_toDate),
                 _showAllColumns,
+                _showDeleted,
                 _selectedCompany?.Id > 0 ? _selectedCompany : null,
                 _selectedVoucher?.Id > 0 ? _selectedVoucher : null
             );
@@ -225,7 +207,8 @@ public partial class FinancialAccountingReport : IAsyncDisposable
                  DateOnly.FromDateTime(_fromDate),
                  DateOnly.FromDateTime(_toDate),
                  _showAllColumns,
-                 _selectedCompany?.Id > 0 ? _selectedCompany : null,
+				 _showDeleted,
+				 _selectedCompany?.Id > 0 ? _selectedCompany : null,
                  _selectedVoucher?.Id > 0 ? _selectedVoucher : null
              );
             await SaveAndViewService.SaveAndView(fileName, stream);
