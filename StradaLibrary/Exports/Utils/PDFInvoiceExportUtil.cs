@@ -484,7 +484,7 @@ public static class PDFInvoiceExportUtil
                 // Apply styling
                 row.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 9f);
                 row.Cells[i].Style.Borders.All = new PdfPen(new PdfColor(220, 220, 220), 0.5f);
-                row.Cells[i].Style.CellPadding = new PdfPaddings(1f, 1f, 1f, 1f);
+                row.Cells[i].Style.CellPadding = new PdfPaddings(4f, 4f, 1f, 1f);
                 // Convert CellAlignment to PdfTextAlignment
                 PdfTextAlignment pdfAlign = column.Alignment switch
                 {

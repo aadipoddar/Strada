@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.0.1.1</AssemblyVersion>
+    <AssemblyVersion>1.0.1.2</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,10 +36,6 @@
     <Using Include="Strada.Shared.Services" />
     <Using Include="StradaLibrary.Data.Common" />
     <Using Include="StradaLibrary.DataAccess" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\Fleet\VehicleRepair\" />
   </ItemGroup>
 
 </Project>

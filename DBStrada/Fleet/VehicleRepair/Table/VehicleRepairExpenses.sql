@@ -4,6 +4,7 @@
     [MasterId] INT NOT NULL,
 	[VehicleExpenseTypeId] INT NOT NULL,
 	[Amount] MONEY NOT NULL,
+	[IdentificationNo] VARCHAR(MAX) NULL,
 	[Remarks] VARCHAR(MAX) NULL, 
 	[Status] BIT NOT NULL DEFAULT 1, 
 	CONSTRAINT [FK_VehicleRepairExpenses_ToVehicleRepair] FOREIGN KEY ([MasterId]) REFERENCES [VehicleRepair]([Id]), 

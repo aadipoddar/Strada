@@ -69,6 +69,17 @@ public static class AccountNames
 
 public static class FleetNames
 {
+	#region Vehicle Repair
+	public static string VehicleRepair => "VehicleRepair";
+	public static string VehicleRepairExpenses => "VehicleRepairExpenses";
+
+	public static string VehicleRepairOverview => "VehicleRepair_Overview";
+	public static string VehicleRepairExpensesOverview => "VehicleRepairExpenses_Overview";
+
+	public static string InsertVehicleRepair => "Insert_VehicleRepair";
+	public static string InsertVehicleRepairExpenses => "Insert_VehicleRepairExpenses";
+	#endregion
+
 	#region Vehicle Trip
 	public static string VehicleTrip => "VehicleTrip";
 	public static string VehicleTripExpenses => "VehicleTripExpenses";
@@ -84,19 +95,21 @@ public static class FleetNames
 	#endregion
 
 	#region Vehicle Route
-	public static string OMC => "OMC";
-	public static string OMCCard => "OMCCard";
 	public static string VehicleRouteLocation => "VehicleRouteLocation";
 	public static string VehicleRoute => "VehicleRoute";
 	public static string VehicleDriver => "VehicleDriver";
-	public static string VehicleExpenseType => "VehicleExpenseType";
-
-	public static string InsertOMC => "Insert_OMC";
-	public static string InsertOMCCard => "Insert_OMCCard";
+	
 	public static string InsertVehicleRouteLocation => "Insert_VehicleRouteLocation";
 	public static string InsertVehicleRoute => "Insert_VehicleRoute";
 	public static string InsertVehicleDriver => "Insert_VehicleDriver";
-	public static string InsertVehicleExpenseType => "Insert_VehicleExpenseType";
+	#endregion
+	
+	#region OMC
+	public static string OMC => "OMC";
+	public static string OMCCard => "OMCCard";
+
+	public static string InsertOMC => "Insert_OMC";
+	public static string InsertOMCCard => "Insert_OMCCard";
 	#endregion
 
 	#region Vehicle Document
@@ -110,8 +123,10 @@ public static class FleetNames
 	#region Vehicle
 	public static string Vehicle => "Vehicle";
 	public static string VehicleType => "VehicleType";
+	public static string VehicleExpenseType => "VehicleExpenseType";
 
 	public static string InsertVehicle => "Insert_Vehicle";
 	public static string InsertVehicleType => "Insert_VehicleType";
+	public static string InsertVehicleExpenseType => "Insert_VehicleExpenseType";
 	#endregion
 }

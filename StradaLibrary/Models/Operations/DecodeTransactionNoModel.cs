@@ -4,14 +4,19 @@ public enum CodeType
 {
 	FinancialAccounting,
 	Ledger,
+
 	VehicleTrip,
-	VehicleType,
-	VehicleDocumentType,
-	OMC,
-	OMCCard,
+	VehicleRepair,
+
 	VehicleRouteLocation,
 	VehicleRoute,
 	VehicleDriver,
+
+	OMC,
+	OMCCard,
+
+	VehicleType,
+	VehicleDocumentType,
 	VehicleExpenseType,
 }
 

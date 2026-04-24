@@ -88,6 +88,9 @@
     <Folder Include="Fleet\OMC" />
     <Folder Include="Fleet\OMC\Insert" />
     <Folder Include="Fleet\OMC\Table" />
+    <Folder Include="Fleet\VehicleRepair\Insert" />
+    <Folder Include="Fleet\VehicleRepair\Table" />
+    <Folder Include="Fleet\VehicleRepair\LoadData" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -150,8 +153,6 @@
     <Build Include="Fleet\VehicleTrip\Load\VehicleTrip_Overview.sql" />
     <Build Include="Fleet\VehicleTrip\Load\VehicleTripExpenses_Overview.sql" />
     <Build Include="Fleet\VehicleTrip\Load\VehicleTripOMCCardPayments_Overview.sql" />
-    <Build Include="Fleet\VehicleRepair\VehicleRepair.sql" />
-    <Build Include="Fleet\VehicleRepair\VehicleRepairExpenses.sql" />
     <Build Include="Fleet\Vehicle\Table\VehicleExpenseType.sql" />
     <Build Include="Fleet\Vehicle\Insert\Insert_VehicleExpenseType.sql" />
     <Build Include="Fleet\OMC\Table\OMC.sql" />
@@ -161,6 +162,12 @@
     <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleDriver.sql" />
     <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRoute.sql" />
     <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteLocation.sql" />
+    <Build Include="Fleet\VehicleRepair\Table\VehicleRepair.sql" />
+    <Build Include="Fleet\VehicleRepair\Table\VehicleRepairExpenses.sql" />
+    <Build Include="Fleet\VehicleRepair\Insert\Insert_VehicleRepair.sql" />
+    <Build Include="Fleet\VehicleRepair\Insert\Insert_VehicleRepairExpenses.sql" />
+    <Build Include="Fleet\VehicleRepair\LoadData\VehicleRepair_Overview.sql" />
+    <Build Include="Fleet\VehicleRepair\LoadData\VehicleRepairExpenses_Overview.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

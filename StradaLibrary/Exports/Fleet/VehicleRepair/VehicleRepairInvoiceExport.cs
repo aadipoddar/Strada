@@ -2,62 +2,49 @@
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Fleet.VehicleTrip;
+using StradaLibrary.Models.Fleet.VehicleRepair;
 
-namespace StradaLibrary.Exports.Fleet.VehicleTrip;
+namespace StradaLibrary.Exports.Fleet.VehicleRepair;
 
-public static class VehicleTripInvoiceExport
+public static class VehicleRepairInvoiceExport
 {
 	public static async Task<(MemoryStream stream, string fileName)> ExportInvoice(int transactionId, InvoiceExportType exportType)
 	{
-		var transaction = await CommonData.LoadTableDataById<VehicleTripOverviewModel>(FleetNames.VehicleTripOverview, transactionId) ??
+		var transaction = await CommonData.LoadTableDataById<VehicleRepairOverviewModel>(FleetNames.VehicleRepairOverview, transactionId) ??
 			throw new InvalidOperationException("Transaction not found.");
 
-		var expenses = await CommonData.LoadTableDataByMasterId<VehicleTripExpensesModel>(FleetNames.VehicleTripExpenses, transaction.Id);
-		var payments = await CommonData.LoadTableDataByMasterId<VehicleTripOMCCardPaymentsModel>(FleetNames.VehicleTripOMCCardPayments, transaction.Id);
+		var expenses = await CommonData.LoadTableDataByMasterId<VehicleRepairExpensesModel>(FleetNames.VehicleRepairExpenses, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
 		LedgerModel ledger = new()
 		{
-			Name = $"Challan: {transaction.ChallanNo}",
-			Address = $"From: {transaction.FromLocation}" +
-			$" \nTo: {transaction.ToLocation}" +
-			$" \nVehicle: {transaction.VehicleCode}" +
-			$" \nDriver: {transaction.DriverName} ({transaction.DriverMobile})" +
-			$" \nQuantity: {transaction.Quantity}",
+			Name = $"Vehicle: {transaction.VehicleCode}",
 		};
 
 		var expensetTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 		var lineItems = expenses.Select(detail =>
 		{
-			return new VehicleTripExpensesCartModel
+			return new VehicleRepairExpensesCartModel
 			{
 				VehicleExpenseTypeId = detail.VehicleExpenseTypeId,
 				VehicleExpenseTypeName = expensetTypes.FirstOrDefault(p => p.Id == detail.VehicleExpenseTypeId).Name,
 				Amount = detail.Amount,
+				IdentificationNo = detail.IdentificationNo,
 				Remarks = detail.Remarks
 			};
 		}).ToList();
-
-		var omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
-		Dictionary<string, decimal> paymentModes = [];
-		foreach (var payment in payments)
-			paymentModes.Add(omcCards.FirstOrDefault(c => c.Id == payment.OMCCardId).CardNumber, payment.Amount);
 
 		var invoiceData = new InvoiceData
 		{
 			Company = company,
 			BillTo = ledger,
-			InvoiceType = "VEHICLE TRIP",
-			OCM = transaction.OMCName,
+			InvoiceType = "VEHICLE REPAIR",
 			TransactionNo = transaction.TransactionNo,
 			TransactionDateTime = transaction.TransactionDateTime,
 			TotalAmount = transaction.TotalExpense,
 			Remarks = transaction.Remarks ?? string.Empty,
-			Status = transaction.Status,
-			PaymentModes = paymentModes
+			Status = transaction.Status
 		};
 
 		var summaryFields = new Dictionary<string, string>
@@ -68,13 +55,14 @@ public static class VehicleTripInvoiceExport
 		var columnSettings = new List<InvoiceColumnSetting>
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
-			new(nameof(VehicleTripExpensesCartModel.VehicleExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
-			new(nameof(VehicleTripExpensesCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
-			new(nameof(VehicleTripExpensesCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 150, 30)
+			new(nameof(VehicleRepairExpensesCartModel.VehicleExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(VehicleRepairExpensesCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
+			new(nameof(VehicleRepairExpensesCartModel.IdentificationNo), "Identification No", exportType, CellAlignment.Left, 100, 30),
+			new(nameof(VehicleRepairExpensesCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 150, 30)
 		};
 
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
-		string fileName = $"VEHICLE_TRIP_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}";
+		string fileName = $"VEHICLE_REPAIR_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}";
 
 		if (exportType == InvoiceExportType.PDF)
 		{

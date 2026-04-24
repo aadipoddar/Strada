@@ -1,20 +1,17 @@
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Fleet.VehicleRoute;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.VehicleTrip;
+using StradaLibrary.Exports.Fleet.VehicleRepair;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Fleet.VehicleRoute;
-using StradaLibrary.Models.Fleet.VehicleTrip;
+using StradaLibrary.Models.Fleet.VehicleRepair;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
 
-namespace Strada.Shared.Pages.Fleet.VehicleTrip.Reports;
+namespace Strada.Shared.Pages.Fleet.VehicleRepair.Reports;
 
-public partial class VehicleTripPaymentsReport : IAsyncDisposable
+public partial class VehicleRepairExpensesReport : IAsyncDisposable
 {
 	private PeriodicTimer _autoRefreshTimer;
 	private CancellationTokenSource _autoRefreshCts;
@@ -29,17 +26,13 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 	private DateTime _toDate = DateTime.Now.Date;
 
 	private CompanyModel? _selectedCompany = null;
-	private OMCModel? _selectedOMC = null;
 	private VehicleModel? _selectedVehicle = null;
-	private VehicleRouteOverviewModel? _selectedRoute = null;
 
 	private List<CompanyModel> _companies = [];
-	private List<OMCModel> _omcs = [];
 	private List<VehicleModel> _vehicles = [];
-	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
-	private List<VehicleTripOMCCardPaymentsOverviewModel> _transactionOverviews = [];
+	private List<VehicleRepairExpensesOverviewModel> _transactionOverviews = [];
 
-	private SfGrid<VehicleTripOMCCardPaymentsOverviewModel> _sfGrid;
+	private SfGrid<VehicleRepairExpensesOverviewModel> _sfGrid;
 	private ToastNotification _toastNotification;
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
@@ -74,14 +67,10 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 		_toDate = _fromDate;
 
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
-		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
-		_omcs = [.. _omcs.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
-		_vehicleRoutes = [.. _vehicleRoutes.OrderBy(s => s.Code)];
 	}
 
 	private async Task LoadTransactionOverviews()
@@ -95,22 +84,16 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
 
-			_transactionOverviews = await CommonData.LoadTableDataByDate<VehicleTripOMCCardPaymentsOverviewModel>(
-				FleetNames.VehicleTripOMCCardPaymentsOverview,
+			_transactionOverviews = await CommonData.LoadTableDataByDate<VehicleRepairExpensesOverviewModel>(
+				FleetNames.VehicleRepairExpensesOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MinValue));
 
 			if (_selectedCompany?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
 
-			if (_selectedOMC?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.OMCId == _selectedOMC.Id)];
-
 			if (_selectedVehicle?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.VehicleId == _selectedVehicle.Id)];
-
-			if (_selectedRoute?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.RouteId == _selectedRoute.Id)];
 
 			_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
 		}
@@ -151,21 +134,9 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnOMCChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<OMCModel, OMCModel> args)
-	{
-		_selectedOMC = args.Value;
-		await LoadTransactionOverviews();
-	}
-
 	private async Task OnVehicleChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VehicleModel, VehicleModel> args)
 	{
 		_selectedVehicle = args.Value;
-		await LoadTransactionOverviews();
-	}
-
-	private async Task OnRouteChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VehicleRouteOverviewModel, VehicleRouteOverviewModel> args)
-	{
-		_selectedRoute = args.Value;
 		await LoadTransactionOverviews();
 	}
 
@@ -188,16 +159,14 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleTripReportExport.ExportPaymentsReport(
+			var (stream, fileName) = await VehicleRepairReportExport.ExportExpensesReport(
 				_transactionOverviews,
 				ReportExportType.Excel,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
-				_selectedOMC?.Id > 0 ? _selectedOMC : null,
-				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
-				_selectedRoute?.Id > 0 ? _selectedRoute : null
+				_selectedVehicle?.Id > 0 ? _selectedVehicle : null
 			);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
@@ -225,16 +194,14 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleTripReportExport.ExportPaymentsReport(
+			var (stream, fileName) = await VehicleRepairReportExport.ExportExpensesReport(
 				_transactionOverviews,
 				ReportExportType.PDF,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
-				_selectedOMC?.Id > 0 ? _selectedOMC : null,
-				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
-				_selectedRoute?.Id > 0 ? _selectedRoute : null
+				_selectedVehicle?.Id > 0 ? _selectedVehicle : null
 			 );
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
@@ -323,7 +290,7 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 		switch (args.Item.Id)
 		{
 			case "NewTransaction":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTrip, FormFactor, JSRuntime, NavigationManager);
+				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleRepair, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "Refresh":
 				await LoadTransactionOverviews();
@@ -347,10 +314,7 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 				await ExportSelectedTransactionExcel();
 				break;
 			case "TransactionHistory":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "ExpensesReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripExpensesReport, FormFactor, JSRuntime, NavigationManager);
+				await AuthenticationService.NavigateToRoute(PageRouteNames.VehicleRepairReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "PeriodToday":
 				await HandleDatesChanged(DateRangeType.Today);
@@ -385,7 +349,7 @@ public partial class VehicleTripPaymentsReport : IAsyncDisposable
 		}
 	}
 
-	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleTripOMCCardPaymentsOverviewModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRepairExpensesOverviewModel> args)
 	{
 		switch (args.Item.Id)
 		{

@@ -37,22 +37,27 @@ public static class PageRouteNames
 	#region Fleet
 	public const string FleetDashboard = "/fleet";
 
+	public const string VehicleRepair = "/fleet/vehicle-repair";
+	public const string VehicleRepairReport = "/fleet/vehicle-repair-report";
+	public const string VehicleRepairExpensesReport = "/fleet/vehicle-repair-expenses-report";
+
 	public const string VehicleTrip = "/fleet/vehicle-trip";
 	public const string VehicleTripReport = "/fleet/vehicle-trip-report";
 	public const string VehicleTripExpensesReport = "/fleet/vehicle-trip-expenses-report";
 	public const string VehicleTripPaymentsReport = "/fleet/vehicle-trip-payments-report";
 
-	public const string VehicleMaster = "/fleet/vehicle";
-	public const string VehicleTypeMaster = "/fleet/vehicle-type";
-	public const string VehicleExpenseTypeMaster = "/fleet/vehicle-expense-type";
+	public const string VehicleRouteLocationMaster = "/fleet/vehicle-route-location";
+	public const string VehicleRouteMaster = "/fleet/vehicle-route";
+	public const string VehicleDriverMaster = "/fleet/vehicle-driver";
+
+	public const string OMCMaster = "/fleet/omc";
+	public const string OMCCardMaster = "/fleet/omc-card";
 
 	public const string VehicleDocumentTypeMaster = "/fleet/vehicle-document-type";
 	public const string VehicleDocument = "/fleet/vehicle-document";
 
-	public const string OMCMaster = "/fleet/omc";
-	public const string OMCCardMaster = "/fleet/omc-card";
-	public const string VehicleRouteLocationMaster = "/fleet/vehicle-route-location";
-	public const string VehicleRouteMaster = "/fleet/vehicle-route";
-	public const string VehicleDriverMaster = "/fleet/vehicle-driver";
+	public const string VehicleMaster = "/fleet/vehicle";
+	public const string VehicleTypeMaster = "/fleet/vehicle-type";
+	public const string VehicleExpenseTypeMaster = "/fleet/vehicle-expense-type";
 	#endregion
 }

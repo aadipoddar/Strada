@@ -26,8 +26,14 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 	public async Task SecureRemoveAll()
 	{
 		await LocalRemove(StorageFileNames.UserDataFileName);
+		await LocalRemove(StorageFileNames.UserDeviceIdDataFileName);
+
 		await LocalRemove(StorageFileNames.FinancialAccountingDataFileName);
 		await LocalRemove(StorageFileNames.FinancialAccountingCartDataFileName);
+
+		await LocalRemove(StorageFileNames.VehicleRepairDataFileName);
+		await LocalRemove(StorageFileNames.VehicleRepairExpensesCartDataFileName);
+
 		await LocalRemove(StorageFileNames.VehicleTripDataFileName);
 		await LocalRemove(StorageFileNames.VehicleTripExpensesCartDataFileName);
 		await LocalRemove(StorageFileNames.VehicleTripPaymentsCartDataFileName);
