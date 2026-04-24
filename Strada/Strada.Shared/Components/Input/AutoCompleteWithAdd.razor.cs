@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using Syncfusion.Blazor.DropDowns;
 
 namespace Strada.Shared.Components.Input;
@@ -7,6 +6,10 @@ namespace Strada.Shared.Components.Input;
 public partial class AutoCompleteWithAdd<TValue, TItem>
 {
 	private SfAutoComplete<TValue, TItem> _sfAutoComplete;
+	private bool _isFocused;
+
+	private void OnFocus(object args) => _isFocused = true;
+	private void OnBlur(object args) => _isFocused = false;
 
 	[Parameter] public TValue? Value { get; set; }
 	[Parameter] public EventCallback<TValue?> ValueChanged { get; set; }

@@ -1,6 +1,11 @@
 @typeparam TValue
 @typeparam TItem
 
+@if (_isFocused && AddNewRoute is not null)
+{
+	<MudBlazor.MudHotkey Key="JsKey.F12" OnHotkeyPressed="NavigateToAddNew" />
+}
+
 <div class="mac-field">
 	@if (Label is not null)
 	{
@@ -23,13 +28,14 @@
 						Enabled="@(!Disabled)"
 						FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
 						CssClass="custom-autocomplete">
-			<AutoCompleteEvents TItem="TItem" TValue="TValue" ValueChange="@OnValueChangeInternal" />
+			<AutoCompleteEvents TItem="TItem" TValue="TValue" ValueChange="@OnValueChangeInternal"
+								Focus="@OnFocus" Blur="@OnBlur" />
 			<AutoCompleteFieldSettings Value="@FieldValue" />
 		</SfAutoComplete>
 	</div>
 	@if (Label is not null && AddNewRoute is not null && !Disabled)
 	{
-		<button class="mac-add-new" @onclick="NavigateToAddNew"
+		<button class="mac-add-new" tabindex="-1" @onclick="NavigateToAddNew"
 				title="@AddNewLabel">
 			<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
 				 fill="none" stroke="currentColor" stroke-width="2.5"
