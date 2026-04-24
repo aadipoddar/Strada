@@ -1,4 +1,5 @@
-﻿using StradaLibrary.DataAccess;
+﻿using StradaLibrary.Data.Common;
+using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Operations;
@@ -7,6 +8,69 @@ public static class UserData
 {
 	public static async Task<int> InsertUser(UserModel userModel) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(OperationNames.InsertUser, userModel)).FirstOrDefault();
+
+	private static async Task ValidateTransaction(UserModel user)
+	{
+		user.Name = user.Name?.Trim() ?? string.Empty;
+		user.Phone = user.Phone?.Trim() ?? string.Empty;
+		user.Email = user.Email?.Trim() ?? string.Empty;
+		user.Password = user.Password?.Trim() ?? string.Empty;
+		user.Remarks = user.Remarks?.Trim() ?? string.Empty;
+		user.Status = true;
+
+		if (string.IsNullOrWhiteSpace(user.Name))
+			throw new Exception("User name is required. Please enter a valid name.");
+
+		if (string.IsNullOrWhiteSpace(user.Phone))
+			throw new Exception("Phone number is required. Please enter a valid 10-digit phone number.");
+
+		if (user.Phone.Length != 10 || !user.Phone.All(char.IsDigit))
+			throw new Exception("Phone number must be exactly 10 digits.");
+
+		if (string.IsNullOrWhiteSpace(user.Password))
+			throw new Exception("Password is required. Please enter a valid password.");
+
+		if (string.IsNullOrWhiteSpace(user.Email))
+			user.Email = null;
+
+		if (string.IsNullOrWhiteSpace(user.Remarks))
+			user.Remarks = null;
+
+		if (user.Id == 0)
+		{
+			user.FailedAttempts = 0;
+			user.CodeResends = 0;
+			user.LastCode = null;
+			user.LastCodeDeviceId = null;
+			user.LastCodeDateTime = null;
+		}
+
+		var allUsers = await CommonData.LoadTableData<UserModel>(OperationNames.User);
+
+		var existingByPhone = allUsers.FirstOrDefault(existingUser =>
+			existingUser.Id != user.Id &&
+			existingUser.Phone == user.Phone);
+
+		if (existingByPhone is not null)
+			throw new Exception($"Phone number '{user.Phone}' already exists. Please use a different phone number.");
+
+		if (!string.IsNullOrWhiteSpace(user.Email))
+		{
+			var existingByEmail = allUsers.FirstOrDefault(existingUser =>
+				existingUser.Id != user.Id &&
+				!string.IsNullOrWhiteSpace(existingUser.Email) &&
+				existingUser.Email.Equals(user.Email, StringComparison.OrdinalIgnoreCase));
+
+			if (existingByEmail is not null)
+				throw new Exception($"Email '{user.Email}' already exists. Please use a different email.");
+		}
+	}
+
+	public static async Task<int> SaveTransaction(UserModel user)
+	{
+		await ValidateTransaction(user);
+		return await InsertUser(user);
+	}
 
 	public static async Task ResetInsertUser(UserModel user)
 	{
