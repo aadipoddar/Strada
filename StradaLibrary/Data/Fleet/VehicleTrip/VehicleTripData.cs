@@ -109,9 +109,6 @@ public static class VehicleTripData
 		if (trip.Quantity < 0)
 			throw new InvalidOperationException("Quantity cannot be negative.");
 
-		if (string.IsNullOrWhiteSpace(trip.ChallanNo))
-			throw new InvalidOperationException("Please enter challan number for the transaction.");
-
 		if (trip.TotalExpense < 0)
 			throw new InvalidOperationException("Total expense cannot be negative.");
 
@@ -152,13 +149,6 @@ public static class VehicleTripData
 	{
 		if (paymentDetails.Any(pd => pd.Amount <= 0))
 			throw new InvalidOperationException("Payment amount must be greater than zero.");
-
-		foreach (var payment in paymentDetails)
-		{
-			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, payment.OMCCardId);
-			if (omcCard.OMCId != trip.OMCId)
-				throw new InvalidOperationException("Selected OMC card does not belong to the selected OMC.");
-		}
 
 		if (paymentDetails.Sum(pd => pd.Amount) != trip.TotalExpense)
 			throw new InvalidOperationException("Total payment amount must be equal to total expense.");

@@ -7,13 +7,14 @@ public class VehicleTripModel
 	public int CompanyId { get; set; }
 	public DateTime TransactionDateTime { get; set; }
 	public int FinancialYearId { get; set; }
-	public string ChallanNo { get; set; }
+	public string? ChallanNo { get; set; }
 	public int OMCId { get; set; }
 	public int VehicleId { get; set; }
 	public int DriverId { get; set; }
 	public int RouteId { get; set; }
 	public decimal Quantity { get; set; }
 	public decimal TotalExpense { get; set; }
+	public bool VehicleEmpty { get; set; }
 	public string? Remarks { get; set; }
 	public int CreatedBy { get; set; }
 	public DateTime CreatedAt { get; set; }
@@ -34,7 +35,7 @@ public class VehicleTripOverviewModel
 	public int FinancialYearId { get; set; }
 	public string FinancialYear { get; set; }
 
-	public string ChallanNo { get; set; }
+	public string? ChallanNo { get; set; }
 	public int OMCId { get; set; }
 	public string OMCName { get; set; }
 	public int VehicleId { get; set; }
@@ -54,6 +55,8 @@ public class VehicleTripOverviewModel
 	public decimal EstimatedFuelConsumption { get; set; }
 	public decimal EstimatedCost { get; set; }
 	public decimal TotalExpense { get; set; }
+
+	public bool VehicleEmpty { get; set; }
 
 	public string? Remarks { get; set; }
 	public int CreatedBy { get; set; }

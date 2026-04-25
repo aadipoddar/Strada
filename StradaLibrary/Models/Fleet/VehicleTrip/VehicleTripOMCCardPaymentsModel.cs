@@ -34,7 +34,7 @@ public class VehicleTripOMCCardPaymentsOverviewModel
 	public int FinancialYearId { get; set; }
 	public string FinancialYear { get; set; }
 
-	public string ChallanNo { get; set; }
+	public string? ChallanNo { get; set; }
 	public int OMCId { get; set; }
 	public string OMCName { get; set; }
 	public int VehicleId { get; set; }
@@ -54,6 +54,8 @@ public class VehicleTripOMCCardPaymentsOverviewModel
 	public decimal EstimatedFuelConsumption { get; set; }
 	public decimal EstimatedCost { get; set; }
 	public decimal TotalExpense { get; set; }
+
+	public bool VehicleEmpty { get; set; }
 
 	public string? Remarks { get; set; }
 	public int CreatedBy { get; set; }

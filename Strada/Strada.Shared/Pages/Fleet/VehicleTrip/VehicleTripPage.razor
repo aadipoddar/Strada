@@ -11,23 +11,16 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft]
-					 OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]"
-					 OnHotkeyPressed="() => _sfOMCCardAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="() => _sfOMCCardAutoComplete.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="AddExpensesToCart" />
-<MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]"
-					 OnHotkeyPressed="AddPaymentsToCart" />
-<MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft]
-					 OnHotkeyPressed="() => SaveTransaction()" />
-<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft]
-					 OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
-<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft]
-					 OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" />
+<MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="AddPaymentsToCart" />
+<MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportPdfInvoice" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportExcelInvoice" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft]
-					 OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripReport, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.VehicleTripReport, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedExpensesCartItem" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="RemoveSelectedExpensesCartItem" />
 
@@ -197,7 +190,7 @@ else
 												 AddNewRoute="@PageRouteNames.VehicleRouteMaster" />
 							</div>
 
-							<!-- Route Estimated Hours -->
+							<!-- Route Estimated Distance / Cost -->
 							<div class="form-field">
 								<label class="field-label">
 									Estimated Distance / Cost
@@ -212,6 +205,21 @@ else
 								</div>
 							</div>
 
+							<!-- Route Estimated Hours / Fuel -->
+							<div class="form-field">
+								<label class="field-label">
+									Estimated Hours / Fuel
+								</label>
+								<div class="date-year-wrapper">
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedHours"
+													  Placeholder="Enter estimated hours..." FloatLabelType="FloatLabelType.Never"
+													  Readonly="true" CssClass="custom-numeric readonly-field" />
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedFuelConsumption"
+													  Placeholder="Enter estimated fuel..." FloatLabelType="FloatLabelType.Never"
+													  Readonly="true" CssClass="custom-numeric readonly-field" />
+								</div>
+							</div>
+
 							<!-- Driver -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel"
@@ -222,6 +230,13 @@ else
 												 ValueChange="OnVehicleDriverChanged"
 												 FieldValue="@nameof(VehicleDriverOverviewModel.DisplayName)"
 												 AddNewRoute="@PageRouteNames.VehicleDriverMaster" />
+							</div>
+
+							<div class="form-field">
+								<label class="field-label">Vehicle Empty</label>
+								<div class="checkbox-wrapper">
+									<SfCheckBox @bind-Checked="_vehicleTrip.VehicleEmpty" Label="Vehicle Empty" CssClass="custom-checkbox" />
+								</div>
 							</div>
 
 							<!-- Remarks -->

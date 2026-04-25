@@ -31,6 +31,8 @@ SELECT
 	[r].[EstimatedCost],
 	[t].[TotalExpense],
 
+	[t].[VehicleEmpty],
+
     [t].[Remarks],
 	[t].[CreatedBy],
 	[u].[Name] AS CreatedByName,

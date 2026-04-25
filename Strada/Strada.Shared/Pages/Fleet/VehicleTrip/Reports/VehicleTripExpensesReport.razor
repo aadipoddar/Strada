@@ -124,49 +124,49 @@ else
 							<!-- Company -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-												 @bind-Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="All Companies"
-												 Label="Company" Required="true"
-												 ValueChange="OnCompanyChanged"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+													 @bind-Value="_selectedCompany"
+													 DataSource="@_companies"
+													 Placeholder="All Companies"
+													 Label="Company" Required="true"
+													 ValueChange="OnCompanyChanged"
+													 FieldValue="@nameof(CompanyModel.Name)"
+													 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- OMC -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
-												 @bind-Value="_selectedOMC"
-												 DataSource="@_omcs"
-												 Placeholder="All OMCs"
-												 Label="OMC" Required="true"
-												 ValueChange="OnOMCChanged"
-												 FieldValue="@nameof(OMCModel.Name)"
-												 AddNewRoute="@PageRouteNames.OMCMaster" />
+													 @bind-Value="_selectedOMC"
+													 DataSource="@_omcs"
+													 Placeholder="All OMCs"
+													 Label="OMC" Required="true"
+													 ValueChange="OnOMCChanged"
+													 FieldValue="@nameof(OMCModel.Name)"
+													 AddNewRoute="@PageRouteNames.OMCMaster" />
 							</div>
 
 							<!-- Vehicle -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
-												 @bind-Value="_selectedVehicle"
-												 DataSource="@_vehicles"
-												 Placeholder="All Vehicles"
-												 Label="Vehicle" Required="true"
-												 ValueChange="OnVehicleChanged"
-												 FieldValue="@nameof(VehicleModel.Code)"
-												 AddNewRoute="@PageRouteNames.VehicleMaster" />
+													 @bind-Value="_selectedVehicle"
+													 DataSource="@_vehicles"
+													 Placeholder="All Vehicles"
+													 Label="Vehicle" Required="true"
+													 ValueChange="OnVehicleChanged"
+													 FieldValue="@nameof(VehicleModel.Code)"
+													 AddNewRoute="@PageRouteNames.VehicleMaster" />
 							</div>
 
 							<!-- Route -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleRouteOverviewModel" TValue="VehicleRouteOverviewModel"
-												 @bind-Value="_selectedRoute"
-												 DataSource="@_vehicleRoutes"
-												 Placeholder="All Routes"
-												 Label="Route" Required="true"
-												 ValueChange="OnRouteChanged"
-												 FieldValue="@nameof(VehicleRouteOverviewModel.RouteDisplay)"
-												 AddNewRoute="@PageRouteNames.VehicleRouteMaster" />
+													 @bind-Value="_selectedRoute"
+													 DataSource="@_vehicleRoutes"
+													 Placeholder="All Routes"
+													 Label="Route" Required="true"
+													 ValueChange="OnRouteChanged"
+													 FieldValue="@nameof(VehicleRouteOverviewModel.RouteDisplay)"
+													 AddNewRoute="@PageRouteNames.VehicleRouteMaster" />
 							</div>
 						</div>
 					</div>
@@ -325,6 +325,17 @@ else
 										HeaderText="Est. Cost" Width="130" TextAlign="TextAlign.Right" Format="N2" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.TotalExpense)"
 										HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right" Format="N2" />
+
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.VehicleEmpty)" HeaderText="Vehicle Empty" Width="110" TextAlign="TextAlign.Center">
+								<Template>
+									@{
+										var item = (context as VehicleTripExpensesOverviewModel);
+										<span class="@(item.VehicleEmpty ? "grid-debit" : string.Empty)">
+											@(item.VehicleEmpty ? "Empty" : "Loaded")
+										</span>
+									}
+								</Template>
+							</GridColumn>
 
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.Remarks)" HeaderText="Remarks"
 										Width="200" Visible="_showAllColumns" />

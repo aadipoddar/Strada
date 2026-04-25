@@ -44,6 +44,8 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripOverviewModel.EstimatedCost)] = new() { DisplayName = "Est Cost", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(VehicleTripOverviewModel.VehicleEmpty)] = new() { DisplayName = "Vehicle Empty", Alignment = CellAlignment.Center, IncludeInTotal = false },
+
 			[nameof(VehicleTripOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -79,6 +81,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOverviewModel.EstimatedFuelConsumption),
 				nameof(VehicleTripOverviewModel.EstimatedCost),
 				nameof(VehicleTripOverviewModel.TotalExpense),
+				nameof(VehicleTripOverviewModel.VehicleEmpty),
 				nameof(VehicleTripOverviewModel.Remarks),
 				nameof(VehicleTripOverviewModel.CreatedByName),
 				nameof(VehicleTripOverviewModel.CreatedAt),
@@ -106,6 +109,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOverviewModel.DriverDisplay),
 				nameof(VehicleTripOverviewModel.Quantity),
 				nameof(VehicleTripOverviewModel.TotalExpense),
+				nameof(VehicleTripOverviewModel.VehicleEmpty),
 				nameof(VehicleTripOverviewModel.Status)
 			];
 
@@ -214,6 +218,8 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripExpensesOverviewModel.EstimatedCost)] = new() { DisplayName = "Est Cost", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripExpensesOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(VehicleTripExpensesOverviewModel.VehicleEmpty)] = new() { DisplayName = "Vehicle Empty", Alignment = CellAlignment.Center, IncludeInTotal = false },
+
 			[nameof(VehicleTripExpensesOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -251,6 +257,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.EstimatedFuelConsumption),
 				nameof(VehicleTripExpensesOverviewModel.EstimatedCost),
 				nameof(VehicleTripExpensesOverviewModel.TotalExpense),
+				nameof(VehicleTripExpensesOverviewModel.VehicleEmpty),
 				nameof(VehicleTripExpensesOverviewModel.Remarks),
 				nameof(VehicleTripExpensesOverviewModel.CreatedByName),
 				nameof(VehicleTripExpensesOverviewModel.CreatedAt),
@@ -276,6 +283,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.DriverDisplay),
 				nameof(VehicleTripExpensesOverviewModel.Quantity),
 				nameof(VehicleTripExpensesOverviewModel.TotalExpense),
+				nameof(VehicleTripExpensesOverviewModel.VehicleEmpty),
 			];
 
 			if (company is not null)
@@ -380,6 +388,8 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripOMCCardPaymentsOverviewModel.EstimatedCost)] = new() { DisplayName = "Est Cost", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripOMCCardPaymentsOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(VehicleTripOMCCardPaymentsOverviewModel.VehicleEmpty)] = new() { DisplayName = "Vehicle Empty", Alignment = CellAlignment.Center, IncludeInTotal = false },
+
 			[nameof(VehicleTripOMCCardPaymentsOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripOMCCardPaymentsOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripOMCCardPaymentsOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -417,6 +427,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.EstimatedFuelConsumption),
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.EstimatedCost),
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.TotalExpense),
+				nameof(VehicleTripOMCCardPaymentsOverviewModel.VehicleEmpty),
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.Remarks),
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.CreatedByName),
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.CreatedAt),
@@ -442,6 +453,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.DriverDisplay),
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.Quantity),
 				nameof(VehicleTripOMCCardPaymentsOverviewModel.TotalExpense),
+				nameof(VehicleTripOMCCardPaymentsOverviewModel.VehicleEmpty)
 			];
 
 			if (company is not null)

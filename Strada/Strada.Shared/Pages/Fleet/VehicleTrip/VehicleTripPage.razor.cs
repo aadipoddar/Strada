@@ -113,7 +113,6 @@ public partial class VehicleTripPage
 		_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
 
 		_omcs = [.. _omcs.OrderBy(s => s.Name)];
-		_omcCards = [.. _omcCards.Where(s => s.OMCId == _omcs.FirstOrDefault()?.Id)];
 		_omcCards = [.. _omcCards.OrderBy(s => s.CardNumber)];
 		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
@@ -250,11 +249,7 @@ public partial class VehicleTripPage
 		if (_selectedFinancialYear is not null)
 			_vehicleTrip.FinancialYearId = _selectedFinancialYear.Id;
 
-		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-
-		_omcCards = [.. _omcCards.Where(s => s.OMCId == _selectedOMC.Id)];
-		_omcCards = [.. _omcCards.OrderBy(s => s.CardNumber)];
 		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 
@@ -384,10 +379,6 @@ public partial class VehicleTripPage
 		_selectedOMC = args.Value;
 		_vehicleTrip.OMCId = _selectedOMC.Id;
 
-		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
-		_omcCards = [.. _omcCards.Where(s => s.OMCId == _selectedOMC.Id)];
-		_selectedPaymentCart = _paymentsCart.FirstOrDefault();
-
 		await SaveTransactionFile();
 	}
 
@@ -445,7 +436,6 @@ public partial class VehicleTripPage
 		{
 			_selectedExpensesCart.VehicleExpenseTypeId = _selectedExpenseType.Id;
 			_selectedExpensesCart.VehicleExpenseTypeName = _selectedExpenseType.Name;
-			_selectedExpensesCart.Amount = 0;
 		}
 	}
 
