@@ -4,6 +4,7 @@ using Strada.Shared.Components.Input;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.VehicleRepair;
 using StradaLibrary.Data.Operations;
+using StradaLibrary.Exports.Accounts.Masters;
 using StradaLibrary.Exports.Fleet.VehicleRepair;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
@@ -26,12 +27,14 @@ public partial class VehicleRepairPage
 
 	private CompanyModel _selectedCompany = new();
 	private FinancialYearModel _selectedFinancialYear = new();
+	private LedgerModel _selectedLedger = new();
 	private VehicleModel _selectedVehicle = new();
 	private VehicleExpenseTypeModel _selectedExpenseType = null;
 	private VehicleRepairExpensesCartModel _selectedExpensesCart = new();
 	private VehicleRepairModel _vehicleRepair = new();
 
 	private List<CompanyModel> _companies = [];
+	private List<LedgerModel> _ledgers = [];
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleExpenseTypeModel> _expenseTypes = [];
 	private List<VehicleRepairExpensesCartModel> _expensesCart = [];
@@ -79,6 +82,7 @@ public partial class VehicleRepairPage
 	private async Task LoadData()
 	{
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
+		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 
@@ -86,6 +90,7 @@ public partial class VehicleRepairPage
 		var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
 		_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
 
+		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
@@ -161,6 +166,7 @@ public partial class VehicleRepairPage
 			TransactionDateTime = currentDateTime,
 			FinancialYearId = financialYear is null ? 0 : financialYear.Id,
 			VehicleId = _selectedVehicle.Id,
+			LedgerId = null,
 			TotalExpense = 0,
 			Remarks = string.Empty,
 			CreatedBy = _user.Id,
@@ -203,6 +209,11 @@ public partial class VehicleRepairPage
 			_selectedVehicle = _vehicles.FirstOrDefault(s => s.Id == _vehicleRepair.VehicleId) ?? _vehicles.FirstOrDefault();
 		else
 			_selectedVehicle = _vehicles.FirstOrDefault();
+
+		if (_vehicleRepair.LedgerId.HasValue && _vehicleRepair.LedgerId.Value > 0)
+			_selectedLedger = _ledgers.FirstOrDefault(s => s.Id == _vehicleRepair.LedgerId.Value) ?? new();
+		else
+			_selectedLedger = null;
 	}
 
 	private async Task ResolveExpensesCart()
@@ -281,6 +292,20 @@ public partial class VehicleRepairPage
 
 		await SaveTransactionFile();
 	}
+
+	private async Task OnLedgerChanged(ChangeEventArgs<LedgerModel, LedgerModel> args)
+	{
+		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedLedger = null;
+			_vehicleRepair.LedgerId = null;
+		}
+
+		_selectedLedger = args.Value;
+		_vehicleRepair.LedgerId = _selectedLedger.Id;
+
+		await SaveTransactionFile();
+	}
 	#endregion
 
 	#region Expenses Cart
@@ -304,7 +329,6 @@ public partial class VehicleRepairPage
 		{
 			_selectedExpensesCart.VehicleExpenseTypeId = _selectedExpenseType.Id;
 			_selectedExpensesCart.VehicleExpenseTypeName = _selectedExpenseType.Name;
-			_selectedExpensesCart.Amount = 0;
 		}
 	}
 
@@ -393,6 +417,7 @@ public partial class VehicleRepairPage
 			_vehicleRepair.Remarks = null;
 
 		_vehicleRepair.CompanyId = _selectedCompany.Id;
+		_vehicleRepair.LedgerId = _selectedLedger?.Id;
 		_vehicleRepair.VehicleId = _selectedVehicle.Id;
 		_vehicleRepair.TotalExpense = _expensesCart.Sum(s => s.Amount);
 

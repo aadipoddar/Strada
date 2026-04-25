@@ -23,6 +23,7 @@ public static class VehicleRepairReportExport
 			[nameof(VehicleRepairOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleRepairOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(VehicleRepairOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleRepairOverviewModel.LedgerName)] = new() { DisplayName = "Ledger", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleRepairOverviewModel.VehicleCode)] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleRepairOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
@@ -46,6 +47,7 @@ public static class VehicleRepairReportExport
 				nameof(VehicleRepairOverviewModel.CompanyName),
 				nameof(VehicleRepairOverviewModel.TransactionDateTime),
 				nameof(VehicleRepairOverviewModel.FinancialYear),
+				nameof(VehicleRepairOverviewModel.LedgerName),
 				nameof(VehicleRepairOverviewModel.VehicleCode),
 				nameof(VehicleRepairOverviewModel.TotalExpense),
 				nameof(VehicleRepairOverviewModel.Remarks),
@@ -68,6 +70,7 @@ public static class VehicleRepairReportExport
 				nameof(VehicleRepairOverviewModel.TransactionNo),
 				nameof(VehicleRepairOverviewModel.CompanyName),
 				nameof(VehicleRepairOverviewModel.TransactionDateTime),
+				nameof(VehicleRepairOverviewModel.LedgerName),
 				nameof(VehicleRepairOverviewModel.VehicleCode),
 				nameof(VehicleRepairOverviewModel.TotalExpense),
 				nameof(VehicleRepairOverviewModel.Status)
@@ -150,6 +153,8 @@ public static class VehicleRepairReportExport
 			[nameof(VehicleRepairExpensesOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleRepairExpensesOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(VehicleRepairExpensesOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			
+			[nameof(VehicleRepairExpensesOverviewModel.LedgerName)] = new() { DisplayName = "Ledger", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleRepairExpensesOverviewModel.VehicleCode)] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleRepairExpensesOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
@@ -176,6 +181,7 @@ public static class VehicleRepairReportExport
 				nameof(VehicleRepairExpensesOverviewModel.CompanyName),
 				nameof(VehicleRepairExpensesOverviewModel.TransactionDateTime),
 				nameof(VehicleRepairExpensesOverviewModel.FinancialYear),
+				nameof(VehicleRepairExpensesOverviewModel.LedgerName),
 				nameof(VehicleRepairExpensesOverviewModel.VehicleCode),
 				nameof(VehicleRepairExpensesOverviewModel.TotalExpense),
 				nameof(VehicleRepairExpensesOverviewModel.Remarks),
@@ -197,6 +203,7 @@ public static class VehicleRepairReportExport
 				nameof(VehicleRepairExpensesOverviewModel.TransactionNo),
 				nameof(VehicleRepairExpensesOverviewModel.CompanyName),
 				nameof(VehicleRepairExpensesOverviewModel.TransactionDateTime),
+				nameof(VehicleRepairExpensesOverviewModel.LedgerName),
 				nameof(VehicleRepairExpensesOverviewModel.VehicleCode),
 				nameof(VehicleRepairExpensesOverviewModel.TotalExpense),
 			];

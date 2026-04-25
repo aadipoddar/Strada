@@ -21,13 +21,16 @@ public static class VehicleTripInvoiceExport
 
 		LedgerModel ledger = new()
 		{
-			Name = $"Challan: {transaction.ChallanNo}",
 			Address = $"From: {transaction.FromLocation}" +
 			$" \nTo: {transaction.ToLocation}" +
 			$" \nVehicle: {transaction.VehicleCode}" +
 			$" \nDriver: {transaction.DriverName} ({transaction.DriverMobile})" +
-			$" \nQuantity: {transaction.Quantity}",
+			$" \nQuantity: {transaction.Quantity}" +
+			$" \nVehicle: {(transaction.VehicleEmpty ? "Empty" : "Loaded")}"
 		};
+
+		if (!string.IsNullOrEmpty(transaction.ChallanNo))
+			ledger.Name = $"Challan: {transaction.ChallanNo}";
 
 		var expensetTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 		var lineItems = expenses.Select(detail =>

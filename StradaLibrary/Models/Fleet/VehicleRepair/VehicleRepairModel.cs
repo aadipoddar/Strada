@@ -7,6 +7,7 @@ public class VehicleRepairModel
 	public int CompanyId { get; set; }
 	public DateTime TransactionDateTime { get; set; }
 	public int FinancialYearId { get; set; }
+	public int? LedgerId { get; set; }
 	public int VehicleId { get; set; }
 	public decimal TotalExpense { get; set; }
 	public string? Remarks { get; set; }
@@ -29,6 +30,8 @@ public class VehicleRepairOverviewModel
 	public int FinancialYearId { get; set; }
 	public string FinancialYear { get; set; }
 
+	public int? LedgerId { get; set; }
+	public string? LedgerName { get; set; }
 	public int VehicleId { get; set; }
 	public string VehicleCode { get; set; }
 	public decimal TotalExpense { get; set; }

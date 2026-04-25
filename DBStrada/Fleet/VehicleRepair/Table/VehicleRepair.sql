@@ -5,6 +5,7 @@
     [CompanyId] INT NOT NULL,
     [TransactionDateTime] DATETIME NOT NULL,
     [FinancialYearId] INT NOT NULL,
+	[LedgerId] INT NULL,
     [VehicleId] INT NOT NULL,
     [TotalExpense] MONEY NOT NULL,
     [Remarks] VARCHAR(MAX) NULL,
@@ -17,6 +18,7 @@
 	[LastModifiedFromPlatform] VARCHAR(MAX) NULL, 
 	CONSTRAINT [FK_VehicleRepair_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
     CONSTRAINT [FK_VehicleRepair_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [FinancialYear](Id), 
+	CONSTRAINT [FK_VehicleRepair_ToLedger] FOREIGN KEY ([LedgerId]) REFERENCES [Ledger]([Id]),
     CONSTRAINT [FK_VehicleRepair_ToVehicle] FOREIGN KEY ([VehicleId]) REFERENCES [Vehicle]([Id]),
     CONSTRAINT [FK_VehicleRepair_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 	CONSTRAINT [FK_VehicleRepair_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])

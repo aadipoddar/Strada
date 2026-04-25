@@ -16,6 +16,8 @@ SELECT
     [t].[FinancialYearId],
 	CONVERT(VARCHAR(10), fy.StartDate, 103) + ' to ' + CONVERT(VARCHAR(10), fy.EndDate, 103) AS FinancialYear,
 
+	[t].[LedgerId],
+	[l].[Name] AS LedgerName,
 	[t].[VehicleId],
 	[v].[Code] AS VehicleCode,
 	[t].[TotalExpense],
@@ -40,6 +42,8 @@ INNER JOIN
     [dbo].[Company] c ON t.CompanyId = c.Id
 INNER JOIN
     [dbo].[FinancialYear] fy ON t.FinancialYearId = fy.Id
+LEFT JOIN
+	[dbo].[Ledger] l ON t.LedgerId = l.Id
 INNER JOIN
 	[dbo].[Vehicle] v ON t.VehicleId = v.Id
 INNER JOIN

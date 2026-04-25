@@ -29,8 +29,8 @@ internal static class VehicleTripNotify
             Details = new Dictionary<string, string>
             {
                 ["Transaction Number"] = trip.TransactionNo,
-                ["Challan Number"] = trip.ChallanNo,
-                ["Route"] = $"{trip.FromLocation} to {trip.ToLocation}",
+                ["Challan Number"] = trip.ChallanNo ?? "N/A",
+				["Route"] = $"{trip.FromLocation} to {trip.ToLocation}",
                 ["Vehicle"] = $"{trip.VehicleCode}",
                 ["Driver"] = $"{trip.DriverName} ({trip.DriverMobile})",
                 ["Expenses"] = trip.TotalExpense.ToString(),

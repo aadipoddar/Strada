@@ -17,10 +17,16 @@ public static class VehicleRepairInvoiceExport
 		var expenses = await CommonData.LoadTableDataByMasterId<VehicleRepairExpensesModel>(FleetNames.VehicleRepairExpenses, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
-		LedgerModel ledger = new()
+		LedgerModel ledger = new();
+
+		if (transaction.LedgerId is not null)
 		{
-			Name = $"Vehicle: {transaction.VehicleCode}",
-		};
+			ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, transaction.LedgerId.Value);
+			ledger.Address = $"\nVehicle: {transaction.VehicleCode}";
+		}
+
+		else
+			ledger.Name = $"Vehicle: {transaction.VehicleCode}";
 
 		var expensetTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 		var lineItems = expenses.Select(detail =>
