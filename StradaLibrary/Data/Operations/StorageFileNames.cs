@@ -8,10 +8,10 @@ public static class StorageFileNames
 	public static string FinancialAccountingDataFileName => "financial_accounting_data.json";
 	public static string FinancialAccountingCartDataFileName => "financial_accounting_cart_data.json";
 
-	public static string VehicleRepairDataFileName => "vehicle_repair_data.json";
-	public static string VehicleRepairExpensesCartDataFileName => "vehicle_repair_expenses_cart_data.json";
+	public static string TripAdvanceDataFileName => "trip_advance_data.json";
+	public static string TripAdvanceExpensesCartDataFileName => "trip_advance_expenses_cart_data.json";
+	public static string TripAdvancePaymentsCartDataFileName => "trip_advance_payments_cart_data.json";
 
-	public static string VehicleTripDataFileName => "vehicle_trip_data.json";
-	public static string VehicleTripExpensesCartDataFileName => "vehicle_trip_expenses_cart_data.json";
-	public static string VehicleTripPaymentsCartDataFileName => "vehicle_trip_payments_cart_data.json";
+	public static string VehicleExpenseDataFileName => "vehicle_expense_data.json";
+	public static string VehicleExpenseCartDataFileName => "vehicle_expense_cart_data.json";
 }

@@ -1,0 +1,76 @@
+﻿CREATE PROCEDURE [dbo].[Insert_VehicleExpense]
+	@Id INT OUTPUT,
+	@TransactionNo VARCHAR(100),
+	@CompanyId INT,
+	@TransactionDateTime DATETIME,
+	@FinancialYearId INT,
+	@LedgerId INT,
+	@VehicleId INT,
+	@TotalExpense MONEY,
+	@Remarks VARCHAR(MAX),
+	@CreatedBy INT,
+	@CreatedAt DATETIME,
+	@CreatedFromPlatform VARCHAR(MAX),
+	@Status BIT,
+	@LastModifiedBy INT,
+	@LastModifiedAt DATETIME,
+	@LastModifiedFromPlatform VARCHAR(MAX)
+AS
+BEGIN
+	IF @Id = 0
+	BEGIN
+		INSERT INTO [dbo].[VehicleExpense]
+		(
+			[TransactionNo],
+			[CompanyId],
+			[TransactionDateTime],
+			[FinancialYearId],
+			[LedgerId],
+			[VehicleId],
+			[TotalExpense],
+			[Remarks],
+			[CreatedBy],
+			[CreatedAt],
+			[CreatedFromPlatform],
+			[Status]
+		) VALUES
+		(
+			@TransactionNo,
+			@CompanyId,
+			@TransactionDateTime,
+			@FinancialYearId,
+			@LedgerId,
+			@VehicleId,
+			@TotalExpense,
+			@Remarks,
+			@CreatedBy,
+			@CreatedAt,
+			@CreatedFromPlatform,
+			@Status
+		)
+
+		SET @Id = SCOPE_IDENTITY();
+	END
+
+	ELSE
+	BEGIN
+		UPDATE [dbo].[VehicleExpense]
+		SET
+			[TransactionNo] = @TransactionNo,
+			[CompanyId] = @CompanyId,
+			[TransactionDateTime] = @TransactionDateTime,
+			[FinancialYearId] = @FinancialYearId,
+			[LedgerId] = @LedgerId,
+			[VehicleId] = @VehicleId,
+			[TotalExpense] = @TotalExpense,
+			[Remarks] = @Remarks,
+			[Status] = @Status,
+			[LastModifiedBy] = @LastModifiedBy,
+			[LastModifiedAt] = @LastModifiedAt,
+			[LastModifiedFromPlatform] = @LastModifiedFromPlatform
+		WHERE
+			[Id] = @Id
+	END
+
+	SELECT @Id AS Id
+END

@@ -17,7 +17,7 @@ public static class AuthenticationService
 		if (user is null)
 			await Logout(dataStorageService, navigationManager, vibrationService);
 
-		var serverUser = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, user.Id);
+		UserModel? serverUser = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, user.Id);
 		if (serverUser is null)
 			await Logout(dataStorageService, navigationManager, vibrationService);
 

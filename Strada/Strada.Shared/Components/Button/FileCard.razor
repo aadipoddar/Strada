@@ -1,321 +1,207 @@
-﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components
 
 <SfButton CssClass="file-card" OnClick="OnClick">
-	<div class="file-container">
-
-		<!-- Back Content (Revealed when top-right corner folds down) -->
-		<div class="file-underneath">
-			<div class="underneath-content">
-				<p class="card-description">@Description</p>
-			</div>
-		</div>
-
-		<!-- Front Paper -->
-		<div class="file-paper">
-			<div class="file-header">
-				@if (IconContent != null)
-				{
-					<div class="card-icon-wrapper">
-						@IconContent
-					</div>
-				}
-				<div class="title-wrapper">
-					<h3 class="card-title">@Title</h3>
-				</div>
-			</div>
-
-			<div class="cover-lines">
-				<div class="c-line"></div>
-				<div class="c-line"></div>
-				<div class="c-line short"></div>
-			</div>
-
-			<!-- The Folded Flap (Renders on top of everything inside the paper) -->
-			<div class="file-top-fold"></div>
-		</div>
-
-	</div>
+    <div class="file-wrapper">
+        <div class="file-body">
+            <div class="file-corner"></div>
+            <div class="file-content">
+                <div class="file-header">
+                    @if (IconContent != null)
+                    {
+                        <div class="file-icon">
+                            @IconContent
+                        </div>
+                    }
+                    <p class="file-title">@Title</p>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Description))
+                {
+                    <p class="file-desc">@Description</p>
+                }
+            </div>
+            <div class="file-lines">
+                <div class="f-line"></div>
+                <div class="f-line short"></div>
+            </div>
+        </div>
+    </div>
 </SfButton>
 
 <style>
-	/* Entire Card represents the File */
-	.file-card {
-		background: transparent !important;
-		border: none !important;
-		padding: 0 !important;
-		cursor: pointer !important;
-		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-		position: relative !important;
-		width: 240px !important;
-		height: 150px !important;
-		flex-shrink: 0 !important;
-		text-align: left !important;
-		display: block !important;
-		box-shadow: none !important;
-		outline: none !important;
-	}
+    .file-card {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        cursor: pointer !important;
+        display: inline-block !important;
+        width: 200px !important;
+        height: 170px !important;
+        flex-shrink: 0 !important;
+        text-align: left !important;
+        box-shadow: none !important;
+        outline: none !important;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
 
-	.file-card:hover {
-		transform: translateY(-6px) !important;
-	}
+        .file-card:hover {
+            transform: translateY(-5px) !important;
+        }
 
-	.file-card:active {
-		transform: translateY(-2px) !important;
-	}
+        .file-card:active {
+            transform: translateY(-2px) scale(0.98) !important;
+        }
 
-	/* Container */
-	.file-container {
-		width: 100%;
-		height: 100%;
-		position: relative;
-	}
+    .file-wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-	/* The background underneath the fold */
-	.file-underneath {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: #ffffff;
-		border: 1px solid #cbd5e1;
-		border-radius: 8px;
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-		z-index: 1;
-		padding: 12px 18px;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		justify-content: flex-start;
-		overflow: hidden;
-	}
+    .file-body {
+        position: relative;
+        width: 170px;
+        height: 140px;
+        background: #FFFFFF;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 4px 12px 4px 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        padding: 14px 14px 10px 14px;
+        transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        overflow: hidden;
+    }
 
-	.underneath-content {
-		width: 180px;
-		/* fit inside the revealed corner */
-		text-align: right;
-		opacity: 0;
-		transform: translateY(-5px) translateX(5px);
-		transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-		pointer-events: none;
-		z-index: 2;
-		/* Put it above the background */
-	}
+    .file-card:hover .file-body {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06);
+        border-color: #CBD5E1;
+    }
 
-	.file-card:hover .underneath-content {
-		opacity: 1;
-		transform: translateY(0) translateX(0);
-		transition-delay: 0.1s;
-	}
+    /* Folded corner */
+    .file-corner {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(225deg, #F1F5F9 50%, #E2E8F0 50%);
+        border-bottom-left-radius: 6px;
+        border-top-right-radius: 12px;
+        box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.08);
+        transition: width 0.25s ease, height 0.25s ease;
+    }
 
-	.file-card:hover .file-underneath {
-		box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
-	}
+    .file-card:hover .file-corner {
+        width: 26px;
+        height: 26px;
+    }
 
-	/* The Front Paper Layer */
-	.file-paper {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: #f8fafc;
-		border: 1px solid #cbd5e1;
-		border-radius: 8px;
-		/* Cuts off the top right for the fold seamlessly */
-		clip-path: polygon(0 0, calc(100% - 36px) 0, 100% 36px, 100% 100%, 0 100%);
-		padding: 12px 18px;
-		display: flex;
-		flex-direction: column;
-		transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-		z-index: 2;
-		overflow: hidden;
-	}
+    .file-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+    }
 
-	/* Huge fold down reveal */
-	.file-card:hover .file-paper {
-		clip-path: polygon(0 0, calc(100% - 210px) 0, 100% 210px, 100% 100%, 0 100%);
-		background-color: #f1f5f9;
-	}
+    .file-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
 
-	/* The Folded Corner Flap (Realistic Paper Roll) */
-	.file-top-fold {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 36px;
-		height: 36px;
-		/* Solid gradient starting exactly at 50% so no text bleeds through */
-		background: linear-gradient(225deg,
-				transparent 50%,
-				#d2dbea 50%,
-				#f8fafc 52%,
-				#e2e8f0 65%,
-				#cbd5e1 85%,
-				#94a3b8 100%);
-		border-bottom-left-radius: 6px;
-		filter: drop-shadow(-2px 2px 4px rgba(0, 0, 0, 0.15));
-		transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-		z-index: 10;
-		pointer-events: none;
-	}
+    .file-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: var(--primary-blue, #3B82F6);
+        border-radius: 6px;
+        color: #ffffff;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
 
-	.file-card:hover .file-top-fold {
-		width: 210px;
-		height: 210px;
-		border-bottom-left-radius: 50px;
-		/* Makes the rolling tip beautifully rounded */
-		filter: drop-shadow(-8px 8px 16px rgba(0, 0, 0, 0.3));
-	}
+        .file-icon svg {
+            width: 16px;
+            height: 16px;
+        }
 
-	/* Content Alignment */
-	.file-header {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 12px;
-		margin-bottom: 8px;
-		z-index: 3;
-	}
+    .file-card:hover .file-icon {
+        transform: scale(1.08);
+    }
 
-	.card-icon-wrapper {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		color: #3b82f6;
-		/* Soft blue standard file icon */
-		background-color: #eff6ff;
-		border-radius: 8px;
-		flex-shrink: 0;
-	}
+    .file-title {
+        font-size: 13px;
+        font-weight: 650;
+        color: #1e293b;
+        margin: 0;
+        line-height: 1.4;
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        letter-spacing: -0.1px;
+        flex: 1;
+    }
 
-	.card-icon-wrapper svg {
-		width: 20px;
-		height: 20px;
-		stroke-width: 2.5;
-	}
+    .file-desc {
+        font-size: 10.5px;
+        color: #64748B;
+        margin: 0;
+        line-height: 1.4;
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
 
-	.title-wrapper {
-		flex-grow: 1;
-		/* Prevent long titles from overlapping the fold */
-		padding-right: 15px;
-	}
+    .file-lines {
+        margin-top: auto;
+        padding-top: 6px;
+    }
 
-	/* Text Styles */
-	.card-title {
-		font-size: 16px;
-		font-weight: 700;
-		color: #0f172a;
-		margin: 0;
-		letter-spacing: -0.3px;
-		white-space: normal !important;
-		text-shadow: none;
-		width: min-content;
-		/* Forces text to wrap word by word */
-	}
+    .f-line {
+        height: 3px;
+        background: #F1F5F9;
+        border-radius: 2px;
+        margin-bottom: 4px;
+        width: 100%;
+    }
 
-	.card-description {
-		font-size: 12px;
-		color: #64748b;
-		margin: 0 0 16px 0;
-		line-height: 1.4;
-		font-weight: 500;
-		white-space: normal !important;
-		overflow-wrap: anywhere;
-		word-break: break-word;
-		z-index: 3;
-		flex-grow: 1;
-	}
+        .f-line.short {
+            width: 55%;
+            margin-bottom: 0;
+        }
 
-	.paper-lines {
-		margin-top: auto;
-		opacity: 0.8;
-	}
+    @@media (max-width: 600px) {
+        .file-card {
+            width: 180px !important;
+            height: 160px !important;
+        }
 
-	.cover-lines {
-		margin-top: auto;
-		opacity: 0.6;
-	}
+        .file-body {
+            width: 155px;
+            height: 130px;
+            padding: 12px 12px 8px 12px;
+        }
 
-	.p-line,
-	.c-line {
-		height: 6px;
-		background-color: #f1f5f9;
-		border-radius: 3px;
-		margin-bottom: 8px;
-		width: 100%;
-		transition: background-color 0.3s ease;
-	}
+        .file-title {
+            font-size: 12px;
+        }
 
-	.file-card:hover .p-line,
-	.file-card:hover .c-line {
-		background-color: #e2e8f0;
-	}
+        .file-desc {
+            font-size: 9.5px;
+        }
 
-	.p-line.short,
-	.c-line.short {
-		width: 60%;
-		margin-bottom: 0;
-	}
+        .file-icon {
+            width: 26px;
+            height: 26px;
+        }
 
-	@@media (max-width: 600px) {
-		.file-card {
-			width: calc(50% - 8px) !important;
-			min-width: calc(50% - 8px) !important;
-			max-width: calc(50% - 8px) !important;
-			height: 120px !important;
-		}
-
-		.file-paper {
-			padding: 12px 14px;
-			border-radius: 6px 24px 6px 6px;
-		}
-
-		.file-top-fold {
-			border-width: 0 28px 28px 0;
-			border-bottom-left-radius: 6px;
-		}
-
-		.file-card:hover .file-top-fold {
-			border-width: 0 32px 32px 0;
-		}
-
-		.file-header {
-			gap: 8px;
-			margin-bottom: 4px;
-		}
-
-		.card-icon-wrapper {
-			width: 28px;
-			height: 28px;
-			border-radius: 6px;
-		}
-
-		.card-icon-wrapper svg {
-			width: 16px;
-			height: 16px;
-		}
-
-		.title-wrapper {
-			padding-right: 8px;
-		}
-
-		.card-title {
-			font-size: 14px;
-		}
-
-		.card-description {
-			font-size: 10px;
-			margin-bottom: 10px;
-		}
-
-		.p-line {
-			height: 4px;
-			margin-bottom: 6px;
-		}
-	}
+            .file-icon svg {
+                width: 15px;
+                height: 15px;
+            }
+    }
 </style>
-
-
