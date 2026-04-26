@@ -21,6 +21,11 @@ public static class UserExport
 			Reports = user.Reports ? "Yes" : "No",
 			Admin = user.Admin ? "Yes" : "No",
 			user.Remarks,
+			user.FailedAttempts,
+			user.CodeResends,
+			user.LastCode,
+			user.LastCodeDeviceId,
+			user.LastCodeDateTime,
 			Status = user.Status ? "Active" : "Deleted"
 		});
 
@@ -35,6 +40,11 @@ public static class UserExport
 			[nameof(UserModel.Reports)] = new() { DisplayName = "Reports", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(UserModel.Admin)] = new() { DisplayName = "Admin", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(UserModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left },
+			[nameof(UserModel.FailedAttempts)] = new() { DisplayName = "Failed Attempts", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(UserModel.CodeResends)] = new() { DisplayName = "Code Resends", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(UserModel.LastCode)] = new() { DisplayName = "Last Code", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(UserModel.LastCodeDeviceId)] = new() { DisplayName = "Device ID", Alignment = CellAlignment.Left },
+			[nameof(UserModel.LastCodeDateTime)] = new() { DisplayName = "Last Code Time", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(UserModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
@@ -49,6 +59,11 @@ public static class UserExport
 			nameof(UserModel.Reports),
 			nameof(UserModel.Admin),
 			nameof(UserModel.Remarks),
+			nameof(UserModel.FailedAttempts),
+			nameof(UserModel.CodeResends),
+			nameof(UserModel.LastCode),
+			nameof(UserModel.LastCodeDeviceId),
+			nameof(UserModel.LastCodeDateTime),
 			nameof(UserModel.Status)
 		];
 

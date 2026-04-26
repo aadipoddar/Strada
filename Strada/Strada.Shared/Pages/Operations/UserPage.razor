@@ -11,6 +11,7 @@
 <MudBlazor.MudHotkey Key=JsKey.Delete KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDeleted" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedItem" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="DeleteRecoverSelectedItem" />
+<MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetSelectedItem" />
 
 @if (_isLoading || _loggedInUser is null)
 {
@@ -39,6 +40,7 @@ else
 							<MenuItems>
 								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem" Disabled="@_isProcessing" />
 								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem" Disabled="@_isProcessing" />
+								<MenuItem Text="Reset User (Ctrl + R)" IconCss="e-icons e-reset" Id="ResetTransaction" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 					</MenuItems>
@@ -171,6 +173,11 @@ else
 								</Template>
 							</GridColumn>
 							<GridColumn Field="@nameof(UserModel.Remarks)" HeaderText="Remarks" Width="220" />
+							<GridColumn Field="@nameof(UserModel.FailedAttempts)" HeaderText="Failed Attempts" Width="140" TextAlign="TextAlign.Center" Visible="_showDeleted" />
+							<GridColumn Field="@nameof(UserModel.CodeResends)" HeaderText="Code Resends" Width="140" TextAlign="TextAlign.Center" Visible="_showDeleted" />
+							<GridColumn Field="@nameof(UserModel.LastCode)" HeaderText="Last Code" Width="120" TextAlign="TextAlign.Center" Visible="_showDeleted" />
+							<GridColumn Field="@nameof(UserModel.LastCodeDeviceId)" HeaderText="Device ID" Width="220" Visible="_showDeleted" />
+							<GridColumn Field="@nameof(UserModel.LastCodeDateTime)" HeaderText="Last Code Time" Width="180" Format="dd/MM/yyyy HH:mm" TextAlign="TextAlign.Center" Visible="_showDeleted" />
 							<GridColumn Field="@nameof(UserModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
@@ -194,6 +201,15 @@ else
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="User" IdentifierLabel="Name" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+
+<ResetConfirmationDialog @ref="_resetConfirmationDialog"
+						 Message="Are you sure you want to reset this user?"
+						 WarningMessage="This will clear all login security data: failed attempts, code resends, last OTP code, device ID, and last code timestamp."
+						 NoteMessage="The user's name, phone, permissions, and password will remain unchanged. Only security/session fields will be reset."
+						 ConfirmButtonText="Reset User"
+						 Disabled="@_isProcessing"
+						 OnConfirm="ConfirmReset"
+						 OnCancel="CancelReset" />
 
 <ToastNotification @ref="_toastNotification" />
 

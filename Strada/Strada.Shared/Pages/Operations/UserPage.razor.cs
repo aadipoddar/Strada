@@ -20,18 +20,23 @@ public partial class UserPage
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
-		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" },
+		new() { Text = "Reset User (Ctrl + R)", Id = "ResetSelectedItem", IconCss = "e-icons e-reset", Target = ".e-content" }
 	];
 
 	private SfGrid<UserModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private ResetConfirmationDialog _resetConfirmationDialog;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
 
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
+
+	private int _resetTransactionId = 0;
+	private string _resetTransactionName = string.Empty;
 
 	private ToastNotification _toastNotification;
 
@@ -210,6 +215,36 @@ public partial class UserPage
 			_recoverTransactionName = string.Empty;
 		}
 	}
+
+	private async Task ConfirmReset()
+	{
+		try
+		{
+			_isProcessing = true;
+			await _resetConfirmationDialog.HideAsync();
+
+			if (!_loggedInUser.Admin)
+				throw new Exception("You do not have permission to perform this action.");
+
+			var user = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, _resetTransactionId)
+				?? throw new Exception("Transaction not found.");
+
+			await UserData.ResetInsertUser(user);
+
+			await _toastNotification.ShowAsync("Reset", "User has been reset successfully.", ToastType.Success);
+			ResetPage();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Resetting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			_resetTransactionId = 0;
+			_resetTransactionName = string.Empty;
+		}
+	}
 	#endregion
 
 	#region Utilities
@@ -238,6 +273,9 @@ public partial class UserPage
 			case "DeleteRecoverSelectedItem":
 				await DeleteRecoverSelectedItem();
 				break;
+			case "ResetTransaction":
+				await ResetSelectedItem();
+				break;
 		}
 	}
 
@@ -250,6 +288,9 @@ public partial class UserPage
 				break;
 			case "DeleteRecoverSelectedItem":
 				await DeleteRecoverSelectedItem();
+				break;
+			case "ResetSelectedItem":
+				await ResetSelectedItem();
 				break;
 		}
 	}
@@ -305,6 +346,27 @@ public partial class UserPage
 		_recoverTransactionId = 0;
 		_recoverTransactionName = string.Empty;
 		await _recoverConfirmationDialog.HideAsync();
+	}
+
+	private async Task ResetSelectedItem()
+	{
+		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
+		if (selectedRecords.Count > 0)
+			await ShowResetConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
+	}
+
+	private async Task ShowResetConfirmation(int id, string name)
+	{
+		_resetTransactionId = id;
+		_resetTransactionName = name;
+		await _resetConfirmationDialog.ShowAsync();
+	}
+
+	private async Task CancelReset()
+	{
+		_resetTransactionId = 0;
+		_resetTransactionName = string.Empty;
+		await _resetConfirmationDialog.HideAsync();
 	}
 
 	private async Task ToggleDeleted()
