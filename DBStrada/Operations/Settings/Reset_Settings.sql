@@ -21,7 +21,7 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleExpenseTypeCodePrefix'		, N'VEXT'	, N'Prefix for Vehicle Expense Type Codes')
 	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'ACCT'	, N'Prefix for Financial Accounting Transaction Numbers')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'TripAdvanceTransactionPrefix'			, N'TADV'	, N'Prefix for Trip Advance Transaction Numbers')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleTripTransactionPrefix'			, N'VHTR'	, N'Prefix for Vehicle Trip Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleExpenseTransactionPrefix'			, N'VEXP'	, N'Prefix for Vehicle Expense Transaction Numbers')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PrimaryCompanyLinkingId'			, N'1'		, N'Company Id for the Primary Company Account')

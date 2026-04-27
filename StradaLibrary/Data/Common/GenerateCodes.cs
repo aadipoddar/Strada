@@ -2,22 +2,22 @@
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Accounts.FinancialAccounting;
 using StradaLibrary.Exports.Accounts.Masters;
+using StradaLibrary.Exports.Fleet.OMC;
 using StradaLibrary.Exports.Fleet.Vehicle;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
+using StradaLibrary.Exports.Fleet.VehicleExpense;
+using StradaLibrary.Exports.Fleet.VehicleRoute;
+using StradaLibrary.Exports.Fleet.VehicleTrip;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Exports.VehicleExpense;
-using StradaLibrary.Exports.VehicleTrip.OMC;
-using StradaLibrary.Exports.VehicleTrip.TripAdvance;
-using StradaLibrary.Exports.VehicleTrip.VehicleRoute;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleDocument;
+using StradaLibrary.Models.Fleet.VehicleExpense;
+using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Operations;
-using StradaLibrary.Models.VehicleExpense;
-using StradaLibrary.Models.VehicleTrip.OMC;
-using StradaLibrary.Models.VehicleTrip.TripAdvance;
-using StradaLibrary.Models.VehicleTrip.VehicleRoute;
 
 namespace StradaLibrary.Data.Common;
 
@@ -74,7 +74,6 @@ public static class GenerateCodes
 
 		switch (decodeTransactionNoModel.CodeType)
 		{
-			#region Accounts
 			case CodeType.FinancialAccounting:
 				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<FinancialAccountingModel>(AccountNames.FinancialAccounting, transactionNo);
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.FinancialAccounting}/{(decodeTransactionNoModel.TransactionModel as FinancialAccountingModel).Id}";
@@ -88,72 +87,57 @@ public static class GenerateCodes
 				decodeTransactionNoModel.PDFStream = await LedgerExport.ExportMaster(ledgers, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await LedgerExport.ExportMaster(ledgers, ReportExportType.Excel);
 				break;
-			#endregion
 
-			#region Vehicle Trip
-			case CodeType.TripAdvance:
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<TripAdvanceModel>(VehicleTripNames.TripAdvance, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.TripAdvance}/{(decodeTransactionNoModel.TransactionModel as TripAdvanceModel).Id}";
-				decodeTransactionNoModel.PDFStream = await TripAdvanceInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as TripAdvanceModel).Id, InvoiceExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await TripAdvanceInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as TripAdvanceModel).Id, InvoiceExportType.Excel);
+			case CodeType.VehicleTrip:
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<VehicleTripModel>(FleetNames.VehicleTrip, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleTrip}/{(decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id}";
+				decodeTransactionNoModel.PDFStream = await VehicleTripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id, InvoiceExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await VehicleTripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id, InvoiceExportType.Excel);
+				break;
+			case CodeType.VehicleExpense:
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<VehicleExpenseModel>(FleetNames.VehicleExpense, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleExpense}/{(decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id}";
+				decodeTransactionNoModel.PDFStream = await VehicleExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id, InvoiceExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await VehicleExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id, InvoiceExportType.Excel);
 				break;
 
 			case CodeType.VehicleRouteLocation:
-				var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(VehicleTripNames.VehicleRouteLocation);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(VehicleTripNames.VehicleRouteLocation, transactionNo);
+				var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, transactionNo);
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleRouteLocationMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleRouteLocationModel).Id}";
 				decodeTransactionNoModel.PDFStream = await VehicleRouteLocationExport.ExportMaster(routeLocations, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await VehicleRouteLocationExport.ExportMaster(routeLocations, ReportExportType.Excel);
 				break;
 			case CodeType.VehicleRoute:
-				var vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(VehicleTripNames.VehicleRoute);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleRouteModel>(VehicleTripNames.VehicleRoute, transactionNo);
+				var vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleRouteModel>(FleetNames.VehicleRoute, transactionNo);
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleRouteMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleRouteModel).Id}";
 				decodeTransactionNoModel.PDFStream = await VehicleRouteExport.ExportMaster(vehicleRoutes, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await VehicleRouteExport.ExportMaster(vehicleRoutes, ReportExportType.Excel);
 				break;
 			case CodeType.VehicleDriver:
-				var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(VehicleTripNames.VehicleDriver);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleDriverModel>(VehicleTripNames.VehicleDriver, transactionNo);
+				var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleDriverModel>(FleetNames.VehicleDriver, transactionNo);
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleDriverMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleDriverModel).Id}";
 				decodeTransactionNoModel.PDFStream = await VehicleDriverExport.ExportMaster(vehicleDrivers, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await VehicleDriverExport.ExportMaster(vehicleDrivers, ReportExportType.Excel);
 				break;
 
 			case CodeType.OMC:
-				var omcs = await CommonData.LoadTableData<OMCModel>(VehicleTripNames.OMC);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<OMCModel>(VehicleTripNames.OMC, transactionNo);
+				var omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<OMCModel>(FleetNames.OMC, transactionNo);
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.OMCMaster}/{(decodeTransactionNoModel.TransactionModel as OMCModel).Id}";
 				decodeTransactionNoModel.PDFStream = await OMCExport.ExportMaster(omcs, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await OMCExport.ExportMaster(omcs, ReportExportType.Excel);
 				break;
 			case CodeType.OMCCard:
-				var omcCards = await CommonData.LoadTableData<OMCCardModel>(VehicleTripNames.OMCCard);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<OMCCardModel>(VehicleTripNames.OMCCard, transactionNo);
+				var omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<OMCCardModel>(FleetNames.OMCCard, transactionNo);
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.OMCCardMaster}/{(decodeTransactionNoModel.TransactionModel as OMCCardModel).Id}";
 				decodeTransactionNoModel.PDFStream = await OMCCardExport.ExportMaster(omcCards, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await OMCCardExport.ExportMaster(omcCards, ReportExportType.Excel);
 				break;
-			#endregion
 
-			#region Vehicle Expense
-			case CodeType.VehicleExpense:
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<VehicleExpenseModel>(VehicleExpenseNames.VehicleExpense, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleExpense}/{(decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id, InvoiceExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id, InvoiceExportType.Excel);
-				break;
-
-			case CodeType.VehicleExpenseType:
-				var vehicleExpenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(VehicleExpenseNames.VehicleExpenseType);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleExpenseTypeModel>(VehicleExpenseNames.VehicleExpenseType, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleExpenseTypeMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleExpenseTypeModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleExpenseTypeExport.ExportMaster(vehicleExpenseTypes, ReportExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleExpenseTypeExport.ExportMaster(vehicleExpenseTypes, ReportExportType.Excel);
-				break;
-			#endregion
-
-			#region Vehicle
 			case CodeType.VehicleType:
 				var vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType);
 				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleTypeModel>(FleetNames.VehicleType, transactionNo);
@@ -168,8 +152,13 @@ public static class GenerateCodes
 				decodeTransactionNoModel.PDFStream = await VehicleDocumentTypeExport.ExportMaster(vehicleDocumentTypes, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await VehicleDocumentTypeExport.ExportMaster(vehicleDocumentTypes, ReportExportType.Excel);
 				break;
-			#endregion
-
+			case CodeType.VehicleExpenseType:
+				var vehicleExpenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleExpenseTypeMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleExpenseTypeModel).Id}";
+				decodeTransactionNoModel.PDFStream = await VehicleExpenseTypeExport.ExportMaster(vehicleExpenseTypes, ReportExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await VehicleExpenseTypeExport.ExportMaster(vehicleExpenseTypes, ReportExportType.Excel);
+				break;
 			default:
 				break;
 		}
@@ -184,7 +173,6 @@ public static class GenerateCodes
 		{
 			switch (type)
 			{
-				#region Accounts
 				case CodeType.FinancialAccounting:
 					var accounting = await CommonData.LoadTableDataByTransactionNo<FinancialAccountingModel>(AccountNames.FinancialAccounting, code, sqlDataAccessTransaction);
 					isDuplicate = accounting is not null;
@@ -193,50 +181,38 @@ public static class GenerateCodes
 					var ledger = await CommonData.LoadTableDataByCode<LedgerModel>(AccountNames.Ledger, code, sqlDataAccessTransaction);
 					isDuplicate = ledger is not null;
 					break;
-				#endregion
 
-				#region Vehicle Trip
-				case CodeType.TripAdvance:
-					var tripAdvance = await CommonData.LoadTableDataByTransactionNo<TripAdvanceModel>(VehicleTripNames.TripAdvance, code, sqlDataAccessTransaction);
-					isDuplicate = tripAdvance is not null;
+				case CodeType.VehicleTrip:
+					var vehicleTrip = await CommonData.LoadTableDataByTransactionNo<VehicleTripModel>(FleetNames.VehicleTrip, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleTrip is not null;
 					break;
-
+				case CodeType.VehicleExpense:
+					var vehicleExpense = await CommonData.LoadTableDataByTransactionNo<VehicleExpenseModel>(FleetNames.VehicleExpense, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleExpense is not null;
+					break;
+				
 				case CodeType.VehicleRouteLocation:
-					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(VehicleTripNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
+					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
 					isDuplicate = routeLocation is not null;
 					break;
 				case CodeType.VehicleRoute:
-					var vehicleRoute = await CommonData.LoadTableDataByCode<VehicleRouteModel>(VehicleTripNames.VehicleRoute, code, sqlDataAccessTransaction);
+					var vehicleRoute = await CommonData.LoadTableDataByCode<VehicleRouteModel>(FleetNames.VehicleRoute, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleRoute is not null;
 					break;
 				case CodeType.VehicleDriver:
-					var vehicleDriver = await CommonData.LoadTableDataByCode<VehicleDriverModel>(VehicleTripNames.VehicleDriver, code, sqlDataAccessTransaction);
+					var vehicleDriver = await CommonData.LoadTableDataByCode<VehicleDriverModel>(FleetNames.VehicleDriver, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleDriver is not null;
 					break;
 
 				case CodeType.OMC:
-					var omc = await CommonData.LoadTableDataByCode<OMCModel>(VehicleTripNames.OMC, code, sqlDataAccessTransaction);
+					var omc = await CommonData.LoadTableDataByCode<OMCModel>(FleetNames.OMC, code, sqlDataAccessTransaction);
 					isDuplicate = omc is not null;
 					break;
 				case CodeType.OMCCard:
-					var omcCard = await CommonData.LoadTableDataByCode<OMCCardModel>(VehicleTripNames.OMCCard, code, sqlDataAccessTransaction);
+					var omcCard = await CommonData.LoadTableDataByCode<OMCCardModel>(FleetNames.OMCCard, code, sqlDataAccessTransaction);
 					isDuplicate = omcCard is not null;
 					break;
-				#endregion
 
-				#region Vehicle Expense
-				case CodeType.VehicleExpense:
-					var vehicleExpense = await CommonData.LoadTableDataByTransactionNo<VehicleExpenseModel>(VehicleExpenseNames.VehicleExpense, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleExpense is not null;
-					break;
-
-				case CodeType.VehicleExpenseType:
-					var vehicleExpenseType = await CommonData.LoadTableDataByCode<VehicleExpenseTypeModel>(VehicleExpenseNames.VehicleExpenseType, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleExpenseType is not null;
-					break;
-				#endregion
-
-				#region Vehicle
 				case CodeType.VehicleType:
 					var vehicleType = await CommonData.LoadTableDataByCode<VehicleTypeModel>(FleetNames.VehicleType, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleType is not null;
@@ -245,7 +221,10 @@ public static class GenerateCodes
 					var vehicleDocumentType = await CommonData.LoadTableDataByCode<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleDocumentType is not null;
 					break;
-				#endregion
+				case CodeType.VehicleExpenseType:
+					var vehicleExpenseType = await CommonData.LoadTableDataByCode<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, code, sqlDataAccessTransaction);
+					isDuplicate = vehicleExpenseType is not null;
+					break;
 			}
 
 			if (!isDuplicate)
@@ -313,35 +292,60 @@ public static class GenerateCodes
 	}
 	#endregion
 
-	#region Vehicle Trip
-	public static async Task<string> GenerateTripAdvanceTransactionNo(TripAdvanceModel tripAdvance, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	#region Vehicle Transactions
+	public static async Task<string> GenerateVehicleTripTransactionNo(VehicleTripModel vehicleTrip, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, tripAdvance.FinancialYearId, sqlDataAccessTransaction);
-		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, tripAdvance.CompanyId, sqlDataAccessTransaction)).Code;
-		var tripPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.TripAdvanceTransactionPrefix, sqlDataAccessTransaction)).Value;
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, vehicleTrip.FinancialYearId, sqlDataAccessTransaction);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, vehicleTrip.CompanyId, sqlDataAccessTransaction)).Code;
+		var tripPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTripTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastTripAdvance = await CommonData.LoadLastTableDataByFinancialYear<TripAdvanceModel>(VehicleTripNames.TripAdvance, tripAdvance.FinancialYearId, sqlDataAccessTransaction);
-		if (lastTripAdvance is not null)
+		var lastVehicleTrip = await CommonData.LoadLastTableDataByFinancialYear<VehicleTripModel>(FleetNames.VehicleTrip, vehicleTrip.FinancialYearId, sqlDataAccessTransaction);
+		if (lastVehicleTrip is not null)
 		{
-			var lastTransactionNo = lastTripAdvance.TransactionNo;
+			var lastTransactionNo = lastVehicleTrip.TransactionNo;
 			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{tripPrefix}"))
 			{
 				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + tripPrefix.Length)..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}{nextNumber:D6}", 6, CodeType.TripAdvance, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}{nextNumber:D6}", 6, CodeType.VehicleTrip, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}000001", 6, CodeType.TripAdvance, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}000001", 6, CodeType.VehicleTrip, sqlDataAccessTransaction);
 	}
 
+	public static async Task<string> GenerateVehicleExpenseTransactionNo(VehicleExpenseModel vehicleExpense, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, vehicleExpense.FinancialYearId, sqlDataAccessTransaction);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, vehicleExpense.CompanyId, sqlDataAccessTransaction)).Code;
+		var expensePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTransactionPrefix, sqlDataAccessTransaction)).Value;
+
+		var lastVehicleExpense = await CommonData.LoadLastTableDataByFinancialYear<VehicleExpenseModel>(FleetNames.VehicleExpense, vehicleExpense.FinancialYearId, sqlDataAccessTransaction);
+		if (lastVehicleExpense is not null)
+		{
+			var lastTransactionNo = lastVehicleExpense.TransactionNo;
+			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{expensePrefix}"))
+			{
+				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + expensePrefix.Length)..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}{nextNumber:D6}", 6, CodeType.VehicleExpense, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}000001", 6, CodeType.VehicleExpense, sqlDataAccessTransaction);
+	}
+	#endregion
+	
 	#region Vehicle Route
 	public static async Task<string> GenerateVehicleRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(VehicleTripNames.VehicleRouteLocation, sqlDataAccessTransaction);
+		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, sqlDataAccessTransaction);
 		var routeLocationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteLocationCodePrefix, sqlDataAccessTransaction)).Value;
 
 		var lastRouteLocation = routeLocations.OrderByDescending(rl => rl.Id).FirstOrDefault();
@@ -364,7 +368,7 @@ public static class GenerateCodes
 
 	public static async Task<string> GenerateVehicleRouteCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(VehicleTripNames.VehicleRoute, sqlDataAccessTransaction);
+		var vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute, sqlDataAccessTransaction);
 		var vehicleRoutePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteCodePrefix, sqlDataAccessTransaction)).Value;
 
 		var lastVehicleRoute = vehicleRoutes.OrderByDescending(vr => vr.Id).FirstOrDefault();
@@ -387,7 +391,7 @@ public static class GenerateCodes
 
 	public static async Task<string> GenerateVehicleDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(VehicleTripNames.VehicleDriver, sqlDataAccessTransaction);
+		var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver, sqlDataAccessTransaction);
 		var vehicleDriverPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleDriverCodePrefix, sqlDataAccessTransaction)).Value;
 
 		var lastVehicleDriver = vehicleDrivers.OrderByDescending(vd => vd.Id).FirstOrDefault();
@@ -412,7 +416,7 @@ public static class GenerateCodes
 	#region OMC
 	public static async Task<string> GenerateOMCCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var omcs = await CommonData.LoadTableData<OMCModel>(VehicleTripNames.OMC, sqlDataAccessTransaction);
+		var omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC, sqlDataAccessTransaction);
 		var omcPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCodePrefix, sqlDataAccessTransaction)).Value;
 
 		var lastOmc = omcs.OrderByDescending(o => o.Id).FirstOrDefault();
@@ -435,7 +439,7 @@ public static class GenerateCodes
 
 	public static async Task<string> GenerateOMCCardCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var omcCards = await CommonData.LoadTableData<OMCCardModel>(VehicleTripNames.OMCCard, sqlDataAccessTransaction);
+		var omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard, sqlDataAccessTransaction);
 		var omcCardPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCardCodePrefix, sqlDataAccessTransaction)).Value;
 
 		var lastOmcCard = omcCards.OrderByDescending(oc => oc.Id).FirstOrDefault();
@@ -454,56 +458,6 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{omcCardPrefix}00001", 5, CodeType.OMCCard, sqlDataAccessTransaction);
-	}
-	#endregion
-	#endregion
-
-	#region Vehicle Expense
-	public static async Task<string> GenerateVehicleExpenseTransactionNo(VehicleExpenseModel vehicleExpense, SqlDataAccessTransaction sqlDataAccessTransaction = null)
-	{
-		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, vehicleExpense.FinancialYearId, sqlDataAccessTransaction);
-		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, vehicleExpense.CompanyId, sqlDataAccessTransaction)).Code;
-		var expensePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTransactionPrefix, sqlDataAccessTransaction)).Value;
-
-		var lastVehicleExpense = await CommonData.LoadLastTableDataByFinancialYear<VehicleExpenseModel>(VehicleExpenseNames.VehicleExpense, vehicleExpense.FinancialYearId, sqlDataAccessTransaction);
-		if (lastVehicleExpense is not null)
-		{
-			var lastTransactionNo = lastVehicleExpense.TransactionNo;
-			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{expensePrefix}"))
-			{
-				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + expensePrefix.Length)..];
-				if (int.TryParse(lastNumberPart, out int lastNumber))
-				{
-					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}{nextNumber:D6}", 6, CodeType.VehicleExpense, sqlDataAccessTransaction);
-				}
-			}
-		}
-
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}000001", 6, CodeType.VehicleExpense, sqlDataAccessTransaction);
-	}
-
-	public static async Task<string> GenerateVehicleExpenseTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
-	{
-		var vehicleExpenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(VehicleExpenseNames.VehicleExpenseType, sqlDataAccessTransaction);
-		var vehicleExpenseTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTypeCodePrefix, sqlDataAccessTransaction)).Value;
-
-		var lastVehicleExpenseType = vehicleExpenseTypes.OrderByDescending(v => v.Id).FirstOrDefault();
-		if (lastVehicleExpenseType is not null)
-		{
-			var lastVehicleExpenseTypeCode = lastVehicleExpenseType.Code;
-			if (lastVehicleExpenseTypeCode.StartsWith(vehicleExpenseTypePrefix))
-			{
-				var lastNumberPart = lastVehicleExpenseTypeCode[vehicleExpenseTypePrefix.Length..];
-				if (int.TryParse(lastNumberPart, out int lastNumber))
-				{
-					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{vehicleExpenseTypePrefix}{nextNumber:D5}", 5, CodeType.VehicleExpenseType, sqlDataAccessTransaction);
-				}
-			}
-		}
-
-		return await CheckDuplicateCode($"{vehicleExpenseTypePrefix}00001", 5, CodeType.VehicleExpenseType, sqlDataAccessTransaction);
 	}
 	#endregion
 
@@ -554,5 +508,27 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{vehicleDocumentTypePrefix}00001", 5, CodeType.VehicleDocumentType, sqlDataAccessTransaction);
 	}
 
+	public static async Task<string> GenerateVehicleExpenseTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var vehicleExpenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, sqlDataAccessTransaction);
+		var vehicleExpenseTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTypeCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastVehicleExpenseType = vehicleExpenseTypes.OrderByDescending(v => v.Id).FirstOrDefault();
+		if (lastVehicleExpenseType is not null)
+		{
+			var lastVehicleExpenseTypeCode = lastVehicleExpenseType.Code;
+			if (lastVehicleExpenseTypeCode.StartsWith(vehicleExpenseTypePrefix))
+			{
+				var lastNumberPart = lastVehicleExpenseTypeCode[vehicleExpenseTypePrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{vehicleExpenseTypePrefix}{nextNumber:D5}", 5, CodeType.VehicleExpenseType, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{vehicleExpenseTypePrefix}00001", 5, CodeType.VehicleExpenseType, sqlDataAccessTransaction);
+	}
 	#endregion
 }
