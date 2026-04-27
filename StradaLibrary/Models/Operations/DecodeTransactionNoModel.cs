@@ -6,6 +6,7 @@ public enum CodeType
 	Ledger,
 
 	VehicleTrip,
+	VehicleTripBill,
 	VehicleExpense,
 
 	VehicleRouteLocation,

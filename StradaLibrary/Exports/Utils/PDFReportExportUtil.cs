@@ -357,7 +357,7 @@ public static class PDFReportExportUtil
 
             foreach (var metadata in headerMetadata)
             {
-                if (!string.IsNullOrEmpty(metadata.Value))
+                if (!string.IsNullOrWhiteSpace(metadata.Value))
                 {
                     string metadataText = $"{metadata.Key}: {metadata.Value}";
                     page.Graphics.DrawString(metadataText, metadataFont, metadataBrush, new PointF(leftMargin, currentY));
@@ -378,7 +378,7 @@ public static class PDFReportExportUtil
         }
 
         // Add final spacing if metadata or period was displayed
-        bool hasMetadata = headerMetadata != null && headerMetadata.Any(m => !string.IsNullOrEmpty(m.Value));
+        bool hasMetadata = headerMetadata != null && headerMetadata.Any(m => !string.IsNullOrWhiteSpace(m.Value));
         if (hasMetadata || hasPeriod)
             currentY += 14; return currentY;
     }
@@ -732,7 +732,7 @@ public static class PDFReportExportUtil
     /// </summary>
     private static void DrawWrappedText(PdfGraphics graphics, string text, PdfFont font, PdfBrush brush, RectangleF bounds)
     {
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
             return;
 
         PdfStringFormat format = new()
@@ -832,7 +832,7 @@ public static class PDFReportExportUtil
         if (value == null)
             return string.Empty;
 
-        if (string.IsNullOrEmpty(format))
+        if (string.IsNullOrWhiteSpace(format))
             return value.ToString();
 
         try
@@ -870,7 +870,7 @@ public static class PDFReportExportUtil
     /// </summary>
     private static string SplitCamelCase(string input)
     {
-        if (string.IsNullOrEmpty(input))
+        if (string.IsNullOrWhiteSpace(input))
             return input;
 
         // Handle special cases

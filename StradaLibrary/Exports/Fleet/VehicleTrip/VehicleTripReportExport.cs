@@ -19,7 +19,8 @@ public static class VehicleTripReportExport
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
-		VehicleRouteOverviewModel route = null)
+		VehicleRouteOverviewModel route = null,
+		VehicleDriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{
@@ -45,6 +46,12 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(VehicleTripOverviewModel.VehicleEmpty)] = new() { DisplayName = "Vehicle Empty", Alignment = CellAlignment.Center, IncludeInTotal = false },
+
+			[nameof(VehicleTripOverviewModel.BillNo)] = new() { DisplayName = "Bill No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleTripOverviewModel.GrossAmount)] = new() { DisplayName = "Gross Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripOverviewModel.TDSAmount)] = new() { DisplayName = "TDS Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripOverviewModel.PenaltyAmount)] = new() { DisplayName = "Penalty Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripOverviewModel.NetAmount)] = new() { DisplayName = "Net Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(VehicleTripOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -82,6 +89,11 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOverviewModel.EstimatedCost),
 				nameof(VehicleTripOverviewModel.TotalExpense),
 				nameof(VehicleTripOverviewModel.VehicleEmpty),
+				nameof(VehicleTripOverviewModel.BillNo),
+				nameof(VehicleTripOverviewModel.GrossAmount),
+				nameof(VehicleTripOverviewModel.TDSAmount),
+				nameof(VehicleTripOverviewModel.PenaltyAmount),
+				nameof(VehicleTripOverviewModel.NetAmount),
 				nameof(VehicleTripOverviewModel.Remarks),
 				nameof(VehicleTripOverviewModel.CreatedByName),
 				nameof(VehicleTripOverviewModel.CreatedAt),
@@ -110,6 +122,8 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOverviewModel.Quantity),
 				nameof(VehicleTripOverviewModel.TotalExpense),
 				nameof(VehicleTripOverviewModel.VehicleEmpty),
+				nameof(VehicleTripOverviewModel.BillNo),
+				nameof(VehicleTripOverviewModel.NetAmount),
 				nameof(VehicleTripOverviewModel.Status)
 			];
 
@@ -124,6 +138,9 @@ public static class VehicleTripReportExport
 
 			if (route is not null)
 				columnOrder.Remove(nameof(VehicleTripOverviewModel.RouteDisplay));
+
+			if (driver is not null)
+				columnOrder.Remove(nameof(VehicleTripOverviewModel.DriverDisplay));
 
 			if (!showDeleted)
 				columnOrder.Remove(nameof(VehicleTripOverviewModel.Status));
@@ -149,7 +166,8 @@ public static class VehicleTripReportExport
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
-					["Route"] = route?.RouteDisplay ?? null
+					["Route"] = route?.RouteDisplay ?? null,
+					["Driver"] = driver?.DisplayName ?? null
 				}
 			);
 
@@ -171,7 +189,8 @@ public static class VehicleTripReportExport
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
-					["Route"] = route?.RouteDisplay ?? null
+					["Route"] = route?.RouteDisplay ?? null,
+					["Driver"] = driver?.DisplayName ?? null
 				}
 			);
 
@@ -189,7 +208,8 @@ public static class VehicleTripReportExport
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
-		VehicleRouteOverviewModel route = null)
+		VehicleRouteOverviewModel route = null,
+		VehicleDriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{
@@ -219,6 +239,12 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripExpensesOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(VehicleTripExpensesOverviewModel.VehicleEmpty)] = new() { DisplayName = "Vehicle Empty", Alignment = CellAlignment.Center, IncludeInTotal = false },
+
+			[nameof(VehicleTripExpensesOverviewModel.BillNo)] = new() { DisplayName = "Bill No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleTripExpensesOverviewModel.GrossAmount)] = new() { DisplayName = "Gross Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripExpensesOverviewModel.TDSAmount)] = new() { DisplayName = "TDS Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripExpensesOverviewModel.PenaltyAmount)] = new() { DisplayName = "Penalty Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripExpensesOverviewModel.NetAmount)] = new() { DisplayName = "Net Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(VehicleTripExpensesOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -258,6 +284,11 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.EstimatedCost),
 				nameof(VehicleTripExpensesOverviewModel.TotalExpense),
 				nameof(VehicleTripExpensesOverviewModel.VehicleEmpty),
+				nameof(VehicleTripExpensesOverviewModel.BillNo),
+				nameof(VehicleTripExpensesOverviewModel.GrossAmount),
+				nameof(VehicleTripExpensesOverviewModel.TDSAmount),
+				nameof(VehicleTripExpensesOverviewModel.PenaltyAmount),
+				nameof(VehicleTripExpensesOverviewModel.NetAmount),
 				nameof(VehicleTripExpensesOverviewModel.Remarks),
 				nameof(VehicleTripExpensesOverviewModel.CreatedByName),
 				nameof(VehicleTripExpensesOverviewModel.CreatedAt),
@@ -284,6 +315,8 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.Quantity),
 				nameof(VehicleTripExpensesOverviewModel.TotalExpense),
 				nameof(VehicleTripExpensesOverviewModel.VehicleEmpty),
+				nameof(VehicleTripExpensesOverviewModel.BillNo),
+				nameof(VehicleTripExpensesOverviewModel.NetAmount),
 			];
 
 			if (company is not null)
@@ -297,6 +330,9 @@ public static class VehicleTripReportExport
 
 			if (route is not null)
 				columnOrder.Remove(nameof(VehicleTripExpensesOverviewModel.RouteDisplay));
+
+			if (driver is not null)
+				columnOrder.Remove(nameof(VehicleTripExpensesOverviewModel.DriverDisplay));
 		}
 
 		string fileName = $"VEHICLE_TRIP_EXPENSES_REPORT";
@@ -319,7 +355,8 @@ public static class VehicleTripReportExport
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
-					["Route"] = route?.RouteDisplay ?? null
+					["Route"] = route?.RouteDisplay ?? null,
+					["Driver"] = driver?.DisplayName ?? null
 				}
 			);
 
@@ -341,7 +378,8 @@ public static class VehicleTripReportExport
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
-					["Route"] = route?.RouteDisplay ?? null
+					["Route"] = route?.RouteDisplay ?? null,
+					["Driver"] = driver?.DisplayName ?? null
 				}
 			);
 
@@ -359,7 +397,8 @@ public static class VehicleTripReportExport
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
-		VehicleRouteOverviewModel route = null)
+		VehicleRouteOverviewModel route = null,
+		VehicleDriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{
@@ -389,6 +428,12 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripCardPaymentsOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(VehicleTripCardPaymentsOverviewModel.VehicleEmpty)] = new() { DisplayName = "Vehicle Empty", Alignment = CellAlignment.Center, IncludeInTotal = false },
+
+			[nameof(VehicleTripCardPaymentsOverviewModel.BillNo)] = new() { DisplayName = "Bill No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleTripCardPaymentsOverviewModel.GrossAmount)] = new() { DisplayName = "Gross Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripCardPaymentsOverviewModel.TDSAmount)] = new() { DisplayName = "TDS Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripCardPaymentsOverviewModel.PenaltyAmount)] = new() { DisplayName = "Penalty Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripCardPaymentsOverviewModel.NetAmount)] = new() { DisplayName = "Net Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(VehicleTripCardPaymentsOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripCardPaymentsOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -428,6 +473,11 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripCardPaymentsOverviewModel.EstimatedCost),
 				nameof(VehicleTripCardPaymentsOverviewModel.TotalExpense),
 				nameof(VehicleTripCardPaymentsOverviewModel.VehicleEmpty),
+				nameof(VehicleTripCardPaymentsOverviewModel.BillNo),
+				nameof(VehicleTripCardPaymentsOverviewModel.GrossAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.TDSAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.PenaltyAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.NetAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.Remarks),
 				nameof(VehicleTripCardPaymentsOverviewModel.CreatedByName),
 				nameof(VehicleTripCardPaymentsOverviewModel.CreatedAt),
@@ -453,7 +503,9 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripCardPaymentsOverviewModel.DriverDisplay),
 				nameof(VehicleTripCardPaymentsOverviewModel.Quantity),
 				nameof(VehicleTripCardPaymentsOverviewModel.TotalExpense),
-				nameof(VehicleTripCardPaymentsOverviewModel.VehicleEmpty)
+				nameof(VehicleTripCardPaymentsOverviewModel.VehicleEmpty),
+				nameof(VehicleTripCardPaymentsOverviewModel.BillNo),
+				nameof(VehicleTripCardPaymentsOverviewModel.NetAmount)
 			];
 
 			if (company is not null)
@@ -467,6 +519,9 @@ public static class VehicleTripReportExport
 
 			if (route is not null)
 				columnOrder.Remove(nameof(VehicleTripCardPaymentsOverviewModel.RouteDisplay));
+
+			if (driver is not null)
+				columnOrder.Remove(nameof(VehicleTripCardPaymentsOverviewModel.DriverDisplay));
 		}
 
 		string fileName = $"VEHICLE_TRIP_PAYMENTS_REPORT";
@@ -489,7 +544,8 @@ public static class VehicleTripReportExport
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
-					["Route"] = route?.RouteDisplay ?? null
+					["Route"] = route?.RouteDisplay ?? null,
+					["Driver"] = driver?.DisplayName ?? null
 				}
 			);
 
@@ -511,7 +567,8 @@ public static class VehicleTripReportExport
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
-					["Route"] = route?.RouteDisplay ?? null
+					["Route"] = route?.RouteDisplay ?? null,
+					["Driver"] = driver?.DisplayName ?? null
 				}
 			);
 

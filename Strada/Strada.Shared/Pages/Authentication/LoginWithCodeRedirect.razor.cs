@@ -16,7 +16,7 @@ public partial class LoginWithCodeRedirect
 
 		try
 		{
-			if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(Code))
+			if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(Code))
 			{
 				NavigationManager.NavigateTo(PageRouteNames.Login, true);
 				return;

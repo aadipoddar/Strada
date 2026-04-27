@@ -4,7 +4,6 @@ using Strada.Shared.Components.Input;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.VehicleExpense;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Accounts.Masters;
 using StradaLibrary.Exports.Fleet.VehicleExpense;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
@@ -398,7 +397,7 @@ public partial class VehicleExpensePage
 	#region Saving
 	private async Task UpdateFinancialDetails()
 	{
-		foreach (var item in _expensesCart)
+		foreach (var item in _expensesCart.ToList())
 		{
 			if (item.Amount <= 0)
 				_expensesCart.Remove(item);
@@ -457,6 +456,12 @@ public partial class VehicleExpensePage
 			_isProcessing = true;
 
 			await UpdateFinancialDetails();
+
+			if (_expensesCart.Count == 0)
+			{
+				await DeleteLocalFiles();
+				return;
+			}
 
 			await DataStorageService.LocalSaveAsync(StorageFileNames.VehicleExpenseDataFileName, System.Text.Json.JsonSerializer.Serialize(_vehicleExpense));
 			await DataStorageService.LocalSaveAsync(StorageFileNames.VehicleExpenseDetailsCartDataFileName, System.Text.Json.JsonSerializer.Serialize(_expensesCart));

@@ -537,6 +537,50 @@ h1:focus {
     flex: 0 0 calc(25% - 16px);
 }
 
+/* Two Column Layout (equal 50-50 split) */
+.two-column-layout-equal {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.two-column-layout-equal>* {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* Three Column Layout (50-25-25 split) */
+.three-column-layout {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.three-column-layout>* {
+    min-width: 0;
+}
+
+.three-column-layout> :first-child {
+    flex: 0 0 calc(50% - 16px);
+}
+
+.three-column-layout> :nth-child(2),
+.three-column-layout> :nth-child(3) {
+    flex: 0 0 calc(25% - 8px);
+}
+
+/* Four Column Layout (equal 25-25-25-25 split) */
+.four-column-layout {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.four-column-layout>* {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
 /* Transaction Number with Auto-generate Checkbox */
 .transaction-no-wrapper {
     display: flex;

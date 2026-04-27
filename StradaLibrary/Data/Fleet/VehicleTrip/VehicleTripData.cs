@@ -4,7 +4,6 @@ using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Fleet.VehicleTrip;
 using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Operations;
@@ -13,13 +12,17 @@ namespace StradaLibrary.Data.Fleet.VehicleTrip;
 
 public static class VehicleTripData
 {
-	private static async Task<int> InsertVehicleTrip(VehicleTripModel vehicleTrip, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+	internal static async Task<int> InsertVehicleTrip(VehicleTripModel vehicleTrip, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleTrip, vehicleTrip, sqlDataAccessTransaction)).FirstOrDefault();
 
 	private static async Task<int> InsertVehicleTripExpenses(VehicleTripExpensesModel vehicleTripExpenses, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleTripExpenses, vehicleTripExpenses, sqlDataAccessTransaction)).FirstOrDefault();
+
 	private static async Task<int> InsertVehicleTripCardPayments(VehicleTripCardPaymentsModel vehicleTripOMCCardPayments, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-			(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleTripCardPayments, vehicleTripOMCCardPayments, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleTripCardPayments, vehicleTripOMCCardPayments, sqlDataAccessTransaction)).FirstOrDefault();
+
+	public static async Task<List<VehicleTripOverviewModel>> LoadVehicleTripOverviewByBillIdDate(int? BillId = null, DateTime? StartDate = null, DateTime? EndDate = null, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+		await SqlDataAccess.LoadData<VehicleTripOverviewModel, dynamic>(FleetNames.LoadVehicleTripOverviewByBillIdDate, new { BillId, StartDate, EndDate }, sqlDataAccessTransaction);
 
 	public static List<VehicleTripExpensesModel> ConvertExpensesCartToDetails(List<VehicleTripExpensesCartModel> cart, int accountingId = 0) =>
 		[.. cart.Select(item => new VehicleTripExpensesModel
@@ -38,7 +41,7 @@ public static class VehicleTripData
 			Id = 0,
 			MasterId = accountingId,
 			OMCCardId = item.OMCCardId,
-			Amount = item.Amount,	
+			Amount = item.Amount,
 			Remarks = item.Remarks,
 			Status = true
 		})];
@@ -67,6 +70,9 @@ public static class VehicleTripData
 		try
 		{
 			await FinancialYearData.ValidateFinancialYear(trip.TransactionDateTime, sqlDataAccessTransaction);
+
+			if (trip.BillId is not null)
+				throw new InvalidOperationException("Cannot delete a vehicle trip transaction that is associated with a bill.");
 
 			trip.Status = false;
 			await InsertVehicleTrip(trip, sqlDataAccessTransaction);
@@ -140,7 +146,7 @@ public static class VehicleTripData
 	{
 		if (expensesDetails.Any(ed => ed.Amount <= 0))
 			throw new InvalidOperationException("Expense amount must be greater than zero.");
-		
+
 		if (expensesDetails.Sum(ed => ed.Amount) != trip.TotalExpense)
 			throw new InvalidOperationException("Total expense amount must be equal to total expense of the transaction.");
 	}

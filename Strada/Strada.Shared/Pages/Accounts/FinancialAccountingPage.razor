@@ -155,7 +155,7 @@ else
                                         <SfTextBox @bind-Value="_accounting.ReferenceNo" Placeholder="Enter Reference No"
                                                    FloatLabelType="FloatLabelType.Never" Readonly="true"
                                                    CssClass="custom-textbox readonly-field" />
-                                        @if (!string.IsNullOrEmpty(_accounting.ReferenceNo))
+                                        @if (!string.IsNullOrWhiteSpace(_accounting.ReferenceNo))
                                         {
                                             <div class="reference-actions">
                                                 <IconButton Icon="IconType.View" Variant="ButtonVariant.View"

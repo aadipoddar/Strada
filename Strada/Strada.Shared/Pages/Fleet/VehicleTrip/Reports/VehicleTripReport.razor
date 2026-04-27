@@ -172,6 +172,42 @@ else
 													 FieldValue="@nameof(VehicleRouteOverviewModel.RouteDisplay)"
 													 AddNewRoute="@PageRouteNames.VehicleRouteMaster" />
 							</div>
+
+							<!-- Driver -->
+							<div class="form-field">
+								<AutoCompleteWithAdd TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel"
+													 @bind-Value="_selectedDriver"
+													 DataSource="@_vehicleDrivers"
+													 Placeholder="All Drivers"
+													 Label="Driver" Required="true"
+													 ValueChange="OnDriverChanged"
+													 FieldValue="@nameof(VehicleDriverOverviewModel.DisplayName)"
+													 AddNewRoute="@PageRouteNames.VehicleDriverMaster" />
+							</div>
+
+							<!-- Vehicle Empty -->
+							<div class="form-field">
+								<label class="field-label">Vehicle Empty</label>
+								<SfDropDownList TValue="int" TItem="YesNoFilterOption"
+												DataSource="@TripFilterOptions.YesNo" Value="_vehicleEmptyFilter"
+												CssClass="custom-textbox" FloatLabelType="FloatLabelType.Never">
+									<DropDownListFieldSettings Text="Name" Value="Id" />
+									<DropDownListEvents TValue="int" TItem="YesNoFilterOption"
+														ValueChange="OnVehicleEmptyFilterChanged" />
+								</SfDropDownList>
+							</div>
+
+							<!-- Pending Bills -->
+							<div class="form-field">
+								<label class="field-label">Pending Bills</label>
+								<SfDropDownList TValue="int" TItem="YesNoFilterOption"
+												DataSource="@TripFilterOptions.YesNo" Value="_pendingBillsFilter"
+												CssClass="custom-textbox" FloatLabelType="FloatLabelType.Never">
+									<DropDownListFieldSettings Text="Name" Value="Id" />
+									<DropDownListEvents TValue="int" TItem="YesNoFilterOption"
+														ValueChange="OnPendingBillsFilterChanged" />
+								</SfDropDownList>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -285,6 +321,96 @@ else
 											}
 										</GroupCaptionTemplate>
 									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleTripOverviewModel.GrossAmount)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleTripOverviewModel.TDSAmount)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleTripOverviewModel.PenaltyAmount)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div><strong>@aggregate.Sum</strong></div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleTripOverviewModel.NetAmount)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
 								</GridAggregateColumns>
 							</GridAggregate>
 						</GridAggregates>
@@ -319,7 +445,8 @@ else
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.DriverMobile)" HeaderText="Driver Mobile"
 										Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.DriverDisplay)" HeaderText="Driver"
-										Width="170" />
+										Width="170"
+										Visible="@(_showAllColumns || _selectedDriver is null || _selectedDriver.Id <= 0)" />
 
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.Quantity)" HeaderText="Qty" Width="100"
 										TextAlign="TextAlign.Right" Format="N2" />
@@ -346,9 +473,27 @@ else
 								<Template>
 									@{
 										var item = (context as VehicleTripOverviewModel);
-										<span class="@(item.VehicleEmpty ? "grid-debit": string.Empty)">
+										<span class="@(item.VehicleEmpty ? "grid-debit" : string.Empty)">
 											@(item.VehicleEmpty ? "Empty" : "Loaded")
 										</span>
+									}
+								</Template>
+							</GridColumn>
+
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.BillNo)" HeaderText="Bill No"
+										Width="150" />
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.GrossAmount)" HeaderText="Gross Amt"
+										Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.TDSAmount)" HeaderText="TDS Amt"
+										Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.PenaltyAmount)" HeaderText="Penalty Amt"
+										Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.NetAmount)" HeaderText="Net Amt"
+										Width="150" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = (context as VehicleTripOverviewModel);
+										<span class="grid-total">@(item.NetAmount?.ToString("N2") ?? string.Empty)</span>
 									}
 								</Template>
 							</GridColumn>

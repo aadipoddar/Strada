@@ -14,7 +14,6 @@
 <MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="() => _sfOMCCardAutoComplete.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="AddExpensesToCart" />
-<MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="AddPaymentsToCart" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" />
@@ -198,10 +197,10 @@ else
 								<div class="date-year-wrapper">
 									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedDistance"
 													  Placeholder="Enter estimated distance..." FloatLabelType="FloatLabelType.Never"
-													  Readonly="true" CssClass="custom-numeric readonly-field" />
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
 									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedCost"
 													  Placeholder="Enter estimated cost..." FloatLabelType="FloatLabelType.Never"
-													  Readonly="true" CssClass="custom-numeric readonly-field" />
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
 								</div>
 							</div>
 
@@ -213,10 +212,10 @@ else
 								<div class="date-year-wrapper">
 									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedHours"
 													  Placeholder="Enter estimated hours..." FloatLabelType="FloatLabelType.Never"
-													  Readonly="true" CssClass="custom-numeric readonly-field" />
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
 									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedFuelConsumption"
 													  Placeholder="Enter estimated fuel..." FloatLabelType="FloatLabelType.Never"
-													  Readonly="true" CssClass="custom-numeric readonly-field" />
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
 								</div>
 							</div>
 

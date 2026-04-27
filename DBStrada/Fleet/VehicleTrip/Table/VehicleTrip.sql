@@ -13,6 +13,11 @@
     [Quantity] MONEY NOT NULL,
     [TotalExpense] MONEY NOT NULL,
     [VehicleEmpty] BIT NOT NULL DEFAULT 0,
+    [BillId] INT NULL,
+    [GrossAmount] MONEY NULL,
+    [TDSAmount] MONEY NULL,
+    [PenaltyAmount] MONEY NULL,
+    [NetAmount] MONEY NULL,
     [Remarks] VARCHAR(MAX) NULL,
 	[CreatedBy] INT NOT NULL,
 	[CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
@@ -27,6 +32,7 @@
     CONSTRAINT [FK_VehicleTrip_ToVehicle] FOREIGN KEY ([VehicleId]) REFERENCES [Vehicle]([Id]),
     CONSTRAINT [FK_VehicleTrip_ToDriver] FOREIGN KEY ([DriverId]) REFERENCES [VehicleDriver]([Id]),
     CONSTRAINT [FK_VehicleTrip_ToRoute] FOREIGN KEY ([RouteId]) REFERENCES [VehicleRoute]([Id]),
+    CONSTRAINT [FK_VehicleTrip_ToVehicleTripBill] FOREIGN KEY ([BillId]) REFERENCES [VehicleTripBill]([Id]),
     CONSTRAINT [FK_VehicleTrip_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 	CONSTRAINT [FK_VehicleTrip_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])
 )

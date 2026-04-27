@@ -30,6 +30,11 @@ public class DataStorageService : IDataStorageService
 		await LocalRemove(StorageFileNames.VehicleTripDataFileName);
 		await LocalRemove(StorageFileNames.VehicleTripExpensesCartDataFileName);
 		await LocalRemove(StorageFileNames.VehicleTripPaymentsCartDataFileName);
+
+		await LocalRemove(StorageFileNames.VehicleTripBillDataFileName);
+		await LocalRemove(StorageFileNames.VehicleTripBillPendingTripsCartDataFileName);
+		await LocalRemove(StorageFileNames.VehicleTripBillCardPaymentsCartDataFileName);
+		await LocalRemove(StorageFileNames.VehicleTripBillLedgerPaymentsCartDataFileName);
 	}
 
 

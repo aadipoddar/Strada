@@ -28,6 +28,7 @@ public static class SettingsKeys
 
 	public static string FinancialAccountingTransactionPrefix => "FinancialAccountingTransactionPrefix";
 	public static string VehicleTripTransactionPrefix => "VehicleTripTransactionPrefix";
+	public static string VehicleTripBillTransactionPrefix => "VehicleTripBillTransactionPrefix";
 	public static string VehicleExpenseTransactionPrefix => "VehicleExpenseTransactionPrefix";
 
 	public static string PrimaryCompanyLinkingId => "PrimaryCompanyLinkingId";

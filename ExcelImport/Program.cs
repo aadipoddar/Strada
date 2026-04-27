@@ -39,12 +39,12 @@ static async Task ImportVehicles(ExcelWorksheet worksheet1)
 		var vehicleTypeId = worksheet1.Cells[row, 6].Value.ToString();
 		var companyId = worksheet1.Cells[row, 7].Value.ToString();
 
-		if (string.IsNullOrEmpty(code) ||
-			string.IsNullOrEmpty(shortCode) ||
-			string.IsNullOrEmpty(chasis) ||
-			string.IsNullOrEmpty(engine) ||
-			string.IsNullOrEmpty(vehicleTypeId) ||
-			string.IsNullOrEmpty(companyId))
+		if (string.IsNullOrWhiteSpace(code) ||
+			string.IsNullOrWhiteSpace(shortCode) ||
+			string.IsNullOrWhiteSpace(chasis) ||
+			string.IsNullOrWhiteSpace(engine) ||
+			string.IsNullOrWhiteSpace(vehicleTypeId) ||
+			string.IsNullOrWhiteSpace(companyId))
 		{
 			Console.WriteLine("Not Inserted Row = " + row);
 			continue;

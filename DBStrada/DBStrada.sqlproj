@@ -91,6 +91,10 @@
     <Folder Include="Fleet\VehicleExpense\Insert" />
     <Folder Include="Fleet\VehicleExpense\Table" />
     <Folder Include="Fleet\VehicleExpense\Load" />
+    <Folder Include="Fleet\VehicleTripBill" />
+    <Folder Include="Fleet\VehicleTripBill\Table" />
+    <Folder Include="Fleet\VehicleTripBill\Load" />
+    <Folder Include="Fleet\VehicleTripBill\Insert" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -168,6 +172,16 @@
     <Build Include="Fleet\VehicleExpense\Insert\Insert_VehicleExpenseDetails.sql" />
     <Build Include="Fleet\VehicleExpense\Load\VehicleExpense_Overview.sql" />
     <Build Include="Fleet\VehicleExpense\Load\VehicleExpenseDetails_Overview.sql" />
+    <Build Include="Fleet\VehicleTripBill\Table\VehicleTripBill.sql" />
+    <Build Include="Fleet\VehicleTripBill\Table\VehicleTripBillLedgerPayments.sql" />
+    <Build Include="Fleet\VehicleTripBill\Table\VehicleTripBillCardPayments.sql" />
+    <Build Include="Fleet\VehicleTripBill\Insert\Insert_VehicleTripBill.sql" />
+    <Build Include="Fleet\VehicleTripBill\Insert\Insert_VehicleTripBillCardPayments.sql" />
+    <Build Include="Fleet\VehicleTripBill\Insert\Insert_VehicleTripBillLedgerPayments.sql" />
+    <Build Include="Fleet\VehicleTripBill\Load\VehicleTripBill_Overview.sql" />
+    <Build Include="Fleet\VehicleTripBill\Load\VehicleTripBillCardPayments_Overview.sql" />
+    <Build Include="Fleet\VehicleTripBill\Load\VehicleTripBillLedgerPayments_Overview.sql" />
+    <Build Include="Fleet\VehicleTrip\Load\Load_VehicleTrip_Overview_By_BillId_Date.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

@@ -488,7 +488,7 @@ public partial class FinancialAccountingPage
 			_accountingLedgers = [.. ledgerGroups.Values
 				.Where(x => (x.Debit ?? 0) != (x.Credit ?? 0) &&
 							x.ReferenceId is not null &&
-							!string.IsNullOrEmpty(x.ReferenceNo))
+							!string.IsNullOrWhiteSpace(x.ReferenceNo))
 				.OrderByDescending(x => x.ReferenceDateTime)];
 
 			if (_accountingLedgers.Count == 0)
@@ -592,6 +592,12 @@ public partial class FinancialAccountingPage
 			_isProcessing = true;
 
 			await UpdateFinancialDetails();
+
+			if (_cart.Count == 0)
+			{
+				await DeleteLocalFiles();
+				return;
+			}
 
 			await DataStorageService.LocalSaveAsync(StorageFileNames.FinancialAccountingDataFileName, System.Text.Json.JsonSerializer.Serialize(_accounting));
 			await DataStorageService.LocalSaveAsync(StorageFileNames.FinancialAccountingCartDataFileName, System.Text.Json.JsonSerializer.Serialize(_cart));

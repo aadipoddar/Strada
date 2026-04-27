@@ -38,6 +38,13 @@ SELECT
 
 	[t].[VehicleEmpty],
 
+	[t].[BillId],
+	[b].[BillNo],
+	[t].[GrossAmount],
+	[t].[TDSAmount],
+	[t].[PenaltyAmount],
+	[t].[NetAmount],
+
     [t].[Remarks],
 	[t].[CreatedBy],
 	[u].[Name] AS CreatedByName,
@@ -70,6 +77,8 @@ INNER JOIN
 	[dbo].[VehicleRouteLocation] frl ON r.FromLocationId = frl.Id
 INNER JOIN
 	[dbo].[VehicleRouteLocation] torl ON r.ToLocationId = torl.Id
+LEFT JOIN
+	[dbo].[VehicleTripBill] b ON t.BillId = b.Id
 INNER JOIN
 	[dbo].[User] AS u ON t.CreatedBy = u.Id
 LEFT JOIN

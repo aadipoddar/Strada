@@ -8,8 +8,14 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 {
 	private readonly ProtectedLocalStorage _protectedLocalStorage = protectedLocalStorage;
 
-	public async Task SecureSaveAsync(string key, string value) =>
-		await _protectedLocalStorage.SetAsync(key, value);
+	public async Task SecureSaveAsync(string key, string value)
+	{
+		try
+		{
+			await _protectedLocalStorage.SetAsync(key, value);
+		}
+		catch { }
+	}
 
 	public async Task<string?> SecureGetAsync(string key) =>
 		(await _protectedLocalStorage.GetAsync<string>(key)).Value;
@@ -37,6 +43,11 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 		await LocalRemove(StorageFileNames.VehicleTripDataFileName);
 		await LocalRemove(StorageFileNames.VehicleTripExpensesCartDataFileName);
 		await LocalRemove(StorageFileNames.VehicleTripPaymentsCartDataFileName);
+
+		await LocalRemove(StorageFileNames.VehicleTripBillDataFileName);
+		await LocalRemove(StorageFileNames.VehicleTripBillPendingTripsCartDataFileName);
+		await LocalRemove(StorageFileNames.VehicleTripBillCardPaymentsCartDataFileName);
+		await LocalRemove(StorageFileNames.VehicleTripBillLedgerPaymentsCartDataFileName);
 	}
 
 

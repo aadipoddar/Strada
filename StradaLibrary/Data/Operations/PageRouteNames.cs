@@ -46,6 +46,11 @@ public static class PageRouteNames
 	public const string VehicleTripExpensesReport = "/fleet/vehicle-trip-expenses-report";
 	public const string VehicleTripPaymentsReport = "/fleet/vehicle-trip-payments-report";
 
+	public const string VehicleTripBill = "/fleet/vehicle-trip-bill";
+	public const string VehicleTripBillReport = "/fleet/vehicle-trip-bill-report";
+	public const string VehicleTripBillCardPaymentsReport = "/fleet/vehicle-trip-bill-card-payments-report";
+	public const string VehicleTripBillLedgerPaymentsReport = "/fleet/vehicle-trip-bill-ledger-payments-report";
+
 	public const string VehicleRouteLocationMaster = "/fleet/vehicle-route-location";
 	public const string VehicleRouteMaster = "/fleet/vehicle-route";
 	public const string VehicleDriverMaster = "/fleet/vehicle-driver";

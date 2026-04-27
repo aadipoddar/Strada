@@ -17,7 +17,7 @@ public static class VehicleRouteData
 		List<VehicleRouteOverviewModel> routeLocations = [];
 
 		foreach (var route in routes)
-			routeLocations.Add(new ()
+			routeLocations.Add(new()
 			{
 				Id = route.Id,
 				FromLocationId = route.FromLocationId,

@@ -163,7 +163,7 @@ public partial class VehicleTripPage
 
 	private async Task<bool> TryRestoreFromLocalStorage()
 	{
-		if (!await DataStorageService.LocalExists(StorageFileNames.VehicleTripExpensesCartDataFileName))
+		if (!await DataStorageService.LocalExists(StorageFileNames.VehicleTripDataFileName))
 			return false;
 
 		try
@@ -593,7 +593,7 @@ public partial class VehicleTripPage
 	#region Saving
 	private async Task UpdateFinancialDetails()
 	{
-		foreach (var item in _expensesCart)
+		foreach (var item in _expensesCart.ToList())
 		{
 			if (item.Amount <= 0)
 				_expensesCart.Remove(item);
@@ -603,7 +603,7 @@ public partial class VehicleTripPage
 				item.Remarks = null;
 		}
 
-		foreach (var item in _paymentsCart)
+		foreach (var item in _paymentsCart.ToList())
 		{
 			if (item.Amount <= 0)
 				_paymentsCart.Remove(item);
@@ -663,6 +663,12 @@ public partial class VehicleTripPage
 			_isProcessing = true;
 
 			await UpdateFinancialDetails();
+
+			if (_expensesCart.Count == 0)
+			{
+				await DeleteLocalFiles();
+				return;
+			}
 
 			await DataStorageService.LocalSaveAsync(StorageFileNames.VehicleTripDataFileName, System.Text.Json.JsonSerializer.Serialize(_vehicleTrip));
 			await DataStorageService.LocalSaveAsync(StorageFileNames.VehicleTripExpensesCartDataFileName, System.Text.Json.JsonSerializer.Serialize(_expensesCart));

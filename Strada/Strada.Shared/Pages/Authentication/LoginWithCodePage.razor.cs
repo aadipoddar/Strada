@@ -72,7 +72,7 @@ public partial class LoginWithCodePage
 		if (_isVerifying)
 			return;
 
-		if (string.IsNullOrEmpty(_phoneEmail))
+		if (string.IsNullOrWhiteSpace(_phoneEmail))
 		{
 			await _toastNotification.ShowAsync("Invalid Input", "Please enter a valid phone number or email address.", ToastType.Error);
 			return;
@@ -155,7 +155,7 @@ public partial class LoginWithCodePage
 			if (!_isCodeSent)
 				throw new Exception("Please send the code before attempting to log in.");
 
-			if (string.IsNullOrEmpty(_otpCode) || _otpCode.Length != _otpInput.Length)
+			if (string.IsNullOrWhiteSpace(_otpCode) || _otpCode.Length != _otpInput.Length)
 			{
 				_otpInput.FocusAsync();
 				throw new Exception("Please enter the complete code sent to you.");
@@ -196,7 +196,7 @@ public partial class LoginWithCodePage
 				throw new Exception("The code has expired. Please request a new code.");
 			}
 
-			if (!string.IsNullOrEmpty(_newPassword))
+			if (!string.IsNullOrWhiteSpace(_newPassword))
 			{
 				if (_isEnabledUsersResetPassword)
 					throw new Exception("Users are not allowed to set a new password. Please contact support.");

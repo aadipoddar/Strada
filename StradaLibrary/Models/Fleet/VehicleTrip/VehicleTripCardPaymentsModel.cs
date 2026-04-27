@@ -57,6 +57,13 @@ public class VehicleTripCardPaymentsOverviewModel
 
 	public bool VehicleEmpty { get; set; }
 
+	public int? BillId { get; set; }
+	public string? BillNo { get; set; }
+	public decimal? GrossAmount { get; set; }
+	public decimal? TDSAmount { get; set; }
+	public decimal? PenaltyAmount { get; set; }
+	public decimal? NetAmount { get; set; }
+
 	public string? Remarks { get; set; }
 	public int CreatedBy { get; set; }
 	public string CreatedByName { get; set; }

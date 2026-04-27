@@ -32,11 +32,15 @@ public partial class VehicleTripExpensesReport : IAsyncDisposable
 	private OMCModel? _selectedOMC = null;
 	private VehicleModel? _selectedVehicle = null;
 	private VehicleRouteOverviewModel? _selectedRoute = null;
+	private VehicleDriverOverviewModel? _selectedDriver = null;
+	private int _vehicleEmptyFilter = TripFilterOptions.All;
+	private int _pendingBillsFilter = TripFilterOptions.All;
 
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
+	private List<VehicleDriverOverviewModel> _vehicleDrivers = [];
 	private List<VehicleTripExpensesOverviewModel> _transactionOverviews = [];
 
 	private SfGrid<VehicleTripExpensesOverviewModel> _sfGrid;
@@ -77,11 +81,13 @@ public partial class VehicleTripExpensesReport : IAsyncDisposable
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
+		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		_omcs = [.. _omcs.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 		_vehicleRoutes = [.. _vehicleRoutes.OrderBy(s => s.Code)];
+		_vehicleDrivers = [.. _vehicleDrivers.OrderBy(s => s.Name)];
 	}
 
 	private async Task LoadTransactionOverviews()
@@ -111,6 +117,19 @@ public partial class VehicleTripExpensesReport : IAsyncDisposable
 
 			if (_selectedRoute?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.RouteId == _selectedRoute.Id)];
+
+			if (_selectedDriver?.Id > 0)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.DriverId == _selectedDriver.Id)];
+
+			if (_vehicleEmptyFilter == TripFilterOptions.Yes)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.VehicleEmpty)];
+			else if (_vehicleEmptyFilter == TripFilterOptions.No)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => !_.VehicleEmpty)];
+
+			if (_pendingBillsFilter == TripFilterOptions.Yes)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.BillId is null)];
+			else if (_pendingBillsFilter == TripFilterOptions.No)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.BillId is not null)];
 
 			_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
 		}
@@ -169,6 +188,24 @@ public partial class VehicleTripExpensesReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
+	private async Task OnDriverChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VehicleDriverOverviewModel, VehicleDriverOverviewModel> args)
+	{
+		_selectedDriver = args.Value;
+		await LoadTransactionOverviews();
+	}
+
+	private async Task OnVehicleEmptyFilterChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<int, YesNoFilterOption> args)
+	{
+		_vehicleEmptyFilter = args.Value;
+		await LoadTransactionOverviews();
+	}
+
+	private async Task OnPendingBillsFilterChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<int, YesNoFilterOption> args)
+	{
+		_pendingBillsFilter = args.Value;
+		await LoadTransactionOverviews();
+	}
+
 	private async Task HandleDatesChanged(DateRangeType dateRangeType)
 	{
 		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
@@ -197,7 +234,8 @@ public partial class VehicleTripExpensesReport : IAsyncDisposable
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
-				_selectedRoute?.Id > 0 ? _selectedRoute : null
+				_selectedRoute?.Id > 0 ? _selectedRoute : null,
+				_selectedDriver?.Id > 0 ? _selectedDriver : null
 			);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
@@ -234,7 +272,8 @@ public partial class VehicleTripExpensesReport : IAsyncDisposable
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
-				_selectedRoute?.Id > 0 ? _selectedRoute : null
+				_selectedRoute?.Id > 0 ? _selectedRoute : null,
+				_selectedDriver?.Id > 0 ? _selectedDriver : null
 			 );
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
