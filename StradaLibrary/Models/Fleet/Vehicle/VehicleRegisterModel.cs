@@ -1,4 +1,7 @@
-﻿namespace StradaLibrary.Models.Fleet.Vehicle;
+﻿using StradaLibrary.Models.Fleet.VehicleExpense;
+using StradaLibrary.Models.Fleet.VehicleTrip;
+
+namespace StradaLibrary.Models.Fleet.Vehicle;
 
 public class VehicleRegisterModel
 {
@@ -23,6 +26,9 @@ public class VehicleRegisterModel
 	public decimal TotalNetAmount { get; set; }
 
 	public decimal TotalProfitLoss { get; set; }
+
+	public List<VehicleTripOverviewModel> VehicleTripOverviews { get; set; } = [];
+	public List<VehicleExpenseOverviewModel> VehicleExpenseOverviews { get; set; } = [];
 }
 
 public class VehicleRegisterExpensesModel

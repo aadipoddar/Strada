@@ -3,7 +3,8 @@
     "allow": [
       "PowerShell($root = 'c:\\\\Dev\\\\Strada\\\\Strada\\\\Strada.Shared\\\\Pages\\\\Fleet'; Move-Item \"$root\\\\VehicleRepair\" \"$root\\\\VehicleExpense\"; Get-ChildItem \"$root\\\\VehicleExpense\" -Recurse)",
       "Bash(dotnet build *)",
-      "Bash(wait)"
+      "Bash(wait)",
+      "WebFetch(domain:blazor.syncfusion.com)"
     ]
   }
 }

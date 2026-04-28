@@ -28,7 +28,7 @@ public partial class VehicleExpensePage
 	private FinancialYearModel _selectedFinancialYear = new();
 	private VehicleModel _selectedVehicle = new();
 	private VehicleExpenseTypeModel _selectedExpenseType = null;
-	private LedgerModel _selectedLedger = new();
+	private LedgerModel? _selectedLedger = null;
 	private VehicleExpenseDetailsCartModel _selectedExpensesCart = new();
 	private VehicleExpenseModel _vehicleExpense = new();
 
@@ -468,7 +468,7 @@ public partial class VehicleExpensePage
 
 			await UpdateFinancialDetails();
 
-			if (_expensesCart.Count == 0)
+			if (_expensesCart.Count == 0 || _vehicleExpense.Id > 0)
 			{
 				await DeleteLocalFiles();
 				return;

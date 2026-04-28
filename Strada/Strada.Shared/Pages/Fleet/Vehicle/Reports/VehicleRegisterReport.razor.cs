@@ -166,6 +166,8 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			vehicle.TotalTDSAmount = vehicleTrips.Where(_ => _.TDSAmount.HasValue).Sum(_ => _.TDSAmount.Value);
 			vehicle.TotalNetAmount = vehicleTrips.Where(_ => _.NetAmount.HasValue).Sum(_ => _.NetAmount.Value);
 
+			vehicle.VehicleTripOverviews = [.. vehicleTrips];
+
 			foreach (var trip in vehicleTrips)
 			{
 				var tripExpenses = await CommonData.LoadTableDataByMasterId<VehicleTripExpensesOverviewModel>(FleetNames.VehicleTripExpensesOverview, trip.Id);
@@ -187,6 +189,8 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		{
 			var vehicleExpenses = expenses.Where(_ => _.VehicleId == vehicle.VehicleId);
 			vehicle.TotalVehicleExpenses = vehicleExpenses.Sum(_ => _.TotalExpense);
+
+			vehicle.VehicleExpenseOverviews = [.. vehicleExpenses];
 
 			foreach (var expense in vehicleExpenses)
 			{
@@ -271,7 +275,8 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	#region Exports
 	private async Task ExportExcel()
 	{
-
+		_sfGrid.AllowExcelExport = true;
+		await _sfGrid?.ExportToExcelAsync();
 	}
 
 	private async Task ExportPdf()
