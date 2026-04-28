@@ -1001,6 +1001,6 @@ public partial class VehicleTripBillPage
 	}
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard, true);
+		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard, true);
 	#endregion
 }

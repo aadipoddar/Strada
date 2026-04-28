@@ -1,0 +1,62 @@
+@attribute [Route(PageRouteNames.FleetTransactionsDashboard)]
+
+<PageTitle>Fleet Transactions - Strada</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => NavigationManager.NavigateTo(PageRouteNames.Dashboard)" />
+
+@if (_isLoading || _user is null)
+{
+	<LoadingScreen />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Fleet Transactions" />
+
+		<div class="page-container">
+
+			<!-- VEHICLE TRIPS -->
+			<div class="dashboard-grid">
+				<FileCard Title="Vehicle Trip" Description="Record a new trip with route, driver and trip expenses" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTrip)">
+					<IconContent>
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="1" y="3" width="15" height="13" />
+							<polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+							<circle cx="5.5" cy="18.5" r="2.5" />
+							<circle cx="18.5" cy="18.5" r="2.5" />
+						</svg>
+					</IconContent>
+				</FileCard>
+
+					
+				<!-- TRIP BILLS -->
+				<FileCard Title="Vehicle Trip Bill" Description="Generate and manage billing for completed trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripBill)">
+					<IconContent>
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="2" y="3" width="20" height="18" rx="2" />
+							<line x1="7" y1="8" x2="17" y2="8" />
+							<line x1="7" y1="12" x2="17" y2="12" />
+							<line x1="7" y1="16" x2="13" y2="16" />
+							<path d="M17 16l1.5 1.5L21 15" />
+						</svg>
+					</IconContent>
+				</FileCard>
+
+				<!-- VEHICLE EXPENSES -->
+				<FileCard Title="Vehicle Expense" Description="Log repair, fuel and other vehicle expenses" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleExpense)">
+					<IconContent>
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M4 2h13l3 3v17a1 1 0 0 1-1.5.87L17 22l-2 .87L13 22l-2 .87L9 22l-2 .87L5 22l-1.5.87A1 1 0 0 1 2 22V4a2 2 0 0 1 2-2z" />
+							<line x1="7" y1="9" x2="17" y2="9" />
+							<line x1="7" y1="13" x2="17" y2="13" />
+							<line x1="7" y1="17" x2="13" y2="17" />
+						</svg>
+					</IconContent>
+				</FileCard>
+			</div>
+
+		</div>
+
+		<Footer />
+	</div>
+}

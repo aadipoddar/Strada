@@ -1,8 +1,8 @@
 using StradaLibrary.Models.Operations;
 
-namespace Strada.Shared.Pages.Operations;
+namespace Strada.Shared.Pages.Fleet;
 
-public partial class ReportsDashbaord
+public partial class FleetTransactionsDashbaord
 {
 	private UserModel _user;
 	private bool _isLoading = true;

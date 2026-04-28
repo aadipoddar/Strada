@@ -338,6 +338,6 @@ public partial class VehiclePage
 		NavigationManager.NavigateTo(PageRouteNames.VehicleMaster, true);
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
 	#endregion
 }

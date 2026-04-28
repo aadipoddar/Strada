@@ -9,9 +9,6 @@ public static class PageRouteNames
 
 	public const string Dashboard = "/";
 	public const string OperationsDashboard = "/operations";
-	public const string ReportsDashboard = "/reports";
-	public const string TransactionsDashboard = "/transactions";
-	public const string MastersDashboard = "/masters";
 
 	public const string User = "/operations/user";
 	public const string Settings = "/operations/settings";
@@ -38,6 +35,9 @@ public static class PageRouteNames
 
 	#region Fleet
 	public const string FleetDashboard = "/fleet";
+	public const string FleetReportsDashboard = "/fleet-reports";
+	public const string FleetTransactionsDashboard = "/fleet-transactions";
+	public const string FleetMastersDashboard = "/fleet-masters";
 
 	public const string VehicleRegisterReport = "/fleet/vehicle-register-report";
 

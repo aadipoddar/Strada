@@ -1,0 +1,330 @@
+@using StradaLibrary.Models.Accounts.Masters
+@using StradaLibrary.Models.Operations
+@attribute [Route(PageRouteNames.Settings)]
+
+<PageTitle>Settings - Strada</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveSettings" />
+<MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ShowResetConfirmation" />
+<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
+
+@if (_isLoading)
+{
+	<LoadingScreen />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="System Settings">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveSettings" Disabled="@_isProcessing" />
+								<MenuItem Text="Reset to Defaults (Ctrl + R)" IconCss="e-icons e-reset" Id="ResetSettings" Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<div class="page-container">
+
+			<!-- Primary Configuration -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="3" />
+							<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+						</svg>
+						<h2 class="section-title">Primary Configuration</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">Primary Company <span class="required">*</span></label>
+							<SfAutoComplete @bind-Value="_selectedCompanyName" TValue="string" TItem="CompanyModel"
+											DataSource="@_companies" Placeholder="Select primary company"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+								<AutoCompleteEvents TValue="string" TItem="CompanyModel" ValueChange="OnCompanyChange" />
+							</SfAutoComplete>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Login Settings -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+							<path d="M7 11V7a5 5 0 0 1 10 0v4" />
+						</svg>
+						<h2 class="section-title">Login Settings</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">Enable Login with Code</label>
+							<div class="checkbox-wrapper">
+								<SfCheckBox @bind-Checked="_enableLoginWithCode" Label="Allow OTP-based login" CssClass="custom-checkbox" />
+							</div>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Enable Users to Reset Password</label>
+							<div class="checkbox-wrapper">
+								<SfCheckBox @bind-Checked="_enableUsersToResetPassword" Label="Allow self-service password reset" CssClass="custom-checkbox" />
+							</div>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Max Login Attempts</label>
+							<SfNumericTextBox @bind-Value="_maxLoginAttempts" TValue="int" Min="1" Max="20"
+											  Placeholder="e.g., 5" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Code Resend Limit</label>
+							<SfNumericTextBox @bind-Value="_codeResendLimit" TValue="int" Min="1" Max="10"
+											  Placeholder="e.g., 3" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Code Expiry (Minutes)</label>
+							<SfNumericTextBox @bind-Value="_codeExpiryMinutes" TValue="int" Min="1" Max="60"
+											  Placeholder="e.g., 10" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Master Code Prefixes -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="16 18 22 12 16 6" />
+							<polyline points="8 6 2 12 8 18" />
+						</svg>
+						<h2 class="section-title">Master Code Prefixes</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">Ledger Code Prefix</label>
+							<SfTextBox @bind-Value="_ledgerCodePrefix" Placeholder="e.g., LD"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Vehicle Type Code Prefix</label>
+							<SfTextBox @bind-Value="_vehicleTypeCodePrefix" Placeholder="e.g., VHTY"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Document Type Code Prefix</label>
+							<SfTextBox @bind-Value="_documentTypeCodePrefix" Placeholder="e.g., DCTY"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">OMC Code Prefix</label>
+							<SfTextBox @bind-Value="_omcCodePrefix" Placeholder="e.g., OMC"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">OMC Card Code Prefix</label>
+							<SfTextBox @bind-Value="_omcCardCodePrefix" Placeholder="e.g., OMCC"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Route Location Code Prefix</label>
+							<SfTextBox @bind-Value="_vehicleRouteLocationCodePrefix" Placeholder="e.g., VHRL"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Vehicle Route Code Prefix</label>
+							<SfTextBox @bind-Value="_vehicleRouteCodePrefix" Placeholder="e.g., VHRO"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Vehicle Driver Code Prefix</label>
+							<SfTextBox @bind-Value="_vehicleDriverCodePrefix" Placeholder="e.g., VHDR"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Vehicle Expense Type Code Prefix</label>
+							<SfTextBox @bind-Value="_vehicleExpenseTypeCodePrefix" Placeholder="e.g., VEXT"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Transaction Prefixes -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<line x1="12" y1="1" x2="12" y2="23" />
+							<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+						</svg>
+						<h2 class="section-title">Transaction Prefixes</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">Financial Accounting Prefix</label>
+							<SfTextBox @bind-Value="_financialAccountingTransactionPrefix" Placeholder="e.g., ACCT"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Vehicle Trip Prefix</label>
+							<SfTextBox @bind-Value="_vehicleTripTransactionPrefix" Placeholder="e.g., VHTR"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Vehicle Trip Bill Prefix</label>
+							<SfTextBox @bind-Value="_vehicleTripBillTransactionPrefix" Placeholder="e.g., VTBL"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Vehicle Expense Prefix</label>
+							<SfTextBox @bind-Value="_vehicleExpenseTransactionPrefix" Placeholder="e.g., VEXP"
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Ledger Linking -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+							<polyline points="14 2 14 8 20 8" />
+							<line x1="16" y1="13" x2="8" y2="13" />
+							<line x1="16" y1="17" x2="8" y2="17" />
+							<line x1="10" y1="9" x2="8" y2="9" />
+						</svg>
+						<h2 class="section-title">Ledger Linking</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">Cash Ledger</label>
+							<SfAutoComplete @bind-Value="_selectedCashLedgerName" TValue="string" TItem="LedgerModel"
+											DataSource="@_ledgers" Placeholder="Select cash ledger"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+								<AutoCompleteEvents TValue="string" TItem="LedgerModel" ValueChange="OnCashLedgerChange" />
+							</SfAutoComplete>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">GST Ledger</label>
+							<SfAutoComplete @bind-Value="_selectedGSTLedgerName" TValue="string" TItem="LedgerModel"
+											DataSource="@_ledgers" Placeholder="Select GST ledger"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+								<AutoCompleteEvents TValue="string" TItem="LedgerModel" ValueChange="OnGSTLedgerChange" />
+							</SfAutoComplete>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Default Values -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="4" width="18" height="16" rx="2" />
+							<line x1="8" y1="9" x2="16" y2="9" />
+							<line x1="8" y1="13" x2="13" y2="13" />
+							<line x1="8" y1="17" x2="11" y2="17" />
+						</svg>
+						<h2 class="section-title">Default Values</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">Default Voucher for Accounting Transactions</label>
+							<SfAutoComplete @bind-Value="_selectedDefaultVoucherName" TValue="string" TItem="VoucherModel"
+											DataSource="@_vouchers" Placeholder="Select default voucher"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+								<AutoCompleteEvents TValue="string" TItem="VoucherModel" ValueChange="OnDefaultVoucherChange" />
+							</SfAutoComplete>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Report Settings -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10" />
+							<polyline points="12 6 12 12 16 14" />
+						</svg>
+						<h2 class="section-title">Report Settings</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="form-grid">
+						<div class="form-field">
+							<label class="field-label">Auto Refresh Timer (Minutes)</label>
+							<SfNumericTextBox @bind-Value="_autoRefreshReportTimer" TValue="int" Min="1" Max="60"
+											  Placeholder="e.g., 5" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<ResetConfirmationDialog @ref="_resetConfirmationDialog"
+						 Message="Are you sure you want to reset all settings to their default values?"
+						 WarningMessage="This will reset all system configuration including company linking, code prefixes, transaction prefixes, ledger associations, and login settings."
+						 NoteMessage="This action cannot be undone. You will need to reconfigure all settings manually."
+						 ConfirmButtonText="Reset Settings" Disabled="@_isProcessing" OnConfirm="ConfirmReset"
+						 OnCancel="CancelReset" />
+
+<ToastNotification @ref="_toastNotification" />

@@ -319,6 +319,6 @@ public partial class VehicleDriverPage
 		NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster, true);
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
 	#endregion
 }

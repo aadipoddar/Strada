@@ -275,13 +275,89 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	#region Exports
 	private async Task ExportExcel()
 	{
-		_sfGrid.AllowExcelExport = true;
-		await _sfGrid?.ExportToExcelAsync();
+		var props = new ExcelExportProperties
+		{
+			FileName = $"VehicleRegister_{_fromDate:dd-MMM-yyyy}_to_{_toDate:dd-MMM-yyyy}.xlsx",
+			IncludeTemplateColumn = true,
+			ExcelDetailRowMode = _showAllColumns ? ExcelDetailRowMode.Expand : ExcelDetailRowMode.None
+		};
+		await _sfGrid.ExportToExcelAsync(props);
+	}
+
+	public void OnExcelDetailTemplateExporting(ExcelDetailTemplateEventArgs<VehicleRegisterModel> args)
+	{
+		var vehicle = args.ParentRow.Data;
+		var rows = new List<ExcelDetailTemplateRow>();
+
+		if (vehicle.VehicleTripOverviews.Count > 0)
+		{
+			// Section heading
+			rows.Add(ExcelRow(["TRIPS", .. Enumerable.Repeat("", 13)], bold: true, backColor: "#BDD7EE"));
+
+			// Column headers
+			rows.Add(ExcelRow(["Date", "Challan", "Route", "Driver", "Type", "Qty", "Trip Exp", "Bill No", "Bill Date", "Gross", "TDS", "Net Amt", "Trip No", "Remarks"], bold: true, backColor: "#DEEAF1"));
+
+			foreach (var trip in vehicle.VehicleTripOverviews)
+			{
+				rows.Add(ExcelRow([
+					trip.TransactionDateTime.ToString("dd/MM/yy"),
+					trip.ChallanNo ?? "",
+					trip.RouteDisplay ?? "",
+					trip.DriverDisplay ?? "",
+					trip.VehicleEmpty ? "Empty" : "Loaded",
+					trip.Quantity.ToString("N2"),
+					trip.TotalExpense.ToString("N2"),
+					trip.BillNo ?? "",
+					trip.BillDateTime?.ToString("dd/MM/yy") ?? "",
+					trip.GrossAmount?.ToString("N2") ?? "",
+					trip.TDSAmount?.ToString("N2") ?? "",
+					trip.NetAmount?.ToString("N2") ?? "",
+					trip.TransactionNo ?? "",
+					trip.Remarks ?? ""
+				]));
+			}
+
+			// Blank separator
+			rows.Add(ExcelRow([""]));
+		}
+
+		if (vehicle.VehicleExpenseOverviews.Count > 0)
+		{
+			// Section heading
+			rows.Add(ExcelRow(["VEHICLE EXPENSES", .. Enumerable.Repeat("", 3)], bold: true, backColor: "#BDD7EE"));
+
+			// Column headers
+			rows.Add(ExcelRow(["Date", "Amount", "Expense No", "Remarks"], bold: true, backColor: "#DEEAF1"));
+
+			foreach (var expense in vehicle.VehicleExpenseOverviews)
+			{
+				rows.Add(ExcelRow([
+					expense.TransactionDateTime.ToString("dd/MM/yy"),
+					expense.TotalExpense.ToString("N2"),
+					expense.TransactionNo ?? "",
+					expense.Remarks ?? ""
+				]));
+			}
+		}
+
+		args.RowInfo.Rows = rows;
+	}
+
+	private static ExcelDetailTemplateRow ExcelRow(List<string> values, bool bold = false, string backColor = null)
+	{
+		var cells = new List<ExcelDetailTemplateCell>();
+		for (var i = 0; i < values.Count; i++)
+		{
+			var cell = new ExcelDetailTemplateCell { Index = i, CellValue = values[i] };
+			if (bold || backColor is not null)
+				cell.Style = new ExcelStyle { Bold = bold, BackColor = backColor };
+			cells.Add(cell);
+		}
+		return new ExcelDetailTemplateRow { Cells = cells };
 	}
 
 	private async Task ExportPdf()
 	{
-
 	}
 	#endregion
 
@@ -354,7 +430,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	}
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard, true);
 
 	private async Task StartAutoRefresh()
 	{

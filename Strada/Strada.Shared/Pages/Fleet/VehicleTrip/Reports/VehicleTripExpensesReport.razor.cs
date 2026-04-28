@@ -451,7 +451,7 @@ public partial class VehicleTripExpensesReport : IAsyncDisposable
 			await _sfGrid.Refresh();
 	}
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard, true);
 
 	private async Task StartAutoRefresh()
 	{

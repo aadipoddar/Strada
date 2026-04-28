@@ -1,4 +1,4 @@
-@attribute [Route(PageRouteNames.ReportsDashboard)]
+@attribute [Route(PageRouteNames.FleetReportsDashboard)]
 
 <PageTitle>Fleet Reports - Strada</PageTitle>
 
@@ -31,7 +31,7 @@ else
 				</div>
 				<div class="section-body">
 					<div class="dashboard-grid">
-						<FileCard Title="Vehicle Register Report" Description="Complete register of all fleet vehicles with type and registration details" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleRegisterReport)">
+						<FileCard Title="Vehicle Register" Description="Complete register of all fleet vehicles with type and registration details" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleRegisterReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M10 17h4V5H2v12h3" />
@@ -54,7 +54,7 @@ else
 							<line x1="12" y1="20" x2="12" y2="4" />
 							<line x1="6" y1="20" x2="6" y2="14" />
 						</svg>
-						<h2 class="section-title">Vehicle Trip Reports</h2>
+						<h2 class="section-title">Trip Reports</h2>
 					</div>
 					<p class="section-subtitle">Review trip activity, expense breakdowns and OMC card payments across trips</p>
 				</div>
@@ -108,14 +108,14 @@ else
 							<line x1="7" y1="16" x2="13" y2="16" />
 							<path d="M17 16l1.5 1.5L21 15" />
 						</svg>
-						<h2 class="section-title">Trip Bill Reports</h2>
+						<h2 class="section-title">Billing Reports</h2>
 					</div>
 					<p class="section-subtitle">Billing summaries, card payments and ledger settlements recorded on trip bills</p>
 				</div>
 				<div class="section-body">
 					<div class="dashboard-grid">
 
-						<FileCard Title="Trip Bill Report" Description="Summary of all trip bills filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripBillReport)">
+						<FileCard Title="Bill Report" Description="Summary of all trip bills filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripBillReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -162,7 +162,7 @@ else
 							<polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
 							<polyline points="17 6 23 6 23 12" />
 						</svg>
-						<h2 class="section-title">Vehicle Expense Reports</h2>
+						<h2 class="section-title">Expense Reports</h2>
 					</div>
 					<p class="section-subtitle">Track non-trip expenses by vehicle, expense type and date range</p>
 				</div>

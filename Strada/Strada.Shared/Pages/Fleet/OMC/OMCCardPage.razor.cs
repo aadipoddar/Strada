@@ -328,6 +328,6 @@ public partial class OMCCardPage
 		NavigationManager.NavigateTo(PageRouteNames.OMCCardMaster, true);
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
 	#endregion
 }

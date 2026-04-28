@@ -87,21 +87,22 @@ else
 				{
 					@if (_user.Fleet)
 					{
-						<FolderCard Title="Fleet" Description="Access fleet dashboard"
-									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetDashboard)">
+						<FolderCard Title="Fleet Masters" Description="Manage vehicles, routes, drivers, OMC and document types"
+									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard)">
 							<IconContent>
-								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-									 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M10 17h4V5H2v12h3" />
-									<path d="M14 9h4l4 4v4h-3" />
-									<circle cx="7.5" cy="17.5" r="2.5" />
-									<circle cx="17.5" cy="17.5" r="2.5" />
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<ellipse cx="12" cy="5" rx="9" ry="3" />
+									<path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+									<path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
 								</svg>
 							</IconContent>
 						</FolderCard>
+					}
 
+					@if (_user.Fleet)
+					{
 						<FolderCard Title="Fleet Transactions" Description="Record vehicle trips, trip bills and vehicle expenses"
-									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TransactionsDashboard)">
+									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M12 20h9" />
@@ -114,27 +115,13 @@ else
 					@if (_user.Reports)
 					{
 						<FolderCard Title="Fleet Reports" Description="View trip, billing and expense reports across the fleet"
-									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportsDashboard)">
+									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M3 3v18h18" />
 									<path d="M18 17V9" />
 									<path d="M13 17V5" />
 									<path d="M8 17v-3" />
-								</svg>
-							</IconContent>
-						</FolderCard>
-					}
-
-					@if (_user.Fleet)
-					{
-						<FolderCard Title="Fleet Masters" Description="Manage vehicles, routes, drivers, OMC and document types"
-									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.MastersDashboard)">
-							<IconContent>
-								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<ellipse cx="12" cy="5" rx="9" ry="3" />
-									<path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-									<path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
 								</svg>
 							</IconContent>
 						</FolderCard>

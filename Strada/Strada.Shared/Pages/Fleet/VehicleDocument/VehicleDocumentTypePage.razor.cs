@@ -319,6 +319,6 @@ public partial class VehicleDocumentTypePage
 		NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentTypeMaster, true);
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
 	#endregion
 }

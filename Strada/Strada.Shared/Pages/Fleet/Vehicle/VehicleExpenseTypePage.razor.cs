@@ -319,6 +319,6 @@ public partial class VehicleExpenseTypePage
 		NavigationManager.NavigateTo(PageRouteNames.VehicleExpenseTypeMaster, true);
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
 	#endregion
 }
