@@ -1,0 +1,324 @@
+@attribute [Route(PageRouteNames.VehicleRegisterReport)]
+
+@using StradaLibrary.Models.Accounts.Masters
+@using StradaLibrary.Models.Fleet.OMC
+@using StradaLibrary.Models.Fleet.Vehicle
+
+<PageTitle>Vehicle Register - Strada</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
+<MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" />
+<MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" />
+<MudBlazor.MudHotkey Key=JsKey.KeyQ KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDetailsView" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
+
+@if (_isLoading || _user is null)
+{
+	<LoadingScreen />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Vehicle Register">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
+										   Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected"
+								OnOpen='async () => await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0)' />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="Refresh Data (Ctrl + R / F5)" IconCss="e-icons e-refresh" Id="Refresh"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")"
+										  IconCss="e-icons e-table" Id="ToggleDetailsView" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
+										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
+										  Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
+							<MenuItems>
+								<MenuItem Text="Vehicle Trip Report" Id="VehicleTripReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Vehicle Expense Report" Id="VehicleExpenseReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Trip Bill Report" Id="VehicleTripBillReport" Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Periods" IconCss="e-icons e-clock">
+							<MenuItems>
+								<MenuItem Text="Today" Id="PeriodToday" Disabled="@_isProcessing" />
+								<MenuItem Text="Previous Day" Id="PeriodPreviousDay" Disabled="@_isProcessing" />
+								<MenuItem Text="Next Day" Id="PeriodNextDay" Disabled="@_isProcessing" />
+								<MenuItem Text="Current Month" Id="PeriodCurrentMonth" Disabled="@_isProcessing" />
+								<MenuItem Text="Previous Month" Id="PeriodPreviousMonth" Disabled="@_isProcessing" />
+								<MenuItem Text="Next Month" Id="PeriodNextMonth" Disabled="@_isProcessing" />
+								<MenuItem Text="Current FY" Id="PeriodCurrentFinancialYear" Disabled="@_isProcessing" />
+								<MenuItem Text="Previous FY" Id="PeriodPreviousFinancialYear" Disabled="@_isProcessing" />
+								<MenuItem Text="Next FY" Id="PeriodNextFinancialYear" Disabled="@_isProcessing" />
+								<MenuItem Text="All Time" Id="PeriodAllTime" Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<div class="page-container">
+
+			<!-- Filters -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+							 stroke-linecap="round" stroke-linejoin="round">
+							<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+						</svg>
+						<h2 class="section-title">Filters</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="filters-container">
+						<div class="filters-grid">
+							<div class="form-field">
+								<label class="field-label">Date Range</label>
+								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
+												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true"
+												   Placeholder="Select date range">
+									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
+								</SfDateRangePicker>
+							</div>
+							<div class="form-field">
+								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+													 Value="_selectedCompany" DataSource="@_companies"
+													 Placeholder="All Companies" Label="Company" Required="true"
+													 ValueChange="OnCompanyChanged" FieldValue="@nameof(CompanyModel.Name)"
+													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+							</div>
+							<div class="form-field">
+								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+													 Value="_selectedOMC" DataSource="@_omcs"
+													 Placeholder="All OMCs" Label="OMC" Required="true"
+													 ValueChange="OnOMCChanged" FieldValue="@nameof(OMCModel.Name)"
+													 AddNewRoute="@PageRouteNames.OMCMaster" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Register Grid -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+							 stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+							<line x1="3" y1="9" x2="21" y2="9" />
+							<line x1="3" y1="15" x2="21" y2="15" />
+							<line x1="9" y1="3" x2="9" y2="21" />
+						</svg>
+						<h2 class="section-title">Vehicle Register</h2>
+					</div>
+				</div>
+				<div class="section-body grid-body">
+					<SfGrid @ref="_sfGrid" TValue="VehicleRegisterModel" DataSource="_transactionOverviews"
+							AllowTextWrap="true" AllowPaging="true" AllowSorting="true" AllowResizing="true"
+							AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true"
+							GridLines="GridLine.Horizontal" AllowGrouping="true" CssClass="professional-grid"
+							Toolbar="@(new List<string>() { "Search" })">
+
+						<GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+						<GridAggregates>
+							<GridAggregate>
+								<GridAggregateColumns>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.VehicleCode)"
+														 Type="AggregateType.Count">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div class="aggregate-label">
+												<strong>Total Vehicles: @aggregate.Count</strong>
+											</div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalTrips)"
+														 Type="AggregateType.Sum">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.LoadedTrips)"
+														 Type="AggregateType.Sum">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.EmptyTrips)"
+														 Type="AggregateType.Sum">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalQuantity)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalTripExpenses)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalVehicleExpenses)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalBills)"
+														 Type="AggregateType.Sum">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalGrossAmount)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalTDSAmount)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div><strong>@aggregate.Sum</strong></div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalNetAmount)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{ var aggregate = (context as AggregateTemplateContext); }
+											<div class="aggregate-value aggregate-total">
+												<strong>@aggregate.Sum</strong>
+											</div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalProfitLoss)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												var isLoss = aggregate.Sum?.StartsWith("-") == true;
+											}
+											<div class="aggregate-value @(isLoss ? "aggregate-debit" : "aggregate-total")">
+												<strong>@aggregate.Sum</strong>
+											</div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+								</GridAggregateColumns>
+							</GridAggregate>
+						</GridAggregates>
+
+						<GridColumns>
+							<!-- Identity -->
+							<GridColumn Field="@nameof(VehicleRegisterModel.VehicleCode)" HeaderText="Vehicle" Width="130" />
+
+							<!-- Trips -->
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalTrips)" HeaderText="Trips" Width="80" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleRegisterModel.LoadedTrips)" HeaderText="Loaded" Width="85" TextAlign="TextAlign.Right" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleRegisterModel.EmptyTrips)" HeaderText="Empty" Width="80" TextAlign="TextAlign.Right" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalQuantity)" HeaderText="Qty" Width="110" TextAlign="TextAlign.Right" Format="N2" />
+
+							<!-- Trip Expenses: total always, per-type in details mode -->
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalTripExpenses)" HeaderText="Trip Exp" Width="115" TextAlign="TextAlign.Right" Format="N2" />
+							@foreach (var expType in _activeTripExpenseTypes)
+							{
+								var capturedId = expType.ExpenseTypeId;
+								var capturedName = expType.ExpenseType;
+								<GridColumn HeaderText="@($"T: {capturedName}")" Width="130"
+											TextAlign="TextAlign.Right" Visible="_showAllColumns">
+									<Template>
+										@{
+											var item = context as VehicleRegisterModel;
+											var amt = item?.TripExpenses.FirstOrDefault(e => e.ExpenseTypeId == capturedId)?.ExpenseAmount ?? 0;
+											<span>@amt.ToString("N2")</span>
+										}
+									</Template>
+								</GridColumn>
+							}
+
+							<!-- Vehicle Expenses: total always, per-type in details mode -->
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalVehicleExpenses)" HeaderText="Veh Exp"
+										Width="115" TextAlign="TextAlign.Right" Format="N2" />
+							@foreach (var expType in _activeVehicleExpenseTypes)
+							{
+								var capturedId = expType.ExpenseTypeId;
+								var capturedName = expType.ExpenseType;
+								<GridColumn HeaderText="@($"V: {capturedName}")" Width="130"
+											TextAlign="TextAlign.Right" Visible="_showAllColumns">
+									<Template>
+										@{
+											var item = context as VehicleRegisterModel;
+											var amt = item?.VehicleExpenses.FirstOrDefault(e => e.ExpenseTypeId == capturedId)?.ExpenseAmount ?? 0;
+											<span>@amt.ToString("N2")</span>
+										}
+									</Template>
+								</GridColumn>
+							}
+
+							<!-- Bills -->
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalBills)" HeaderText="Bills" Width="75" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalGrossAmount)" HeaderText="Gross Amt" Width="125" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalTDSAmount)" HeaderText="TDS Amt" Width="110" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalNetAmount)" HeaderText="Net Amt" Width="125" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = context as VehicleRegisterModel;
+										<span class="grid-total">@item.TotalNetAmount.ToString("N2")</span>
+									}
+								</Template>
+							</GridColumn>
+
+							<!-- Profit / Loss -->
+							<GridColumn Field="@nameof(VehicleRegisterModel.TotalProfitLoss)" HeaderText="P / L" Width="125" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = context as VehicleRegisterModel;
+										<span class="@(item.TotalProfitLoss >= 0 ? "grid-total" : "grid-debit")">
+											@item.TotalProfitLoss.ToString("N2")
+										</span>
+									}
+								</Template>
+							</GridColumn>
+						</GridColumns>
+					</SfGrid>
+				</div>
+			</div>
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<ToastNotification @ref="_toastNotification" />

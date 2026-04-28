@@ -22,9 +22,7 @@ public partial class Header
 		await _sfGlobalSearch.FocusAsync();
 	}
 
-	private void LoadRoutes()
-	{
-		_searchItems = [.. typeof(PageRouteNames)
+	private void LoadRoutes() => _searchItems = [.. typeof(PageRouteNames)
 			.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
 			.Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
 			.Select(f => new GlobalSearchItem
@@ -41,7 +39,6 @@ public partial class Header
 				return x;
 			})
 			.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase)];
-	}
 
 	private async Task NavigateToSearch()
 	{

@@ -37,6 +37,8 @@ public static class PageRouteNames
 	#region Fleet
 	public const string FleetDashboard = "/fleet";
 
+	public const string VehicleRegisterReport = "/fleet/vehicle-register-report";
+
 	public const string VehicleExpense = "/fleet/vehicle-expense";
 	public const string VehicleExpenseReport = "/fleet/vehicle-expense-report";
 	public const string VehicleExpenseDetailsReport = "/fleet/vehicle-expense-details-report";
