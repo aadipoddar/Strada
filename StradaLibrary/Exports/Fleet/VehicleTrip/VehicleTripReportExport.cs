@@ -4,6 +4,7 @@ using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Fleet.VehicleTrip;
+using StradaLibrary.Models.Fleet.VehicleTripBill;
 
 namespace StradaLibrary.Exports.Fleet.VehicleTrip;
 
@@ -69,13 +70,12 @@ public static class VehicleTripReportExport
 		{
 			columnOrder =
 			[
-				nameof(VehicleTripOverviewModel.TransactionNo),
+				nameof(VehicleTripOverviewModel.VehicleCode),
 				nameof(VehicleTripOverviewModel.CompanyName),
 				nameof(VehicleTripOverviewModel.TransactionDateTime),
 				nameof(VehicleTripOverviewModel.FinancialYear),
 				nameof(VehicleTripOverviewModel.ChallanNo),
 				nameof(VehicleTripOverviewModel.OMCName),
-				nameof(VehicleTripOverviewModel.VehicleCode),
 				nameof(VehicleTripOverviewModel.FromLocation),
 				nameof(VehicleTripOverviewModel.ToLocation),
 				nameof(VehicleTripOverviewModel.RouteDisplay),
@@ -94,6 +94,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOverviewModel.TDSAmount),
 				nameof(VehicleTripOverviewModel.PenaltyAmount),
 				nameof(VehicleTripOverviewModel.NetAmount),
+				nameof(VehicleTripOverviewModel.TransactionNo),
 				nameof(VehicleTripOverviewModel.Remarks),
 				nameof(VehicleTripOverviewModel.CreatedByName),
 				nameof(VehicleTripOverviewModel.CreatedAt),
@@ -111,18 +112,20 @@ public static class VehicleTripReportExport
 		{
 			columnOrder =
 			[
-				nameof(VehicleTripOverviewModel.TransactionNo),
+				nameof(VehicleTripOverviewModel.VehicleCode),
 				nameof(VehicleTripOverviewModel.CompanyName),
 				nameof(VehicleTripOverviewModel.TransactionDateTime),
 				nameof(VehicleTripOverviewModel.ChallanNo),
 				nameof(VehicleTripOverviewModel.OMCName),
-				nameof(VehicleTripOverviewModel.VehicleCode),
 				nameof(VehicleTripOverviewModel.RouteDisplay),
 				nameof(VehicleTripOverviewModel.DriverDisplay),
 				nameof(VehicleTripOverviewModel.Quantity),
 				nameof(VehicleTripOverviewModel.TotalExpense),
 				nameof(VehicleTripOverviewModel.VehicleEmpty),
 				nameof(VehicleTripOverviewModel.BillNo),
+				nameof(VehicleTripOverviewModel.GrossAmount),
+				nameof(VehicleTripOverviewModel.TDSAmount),
+				nameof(VehicleTripOverviewModel.PenaltyAmount),
 				nameof(VehicleTripOverviewModel.NetAmount),
 				nameof(VehicleTripOverviewModel.Status)
 			];
@@ -216,6 +219,7 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripExpensesOverviewModel.ExpenseTypeName)] = new() { DisplayName = "Expense Type", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.ExpenseTypeCode)] = new() { DisplayName = "Expense Type Code", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.ExpenseAmount)] = new() { DisplayName = "Expense Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripExpensesOverviewModel.ExpenseRemarks)] = new() { DisplayName = "Expense Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
 			[nameof(VehicleTripExpensesOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -264,13 +268,13 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.ExpenseTypeName),
 				nameof(VehicleTripExpensesOverviewModel.ExpenseTypeCode),
 				nameof(VehicleTripExpensesOverviewModel.ExpenseAmount),
-				nameof(VehicleTripExpensesOverviewModel.TransactionNo),
+				nameof(VehicleTripExpensesOverviewModel.ExpenseRemarks),
+				nameof(VehicleTripExpensesOverviewModel.VehicleCode),
 				nameof(VehicleTripExpensesOverviewModel.CompanyName),
 				nameof(VehicleTripExpensesOverviewModel.TransactionDateTime),
 				nameof(VehicleTripExpensesOverviewModel.FinancialYear),
 				nameof(VehicleTripExpensesOverviewModel.ChallanNo),
 				nameof(VehicleTripExpensesOverviewModel.OMCName),
-				nameof(VehicleTripExpensesOverviewModel.VehicleCode),
 				nameof(VehicleTripExpensesOverviewModel.FromLocation),
 				nameof(VehicleTripExpensesOverviewModel.ToLocation),
 				nameof(VehicleTripExpensesOverviewModel.RouteDisplay),
@@ -289,6 +293,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.TDSAmount),
 				nameof(VehicleTripExpensesOverviewModel.PenaltyAmount),
 				nameof(VehicleTripExpensesOverviewModel.NetAmount),
+				nameof(VehicleTripExpensesOverviewModel.TransactionNo),
 				nameof(VehicleTripExpensesOverviewModel.Remarks),
 				nameof(VehicleTripExpensesOverviewModel.CreatedByName),
 				nameof(VehicleTripExpensesOverviewModel.CreatedAt),
@@ -304,19 +309,21 @@ public static class VehicleTripReportExport
 			[
 				nameof(VehicleTripExpensesOverviewModel.ExpenseTypeName),
 				nameof(VehicleTripExpensesOverviewModel.ExpenseAmount),
-				nameof(VehicleTripExpensesOverviewModel.TransactionNo),
+				nameof(VehicleTripExpensesOverviewModel.VehicleCode),
 				nameof(VehicleTripExpensesOverviewModel.CompanyName),
 				nameof(VehicleTripExpensesOverviewModel.TransactionDateTime),
 				nameof(VehicleTripExpensesOverviewModel.ChallanNo),
 				nameof(VehicleTripExpensesOverviewModel.OMCName),
-				nameof(VehicleTripExpensesOverviewModel.VehicleCode),
 				nameof(VehicleTripExpensesOverviewModel.RouteDisplay),
 				nameof(VehicleTripExpensesOverviewModel.DriverDisplay),
 				nameof(VehicleTripExpensesOverviewModel.Quantity),
 				nameof(VehicleTripExpensesOverviewModel.TotalExpense),
 				nameof(VehicleTripExpensesOverviewModel.VehicleEmpty),
 				nameof(VehicleTripExpensesOverviewModel.BillNo),
-				nameof(VehicleTripExpensesOverviewModel.NetAmount),
+				nameof(VehicleTripExpensesOverviewModel.GrossAmount),
+				nameof(VehicleTripExpensesOverviewModel.TDSAmount),
+				nameof(VehicleTripExpensesOverviewModel.PenaltyAmount),
+				nameof(VehicleTripExpensesOverviewModel.NetAmount)
 			];
 
 			if (company is not null)
@@ -405,6 +412,7 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripCardPaymentsOverviewModel.OMCCardNumber)] = new() { DisplayName = "OMC Card", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripCardPaymentsOverviewModel.OMCCardCode)] = new() { DisplayName = "OMC Card Code", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripCardPaymentsOverviewModel.PaymentAmount)] = new() { DisplayName = "Payment Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripCardPaymentsOverviewModel.PaymentRemarks)] = new() { DisplayName = "Payment Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
 			[nameof(VehicleTripCardPaymentsOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripCardPaymentsOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -453,13 +461,13 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripCardPaymentsOverviewModel.OMCCardNumber),
 				nameof(VehicleTripCardPaymentsOverviewModel.OMCCardCode),
 				nameof(VehicleTripCardPaymentsOverviewModel.PaymentAmount),
-				nameof(VehicleTripCardPaymentsOverviewModel.TransactionNo),
+				nameof(VehicleTripCardPaymentsOverviewModel.PaymentRemarks),
+				nameof(VehicleTripCardPaymentsOverviewModel.VehicleCode),
 				nameof(VehicleTripCardPaymentsOverviewModel.CompanyName),
 				nameof(VehicleTripCardPaymentsOverviewModel.TransactionDateTime),
 				nameof(VehicleTripCardPaymentsOverviewModel.FinancialYear),
 				nameof(VehicleTripCardPaymentsOverviewModel.ChallanNo),
 				nameof(VehicleTripCardPaymentsOverviewModel.OMCName),
-				nameof(VehicleTripCardPaymentsOverviewModel.VehicleCode),
 				nameof(VehicleTripCardPaymentsOverviewModel.FromLocation),
 				nameof(VehicleTripCardPaymentsOverviewModel.ToLocation),
 				nameof(VehicleTripCardPaymentsOverviewModel.RouteDisplay),
@@ -478,6 +486,7 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripCardPaymentsOverviewModel.TDSAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.PenaltyAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.NetAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.TransactionNo),
 				nameof(VehicleTripCardPaymentsOverviewModel.Remarks),
 				nameof(VehicleTripCardPaymentsOverviewModel.CreatedByName),
 				nameof(VehicleTripCardPaymentsOverviewModel.CreatedAt),
@@ -493,18 +502,20 @@ public static class VehicleTripReportExport
 			[
 				nameof(VehicleTripCardPaymentsOverviewModel.OMCCardNumber),
 				nameof(VehicleTripCardPaymentsOverviewModel.PaymentAmount),
-				nameof(VehicleTripCardPaymentsOverviewModel.TransactionNo),
+				nameof(VehicleTripCardPaymentsOverviewModel.VehicleCode),
 				nameof(VehicleTripCardPaymentsOverviewModel.CompanyName),
 				nameof(VehicleTripCardPaymentsOverviewModel.TransactionDateTime),
 				nameof(VehicleTripCardPaymentsOverviewModel.ChallanNo),
 				nameof(VehicleTripCardPaymentsOverviewModel.OMCName),
-				nameof(VehicleTripCardPaymentsOverviewModel.VehicleCode),
 				nameof(VehicleTripCardPaymentsOverviewModel.RouteDisplay),
 				nameof(VehicleTripCardPaymentsOverviewModel.DriverDisplay),
 				nameof(VehicleTripCardPaymentsOverviewModel.Quantity),
 				nameof(VehicleTripCardPaymentsOverviewModel.TotalExpense),
 				nameof(VehicleTripCardPaymentsOverviewModel.VehicleEmpty),
 				nameof(VehicleTripCardPaymentsOverviewModel.BillNo),
+				nameof(VehicleTripCardPaymentsOverviewModel.GrossAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.TDSAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.PenaltyAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.NetAmount)
 			];
 

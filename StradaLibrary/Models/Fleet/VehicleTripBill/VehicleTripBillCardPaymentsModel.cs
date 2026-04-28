@@ -25,6 +25,7 @@ public class VehicleTripBillCardPaymentsOverviewModel
 	public string OMCCardNumber { get; set; }
 	public string OMCCardCode { get; set; }
 	public decimal PaymentAmount { get; set; }
+	public string? PaymentRemarks { get; set; }
 
 	public int MasterId { get; set; }
 	public string TransactionNo { get; set; }

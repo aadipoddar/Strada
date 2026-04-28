@@ -6,6 +6,7 @@ SELECT
 	[l].[Name] AS LedgerName,
 	[l].[Code] AS LedgerCode,
 	[tp].[Amount] AS PaymentAmount,
+	[tp].[Remarks] AS PaymentRemarks,
 
 	[tp].[MasterId],
     [t].[TransactionNo],

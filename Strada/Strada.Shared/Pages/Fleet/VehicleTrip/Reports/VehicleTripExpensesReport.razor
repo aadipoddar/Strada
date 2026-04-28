@@ -314,14 +314,11 @@ else
 									}
 								</Template>
 							</GridColumn>
-
-							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.TransactionNo)"
-										HeaderText="Trans No" Width="170" />
-							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.CompanyName)" HeaderText="Company"
-										Width="180"
-										Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
-							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.TransactionDateTime)"
-										HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.ExpenseRemarks)" HeaderText="Expense Remarks" Width="170" Visible="_showAllColumns" />
+							
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.FinancialYear)"
 										HeaderText="Financial Year" Width="220" Visible="_showAllColumns" />
 
@@ -329,9 +326,6 @@ else
 										Width="170" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.OMCName)" HeaderText="OMC"
 										Width="100" Visible="@(_showAllColumns || _selectedOMC is null || _selectedOMC.Id <= 0)" />
-							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.VehicleCode)" HeaderText="Vehicle"
-										Width="130"
-										Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.FromLocation)"
 										HeaderText="From Location" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.ToLocation)"
@@ -387,6 +381,7 @@ else
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.NetAmount)" HeaderText="Net Amt"
 										Width="150" TextAlign="TextAlign.Right" Format="N2" />
 
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.Remarks)" HeaderText="Remarks"
 										Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.CreatedByName)"

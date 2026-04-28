@@ -237,6 +237,8 @@ else
 									}
 								</Template>
 							</GridColumn>
+
+							<GridColumn Field="@nameof(VehicleExpenseOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseOverviewModel.Status)" HeaderText="Status" Width="110"
 										TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
@@ -248,7 +250,6 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(VehicleExpenseOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />

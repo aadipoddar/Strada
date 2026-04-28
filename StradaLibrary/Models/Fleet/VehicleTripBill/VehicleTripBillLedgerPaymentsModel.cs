@@ -25,6 +25,7 @@ public class VehicleTripBillLedgerPaymentsOverviewModel
 	public string LedgerName { get; set; }
 	public string LedgerCode { get; set; }
 	public decimal PaymentAmount { get; set; }
+	public string? PaymentRemarks { get; set; }
 
 	public int MasterId { get; set; }
 	public string TransactionNo { get; set; }

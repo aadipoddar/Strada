@@ -348,29 +348,17 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TransactionNo)" HeaderText="Trans No"
-										Width="170" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.CompanyName)" HeaderText="Company"
-										Width="180"
-										Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TransactionDateTime)" HeaderText="Date"
-										Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.FinancialYear)" HeaderText="Financial Year"
-										Width="130" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
 
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.BillNo)" HeaderText="Bill No"
-										Width="170" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.OMCName)" HeaderText="OMC" Width="100"
-										Visible="@(_showAllColumns || _selectedOMC is null || _selectedOMC.Id <= 0)" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.BillNo)" HeaderText="Bill No" Width="170" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.OMCName)" HeaderText="OMC" Width="100" Visible="@(_showAllColumns || _selectedOMC is null || _selectedOMC.Id <= 0)" />
 
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalGrossAmount)" HeaderText="Gross Amt"
-										Width="130" TextAlign="TextAlign.Right" Format="N2" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalTDSAmount)" HeaderText="TDS Amt"
-										Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalPenaltyAmount)" HeaderText="Penalty Amt"
-										Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalNetAmount)" HeaderText="Net Amt"
-										Width="150" TextAlign="TextAlign.Right">
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalGrossAmount)" HeaderText="Gross Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalTDSAmount)" HeaderText="TDS Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalPenaltyAmount)" HeaderText="Penalty Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalNetAmount)" HeaderText="Net Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>
 									@{
 										var item = (context as VehicleTripBillOverviewModel);
@@ -378,13 +366,11 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalCardPaymentAmount)"
-										HeaderText="Card Payment" Width="140" TextAlign="TextAlign.Right" Format="N2" />
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalLedgerPaymentAmount)"
-										HeaderText="Ledger Payment" Width="140" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalCardPaymentAmount)" HeaderText="Card Payment" Width="140" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TotalLedgerPaymentAmount)" HeaderText="Ledger Payment" Width="140" TextAlign="TextAlign.Right" Format="N2" />
 
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.Status)" HeaderText="Status" Width="110"
-										TextAlign="TextAlign.Center" Visible="_showDeleted">
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
 										var item = (context as VehicleTripBillOverviewModel);
@@ -394,8 +380,8 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.Remarks)" HeaderText="Remarks" Width="200"
-										Visible="_showAllColumns" />
+
+							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.CreatedByName)" HeaderText="Created By"
 										Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.CreatedAt)" HeaderText="Created At"

@@ -416,14 +416,13 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleTripOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" />
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="220" Visible="_showAllColumns" />
 
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.ChallanNo)" HeaderText="Challan" Width="170" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.OMCName)" HeaderText="OMC" Width="100" Visible="@(_showAllColumns || _selectedOMC is null || _selectedOMC.Id <= 0)" />
-							<GridColumn Field="@nameof(VehicleTripOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.FromLocation)" HeaderText="From Location" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.ToLocation)" HeaderText="To Location" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.RouteDisplay)" HeaderText="Route" Width="220" Visible="@(_showAllColumns || _selectedRoute is null || _selectedRoute.Id <= 0)" />
@@ -480,6 +479,8 @@ else
 									}
 								</Template>
 							</GridColumn>
+
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.Remarks)" HeaderText="Remarks" Width="200"
 										Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.CreatedByName)" HeaderText="Created By"

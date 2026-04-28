@@ -25,6 +25,7 @@ public class VehicleTripExpensesOverviewModel
 	public string ExpenseTypeName { get; set; }
 	public string ExpenseTypeCode { get; set; }
 	public decimal ExpenseAmount { get; set; }
+	public string? ExpenseRemarks { get; set; }
 
 	public int MasterId { get; set; }
 	public string TransactionNo { get; set; }

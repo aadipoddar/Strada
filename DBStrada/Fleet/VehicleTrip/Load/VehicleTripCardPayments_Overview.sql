@@ -6,6 +6,7 @@ SELECT
 	[oc].[CardNumber] AS OMCCardNumber,
 	[oc].[Code] AS OMCCardCode,
 	[tp].[Amount] AS PaymentAmount,
+	[tp].[Remarks] AS PaymentRemarks,
 
 	[tp].[MasterId],
     [t].[TransactionNo],

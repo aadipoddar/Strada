@@ -6,6 +6,7 @@ SELECT
 	[er].[Name] AS ExpenseTypeName,
 	[er].[Code] AS ExpenseTypeCode,
 	[te].[Amount] AS ExpenseAmount,
+	[te].[Remarks] AS ExpenseRemarks,
 
 	[te].[MasterId],
     [t].[TransactionNo],
