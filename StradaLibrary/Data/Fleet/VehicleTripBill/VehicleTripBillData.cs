@@ -205,6 +205,9 @@ public static class VehicleTripBillData
 
 	private static async Task ValidateVehicleTrips(VehicleTripBillModel bill, List<VehicleTripOverviewModel> vehicleTrips, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
+		if (vehicleTrips is null || vehicleTrips.Count == 0)
+			throw new InvalidOperationException("Please add at least one vehicle trip for the bill.");
+
 		if (vehicleTrips.Any(vt => string.IsNullOrWhiteSpace(vt.ChallanNo)))
 			throw new InvalidOperationException("All vehicle trips included in the bill must have a valid challan number.");
 

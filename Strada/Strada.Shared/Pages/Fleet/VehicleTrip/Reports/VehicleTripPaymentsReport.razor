@@ -124,7 +124,7 @@ else
 							<!-- Company -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-													 @bind-Value="_selectedCompany"
+													 Value="_selectedCompany"
 													 DataSource="@_companies"
 													 Placeholder="All Companies"
 													 Label="Company" Required="true"
@@ -136,7 +136,7 @@ else
 							<!-- OMC -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
-													 @bind-Value="_selectedOMC"
+													 Value="_selectedOMC"
 													 DataSource="@_omcs"
 													 Placeholder="All OMCs"
 													 Label="OMC" Required="true"
@@ -148,7 +148,7 @@ else
 							<!-- Vehicle -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
-													 @bind-Value="_selectedVehicle"
+													 Value="_selectedVehicle"
 													 DataSource="@_vehicles"
 													 Placeholder="All Vehicles"
 													 Label="Vehicle" Required="true"
@@ -160,7 +160,7 @@ else
 							<!-- Route -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleRouteOverviewModel" TValue="VehicleRouteOverviewModel"
-													 @bind-Value="_selectedRoute"
+													 Value="_selectedRoute"
 													 DataSource="@_vehicleRoutes"
 													 Placeholder="All Routes"
 													 Label="Route" Required="true"
@@ -172,7 +172,7 @@ else
 							<!-- Driver -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel"
-													 @bind-Value="_selectedDriver"
+													 Value="_selectedDriver"
 													 DataSource="@_vehicleDrivers"
 													 Placeholder="All Drivers"
 													 Label="Driver" Required="true"
@@ -323,7 +323,7 @@ else
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.TransactionDateTime)"
 										HeaderText="Date" Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.FinancialYear)"
-										HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
+										HeaderText="Financial Year" Width="220" Visible="_showAllColumns" />
 
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.ChallanNo)"
 										HeaderText="Challan" Width="170" />
@@ -337,7 +337,7 @@ else
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.ToLocation)"
 										HeaderText="To Location" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.RouteDisplay)"
-										HeaderText="Route" Width="170"
+										HeaderText="Route" Width="220"
 										Visible="@(_showAllColumns || _selectedRoute is null || _selectedRoute.Id <= 0)" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.DriverName)"
 										HeaderText="Driver Name" Width="170" Visible="_showAllColumns" />
@@ -363,7 +363,7 @@ else
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.TotalExpense)"
 										HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right" Format="N2" />
 
-							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.VehicleEmpty)" HeaderText="Vehicle Empty" Width="110" TextAlign="TextAlign.Center">
+							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.VehicleEmpty)" HeaderText="Empty" Width="110" TextAlign="TextAlign.Center">
 								<Template>
 									@{
 										var item = (context as VehicleTripCardPaymentsOverviewModel);
@@ -396,14 +396,14 @@ else
 										HeaderText="Created At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime"
 										Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.CreatedFromPlatform)"
-										HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
+										HeaderText="Created Platform" Width="300" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.LastModifiedByUserName)"
 										HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.LastModifiedAt)"
 										HeaderText="Modified At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime"
 										Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.LastModifiedFromPlatform)"
-										HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
+										HeaderText="Modified Platform" Width="300" Visible="_showAllColumns" />
 						</GridColumns>
 					</SfGrid>
 				</div>

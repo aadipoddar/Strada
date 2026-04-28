@@ -96,7 +96,7 @@ else
                             <!-- Company -->
                             <div class="form-field">
                                 <AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-                                                     @bind-Value="_selectedCompany"
+                                                     Value="_selectedCompany"
                                                      DataSource="@_companies"
                                                      Placeholder="Select Company"
                                                      Label="Company" Required="true"
@@ -108,7 +108,7 @@ else
                             <!-- Voucher -->
                             <div class="form-field">
                                 <AutoCompleteWithAdd TItem="VoucherModel" TValue="VoucherModel"
-                                                     @bind-Value="_selectedVoucher"
+                                                     Value="_selectedVoucher"
                                                      DataSource="@_vouchers"
                                                      Placeholder="Select Voucher"
                                                      Label="Voucher" Required="true"
@@ -244,7 +244,7 @@ else
                         <div class="cart-field cart-field-wide">
                             <div class="reference-wrapper">
                                 <AutoCompleteWithAdd @ref="_sfLedgerAutoComplete" TItem="LedgerModel" TValue="LedgerModel"
-                                                     @bind-Value="_selectedLedger"
+                                                     Value="_selectedLedger"
                                                      DataSource="@_ledgers"
                                                      Placeholder="Select Ledger (Ctrl + F)"
                                                      Label="Ledger" Required="true"

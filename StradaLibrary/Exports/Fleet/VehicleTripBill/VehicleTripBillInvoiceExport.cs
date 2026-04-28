@@ -59,8 +59,9 @@ public static class VehicleTripBillInvoiceExport
 		var columnSettings = new List<InvoiceColumnSetting>
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
-			new(nameof(VehicleTripOverviewModel.VehicleCode), "Vehicle", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(VehicleTripOverviewModel.VehicleCode), "Vehicle", exportType, CellAlignment.Left, 60, 30),
 			new(nameof(VehicleTripOverviewModel.ChallanNo), "Challan", exportType, CellAlignment.Left, 60, 30),
+			new(nameof(VehicleTripOverviewModel.RouteDisplay), "Route", exportType, CellAlignment.Left, 0, 30),
 			new(nameof(VehicleTripOverviewModel.Quantity), "Qty", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(VehicleTripOverviewModel.GrossAmount), "Gross", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(VehicleTripOverviewModel.TDSAmount), "TDS", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),

@@ -99,7 +99,7 @@ else
 							<!-- Company -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-												 @bind-Value="_selectedCompany"
+												 Value="_selectedCompany"
 												 DataSource="@_companies"
 												 Placeholder="Select a Company"
 												 Label="Company" Required="true"
@@ -147,7 +147,7 @@ else
 							<!-- OMC -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
-												 @bind-Value="_selectedOMC"
+												 Value="_selectedOMC"
 												 DataSource="@_omcs"
 												 Placeholder="Select an OMC"
 												 Label="OMC" Required="true"
@@ -159,7 +159,7 @@ else
 							<!-- Vehicle -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
-												 @bind-Value="_selectedVehicle"
+												 Value="_selectedVehicle"
 												 DataSource="@_vehicles"
 												 Placeholder="Select a Vehicle"
 												 Label="Vehicle" Required="true"
@@ -180,7 +180,7 @@ else
 							<!-- Route -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleRouteOverviewModel" TValue="VehicleRouteOverviewModel"
-												 @bind-Value="_selectedRoute"
+												 Value="_selectedRoute"
 												 DataSource="@_vehicleRoutes"
 												 Placeholder="Select a Route"
 												 Label="Route" Required="true"
@@ -222,7 +222,7 @@ else
 							<!-- Driver -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel"
-												 @bind-Value="_selectedDriver"
+												 Value="_selectedDriver"
 												 DataSource="@_vehicleDrivers"
 												 Placeholder="Select a Driver"
 												 Label="Driver" Required="true"
@@ -397,7 +397,7 @@ else
 						<div class="cart-field cart-field-wide">
 							<AutoCompleteWithAdd TItem="VehicleExpenseTypeModel" TValue="VehicleExpenseTypeModel"
 														 @ref="_sfExpenseTypeAutoComplete"
-														 FieldValue="@nameof(VehicleExpenseTypeModel.Name)" @bind-Value="_selectedExpenseType"
+														 FieldValue="@nameof(VehicleExpenseTypeModel.Name)" Value="_selectedExpenseType"
 														 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
 														 ValueChange="OnExpensesTypeChanged"
 														 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.VehicleExpenseTypeMaster" />

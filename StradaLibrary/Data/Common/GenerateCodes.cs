@@ -272,12 +272,12 @@ public static class GenerateCodes
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}{nextNumber:D6}", 6, CodeType.FinancialAccounting, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}{nextNumber:D5}", 5, CodeType.FinancialAccounting, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}000001", 6, CodeType.FinancialAccounting, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}00001", 5, CodeType.FinancialAccounting, sqlDataAccessTransaction);
 	}
 
 	public static async Task<string> GenerateLedgerCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
@@ -321,12 +321,12 @@ public static class GenerateCodes
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}{nextNumber:D6}", 6, CodeType.VehicleTrip, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}{nextNumber:D5}", 5, CodeType.VehicleTrip, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}000001", 6, CodeType.VehicleTrip, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}00001", 5, CodeType.VehicleTrip, sqlDataAccessTransaction);
 	}
 
 	public static async Task<string> GenerateVehicleTripBillTransactionNo(VehicleTripBillModel vehicleTripBill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
@@ -345,12 +345,12 @@ public static class GenerateCodes
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}{nextNumber:D6}", 6, CodeType.VehicleTripBill, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}{nextNumber:D5}", 5, CodeType.VehicleTripBill, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}000001", 6, CodeType.VehicleTripBill, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}00001", 5, CodeType.VehicleTripBill, sqlDataAccessTransaction);
 	}
 
 	public static async Task<string> GenerateVehicleExpenseTransactionNo(VehicleExpenseModel vehicleExpense, SqlDataAccessTransaction sqlDataAccessTransaction = null)
@@ -369,12 +369,12 @@ public static class GenerateCodes
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}{nextNumber:D6}", 6, CodeType.VehicleExpense, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}{nextNumber:D5}", 5, CodeType.VehicleExpense, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}000001", 6, CodeType.VehicleExpense, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}00001", 5, CodeType.VehicleExpense, sqlDataAccessTransaction);
 	}
 	#endregion
 	

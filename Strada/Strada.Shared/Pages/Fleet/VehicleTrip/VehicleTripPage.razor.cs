@@ -664,7 +664,7 @@ public partial class VehicleTripPage
 
 			await UpdateFinancialDetails();
 
-			if (_expensesCart.Count == 0)
+			if (_expensesCart.Count == 0 || _vehicleTrip.Id > 0)
 			{
 				await DeleteLocalFiles();
 				return;

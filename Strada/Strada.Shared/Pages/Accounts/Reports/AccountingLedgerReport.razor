@@ -120,7 +120,7 @@ else
 							<!-- Company -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-												 @bind-Value="_selectedCompany"
+												 Value="_selectedCompany"
 												 DataSource="@_companies"
 												 Placeholder="All Companies"
 												 Label="Company" Required="true"
@@ -132,7 +132,7 @@ else
 							<!-- Ledger -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
-												 @bind-Value="_selectedLedger"
+												 Value="_selectedLedger"
 												 DataSource="@_ledgers"
 												 Placeholder="All Ledgers"
 												 Label="Ledger" Required="true"

@@ -593,7 +593,7 @@ public partial class FinancialAccountingPage
 
 			await UpdateFinancialDetails();
 
-			if (_cart.Count == 0)
+			if (_cart.Count == 0 || _accounting.Id > 0)
 			{
 				await DeleteLocalFiles();
 				return;

@@ -104,7 +104,7 @@ else
 							<!-- Company -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-												 @bind-Value="_selectedCompany"
+												 Value="_selectedCompany"
 												 DataSource="@_companies"
 												 Placeholder="All Companies"
 												 Label="Company" Required="true"
@@ -116,7 +116,7 @@ else
 							<!-- Group -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="GroupModel" TValue="GroupModel"
-												 @bind-Value="_selectedGroup"
+												 Value="_selectedGroup"
 												 DataSource="@_groups"
 												 Placeholder="All Groups"
 												 Label="Group" Required="true"
@@ -128,7 +128,7 @@ else
 							<!-- Account Type -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="AccountTypeModel" TValue="AccountTypeModel"
-												 @bind-Value="_selectedAccountType"
+												 Value="_selectedAccountType"
 												 DataSource="@_accountTypes"
 												 Placeholder="All Account Types"
 												 Label="Account Type" Required="true"

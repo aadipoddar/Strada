@@ -53,6 +53,7 @@ public partial class VehicleTripBillPage
 	private AutoCompleteWithAdd<VehicleExpenseTypeModel?, VehicleExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private AutoCompleteWithAdd<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
 	private AutoCompleteWithAdd<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
+	private Syncfusion.Blazor.Inputs.SfTextBox _sfChallanNoTextBox;
 	private SfGrid<VehicleTripOverviewModel> _sfPendingVehicleTripGrid;
 	private SfGrid<VehicleTripOverviewModel> _sfVehicleTripCartGrid;
 	private SfGrid<VehicleTripBillCardPaymentsCartModel> _sfCardPaymentsCartGrid;
@@ -591,15 +592,17 @@ public partial class VehicleTripBillPage
 
 		_selectedVehicleTrip = _sfPendingVehicleTripGrid.SelectedRecords.First();
 		StateHasChanged();
+		await _sfChallanNoTextBox.FocusAsync();
 	}
 
-	private void OnPendingVehicleTripDoubleClick(RecordDoubleClickEventArgs<VehicleTripOverviewModel> args)
+	private async void OnPendingVehicleTripDoubleClick(RecordDoubleClickEventArgs<VehicleTripOverviewModel> args)
 	{
 		if (args.RowData is null || args.RowData.Id <= 0)
 			return;
 
 		_selectedVehicleTrip = args.RowData;
 		StateHasChanged();
+		await _sfChallanNoTextBox.FocusAsync();
 	}
 
 	private async Task EditSelectedVehicleTripCartItem()
@@ -695,7 +698,10 @@ public partial class VehicleTripBillPage
 			}
 		}
 
-		_pendingVehicleTrips = [.. _allPendingVehicleTrips.Where(s => !_vehicleTripCart.Any(c => c.Id == s.Id)).OrderBy(s => s.TransactionDateTime)];
+		_pendingVehicleTrips = [.. _allPendingVehicleTrips
+			.Where(s => !_vehicleTripCart.Any(c => c.Id == s.Id))
+			.Where(s => s.OMCId == _selectedOMC.Id)
+			.OrderBy(s => s.TransactionDateTime)];
 
 		_vehicleTripBill.Remarks = _vehicleTripBill.Remarks?.Trim();
 		if (string.IsNullOrWhiteSpace(_vehicleTripBill.Remarks))
@@ -762,7 +768,7 @@ public partial class VehicleTripBillPage
 
 			await UpdateFinancialDetails();
 
-			if (_vehicleTripCart.Count == 0)
+			if (_vehicleTripCart.Count == 0 || _vehicleTripBill.Id > 0)
 			{
 				await DeleteLocalFiles();
 				return;

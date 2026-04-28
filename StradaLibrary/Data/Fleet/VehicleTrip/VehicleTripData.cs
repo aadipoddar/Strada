@@ -144,6 +144,9 @@ public static class VehicleTripData
 
 	private static void ValidateExpensesDetails(VehicleTripModel trip, List<VehicleTripExpensesModel> expensesDetails)
 	{
+		if (expensesDetails is null || expensesDetails.Count == 0)
+			throw new InvalidOperationException("Please add at least one expense detail for the transaction.");
+
 		if (expensesDetails.Any(ed => ed.Amount <= 0))
 			throw new InvalidOperationException("Expense amount must be greater than zero.");
 
@@ -153,6 +156,9 @@ public static class VehicleTripData
 
 	private static async Task ValidatePaymentDetails(VehicleTripModel trip, List<VehicleTripCardPaymentsModel> paymentDetails)
 	{
+		if (paymentDetails is null || paymentDetails.Count == 0)
+			throw new InvalidOperationException("Please add at least one payment detail for the transaction.");
+
 		if (paymentDetails.Any(pd => pd.Amount <= 0))
 			throw new InvalidOperationException("Payment amount must be greater than zero.");
 
