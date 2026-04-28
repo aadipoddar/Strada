@@ -75,7 +75,9 @@ public static class VehicleTripData
 				throw new InvalidOperationException("Cannot delete a vehicle trip transaction that is associated with a bill.");
 
 			trip.Status = false;
-			await InsertVehicleTrip(trip, sqlDataAccessTransaction);
+			var id = await InsertVehicleTrip(trip, sqlDataAccessTransaction);
+			if (id <= 0)
+				throw new InvalidOperationException("Failed to delete vehicle trip transaction.");
 		}
 		catch
 		{
@@ -95,6 +97,7 @@ public static class VehicleTripData
 		await VehicleTripNotify.Notify(trip.Id, NotifyType.Recovered);
 	}
 
+	#region Save
 	private static async Task<VehicleTripModel> ValidateTransaction(VehicleTripModel trip, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
 		if (trip.CompanyId <= 0)
@@ -117,6 +120,9 @@ public static class VehicleTripData
 
 		if (trip.TotalExpense < 0)
 			throw new InvalidOperationException("Total expense cannot be negative.");
+
+		if (trip.BillId is not null)
+			throw new InvalidOperationException("Cannot delete a vehicle trip transaction that is associated with a bill.");
 
 		var vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, trip.VehicleId, sqlDataAccessTransaction);
 		if (vehicle.CompanyId != trip.CompanyId)
@@ -219,7 +225,9 @@ public static class VehicleTripData
 			foreach (var item in existingExpensesDetails)
 			{
 				item.Status = false;
-				await InsertVehicleTripExpenses(item, sqlDataAccessTransaction);
+				var id = await InsertVehicleTripExpenses(item, sqlDataAccessTransaction);
+				if (id <= 0)
+					throw new InvalidOperationException("Failed to save vehicle trip expenses detail item.");
 			}
 		}
 
@@ -241,7 +249,9 @@ public static class VehicleTripData
 			foreach (var item in existingPaymentDetails)
 			{
 				item.Status = false;
-				await InsertVehicleTripCardPayments(item, sqlDataAccessTransaction);
+				var id = await InsertVehicleTripCardPayments(item, sqlDataAccessTransaction);
+				if (id <= 0)
+					throw new InvalidOperationException("Failed to save vehicle trip OMC card payments detail item.");
 			}
 		}
 
@@ -254,4 +264,5 @@ public static class VehicleTripData
 				throw new InvalidOperationException("Failed to save vehicle trip OMC card payments detail item.");
 		}
 	}
+	#endregion
 }

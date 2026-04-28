@@ -41,6 +41,7 @@ SELECT
 
 	[t].[BillId],
 	[b].[BillNo],
+	[b].[TransactionDateTime] AS BillDateTime,
 	[t].[GrossAmount],
 	[t].[TDSAmount],
 	[t].[PenaltyAmount],

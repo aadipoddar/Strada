@@ -284,6 +284,9 @@ public partial class VehicleTripBillReport : IAsyncDisposable
 		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0 || !_sfGrid.SelectedRecords.First().Status)
 			return;
 
+		await _toastNotification.ShowAsync("Not Allowed", "Tranaction viewing will come soon in a future update.", ToastType.Info);
+		return;
+
 		var decodedTransactionNo = await GenerateCodes.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
 	}

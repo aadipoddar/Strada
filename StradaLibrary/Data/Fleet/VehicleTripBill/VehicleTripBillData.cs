@@ -8,6 +8,7 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Fleet.VehicleTripBill;
 using StradaLibrary.Models.Operations;
+using System.Net.Sockets;
 
 namespace StradaLibrary.Data.Fleet.VehicleTripBill;
 
@@ -44,6 +45,7 @@ public static class VehicleTripBillData
 			Status = true
 		})];
 
+	#region Delete
 	public static async Task DeleteTransaction(VehicleTripBillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		if (sqlDataAccessTransaction is null)
@@ -83,36 +85,6 @@ public static class VehicleTripBillData
 		}
 	}
 
-	public static async Task RecoverTransaction(VehicleTripBillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
-	{
-		if (sqlDataAccessTransaction is null)
-		{
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				await RecoverTransaction(bill, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
-
-			await VehicleTripBillNotify.Notify(bill.Id, NotifyType.Recovered);
-			return;
-		}
-
-		await FinancialYearData.ValidateFinancialYear(bill.TransactionDateTime, sqlDataAccessTransaction);
-
-		bill.Status = true;
-		var id = await InsertVehicleTripBill(bill, sqlDataAccessTransaction);
-		if (id <= 0)
-			throw new InvalidOperationException("Failed to recover vehicle trip bill transaction.");
-	}
-
 	private static async Task DeleteVehicleTripsBillNo(VehicleTripBillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
 		var existingVehicleTrips = await VehicleTripData.LoadVehicleTripOverviewByBillIdDate(bill.Id, null, null, sqlDataAccessTransaction);
@@ -134,7 +106,9 @@ public static class VehicleTripBillData
 				throw new InvalidOperationException("Failed to save vehicle trips.");
 		}
 	}
+	#endregion
 
+	#region Save
 	private static async Task<VehicleTripBillModel> ValidateTransaction(VehicleTripBillModel bill, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
 		if (bill.CompanyId <= 0)
@@ -242,6 +216,9 @@ public static class VehicleTripBillData
 		SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		bool update = bill.Id > 0;
+
+		if (update)
+			throw new InvalidOperationException("Updating a vehicle trip bill transaction is not allowed. Please delete and recreate the transaction to make changes.");
 
 		if (sqlDataAccessTransaction is null)
 		{
@@ -371,4 +348,5 @@ public static class VehicleTripBillData
 				throw new InvalidOperationException("Failed to save vehicle trips.");
 		}
 	}
+	#endregion
 }

@@ -456,6 +456,7 @@ else
 							</GridColumn>
 
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.BillNo)" HeaderText="Bill No" Width="150" />
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.BillDateTime)" HeaderText="Bill Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.GrossAmount)" HeaderText="Gross Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.TDSAmount)" HeaderText="TDS Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.PenaltyAmount)" HeaderText="Penalty Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />

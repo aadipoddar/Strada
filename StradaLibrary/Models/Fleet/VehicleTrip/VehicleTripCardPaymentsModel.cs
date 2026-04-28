@@ -60,6 +60,7 @@ public class VehicleTripCardPaymentsOverviewModel
 
 	public int? BillId { get; set; }
 	public string? BillNo { get; set; }
+	public DateTime? BillDateTime { get; set; }
 	public decimal? GrossAmount { get; set; }
 	public decimal? TDSAmount { get; set; }
 	public decimal? PenaltyAmount { get; set; }

@@ -370,6 +370,7 @@ else
 
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.BillNo)" HeaderText="Bill No"
 										Width="150" />
+							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.BillDateTime)" HeaderText="Bill Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(VehicleTripCardPaymentsOverviewModel.GrossAmount)"
 										HeaderText="Gross Amt" Width="130" TextAlign="TextAlign.Right" Format="N2"
 										Visible="_showAllColumns" />
