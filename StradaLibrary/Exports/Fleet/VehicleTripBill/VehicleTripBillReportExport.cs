@@ -21,16 +21,16 @@ public static class VehicleTripBillReportExport
 		{
 			[nameof(VehicleTripBillOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleTripBillOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(VehicleTripBillOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(VehicleTripBillOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillOverviewModel.BillNo)] = new() { DisplayName = "Bill", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillOverviewModel.OMCName)] = new() { DisplayName = "OMC", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			
+
 			[nameof(VehicleTripBillOverviewModel.TotalGrossAmount)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripBillOverviewModel.TotalTDSAmount)] = new() { DisplayName = "TDS", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripBillOverviewModel.TotalPenaltyAmount)] = new() { DisplayName = "Penalty", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripBillOverviewModel.TotalNetAmount)] = new() { DisplayName = "Net Amount", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
-			
+
 			[nameof(VehicleTripBillOverviewModel.TotalCardPaymentAmount)] = new() { DisplayName = "Card Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripBillOverviewModel.TotalLedgerPaymentAmount)] = new() { DisplayName = "Ledger Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
@@ -167,7 +167,7 @@ public static class VehicleTripBillReportExport
 
 			[nameof(VehicleTripBillCardPaymentsOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillCardPaymentsOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleTripBillCardPaymentsOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(VehicleTripBillCardPaymentsOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(VehicleTripBillCardPaymentsOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillCardPaymentsOverviewModel.BillNo)] = new() { DisplayName = "Bill", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillCardPaymentsOverviewModel.OMCName)] = new() { DisplayName = "OMC", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -309,7 +309,7 @@ public static class VehicleTripBillReportExport
 
 			[nameof(VehicleTripBillLedgerPaymentsOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillLedgerPaymentsOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleTripBillLedgerPaymentsOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(VehicleTripBillLedgerPaymentsOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(VehicleTripBillLedgerPaymentsOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillLedgerPaymentsOverviewModel.BillNo)] = new() { DisplayName = "Bill", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripBillLedgerPaymentsOverviewModel.OMCName)] = new() { DisplayName = "OMC", Alignment = CellAlignment.Left, IncludeInTotal = false },

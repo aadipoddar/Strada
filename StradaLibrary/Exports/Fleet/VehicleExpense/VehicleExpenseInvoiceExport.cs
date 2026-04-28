@@ -14,28 +14,23 @@ public static class VehicleExpenseInvoiceExport
 		var transaction = await CommonData.LoadTableDataById<VehicleExpenseOverviewModel>(FleetNames.VehicleExpenseOverview, transactionId) ??
 			throw new InvalidOperationException("Transaction not found.");
 
-		var expenses = await CommonData.LoadTableDataByMasterId<VehicleExpenseDetailsModel>(FleetNames.VehicleExpenseDetails, transaction.Id);
+		var expenses = await CommonData.LoadTableDataByMasterId<VehicleExpenseDetailsOverviewModel>(FleetNames.VehicleExpenseDetailsOverview, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
-		LedgerModel ledger = new();
-
-		if (transaction.LedgerId is not null)
+		LedgerModel ledger = new()
 		{
-			ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, transaction.LedgerId.Value);
-			ledger.Address = $"\nVehicle: {transaction.VehicleCode}";
-		}
+			Name = $"Vehicle: {transaction.VehicleCode}"
+		};
 
-		else
-			ledger.Name = $"Vehicle: {transaction.VehicleCode}";
-
-		var expenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 		var lineItems = expenses.Select(detail =>
 		{
 			return new VehicleExpenseDetailsCartModel
 			{
 				VehicleExpenseTypeId = detail.VehicleExpenseTypeId,
-				VehicleExpenseTypeName = expenseTypes.FirstOrDefault(p => p.Id == detail.VehicleExpenseTypeId).Name,
-				Amount = detail.Amount,
+				VehicleExpenseTypeName = detail.ExpenseTypeName,
+				LedgerId = detail.LedgerId,
+				LedgerName = detail.LedgerName,
+				Amount = detail.ExpenseAmount,
 				IdentificationNo = detail.IdentificationNo,
 				Remarks = detail.Remarks
 			};
@@ -62,6 +57,7 @@ public static class VehicleExpenseInvoiceExport
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
 			new(nameof(VehicleExpenseDetailsCartModel.VehicleExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(VehicleExpenseDetailsCartModel.LedgerName), "Ledger", exportType, CellAlignment.Left, 60, 30),
 			new(nameof(VehicleExpenseDetailsCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(VehicleExpenseDetailsCartModel.IdentificationNo), "Identification No", exportType, CellAlignment.Left, 100, 30),
 			new(nameof(VehicleExpenseDetailsCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 150, 30)

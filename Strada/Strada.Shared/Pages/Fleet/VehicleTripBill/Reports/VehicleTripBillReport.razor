@@ -354,7 +354,7 @@ else
 										Width="180"
 										Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.TransactionDateTime)" HeaderText="Date"
-										Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
+										Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.FinancialYear)" HeaderText="Financial Year"
 										Width="130" Visible="_showAllColumns" />
 
@@ -399,14 +399,14 @@ else
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.CreatedByName)" HeaderText="Created By"
 										Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.CreatedAt)" HeaderText="Created At"
-										Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime"
+										Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime"
 										Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.CreatedFromPlatform)"
 										HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.LastModifiedByUserName)"
 										HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.LastModifiedAt)" HeaderText="Modified At"
-										Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime"
+										Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime"
 										Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripBillOverviewModel.LastModifiedFromPlatform)"
 										HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />

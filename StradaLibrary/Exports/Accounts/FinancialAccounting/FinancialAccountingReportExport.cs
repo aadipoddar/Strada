@@ -13,7 +13,7 @@ public static class FinancialAccountingReportExport
         DateOnly? dateRangeEnd = null,
         bool showAllColumns = true,
         bool showDeleted = false,
-		CompanyModel company = null,
+        CompanyModel company = null,
         VoucherModel voucher = null)
     {
         var columnSettings = new Dictionary<string, ReportColumnSetting>
@@ -29,7 +29,7 @@ public static class FinancialAccountingReportExport
             [nameof(FinancialAccountingOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(FinancialAccountingOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(FinancialAccountingOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false },
-            [nameof(FinancialAccountingOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+            [nameof(FinancialAccountingOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(FinancialAccountingOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(FinancialAccountingOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(FinancialAccountingOverviewModel.TotalDebitLedgers)] = new() { DisplayName = "Debit Ledgers", Format = "#,##0", Alignment = CellAlignment.Right, IncludeInTotal = true },
@@ -68,7 +68,7 @@ public static class FinancialAccountingReportExport
 
             if (!showDeleted)
                 columnOrder.Remove(nameof(FinancialAccountingOverviewModel.Status));
-		}
+        }
         else
         {
             columnOrder =
@@ -80,7 +80,7 @@ public static class FinancialAccountingReportExport
                 nameof(FinancialAccountingOverviewModel.TotalCreditAmount),
                 nameof(FinancialAccountingOverviewModel.TotalAmount)
             ];
-		}
+        }
 
         string fileName = $"ACCOUNTING_REPORT";
         if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
@@ -144,7 +144,7 @@ public static class FinancialAccountingReportExport
             [nameof(FinancialAccountingLedgerOverviewModel.AccountingRemarks)] = new() { DisplayName = "Accounting Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(FinancialAccountingLedgerOverviewModel.Remarks)] = new() { DisplayName = "Ledger Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(FinancialAccountingLedgerOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
-            [nameof(FinancialAccountingLedgerOverviewModel.ReferenceDateTime)] = new() { DisplayName = "Ref Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+            [nameof(FinancialAccountingLedgerOverviewModel.ReferenceDateTime)] = new() { DisplayName = "Ref Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(FinancialAccountingLedgerOverviewModel.Debit)] = new() { DisplayName = "Debit", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
             [nameof(FinancialAccountingLedgerOverviewModel.Credit)] = new() { DisplayName = "Credit", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
             [nameof(FinancialAccountingLedgerOverviewModel.ReferenceAmount)] = new() { DisplayName = "Ref Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true }

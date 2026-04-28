@@ -24,6 +24,7 @@ public static class VehicleExpenseData
 			Id = 0,
 			MasterId = accountingId,
 			VehicleExpenseTypeId = item.VehicleExpenseTypeId,
+			LedgerId = item.LedgerId,
 			Amount = item.Amount,
 			IdentificationNo = item.IdentificationNo,
 			Remarks = item.Remarks,

@@ -121,18 +121,6 @@ else
 									   CssClass="custom-textbox readonly-field" />
 						</div>
 
-						<!-- Ledger -->
-						<div class="form-field">
-							<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
-												 Value="_selectedLedger"
-												 DataSource="@_ledgers"
-												 Placeholder="Select a Ledger"
-												 Label="Ledger"
-												 ValueChange="OnLedgerChanged"
-												 FieldValue="@nameof(LedgerModel.Name)"
-												 AddNewRoute="@PageRouteNames.LedgerMaster" />
-						</div>
-
 						<!-- Vehicle -->
 						<div class="form-field">
 							<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
@@ -193,6 +181,15 @@ else
 												 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
 												 ValueChange="OnExpensesTypeChanged"
 												 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.VehicleExpenseTypeMaster" />
+						</div>
+
+						<!-- Ledger -->
+						<div class="cart-field">
+							<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
+												 FieldValue="@nameof(LedgerModel.Name)" @bind-Value="_selectedLedger"
+												 DataSource="@_ledgers" Placeholder="Select Ledger"
+												 ValueChange="OnLedgerChanged"
+												 Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
 						</div>
 
 						<!-- Amount -->
@@ -281,6 +278,7 @@ else
 
 						<GridColumns>
 							<GridColumn Field="@nameof(VehicleExpenseDetailsCartModel.VehicleExpenseTypeName)" HeaderText="Name" Width="200" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsCartModel.LedgerName)" HeaderText="Ledger" Width="200" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
 								<Template>
 									@{

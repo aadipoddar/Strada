@@ -2,6 +2,7 @@
 	@Id INT OUTPUT,
 	@MasterId INT,
 	@VehicleExpenseTypeId INT,
+	@LedgerId INT,
 	@Amount MONEY,
 	@IdentificationNo VARCHAR(MAX),
 	@Remarks VARCHAR(MAX),
@@ -14,6 +15,7 @@ BEGIN
 		(
 			[MasterId],
 			[VehicleExpenseTypeId],
+			[LedgerId],
 			[Amount],
 			[IdentificationNo],
 			[Remarks],
@@ -22,6 +24,7 @@ BEGIN
 		(
 			@MasterId,
 			@VehicleExpenseTypeId,
+			@LedgerId,
 			@Amount,
 			@IdentificationNo,
 			@Remarks,
@@ -37,6 +40,7 @@ BEGIN
 		SET
 			[MasterId] = @MasterId,
 			[VehicleExpenseTypeId] = @VehicleExpenseTypeId,
+			[LedgerId] = @LedgerId,
 			[Amount] = @Amount,
 			[IdentificationNo] = @IdentificationNo,
 			[Remarks] = @Remarks,

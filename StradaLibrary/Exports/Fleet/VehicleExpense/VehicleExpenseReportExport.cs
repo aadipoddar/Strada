@@ -21,9 +21,8 @@ public static class VehicleExpenseReportExport
 		{
 			[nameof(VehicleExpenseOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleExpenseOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(VehicleExpenseOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(VehicleExpenseOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleExpenseOverviewModel.LedgerName)] = new() { DisplayName = "Ledger", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseOverviewModel.VehicleCode)] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
@@ -43,13 +42,12 @@ public static class VehicleExpenseReportExport
 		{
 			columnOrder =
 			[
-				nameof(VehicleExpenseOverviewModel.TransactionNo),
+				nameof(VehicleExpenseOverviewModel.VehicleCode),
 				nameof(VehicleExpenseOverviewModel.CompanyName),
 				nameof(VehicleExpenseOverviewModel.TransactionDateTime),
 				nameof(VehicleExpenseOverviewModel.FinancialYear),
-				nameof(VehicleExpenseOverviewModel.LedgerName),
-				nameof(VehicleExpenseOverviewModel.VehicleCode),
 				nameof(VehicleExpenseOverviewModel.TotalExpense),
+				nameof(VehicleExpenseOverviewModel.TransactionNo),
 				nameof(VehicleExpenseOverviewModel.Remarks),
 				nameof(VehicleExpenseOverviewModel.CreatedByName),
 				nameof(VehicleExpenseOverviewModel.CreatedAt),
@@ -67,11 +65,9 @@ public static class VehicleExpenseReportExport
 		{
 			columnOrder =
 			[
-				nameof(VehicleExpenseOverviewModel.TransactionNo),
+				nameof(VehicleExpenseOverviewModel.VehicleCode),
 				nameof(VehicleExpenseOverviewModel.CompanyName),
 				nameof(VehicleExpenseOverviewModel.TransactionDateTime),
-				nameof(VehicleExpenseOverviewModel.LedgerName),
-				nameof(VehicleExpenseOverviewModel.VehicleCode),
 				nameof(VehicleExpenseOverviewModel.TotalExpense),
 				nameof(VehicleExpenseOverviewModel.Status)
 			];
@@ -146,15 +142,16 @@ public static class VehicleExpenseReportExport
 		{
 			[nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeName)] = new() { DisplayName = "Expense Type", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeCode)] = new() { DisplayName = "Expense Type Code", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleExpenseDetailsOverviewModel.LedgerName)] = new() { DisplayName = "Ledger", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseDetailsOverviewModel.ExpenseAmount)] = new() { DisplayName = "Expense Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleExpenseDetailsOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(VehicleExpenseDetailsOverviewModel.ExpenseRemarks)] = new() { DisplayName = "Expense Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
 			[nameof(VehicleExpenseDetailsOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseDetailsOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(VehicleExpenseDetailsOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
-			[nameof(VehicleExpenseDetailsOverviewModel.LedgerName)] = new() { DisplayName = "Ledger", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseDetailsOverviewModel.VehicleCode)] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleExpenseDetailsOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
@@ -175,15 +172,16 @@ public static class VehicleExpenseReportExport
 			[
 				nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeName),
 				nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeCode),
+				nameof(VehicleExpenseDetailsOverviewModel.LedgerName),
 				nameof(VehicleExpenseDetailsOverviewModel.ExpenseAmount),
 				nameof(VehicleExpenseDetailsOverviewModel.IdentificationNo),
-				nameof(VehicleExpenseDetailsOverviewModel.TransactionNo),
+				nameof(VehicleExpenseDetailsOverviewModel.ExpenseRemarks),
+				nameof(VehicleExpenseDetailsOverviewModel.VehicleCode),
 				nameof(VehicleExpenseDetailsOverviewModel.CompanyName),
 				nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime),
 				nameof(VehicleExpenseDetailsOverviewModel.FinancialYear),
-				nameof(VehicleExpenseDetailsOverviewModel.LedgerName),
-				nameof(VehicleExpenseDetailsOverviewModel.VehicleCode),
 				nameof(VehicleExpenseDetailsOverviewModel.TotalExpense),
+				nameof(VehicleExpenseDetailsOverviewModel.TransactionNo),
 				nameof(VehicleExpenseDetailsOverviewModel.Remarks),
 				nameof(VehicleExpenseDetailsOverviewModel.CreatedByName),
 				nameof(VehicleExpenseDetailsOverviewModel.CreatedAt),
@@ -198,14 +196,13 @@ public static class VehicleExpenseReportExport
 			columnOrder =
 			[
 				nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeName),
+				nameof(VehicleExpenseDetailsOverviewModel.LedgerName),
 				nameof(VehicleExpenseDetailsOverviewModel.ExpenseAmount),
 				nameof(VehicleExpenseDetailsOverviewModel.IdentificationNo),
-				nameof(VehicleExpenseDetailsOverviewModel.TransactionNo),
+				nameof(VehicleExpenseDetailsOverviewModel.VehicleCode),
 				nameof(VehicleExpenseDetailsOverviewModel.CompanyName),
 				nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime),
-				nameof(VehicleExpenseDetailsOverviewModel.LedgerName),
-				nameof(VehicleExpenseDetailsOverviewModel.VehicleCode),
-				nameof(VehicleExpenseDetailsOverviewModel.TotalExpense),
+				nameof(VehicleExpenseDetailsOverviewModel.TotalExpense)
 			];
 
 			if (company is not null)

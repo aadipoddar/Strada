@@ -26,16 +26,16 @@ public partial class VehicleExpensePage
 
 	private CompanyModel _selectedCompany = new();
 	private FinancialYearModel _selectedFinancialYear = new();
-	private LedgerModel _selectedLedger = new();
 	private VehicleModel _selectedVehicle = new();
 	private VehicleExpenseTypeModel _selectedExpenseType = null;
+	private LedgerModel _selectedLedger = new();
 	private VehicleExpenseDetailsCartModel _selectedExpensesCart = new();
 	private VehicleExpenseModel _vehicleExpense = new();
 
 	private List<CompanyModel> _companies = [];
-	private List<LedgerModel> _ledgers = [];
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleExpenseTypeModel> _expenseTypes = [];
+	private List<LedgerModel> _ledgers = [];
 	private List<VehicleExpenseDetailsCartModel> _expensesCart = [];
 
 	private AutoCompleteWithAdd<VehicleExpenseTypeModel?, VehicleExpenseTypeModel> _sfExpenseTypeAutoComplete;
@@ -81,18 +81,18 @@ public partial class VehicleExpensePage
 	private async Task LoadData()
 	{
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
-		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
+		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
 		_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
 
-		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
+		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
 
 		_selectedVehicle = _vehicles.FirstOrDefault();
 	}
@@ -165,7 +165,6 @@ public partial class VehicleExpensePage
 			TransactionDateTime = currentDateTime,
 			FinancialYearId = financialYear is null ? 0 : financialYear.Id,
 			VehicleId = _selectedVehicle.Id,
-			LedgerId = null,
 			TotalExpense = 0,
 			Remarks = string.Empty,
 			CreatedBy = _user.Id,
@@ -208,11 +207,6 @@ public partial class VehicleExpensePage
 			_selectedVehicle = _vehicles.FirstOrDefault(s => s.Id == _vehicleExpense.VehicleId) ?? _vehicles.FirstOrDefault();
 		else
 			_selectedVehicle = _vehicles.FirstOrDefault();
-
-		if (_vehicleExpense.LedgerId.HasValue && _vehicleExpense.LedgerId.Value > 0)
-			_selectedLedger = _ledgers.FirstOrDefault(s => s.Id == _vehicleExpense.LedgerId.Value) ?? new();
-		else
-			_selectedLedger = null;
 	}
 
 	private async Task ResolveExpensesCart()
@@ -254,6 +248,8 @@ public partial class VehicleExpensePage
 			{
 				VehicleExpenseTypeId = item.VehicleExpenseTypeId,
 				VehicleExpenseTypeName = _expenseTypes.First(s => s.Id == item.VehicleExpenseTypeId).Name,
+				LedgerId = item.LedgerId,
+				LedgerName = _ledgers.FirstOrDefault(s => s.Id == item.LedgerId)?.Name,
 				Amount = item.Amount,
 				IdentificationNo = item.IdentificationNo,
 				Remarks = item.Remarks
@@ -291,20 +287,6 @@ public partial class VehicleExpensePage
 
 		await SaveTransactionFile();
 	}
-
-	private async Task OnLedgerChanged(ChangeEventArgs<LedgerModel, LedgerModel> args)
-	{
-		if (args.Value is null || args.Value.Id == 0)
-		{
-			_selectedLedger = null;
-			_vehicleExpense.LedgerId = null;
-		}
-
-		_selectedLedger = args.Value;
-		_vehicleExpense.LedgerId = _selectedLedger.Id;
-
-		await SaveTransactionFile();
-	}
 	#endregion
 
 	#region Expenses Cart
@@ -320,6 +302,8 @@ public partial class VehicleExpensePage
 			{
 				VehicleExpenseTypeId = 0,
 				VehicleExpenseTypeName = "",
+				LedgerId = 0,
+				LedgerName = "",
 				IdentificationNo = "",
 				Amount = 0
 			};
@@ -328,7 +312,28 @@ public partial class VehicleExpensePage
 		{
 			_selectedExpensesCart.VehicleExpenseTypeId = _selectedExpenseType.Id;
 			_selectedExpensesCart.VehicleExpenseTypeName = _selectedExpenseType.Name;
+			_selectedExpensesCart.LedgerId = _selectedLedger?.Id;
+			_selectedExpensesCart.LedgerName = _selectedLedger?.Name;
 		}
+	}
+
+	private async Task OnLedgerChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
+	{
+		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedLedger = null;
+			_selectedExpensesCart.LedgerId = null;
+			_selectedExpensesCart.LedgerName = null;
+		}
+
+		else
+		{
+			_selectedLedger = args.Value;
+			_selectedExpensesCart.LedgerId = _selectedLedger.Id;
+			_selectedExpensesCart.LedgerName = _selectedLedger.Name;
+		}
+
+		await SaveTransactionFile();
 	}
 
 	private async Task AddExpensesToCart()
@@ -347,12 +352,15 @@ public partial class VehicleExpensePage
 			{
 				VehicleExpenseTypeId = _selectedExpenseType.Id,
 				VehicleExpenseTypeName = _selectedExpenseType.Name,
+				LedgerId = _selectedLedger?.Id,
+				LedgerName = _selectedLedger?.Name,
 				Amount = _selectedExpensesCart.Amount,
 				IdentificationNo = _selectedExpensesCart.IdentificationNo,
 				Remarks = _selectedExpensesCart.Remarks
 			});
 
 		_selectedExpenseType = null;
+		_selectedLedger = null;
 		_selectedExpensesCart = new();
 
 		await _sfExpenseTypeAutoComplete.FocusAsync();
@@ -370,10 +378,14 @@ public partial class VehicleExpensePage
 		if (_selectedExpenseType is null)
 			return;
 
+		_selectedLedger = _ledgers.FirstOrDefault(s => s.Id == selectedCartItem.LedgerId);
+
 		_selectedExpensesCart = new()
 		{
 			VehicleExpenseTypeId = selectedCartItem.VehicleExpenseTypeId,
 			VehicleExpenseTypeName = selectedCartItem.VehicleExpenseTypeName,
+			LedgerId = selectedCartItem.LedgerId,
+			LedgerName = selectedCartItem.LedgerName,
 			Amount = selectedCartItem.Amount,
 			IdentificationNo = selectedCartItem.IdentificationNo,
 			Remarks = selectedCartItem.Remarks
@@ -416,7 +428,6 @@ public partial class VehicleExpensePage
 			_vehicleExpense.Remarks = null;
 
 		_vehicleExpense.CompanyId = _selectedCompany.Id;
-		_vehicleExpense.LedgerId = _selectedLedger?.Id;
 		_vehicleExpense.VehicleId = _selectedVehicle.Id;
 		_vehicleExpense.TotalExpense = _expensesCart.Sum(s => s.Amount);
 

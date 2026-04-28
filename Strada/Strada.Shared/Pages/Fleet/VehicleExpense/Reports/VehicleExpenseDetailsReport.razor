@@ -223,6 +223,7 @@ else
 						<GridColumns>
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="170" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeCode)" HeaderText="Expense Type Cdode" Width="130" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="130" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseAmount)" HeaderText="Expense Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>
 									@{
@@ -232,21 +233,22 @@ else
 								</Template>
 							</GridColumn>
 
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.IdentificationNo)" HeaderText="Trans No" Width="170" />
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" />
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="130" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.IdentificationNo)" HeaderText="Identification No" Width="170" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseRemarks)" HeaderText="Expense Remarks" Width="170" Visible="_showAllColumns" />
+
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
 
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
 						</GridColumns>
 					</SfGrid>
