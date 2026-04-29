@@ -66,6 +66,9 @@ public class VehicleTripExpensesOverviewModel
 	public decimal? PenaltyAmount { get; set; }
 	public decimal? NetAmount { get; set; }
 
+	public decimal? ProfitLoss { get; set; }
+	public int? PendingDays { get; set; }
+
 	public string? Remarks { get; set; }
 	public int CreatedBy { get; set; }
 	public string CreatedByName { get; set; }

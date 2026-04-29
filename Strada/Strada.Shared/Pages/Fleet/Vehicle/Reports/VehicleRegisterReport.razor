@@ -179,6 +179,20 @@ else
 														<GridColumn Field="@nameof(VehicleTripOverviewModel.GrossAmount)" HeaderText="Gross" Width="120" TextAlign="TextAlign.Right" Format="N2" />
 														<GridColumn Field="@nameof(VehicleTripOverviewModel.TDSAmount)" HeaderText="TDS" Width="120" TextAlign="TextAlign.Right" Format="N2" />
 														<GridColumn Field="@nameof(VehicleTripOverviewModel.NetAmount)" HeaderText="Net Amt" Width="120" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(VehicleTripOverviewModel.ProfitLoss)" HeaderText="P&amp;L" Width="120" TextAlign="TextAlign.Right">
+															<Template Context="tripCtxPL">
+																@{
+																	var trip = tripCtxPL as VehicleTripOverviewModel;
+																	if (trip.ProfitLoss.HasValue)
+																	{
+																		<span class="@(trip.ProfitLoss >= 0 ? "grid-credit" : "grid-debit")">
+																			@trip.ProfitLoss.Value.ToString("N2")
+																		</span>
+																	}
+																}
+															</Template>
+														</GridColumn>
+														<GridColumn Field="@nameof(VehicleTripOverviewModel.PendingDays)" HeaderText="Pending Days" Width="110" TextAlign="TextAlign.Right" />
 														<GridColumn Field="@nameof(VehicleTripOverviewModel.OMCName)" HeaderText="OMC" Width="150" />
 														<GridColumn Field="@nameof(VehicleTripOverviewModel.CompanyName)" HeaderText="Company" Width="200" />
 														<GridColumn Field="@nameof(VehicleTripOverviewModel.TransactionNo)" HeaderText="Trip No" Width="180" />

@@ -55,6 +55,9 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripOverviewModel.PenaltyAmount)] = new() { DisplayName = "Penalty Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripOverviewModel.NetAmount)] = new() { DisplayName = "Net Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(VehicleTripOverviewModel.ProfitLoss)] = new() { DisplayName = "P&L", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripOverviewModel.PendingDays)] = new() { DisplayName = "Pending Days", Format = "0", Alignment = CellAlignment.Right, IncludeInTotal = false },
+
 			[nameof(VehicleTripOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -96,6 +99,8 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOverviewModel.TDSAmount),
 				nameof(VehicleTripOverviewModel.PenaltyAmount),
 				nameof(VehicleTripOverviewModel.NetAmount),
+				nameof(VehicleTripOverviewModel.ProfitLoss),
+				nameof(VehicleTripOverviewModel.PendingDays),
 				nameof(VehicleTripOverviewModel.TransactionNo),
 				nameof(VehicleTripOverviewModel.Remarks),
 				nameof(VehicleTripOverviewModel.CreatedByName),
@@ -130,6 +135,8 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripOverviewModel.TDSAmount),
 				nameof(VehicleTripOverviewModel.PenaltyAmount),
 				nameof(VehicleTripOverviewModel.NetAmount),
+				nameof(VehicleTripOverviewModel.ProfitLoss),
+				nameof(VehicleTripOverviewModel.PendingDays),
 				nameof(VehicleTripOverviewModel.Status)
 			];
 
@@ -254,6 +261,9 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripExpensesOverviewModel.PenaltyAmount)] = new() { DisplayName = "Penalty Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripExpensesOverviewModel.NetAmount)] = new() { DisplayName = "Net Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(VehicleTripExpensesOverviewModel.ProfitLoss)] = new() { DisplayName = "P&L", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripExpensesOverviewModel.PendingDays)] = new() { DisplayName = "Pending Days", Format = "0", Alignment = CellAlignment.Right, IncludeInTotal = false },
+
 			[nameof(VehicleTripExpensesOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripExpensesOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -298,6 +308,8 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.TDSAmount),
 				nameof(VehicleTripExpensesOverviewModel.PenaltyAmount),
 				nameof(VehicleTripExpensesOverviewModel.NetAmount),
+				nameof(VehicleTripExpensesOverviewModel.ProfitLoss),
+				nameof(VehicleTripExpensesOverviewModel.PendingDays),
 				nameof(VehicleTripExpensesOverviewModel.TransactionNo),
 				nameof(VehicleTripExpensesOverviewModel.Remarks),
 				nameof(VehicleTripExpensesOverviewModel.CreatedByName),
@@ -329,7 +341,9 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripExpensesOverviewModel.GrossAmount),
 				nameof(VehicleTripExpensesOverviewModel.TDSAmount),
 				nameof(VehicleTripExpensesOverviewModel.PenaltyAmount),
-				nameof(VehicleTripExpensesOverviewModel.NetAmount)
+				nameof(VehicleTripExpensesOverviewModel.NetAmount),
+				nameof(VehicleTripExpensesOverviewModel.ProfitLoss),
+				nameof(VehicleTripExpensesOverviewModel.PendingDays)
 			];
 
 			if (company is not null)
@@ -450,6 +464,9 @@ public static class VehicleTripReportExport
 			[nameof(VehicleTripCardPaymentsOverviewModel.PenaltyAmount)] = new() { DisplayName = "Penalty Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(VehicleTripCardPaymentsOverviewModel.NetAmount)] = new() { DisplayName = "Net Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(VehicleTripCardPaymentsOverviewModel.ProfitLoss)] = new() { DisplayName = "P&L", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
+			[nameof(VehicleTripCardPaymentsOverviewModel.PendingDays)] = new() { DisplayName = "Pending Days", Format = "0", Alignment = CellAlignment.Right, IncludeInTotal = false },
+
 			[nameof(VehicleTripCardPaymentsOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripCardPaymentsOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(VehicleTripCardPaymentsOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -494,6 +511,8 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripCardPaymentsOverviewModel.TDSAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.PenaltyAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.NetAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.ProfitLoss),
+				nameof(VehicleTripCardPaymentsOverviewModel.PendingDays),
 				nameof(VehicleTripCardPaymentsOverviewModel.TransactionNo),
 				nameof(VehicleTripCardPaymentsOverviewModel.Remarks),
 				nameof(VehicleTripCardPaymentsOverviewModel.CreatedByName),
@@ -525,7 +544,9 @@ public static class VehicleTripReportExport
 				nameof(VehicleTripCardPaymentsOverviewModel.GrossAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.TDSAmount),
 				nameof(VehicleTripCardPaymentsOverviewModel.PenaltyAmount),
-				nameof(VehicleTripCardPaymentsOverviewModel.NetAmount)
+				nameof(VehicleTripCardPaymentsOverviewModel.NetAmount),
+				nameof(VehicleTripCardPaymentsOverviewModel.ProfitLoss),
+				nameof(VehicleTripCardPaymentsOverviewModel.PendingDays)
 			];
 
 			if (company is not null)

@@ -296,6 +296,36 @@ else
 											}
 										</GroupCaptionTemplate>
 									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleTripExpensesOverviewModel.ProfitLoss)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												var isLoss = aggregate.Sum?.StartsWith("-") == true;
+												<div class="aggregate-value @(isLoss ? "aggregate-debit" : "aggregate-total")">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												var isLoss = aggregate.Sum?.StartsWith("-") == true;
+												<div class="aggregate-value @(isLoss ? "aggregate-debit" : "aggregate-total")">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												var isLoss = aggregate.Sum?.StartsWith("-") == true;
+												<div class="aggregate-value @(isLoss ? "aggregate-debit" : "aggregate-total")">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
 								</GridAggregateColumns>
 							</GridAggregate>
 						</GridAggregates>
@@ -381,6 +411,20 @@ else
 										Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.NetAmount)" HeaderText="Net Amt"
 										Width="150" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.ProfitLoss)" HeaderText="P&amp;L" Width="140" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = (context as VehicleTripExpensesOverviewModel);
+										if (item.ProfitLoss.HasValue)
+										{
+											<span class="@(item.ProfitLoss >= 0 ? "grid-credit" : "grid-debit")">
+												@item.ProfitLoss.Value.ToString("N2")
+											</span>
+										}
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.PendingDays)" HeaderText="Pending Days" Width="130" TextAlign="TextAlign.Right" />
 
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(VehicleTripExpensesOverviewModel.Remarks)" HeaderText="Remarks"

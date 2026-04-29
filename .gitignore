@@ -421,3 +421,4 @@ FodyWeavers.xsd
 *.lscache
 
 StradaLibrary/DataAccess/Secrets.local_secrets.cs
+.claude

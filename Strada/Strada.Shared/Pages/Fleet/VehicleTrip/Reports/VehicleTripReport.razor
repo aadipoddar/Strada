@@ -411,6 +411,33 @@ else
 											}
 										</GroupCaptionTemplate>
 									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(VehicleTripOverviewModel.ProfitLoss)"
+														 Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
 								</GridAggregateColumns>
 							</GridAggregate>
 						</GridAggregates>
@@ -468,6 +495,21 @@ else
 									}
 								</Template>
 							</GridColumn>
+
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.ProfitLoss)" HeaderText="P&L" Width="140" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = (context as VehicleTripOverviewModel);
+										if (item.ProfitLoss.HasValue)
+										{
+											<span class="@(item.ProfitLoss >= 0 ? "grid-credit" : "grid-debit")">
+												@item.ProfitLoss.Value.ToString("N2")
+											</span>
+										}
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(VehicleTripOverviewModel.PendingDays)" HeaderText="Pending Days" Width="130" TextAlign="TextAlign.Right" />
 
 							<GridColumn Field="@nameof(VehicleTripOverviewModel.Status)" HeaderText="Status" Width="110"
 										TextAlign="TextAlign.Center" Visible="_showDeleted">

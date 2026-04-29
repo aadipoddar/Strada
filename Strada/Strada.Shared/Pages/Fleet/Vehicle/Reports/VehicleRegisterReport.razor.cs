@@ -295,7 +295,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			rows.Add(ExcelRow(["TRIPS", .. Enumerable.Repeat("", 13)], bold: true, backColor: "#BDD7EE"));
 
 			// Column headers
-			rows.Add(ExcelRow(["Date", "Challan", "Route", "Driver", "Type", "Qty", "Trip Exp", "Bill No", "Bill Date", "Gross", "TDS", "Net Amt", "Trip No", "Remarks"], bold: true, backColor: "#DEEAF1"));
+			rows.Add(ExcelRow(["Date", "Challan", "Route", "Driver", "Type", "Qty", "Trip Exp", "Bill No", "Bill Date", "Gross", "TDS", "Net Amt", "Profit/Loss", "Pending Days", "OMC", "Company", "Trip No", "Remarks"], bold: true, backColor: "#DEEAF1"));
 
 			foreach (var trip in vehicle.VehicleTripOverviews)
 			{
@@ -312,6 +312,10 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 					trip.GrossAmount?.ToString("N2") ?? "",
 					trip.TDSAmount?.ToString("N2") ?? "",
 					trip.NetAmount?.ToString("N2") ?? "",
+					trip.ProfitLoss?.ToString("N2") ?? "",
+					trip.PendingDays.HasValue ? trip.PendingDays.Value.ToString() : "",
+					trip.OMCName ?? "",
+					trip.CompanyName ?? "",
 					trip.TransactionNo ?? "",
 					trip.Remarks ?? ""
 				]));

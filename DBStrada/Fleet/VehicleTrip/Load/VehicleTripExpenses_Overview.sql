@@ -46,6 +46,9 @@ SELECT
 	[t].[TDSAmount],
 	[t].[PenaltyAmount],
 	[t].[NetAmount],
+	
+	[t].[NetAmount] - [t].[TotalExpense] AS ProfitLoss,
+	CASE WHEN [t].[BillId] IS NULL THEN DATEDIFF(day, [t].[TransactionDateTime], GETDATE()) ELSE NULL END AS PendingDays,
 
     [t].[Remarks],
 	[t].[CreatedBy],
