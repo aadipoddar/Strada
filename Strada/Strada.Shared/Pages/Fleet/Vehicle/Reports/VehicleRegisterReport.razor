@@ -201,21 +201,24 @@ else
 												</SfGrid>
 											</div>
 										}
-										@if (vehicle.VehicleExpenseOverviews.Count > 0)
+										@if (vehicle.VehicleExpenseDetailsOverviews.Count > 0)
 										{
 											<div class="detail-section">
 												<div class="detail-section-header">
 													<span class="detail-section-title">Vehicle Expenses</span>
-													<span class="detail-section-badge">@vehicle.VehicleExpenseOverviews.Count</span>
+													<span class="detail-section-badge">@vehicle.VehicleExpenseDetailsOverviews.Count</span>
 												</div>
-												<SfGrid TValue="VehicleExpenseOverviewModel" DataSource="vehicle.VehicleExpenseOverviews" AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Both">
+												<SfGrid TValue="VehicleExpenseDetailsOverviewModel" DataSource="vehicle.VehicleExpenseDetailsOverviews" AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Both">
 													<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 													<GridColumns>
-														<GridColumn Field="@nameof(VehicleExpenseOverviewModel.TransactionDateTime)" HeaderText="Date" Width="105" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
-														<GridColumn Field="@nameof(VehicleExpenseOverviewModel.TotalExpense)" HeaderText="Amount" Width="250" TextAlign="TextAlign.Right" Format="N2" />
-														<GridColumn Field="@nameof(VehicleExpenseOverviewModel.CompanyName)" HeaderText="Company" Width="250" />
-														<GridColumn Field="@nameof(VehicleExpenseOverviewModel.TransactionNo)" HeaderText="Expense No" Width="250" />
-														<GridColumn Field="@nameof(VehicleExpenseOverviewModel.Remarks)" HeaderText="Remarks" MinWidth="150" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="105" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="250" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="250" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseAmount)" HeaderText="Amount" Width="250" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseRemarks)" HeaderText="Expense Remarks" Width="250" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="250" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionNo)" HeaderText="Expense No" Width="250" />
+														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.Remarks)" HeaderText="Remarks" MinWidth="150" />
 													</GridColumns>
 												</SfGrid>
 											</div>

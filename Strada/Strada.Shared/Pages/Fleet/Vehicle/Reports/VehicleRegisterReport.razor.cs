@@ -190,13 +190,15 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			var vehicleExpenses = expenses.Where(_ => _.VehicleId == vehicle.VehicleId);
 			vehicle.TotalVehicleExpenses = vehicleExpenses.Sum(_ => _.TotalExpense);
 
-			vehicle.VehicleExpenseOverviews = [.. vehicleExpenses];
-
 			foreach (var expense in vehicleExpenses)
 			{
 				var expenseDetails = await CommonData.LoadTableDataByMasterId<VehicleExpenseDetailsOverviewModel>(FleetNames.VehicleExpenseDetailsOverview, expense.Id);
+
 				foreach (var expenseDetail in expenseDetails)
+				{
 					vehicle.VehicleExpenses.FirstOrDefault(_ => _.ExpenseTypeId == expenseDetail.VehicleExpenseTypeId).ExpenseAmount += expenseDetail.ExpenseAmount;
+					vehicle.VehicleExpenseDetailsOverviews.Add(expenseDetail);
+				}
 			}
 		}
 	}
@@ -325,19 +327,23 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			rows.Add(ExcelRow([""]));
 		}
 
-		if (vehicle.VehicleExpenseOverviews.Count > 0)
+		if (vehicle.VehicleExpenseDetailsOverviews.Count > 0)
 		{
 			// Section heading
 			rows.Add(ExcelRow(["VEHICLE EXPENSES", .. Enumerable.Repeat("", 3)], bold: true, backColor: "#BDD7EE"));
 
 			// Column headers
-			rows.Add(ExcelRow(["Date", "Amount", "Expense No", "Remarks"], bold: true, backColor: "#DEEAF1"));
+			rows.Add(ExcelRow(["Date", "Expense Type", "Ledger", "Amount", "Expense Remarks", "Company", "Expense No", "Remarks"], bold: true, backColor: "#DEEAF1"));
 
-			foreach (var expense in vehicle.VehicleExpenseOverviews)
+			foreach (var expense in vehicle.VehicleExpenseDetailsOverviews)
 			{
 				rows.Add(ExcelRow([
 					expense.TransactionDateTime.ToString("dd/MM/yy"),
-					expense.TotalExpense.ToString("N2"),
+					expense.ExpenseTypeName ?? "",
+					expense.LedgerName ?? "",
+					expense.ExpenseAmount.ToString("N2"),
+					expense.ExpenseRemarks ?? "",
+					expense.CompanyName ?? "",
 					expense.TransactionNo ?? "",
 					expense.Remarks ?? ""
 				]));

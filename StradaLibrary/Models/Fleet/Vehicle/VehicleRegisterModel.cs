@@ -15,7 +15,7 @@ public class VehicleRegisterModel
 
 	public decimal TotalTripExpenses { get; set; }
 	public List<VehicleRegisterExpensesModel> TripExpenses { get; set; } = [];
-	
+
 	public decimal TotalVehicleExpenses { get; set; }
 	public List<VehicleRegisterExpensesModel> VehicleExpenses { get; set; } = [];
 
@@ -28,7 +28,7 @@ public class VehicleRegisterModel
 	public decimal TotalProfitLoss { get; set; }
 
 	public List<VehicleTripOverviewModel> VehicleTripOverviews { get; set; } = [];
-	public List<VehicleExpenseOverviewModel> VehicleExpenseOverviews { get; set; } = [];
+	public List<VehicleExpenseDetailsOverviewModel> VehicleExpenseDetailsOverviews { get; set; } = [];
 }
 
 public class VehicleRegisterExpensesModel
