@@ -1,4 +1,4 @@
-CREATE PROCEDURE [dbo].[Insert_VehicleRouteLocation]
+CREATE PROCEDURE [dbo].[Insert_Location]
 	@Id INT OUTPUT,
 	@Name VARCHAR(250),
 	@Code VARCHAR(10),
@@ -8,7 +8,7 @@ AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[VehicleRouteLocation]
+		INSERT INTO [dbo].[Location]
 		(
 			[Name],
 			[Code],
@@ -28,7 +28,7 @@ BEGIN
 
 	ELSE
 	BEGIN
-		UPDATE [dbo].[VehicleRouteLocation]
+		UPDATE [dbo].[Location]
 		SET
 			[Name] = @Name,
 			[Code] = @Code,

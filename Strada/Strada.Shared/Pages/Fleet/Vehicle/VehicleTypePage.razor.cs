@@ -6,6 +6,7 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Fleet.Vehicle;
 
@@ -28,6 +29,7 @@ public partial class VehicleTypePage
 	private SfGrid<VehicleTypeModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfTextBox _sfTextBox;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -59,6 +61,9 @@ public partial class VehicleTypePage
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfTextBox is not null)
+			await _sfTextBox.FocusAsync();
 	}
 	#endregion
 
@@ -265,6 +270,8 @@ public partial class VehicleTypePage
 		_vehicleType = await CommonData.LoadTableDataById<VehicleTypeModel>(FleetNames.VehicleType, selectedRecords[0].Id);
 		if (_vehicleType is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		await _sfTextBox.FocusAsync();
 
 		StateHasChanged();
 	}

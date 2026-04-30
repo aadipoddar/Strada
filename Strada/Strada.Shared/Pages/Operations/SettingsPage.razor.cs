@@ -36,8 +36,8 @@ public partial class SettingsPage
     private string _documentTypeCodePrefix = string.Empty;
     private string _omcCodePrefix = string.Empty;
     private string _omcCardCodePrefix = string.Empty;
-    private string _vehicleRouteLocationCodePrefix = string.Empty;
-    private string _vehicleRouteCodePrefix = string.Empty;
+    private string _locationCodePrefix = string.Empty;
+    private string _routeCodePrefix = string.Empty;
     private string _driverCodePrefix = string.Empty;
     private string _vehicleExpenseTypeCodePrefix = string.Empty;
 
@@ -125,11 +125,11 @@ public partial class SettingsPage
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCardCodePrefix);
         _omcCardCodePrefix = s?.Value ?? string.Empty;
 
-        s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteLocationCodePrefix);
-        _vehicleRouteLocationCodePrefix = s?.Value ?? string.Empty;
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.LocationCodePrefix);
+        _locationCodePrefix = s?.Value ?? string.Empty;
 
-        s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteCodePrefix);
-        _vehicleRouteCodePrefix = s?.Value ?? string.Empty;
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.RouteCodePrefix);
+        _routeCodePrefix = s?.Value ?? string.Empty;
 
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.DriverCodePrefix);
         _driverCodePrefix = s?.Value ?? string.Empty;
@@ -260,8 +260,8 @@ public partial class SettingsPage
             await UpdateSetting(SettingsKeys.DocumentTypeCodePrefix, _documentTypeCodePrefix, Desc(SettingsKeys.DocumentTypeCodePrefix));
             await UpdateSetting(SettingsKeys.OMCCodePrefix, _omcCodePrefix, Desc(SettingsKeys.OMCCodePrefix));
             await UpdateSetting(SettingsKeys.OMCCardCodePrefix, _omcCardCodePrefix, Desc(SettingsKeys.OMCCardCodePrefix));
-            await UpdateSetting(SettingsKeys.VehicleRouteLocationCodePrefix, _vehicleRouteLocationCodePrefix, Desc(SettingsKeys.VehicleRouteLocationCodePrefix));
-            await UpdateSetting(SettingsKeys.VehicleRouteCodePrefix, _vehicleRouteCodePrefix, Desc(SettingsKeys.VehicleRouteCodePrefix));
+            await UpdateSetting(SettingsKeys.LocationCodePrefix, _locationCodePrefix, Desc(SettingsKeys.LocationCodePrefix));
+            await UpdateSetting(SettingsKeys.RouteCodePrefix, _routeCodePrefix, Desc(SettingsKeys.RouteCodePrefix));
             await UpdateSetting(SettingsKeys.DriverCodePrefix, _driverCodePrefix, Desc(SettingsKeys.DriverCodePrefix));
             await UpdateSetting(SettingsKeys.VehicleExpenseTypeCodePrefix, _vehicleExpenseTypeCodePrefix, Desc(SettingsKeys.VehicleExpenseTypeCodePrefix));
 

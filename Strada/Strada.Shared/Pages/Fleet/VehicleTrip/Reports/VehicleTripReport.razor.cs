@@ -1,14 +1,14 @@
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Fleet.VehicleRoute;
+using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.Data.Fleet.VehicleTrip;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.VehicleTrip;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
@@ -33,7 +33,7 @@ public partial class VehicleTripReport : IAsyncDisposable
 	private CompanyModel? _selectedCompany = null;
 	private OMCModel? _selectedOMC = null;
 	private VehicleModel? _selectedVehicle = null;
-	private VehicleRouteOverviewModel? _selectedRoute = null;
+	private RouteOverviewModel? _selectedRoute = null;
 	private DriverOverviewModel? _selectedDriver = null;
 	private int _vehicleEmptyFilter = TripFilterOptions.All;
 	private int _pendingBillsFilter = TripFilterOptions.All;
@@ -41,7 +41,7 @@ public partial class VehicleTripReport : IAsyncDisposable
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
 	private List<VehicleModel> _vehicles = [];
-	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
+	private List<RouteOverviewModel> _routes = [];
 	private List<DriverOverviewModel> _drivers = [];
 	private List<VehicleTripOverviewModel> _transactionOverviews = [];
 
@@ -91,13 +91,13 @@ public partial class VehicleTripReport : IAsyncDisposable
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
+		_routes = await RouteData.LoadRouteOverview();
 		_drivers = await DriverData.LoadDriverOverview();
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		_omcs = [.. _omcs.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
-		_vehicleRoutes = [.. _vehicleRoutes.OrderBy(s => s.Code)];
+		_routes = [.. _routes.OrderBy(s => s.Code)];
 		_drivers = [.. _drivers.OrderBy(s => s.Name)];
 	}
 
@@ -196,7 +196,7 @@ public partial class VehicleTripReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnRouteChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VehicleRouteOverviewModel, VehicleRouteOverviewModel> args)
+	private async Task OnRouteChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<RouteOverviewModel, RouteOverviewModel> args)
 	{
 		_selectedRoute = args.Value;
 		await LoadTransactionOverviews();

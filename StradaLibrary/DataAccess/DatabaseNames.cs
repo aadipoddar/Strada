@@ -109,13 +109,13 @@ public static class FleetNames
 	public static string InsertVehicleExpenseDetails => "Insert_VehicleExpenseDetails";
 	#endregion
 
-	#region Vehicle Route
-	public static string VehicleRouteLocation => "VehicleRouteLocation";
-	public static string VehicleRoute => "VehicleRoute";
+	#region Route
+	public static string Location => "Location";
+	public static string Route => "Route";
 	public static string Driver => "Driver";
 	
-	public static string InsertVehicleRouteLocation => "Insert_VehicleRouteLocation";
-	public static string InsertVehicleRoute => "Insert_VehicleRoute";
+	public static string InsertLocation => "Insert_Location";
+	public static string InsertRoute => "Insert_Route";
 	public static string InsertDriver => "Insert_Driver";
 	#endregion
 	

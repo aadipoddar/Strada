@@ -1,14 +1,14 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Fleet.VehicleRoute;
+using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.VehicleRoute;
+using StradaLibrary.Exports.Fleet.Route;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 
-namespace Strada.Shared.Pages.Fleet.VehicleRoute;
+namespace Strada.Shared.Pages.Fleet.Route;
 
 public partial class DriverPage
 {
@@ -58,8 +58,6 @@ public partial class DriverPage
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
-
-		
 
 		_isLoading = false;
 		StateHasChanged();

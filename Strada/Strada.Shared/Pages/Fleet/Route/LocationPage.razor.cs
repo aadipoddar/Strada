@@ -1,36 +1,35 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Fleet.VehicleRoute;
+using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.VehicleRoute;
+using StradaLibrary.Exports.Fleet.Route;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 
-namespace Strada.Shared.Pages.Fleet.VehicleRoute;
+namespace Strada.Shared.Pages.Fleet.Route;
 
-public partial class VehicleRoutePage
+public partial class LocationPage
 {
 	private UserModel _user;
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showDeleted = false;
 
-	private VehicleRouteModel _vehicleRoute = new();
-	private VehicleRouteLocationModel _selectedFromLocation;
-	private VehicleRouteLocationModel _selectedToLocation;
+	private LocationModel _location = new();
 
-	private List<VehicleRouteModel> _vehicleRoutes = [];
-	private List<VehicleRouteLocationModel> _routeLocations = [];
+	private List<LocationModel> _locations = [];
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private SfGrid<VehicleRouteModel> _sfGrid;
+	private SfGrid<LocationModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfTextBox _sfTextBox;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -52,19 +51,19 @@ public partial class VehicleRoutePage
 
 	private async Task LoadData()
 	{
-		_vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute);
-		_routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
-		_selectedFromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.FromLocationId);
-		_selectedToLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.ToLocationId);
+		_locations = await CommonData.LoadTableData<LocationModel>(FleetNames.Location);
 
 		if (!_showDeleted)
-			_vehicleRoutes = [.. _vehicleRoutes.Where(vr => vr.Status)];
+			_locations = [.. _locations.Where(rl => rl.Status)];
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfTextBox is not null)
+			await _sfTextBox.FocusAsync();
 	}
 	#endregion
 
@@ -84,10 +83,7 @@ public partial class VehicleRoutePage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			_vehicleRoute.FromLocationId = _selectedFromLocation?.Id ?? 0;
-			_vehicleRoute.ToLocationId = _selectedToLocation?.Id ?? 0;
-
-			await VehicleRouteData.SaveTransaction(_vehicleRoute);
+			await LocationData.SaveTransaction(_location);
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -114,11 +110,11 @@ public partial class VehicleRoutePage
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, _deleteTransactionId)
+			var location = await CommonData.LoadTableDataById<LocationModel>(FleetNames.Location, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicleRoute.Status = false;
-			await VehicleRouteData.InsertVehicleRoute(vehicleRoute);
+			location.Status = false;
+			await LocationData.InsertLocation(location);
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -145,11 +141,11 @@ public partial class VehicleRoutePage
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, _recoverTransactionId)
+			var location = await CommonData.LoadTableDataById<LocationModel>(FleetNames.Location, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicleRoute.Status = true;
-			await VehicleRouteData.InsertVehicleRoute(vehicleRoute);
+			location.Status = true;
+			await LocationData.InsertLocation(location);
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();
@@ -179,7 +175,7 @@ public partial class VehicleRoutePage
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleRouteExport.ExportMaster(_vehicleRoutes, ReportExportType.Excel);
+			var (stream, fileName) = await LocationExport.ExportMaster(_locations, ReportExportType.Excel);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -206,7 +202,7 @@ public partial class VehicleRoutePage
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleRouteExport.ExportMaster(_vehicleRoutes, ReportExportType.PDF);
+			var (stream, fileName) = await LocationExport.ExportMaster(_locations, ReportExportType.PDF);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -252,7 +248,7 @@ public partial class VehicleRoutePage
 		}
 	}
 
-	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleRouteModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<LocationModel> args)
 	{
 		switch (args.Item.Id)
 		{
@@ -271,12 +267,11 @@ public partial class VehicleRoutePage
 		if (selectedRecords.Count == 0)
 			return;
 
-		_vehicleRoute = await CommonData.LoadTableDataById<VehicleRouteModel>(FleetNames.VehicleRoute, selectedRecords[0].Id);
-		if (_vehicleRoute is null)
+		_location = await CommonData.LoadTableDataById<LocationModel>(FleetNames.Location, selectedRecords[0].Id);
+		if (_location is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
-		_selectedFromLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.FromLocationId);
-		_selectedToLocation = _routeLocations.FirstOrDefault(rl => rl.Id == _vehicleRoute.ToLocationId);
+		await _sfTextBox.FocusAsync();
 
 		StateHasChanged();
 	}
@@ -286,13 +281,10 @@ public partial class VehicleRoutePage
 		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
 		if (selectedRecords.Count > 0)
 		{
-			var vehicleRoute = selectedRecords[0];
-			var locations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
-
-			if (vehicleRoute.Status)
-				await ShowDeleteConfirmation(vehicleRoute.Id, $"{locations.FirstOrDefault(l => l.Id == vehicleRoute.FromLocationId)?.Name} to {locations.FirstOrDefault(l => l.Id == vehicleRoute.ToLocationId)?.Name}");
+			if (selectedRecords[0].Status)
+				await ShowDeleteConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
 			else
-				await ShowRecoverConfirmation(vehicleRoute.Id, $"{locations.FirstOrDefault(l => l.Id == vehicleRoute.FromLocationId)?.Name} to {locations.FirstOrDefault(l => l.Id == vehicleRoute.ToLocationId)?.Name}");
+				await ShowRecoverConfirmation(selectedRecords[0].Id, selectedRecords[0].Name);
 		}
 	}
 
@@ -331,7 +323,7 @@ public partial class VehicleRoutePage
 	}
 
 	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.VehicleRouteMaster, true);
+		NavigationManager.NavigateTo(PageRouteNames.LocationMaster, true);
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);

@@ -74,9 +74,6 @@
     <Folder Include="Accounts\Masters\Load" />
     <Folder Include="Accounts\Masters\Table" />
     <Folder Include="PublishLocations" />
-    <Folder Include="Fleet\VehicleRoute" />
-    <Folder Include="Fleet\VehicleRoute\Insert" />
-    <Folder Include="Fleet\VehicleRoute\Table" />
     <Folder Include="Fleet\VehicleDocument" />
     <Folder Include="Fleet\VehicleDocument\Table" />
     <Folder Include="Fleet\VehicleDocument\Insert" />
@@ -95,6 +92,9 @@
     <Folder Include="Fleet\VehicleTripBill\Table" />
     <Folder Include="Fleet\VehicleTripBill\Load" />
     <Folder Include="Fleet\VehicleTripBill\Insert" />
+    <Folder Include="Fleet\Route" />
+    <Folder Include="Fleet\Route\Table" />
+    <Folder Include="Fleet\Route\Insert" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -126,9 +126,6 @@
     <Build Include="Fleet\Vehicle\Insert\Insert_VehicleType.sql" />
     <Build Include="Fleet\Vehicle\Table\Vehicle.sql" />
     <Build Include="Fleet\Vehicle\Table\VehicleType.sql" />
-    <Build Include="Fleet\VehicleRoute\Table\VehicleRouteLocation.sql" />
-    <Build Include="Fleet\VehicleRoute\Table\VehicleRoute.sql" />
-    <Build Include="Fleet\VehicleRoute\Table\Driver.sql" />
     <Build Include="Accounts\FinancialAccounting\Load\Load_FinancialAccounting_By_Voucher_Reference.sql" />
     <Build Include="Accounts\FinancialAccounting\Table\FinancialAccounting.sql" />
     <Build Include="Accounts\FinancialAccounting\Table\FinancialAccountingDetail.sql" />
@@ -163,9 +160,6 @@
     <Build Include="Fleet\OMC\Table\OMCCard.sql" />
     <Build Include="Fleet\OMC\Insert\Insert_OMC.sql" />
     <Build Include="Fleet\OMC\Insert\Insert_OMCCard.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_Driver.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRoute.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteLocation.sql" />
     <Build Include="Fleet\VehicleExpense\Table\VehicleExpense.sql" />
     <Build Include="Fleet\VehicleExpense\Table\VehicleExpenseDetails.sql" />
     <Build Include="Fleet\VehicleExpense\Insert\Insert_VehicleExpense.sql" />
@@ -182,6 +176,12 @@
     <Build Include="Fleet\VehicleTripBill\Load\VehicleTripBillCardPayments_Overview.sql" />
     <Build Include="Fleet\VehicleTripBill\Load\VehicleTripBillLedgerPayments_Overview.sql" />
     <Build Include="Fleet\VehicleTrip\Load\Load_VehicleTrip_Overview_By_BillId_Date.sql" />
+    <Build Include="Fleet\Route\Insert\Insert_Route.sql" />
+    <Build Include="Fleet\Route\Insert\Insert_Location.sql" />
+    <Build Include="Fleet\Route\Insert\Insert_Driver.sql" />
+    <Build Include="Fleet\Route\Table\Driver.sql" />
+    <Build Include="Fleet\Route\Table\Location.sql" />
+    <Build Include="Fleet\Route\Table\Route.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

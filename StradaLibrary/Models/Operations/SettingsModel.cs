@@ -21,8 +21,8 @@ public static class SettingsKeys
 	public static string DocumentTypeCodePrefix => "DocumentTypeCodePrefix";
 	public static string OMCCodePrefix => "OMCCodePrefix";
 	public static string OMCCardCodePrefix => "OMCCardCodePrefix";
-	public static string VehicleRouteLocationCodePrefix => "VehicleRouteLocationCodePrefix";
-	public static string VehicleRouteCodePrefix => "VehicleRouteCodePrefix";
+	public static string LocationCodePrefix => "LocationCodePrefix";
+	public static string RouteCodePrefix => "RouteCodePrefix";
 	public static string DriverCodePrefix => "DriverCodePrefix";
 	public static string VehicleExpenseTypeCodePrefix => "VehicleExpenseTypeCodePrefix";
 

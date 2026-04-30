@@ -3,7 +3,7 @@
 @using StradaLibrary.Models.Accounts.Masters
 @using StradaLibrary.Models.Fleet.OMC
 @using StradaLibrary.Models.Fleet.Vehicle
-@using StradaLibrary.Models.Fleet.VehicleRoute
+@using StradaLibrary.Models.Fleet.Route
 @using StradaLibrary.Models.Fleet.VehicleTrip
 
 <PageTitle>Trip Report - Strada</PageTitle>
@@ -163,14 +163,14 @@ else
 
 							<!-- Route -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="VehicleRouteOverviewModel" TValue="VehicleRouteOverviewModel"
+								<AutoCompleteWithAdd TItem="RouteOverviewModel" TValue="RouteOverviewModel"
 													 Value="_selectedRoute"
-													 DataSource="@_vehicleRoutes"
+													 DataSource="@_routes"
 													 Placeholder="All Routes"
 													 Label="Route" Required="true"
 													 ValueChange="OnRouteChanged"
-													 FieldValue="@nameof(VehicleRouteOverviewModel.RouteDisplay)"
-													 AddNewRoute="@PageRouteNames.VehicleRouteMaster" />
+													 FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
+													 AddNewRoute="@PageRouteNames.RouteMaster" />
 							</div>
 
 							<!-- Driver -->

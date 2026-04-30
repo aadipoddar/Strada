@@ -1,4 +1,4 @@
-namespace StradaLibrary.Models.Fleet.VehicleRoute;
+namespace StradaLibrary.Models.Fleet.Route;
 
 public class DriverModel
 {

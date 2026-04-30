@@ -1,8 +1,8 @@
 using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.Route;
 
-namespace StradaLibrary.Data.Fleet.VehicleRoute;
+namespace StradaLibrary.Data.Fleet.Route;
 
 public static class DriverData
 {

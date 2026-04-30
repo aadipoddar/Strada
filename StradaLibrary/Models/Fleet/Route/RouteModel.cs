@@ -1,6 +1,6 @@
-namespace StradaLibrary.Models.Fleet.VehicleRoute;
+namespace StradaLibrary.Models.Fleet.Route;
 
-public class VehicleRouteModel
+public class RouteModel
 {
 	public int Id { get; set; }
 	public int FromLocationId { get; set; }
@@ -14,7 +14,7 @@ public class VehicleRouteModel
 	public bool Status { get; set; }
 }
 
-public class VehicleRouteOverviewModel
+public class RouteOverviewModel
 {
 	public int Id { get; set; }
 	public int FromLocationId { get; set; }

@@ -1,6 +1,6 @@
-namespace StradaLibrary.Models.Fleet.VehicleRoute;
+namespace StradaLibrary.Models.Fleet.Route;
 
-public class VehicleRouteLocationModel
+public class LocationModel
 {
 	public int Id { get; set; }
 	public string Name { get; set; }

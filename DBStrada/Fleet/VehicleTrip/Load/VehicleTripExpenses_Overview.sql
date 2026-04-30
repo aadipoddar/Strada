@@ -77,11 +77,11 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Driver] d ON t.DriverId = d.Id
 INNER JOIN
-	[dbo].[VehicleRoute] r ON t.RouteId = r.Id
+	[dbo].[Route] r ON t.RouteId = r.Id
 INNER JOIN
-	[dbo].[VehicleRouteLocation] frl ON r.FromLocationId = frl.Id
+	[dbo].[Location] frl ON r.FromLocationId = frl.Id
 INNER JOIN
-	[dbo].[VehicleRouteLocation] torl ON r.ToLocationId = torl.Id
+	[dbo].[Location] torl ON r.ToLocationId = torl.Id
 LEFT JOIN
 	[dbo].[VehicleTripBill] b ON t.BillId = b.Id
 INNER JOIN

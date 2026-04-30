@@ -2,15 +2,15 @@
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Fleet.VehicleRoute;
+using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.Data.Fleet.VehicleTrip;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.VehicleTrip;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
@@ -32,7 +32,7 @@ public partial class VehicleTripPage
 	private OMCModel _selectedOMC = new();
 	private VehicleModel _selectedVehicle = new();
 	private DriverOverviewModel _selectedDriver = new();
-	private VehicleRouteOverviewModel _selectedRoute = new();
+	private RouteOverviewModel _selectedRoute = new();
 	private VehicleExpenseTypeModel _selectedExpenseType = null;
 	private OMCCardModel _selectedOMCCard = null;
 	private VehicleTripExpensesCartModel _selectedExpensesCart = new();
@@ -44,7 +44,7 @@ public partial class VehicleTripPage
 	private List<OMCCardModel> _omcCards = [];
 	private List<VehicleModel> _vehicles = [];
 	private List<DriverOverviewModel> _drivers = [];
-	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
+	private List<RouteOverviewModel> _routes = [];
 	private List<VehicleExpenseTypeModel> _expenseTypes = [];
 	private List<VehicleTripExpensesCartModel> _expensesCart = [];
 	private List<VehicleTripCardPaymentsCartModel> _paymentsCart = [];
@@ -105,7 +105,7 @@ public partial class VehicleTripPage
 		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_drivers = await DriverData.LoadDriverOverview();
-		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
+		_routes = await StradaLibrary.Data.Fleet.Route.RouteData.LoadRouteOverview();
 		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
@@ -117,13 +117,13 @@ public partial class VehicleTripPage
 		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 		_drivers = [.. _drivers.OrderBy(s => s.Name)];
-		_vehicleRoutes = [.. _vehicleRoutes.OrderBy(s => s.Code)];
+		_routes = [.. _routes.OrderBy(s => s.Code)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
 
 		_selectedOMC = _omcs.FirstOrDefault();
 		_selectedVehicle = _vehicles.FirstOrDefault();
 		_selectedDriver = _drivers.FirstOrDefault();
-		_selectedRoute = _vehicleRoutes.FirstOrDefault();
+		_selectedRoute = _routes.FirstOrDefault();
 	}
 
 	private async Task ResolveTransaction()
@@ -236,9 +236,9 @@ public partial class VehicleTripPage
 			_selectedDriver = _drivers.FirstOrDefault();
 
 		if (_vehicleTrip.RouteId > 0)
-			_selectedRoute = _vehicleRoutes.FirstOrDefault(s => s.Id == _vehicleTrip.RouteId) ?? _vehicleRoutes.FirstOrDefault();
+			_selectedRoute = _routes.FirstOrDefault(s => s.Id == _vehicleTrip.RouteId) ?? _routes.FirstOrDefault();
 		else
-			_selectedRoute = _vehicleRoutes.FirstOrDefault();
+			_selectedRoute = _routes.FirstOrDefault();
 
 		if (_vehicleTrip.FinancialYearId > 0)
 			_selectedFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, _vehicleTrip.FinancialYearId);
@@ -404,7 +404,7 @@ public partial class VehicleTripPage
 		await SaveTransactionFile();
 	}
 
-	private async Task OnVehicleRouteChanged(ChangeEventArgs<VehicleRouteOverviewModel, VehicleRouteOverviewModel> args)
+	private async Task OnRouteChanged(ChangeEventArgs<RouteOverviewModel, RouteOverviewModel> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;

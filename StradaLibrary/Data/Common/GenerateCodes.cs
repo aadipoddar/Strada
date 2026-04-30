@@ -3,20 +3,20 @@ using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Accounts.FinancialAccounting;
 using StradaLibrary.Exports.Accounts.Masters;
 using StradaLibrary.Exports.Fleet.OMC;
+using StradaLibrary.Exports.Fleet.Route;
 using StradaLibrary.Exports.Fleet.Vehicle;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
 using StradaLibrary.Exports.Fleet.VehicleExpense;
-using StradaLibrary.Exports.Fleet.VehicleRoute;
 using StradaLibrary.Exports.Fleet.VehicleTrip;
 using StradaLibrary.Exports.Fleet.VehicleTripBill;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleDocument;
 using StradaLibrary.Models.Fleet.VehicleExpense;
-using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Fleet.VehicleTripBill;
 using StradaLibrary.Models.Operations;
@@ -109,19 +109,19 @@ public static class GenerateCodes
 				decodeTransactionNoModel.ExcelStream = await VehicleExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id, InvoiceExportType.Excel);
 				break;
 
-			case CodeType.VehicleRouteLocation:
-				var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleRouteLocationMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleRouteLocationModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleRouteLocationExport.ExportMaster(routeLocations, ReportExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleRouteLocationExport.ExportMaster(routeLocations, ReportExportType.Excel);
+			case CodeType.Location:
+				var locations = await CommonData.LoadTableData<LocationModel>(FleetNames.Location);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<LocationModel>(FleetNames.Location, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.LocationMaster}/{(decodeTransactionNoModel.TransactionModel as LocationModel).Id}";
+				decodeTransactionNoModel.PDFStream = await LocationExport.ExportMaster(locations, ReportExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await LocationExport.ExportMaster(locations, ReportExportType.Excel);
 				break;
-			case CodeType.VehicleRoute:
-				var vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleRouteModel>(FleetNames.VehicleRoute, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleRouteMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleRouteModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleRouteExport.ExportMaster(vehicleRoutes, ReportExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleRouteExport.ExportMaster(vehicleRoutes, ReportExportType.Excel);
+			case CodeType.Route:
+				var routes = await CommonData.LoadTableData<RouteModel>(FleetNames.Route);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<RouteModel>(FleetNames.Route, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.RouteMaster}/{(decodeTransactionNoModel.TransactionModel as RouteModel).Id}";
+				decodeTransactionNoModel.PDFStream = await RouteExport.ExportMaster(routes, ReportExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await RouteExport.ExportMaster(routes, ReportExportType.Excel);
 				break;
 			case CodeType.Driver:
 				var drivers = await CommonData.LoadTableData<DriverModel>(FleetNames.Driver);
@@ -202,14 +202,14 @@ public static class GenerateCodes
 					var vehicleExpense = await CommonData.LoadTableDataByTransactionNo<VehicleExpenseModel>(FleetNames.VehicleExpense, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleExpense is not null;
 					break;
-				
-				case CodeType.VehicleRouteLocation:
-					var routeLocation = await CommonData.LoadTableDataByCode<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, code, sqlDataAccessTransaction);
-					isDuplicate = routeLocation is not null;
+
+				case CodeType.Location:
+					var location = await CommonData.LoadTableDataByCode<LocationModel>(FleetNames.Location, code, sqlDataAccessTransaction);
+					isDuplicate = location is not null;
 					break;
-				case CodeType.VehicleRoute:
-					var vehicleRoute = await CommonData.LoadTableDataByCode<VehicleRouteModel>(FleetNames.VehicleRoute, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleRoute is not null;
+				case CodeType.Route:
+					var route = await CommonData.LoadTableDataByCode<RouteModel>(FleetNames.Route, code, sqlDataAccessTransaction);
+					isDuplicate = route is not null;
 					break;
 				case CodeType.Driver:
 					var driver = await CommonData.LoadTableDataByCode<DriverModel>(FleetNames.Driver, code, sqlDataAccessTransaction);
@@ -377,52 +377,52 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}00001", 5, CodeType.VehicleExpense, sqlDataAccessTransaction);
 	}
 	#endregion
-	
-	#region Vehicle Route
-	public static async Task<string> GenerateVehicleRouteLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
-	{
-		var routeLocations = await CommonData.LoadTableData<VehicleRouteLocationModel>(FleetNames.VehicleRouteLocation, sqlDataAccessTransaction);
-		var routeLocationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteLocationCodePrefix, sqlDataAccessTransaction)).Value;
 
-		var lastRouteLocation = routeLocations.OrderByDescending(rl => rl.Id).FirstOrDefault();
-		if (lastRouteLocation is not null)
+	#region Route
+	public static async Task<string> GenerateLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var locations = await CommonData.LoadTableData<LocationModel>(FleetNames.Location, sqlDataAccessTransaction);
+		var locationPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.LocationCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastLocation = locations.OrderByDescending(rl => rl.Id).FirstOrDefault();
+		if (lastLocation is not null)
 		{
-			var lastRouteLocationCode = lastRouteLocation.Code;
-			if (lastRouteLocationCode.StartsWith(routeLocationPrefix))
+			var lastLocationCode = lastLocation.Code;
+			if (lastLocationCode.StartsWith(locationPrefix))
 			{
-				var lastNumberPart = lastRouteLocationCode[routeLocationPrefix.Length..];
+				var lastNumberPart = lastLocationCode[locationPrefix.Length..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{routeLocationPrefix}{nextNumber:D5}", 5, CodeType.VehicleRouteLocation, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{locationPrefix}{nextNumber:D5}", 5, CodeType.Location, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{routeLocationPrefix}00001", 5, CodeType.VehicleRouteLocation, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{locationPrefix}00001", 5, CodeType.Location, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateVehicleRouteCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<string> GenerateRouteCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var vehicleRoutes = await CommonData.LoadTableData<VehicleRouteModel>(FleetNames.VehicleRoute, sqlDataAccessTransaction);
-		var vehicleRoutePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteCodePrefix, sqlDataAccessTransaction)).Value;
+		var routes = await CommonData.LoadTableData<RouteModel>(FleetNames.Route, sqlDataAccessTransaction);
+		var routePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.RouteCodePrefix, sqlDataAccessTransaction)).Value;
 
-		var lastVehicleRoute = vehicleRoutes.OrderByDescending(vr => vr.Id).FirstOrDefault();
-		if (lastVehicleRoute is not null)
+		var lastRoute = routes.OrderByDescending(vr => vr.Id).FirstOrDefault();
+		if (lastRoute is not null)
 		{
-			var lastVehicleRouteCode = lastVehicleRoute.Code;
-			if (lastVehicleRouteCode.StartsWith(vehicleRoutePrefix))
+			var lastRouteCode = lastRoute.Code;
+			if (lastRouteCode.StartsWith(routePrefix))
 			{
-				var lastNumberPart = lastVehicleRouteCode[vehicleRoutePrefix.Length..];
+				var lastNumberPart = lastRouteCode[routePrefix.Length..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{vehicleRoutePrefix}{nextNumber:D5}", 5, CodeType.VehicleRoute, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{routePrefix}{nextNumber:D5}", 5, CodeType.Route, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{vehicleRoutePrefix}00001", 5, CodeType.VehicleRoute, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{routePrefix}00001", 5, CodeType.Route, sqlDataAccessTransaction);
 	}
 
 	public static async Task<string> GenerateDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)

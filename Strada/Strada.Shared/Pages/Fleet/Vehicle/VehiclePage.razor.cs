@@ -8,6 +8,7 @@ using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Fleet.Vehicle;
 
@@ -36,6 +37,7 @@ public partial class VehiclePage
 	private SfGrid<VehicleModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfTextBox _sfTextBox;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -78,6 +80,9 @@ public partial class VehiclePage
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfTextBox is not null)
+			await _sfTextBox.FocusAsync();
 	}
 	#endregion
 
@@ -296,6 +301,8 @@ public partial class VehiclePage
 			_selectedOMC = _omcs.FirstOrDefault(o => o.Id == _vehicle.OMCId);
 		else
 			_selectedOMC = null;
+
+		await _sfTextBox.FocusAsync();
 
 		StateHasChanged();
 	}

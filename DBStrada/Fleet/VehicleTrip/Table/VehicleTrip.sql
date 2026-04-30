@@ -31,7 +31,7 @@
     CONSTRAINT [FK_VehicleTrip_ToOMC] FOREIGN KEY ([OMCId]) REFERENCES [OMC]([Id]),
     CONSTRAINT [FK_VehicleTrip_ToVehicle] FOREIGN KEY ([VehicleId]) REFERENCES [Vehicle]([Id]),
     CONSTRAINT [FK_VehicleTrip_ToDriver] FOREIGN KEY ([DriverId]) REFERENCES [Driver]([Id]),
-    CONSTRAINT [FK_VehicleTrip_ToRoute] FOREIGN KEY ([RouteId]) REFERENCES [VehicleRoute]([Id]),
+    CONSTRAINT [FK_VehicleTrip_ToRoute] FOREIGN KEY ([RouteId]) REFERENCES [Route]([Id]),
     CONSTRAINT [FK_VehicleTrip_ToVehicleTripBill] FOREIGN KEY ([BillId]) REFERENCES [VehicleTripBill]([Id]),
     CONSTRAINT [FK_VehicleTrip_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 	CONSTRAINT [FK_VehicleTrip_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])

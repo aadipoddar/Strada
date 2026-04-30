@@ -1,4 +1,4 @@
-CREATE PROCEDURE [dbo].[Insert_VehicleRoute]
+CREATE PROCEDURE [dbo].[Insert_Route]
 	@Id INT OUTPUT,
 	@FromLocationId INT,
 	@ToLocationId INT,
@@ -13,7 +13,7 @@ AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[VehicleRoute]
+		INSERT INTO [dbo].[Route]
 		(
 			[FromLocationId],
 			[ToLocationId],

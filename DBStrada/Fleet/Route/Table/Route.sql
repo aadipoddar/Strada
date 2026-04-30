@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[VehicleRoute]
+﻿CREATE TABLE [dbo].[Route]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [FromLocationId] INT NOT NULL,
@@ -10,6 +10,6 @@
     [EstimatedCost] MONEY NOT NULL,
     [Remarks] VARCHAR(MAX) NULL,
     [Status] BIT NOT NULL DEFAULT 1, 
-    CONSTRAINT [FK_VehicleRoute_FromVehicleRouteLocation] FOREIGN KEY ([FromLocationId]) REFERENCES [VehicleRouteLocation]([Id]),
-    CONSTRAINT [FK_VehicleRoute_ToVehicleRouteLocation] FOREIGN KEY ([ToLocationId]) REFERENCES [VehicleRouteLocation]([Id])
+    CONSTRAINT [FK_Route_FromLocation] FOREIGN KEY ([FromLocationId]) REFERENCES [Location]([Id]),
+    CONSTRAINT [FK_Route_ToLocation] FOREIGN KEY ([ToLocationId]) REFERENCES [Location]([Id])
 )

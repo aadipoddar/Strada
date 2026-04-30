@@ -1,8 +1,8 @@
 ﻿using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Fleet.VehicleTripBill;
 
@@ -20,7 +20,7 @@ public static class VehicleTripReportExport
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
-		VehicleRouteOverviewModel route = null,
+		RouteOverviewModel route = null,
 		DriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
@@ -221,7 +221,7 @@ public static class VehicleTripReportExport
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
-		VehicleRouteOverviewModel route = null,
+		RouteOverviewModel route = null,
 		DriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
@@ -424,7 +424,7 @@ public static class VehicleTripReportExport
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
-		VehicleRouteOverviewModel route = null,
+		RouteOverviewModel route = null,
 		DriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>

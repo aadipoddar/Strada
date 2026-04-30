@@ -9,8 +9,8 @@ public enum CodeType
 	VehicleTripBill,
 	VehicleExpense,
 
-	VehicleRouteLocation,
-	VehicleRoute,
+	Location,
+	Route,
 	Driver,
 
 	OMC,

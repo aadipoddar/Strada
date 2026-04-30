@@ -1,8 +1,8 @@
 using StradaLibrary.Data.Common;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.VehicleRoute;
+using StradaLibrary.Models.Fleet.Route;
 
-namespace StradaLibrary.Exports.Fleet.VehicleRoute;
+namespace StradaLibrary.Exports.Fleet.Route;
 
 public static class DriverExport
 {

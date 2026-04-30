@@ -1,12 +1,15 @@
 ﻿using OfficeOpenXml;
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Fleet.OMC;
 using StradaLibrary.Data.Fleet.Vehicle;
-using StradaLibrary.Data.Fleet.VehicleRoute;
+using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.DataAccess;
+using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Fleet.Vehicle;
 
 Secrets.SetupConfiguration();
 
-FileInfo fileInfo = new(@"C:\Others\drivers.xlsx");
+FileInfo fileInfo = new(@"C:\Others\vehicle.xlsx");
 
 ExcelPackage.License.SetNonCommercialPersonal("AadiSoft");
 
@@ -28,6 +31,10 @@ Console.ReadLine();
 await ImportVehicles(worksheet1);
 
 await ImportDrivers(worksheet1);
+
+await ImportCards(worksheet1);
+
+await ImportVehicleOMC(worksheet1);
 
 
 static async Task ImportVehicles(ExcelWorksheet worksheet1)
@@ -82,33 +89,38 @@ static async Task ImportVehicles(ExcelWorksheet worksheet1)
 }
 
 static async Task ImportDrivers(ExcelWorksheet worksheet1)
+ 
+static async Task ImportCards(ExcelWorksheet worksheet1)
+
+static async Task ImportVehicleOMC(ExcelWorksheet worksheet1)
 {
 	int row = 1;
+
+	var omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC);
+	var vehicles = await CommonData.LoadTableData<VehicleModel>(FleetNames.Vehicle);
 
 	while (worksheet1.Cells[row, 1].Value != null)
 	{
 		var name = worksheet1.Cells[row, 1].Value.ToString();
-		var number = worksheet1.Cells[row, 2].Value.ToString();
+		var omc = worksheet1.Cells[row, 2].Value.ToString();
 
 		if (string.IsNullOrWhiteSpace(name) ||
-			string.IsNullOrWhiteSpace(number))
+			string.IsNullOrWhiteSpace(omc))
 		{
 			Console.WriteLine("Not Inserted Row = " + row);
 			continue;
 		}
 
-		number = number.Trim().RemoveSpace();
+		var vehicle = vehicles.FirstOrDefault(x => x.Code.Equals(name, StringComparison.OrdinalIgnoreCase));
+		var omcId = omcs.FirstOrDefault(x => x.Name.Equals(omc, StringComparison.OrdinalIgnoreCase))?.Id;
 
+		vehicle.OMCId = omcId;
 		Console.WriteLine("Inserting New Driver: " + name);
-		await DriverData.SaveTransaction(new()
-		{
-			Name = name,
-			Mobile = number,
-		});
+		await VehicleData.SaveTransaction(vehicle);
 
 		row++;
 	}
 }
- 
+
  */
 #endregion
