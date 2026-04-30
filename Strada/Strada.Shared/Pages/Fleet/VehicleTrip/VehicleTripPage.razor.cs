@@ -33,7 +33,7 @@ public partial class VehicleTripPage
 	private VehicleModel _selectedVehicle = new();
 	private DriverOverviewModel _selectedDriver = new();
 	private RouteOverviewModel _selectedRoute = new();
-	private VehicleExpenseTypeModel _selectedExpenseType = null;
+	private ExpenseTypeModel _selectedExpenseType = null;
 	private OMCCardModel _selectedOMCCard = null;
 	private VehicleTripExpensesCartModel _selectedExpensesCart = new();
 	private VehicleTripCardPaymentsCartModel _selectedPaymentCart = new();
@@ -45,11 +45,11 @@ public partial class VehicleTripPage
 	private List<VehicleModel> _vehicles = [];
 	private List<DriverOverviewModel> _drivers = [];
 	private List<RouteOverviewModel> _routes = [];
-	private List<VehicleExpenseTypeModel> _expenseTypes = [];
+	private List<ExpenseTypeModel> _expenseTypes = [];
 	private List<VehicleTripExpensesCartModel> _expensesCart = [];
 	private List<VehicleTripCardPaymentsCartModel> _paymentsCart = [];
 
-	private AutoCompleteWithAdd<VehicleExpenseTypeModel?, VehicleExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private AutoCompleteWithAdd<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private AutoCompleteWithAdd<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
 	private SfGrid<VehicleTripExpensesCartModel> _sfExpensesCartGrid;
 	private SfGrid<VehicleTripCardPaymentsCartModel> _sfPaymentsCartGrid;
@@ -106,7 +106,7 @@ public partial class VehicleTripPage
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_drivers = await DriverData.LoadDriverOverview();
 		_routes = await StradaLibrary.Data.Fleet.Route.RouteData.LoadRouteOverview();
-		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
+		_expenseTypes = await CommonData.LoadTableDataByStatus<ExpenseTypeModel>(FleetNames.ExpenseType);
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
@@ -287,17 +287,17 @@ public partial class VehicleTripPage
 
 		foreach (var item in existingCart)
 		{
-			if (_expenseTypes.FirstOrDefault(s => s.Id == item.VehicleExpenseTypeId) is null)
+			if (_expenseTypes.FirstOrDefault(s => s.Id == item.ExpenseTypeId) is null)
 			{
-				var expenseType = await CommonData.LoadTableDataById<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, item.VehicleExpenseTypeId);
-				await _toastNotification.ShowAsync("Vehicle Expense Type Not Found", $"The vehicle expense type {expenseType?.Name} (ID: {item.VehicleExpenseTypeId}) in the existing transaction cart was not found in the available expense types list. It may have been deleted or is inaccessible.", ToastType.Error);
+				var expenseType = await CommonData.LoadTableDataById<ExpenseTypeModel>(FleetNames.ExpenseType, item.ExpenseTypeId);
+				await _toastNotification.ShowAsync("Expense Type Not Found", $"The expense type {expenseType?.Name} (ID: {item.ExpenseTypeId}) in the existing transaction cart was not found in the available expense types list. It may have been deleted or is inaccessible.", ToastType.Error);
 				continue;
 			}
 
 			_expensesCart.Add(new()
 			{
-				VehicleExpenseTypeId = item.VehicleExpenseTypeId,
-				VehicleExpenseTypeName = _expenseTypes.First(s => s.Id == item.VehicleExpenseTypeId).Name,
+				ExpenseTypeId = item.ExpenseTypeId,
+				ExpenseTypeName = _expenseTypes.First(s => s.Id == item.ExpenseTypeId).Name,
 				Amount = item.Amount,
 				Remarks = item.Remarks
 			});
@@ -417,7 +417,7 @@ public partial class VehicleTripPage
 	#endregion
 
 	#region Expenses Cart
-	private async Task OnExpensesTypeChanged(ChangeEventArgs<VehicleExpenseTypeModel?, VehicleExpenseTypeModel?> args)
+	private async Task OnExpensesTypeChanged(ChangeEventArgs<ExpenseTypeModel?, ExpenseTypeModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;
@@ -427,15 +427,15 @@ public partial class VehicleTripPage
 		if (_selectedExpenseType is null)
 			_selectedExpensesCart = new()
 			{
-				VehicleExpenseTypeId = 0,
-				VehicleExpenseTypeName = "",
+				ExpenseTypeId = 0,
+				ExpenseTypeName = "",
 				Amount = 0
 			};
 
 		else
 		{
-			_selectedExpensesCart.VehicleExpenseTypeId = _selectedExpenseType.Id;
-			_selectedExpensesCart.VehicleExpenseTypeName = _selectedExpenseType.Name;
+			_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
+			_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
 		}
 	}
 
@@ -447,14 +447,14 @@ public partial class VehicleTripPage
 			return;
 		}
 
-		var existingItem = _expensesCart.FirstOrDefault(s => s.VehicleExpenseTypeId == _selectedExpenseType.Id);
+		var existingItem = _expensesCart.FirstOrDefault(s => s.ExpenseTypeId == _selectedExpenseType.Id);
 		if (existingItem is not null)
 			existingItem.Amount += _selectedExpensesCart.Amount;
 		else
 			_expensesCart.Add(new()
 			{
-				VehicleExpenseTypeId = _selectedExpenseType.Id,
-				VehicleExpenseTypeName = _selectedExpenseType.Name,
+				ExpenseTypeId = _selectedExpenseType.Id,
+				ExpenseTypeName = _selectedExpenseType.Name,
 				Amount = _selectedExpensesCart.Amount,
 				Remarks = _selectedExpensesCart.Remarks
 			});
@@ -473,14 +473,14 @@ public partial class VehicleTripPage
 
 		var selectedCartItem = _sfExpensesCartGrid.SelectedRecords.First();
 
-		_selectedExpenseType = _expenseTypes.FirstOrDefault(s => s.Id == selectedCartItem.VehicleExpenseTypeId);
+		_selectedExpenseType = _expenseTypes.FirstOrDefault(s => s.Id == selectedCartItem.ExpenseTypeId);
 		if (_selectedExpenseType is null)
 			return;
 
 		_selectedExpensesCart = new()
 		{
-			VehicleExpenseTypeId = selectedCartItem.VehicleExpenseTypeId,
-			VehicleExpenseTypeName = selectedCartItem.VehicleExpenseTypeName,
+			ExpenseTypeId = selectedCartItem.ExpenseTypeId,
+			ExpenseTypeName = selectedCartItem.ExpenseTypeName,
 			Amount = selectedCartItem.Amount,
 			Remarks = selectedCartItem.Remarks
 		};

@@ -321,7 +321,7 @@ public partial class VehicleExpenseReport : IAsyncDisposable
 			expense.LastModifiedBy = _user.Id;
 			expense.LastModifiedAt = await CommonData.LoadCurrentDateTime();
 			expense.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			await VehicleExpenseData.DeleteTransaction(expense);
+			await ExpenseData.DeleteTransaction(expense);
 
 			await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
 		}
@@ -361,7 +361,7 @@ public partial class VehicleExpenseReport : IAsyncDisposable
 			expense.LastModifiedBy = _user.Id;
 			expense.LastModifiedAt = await CommonData.LoadCurrentDateTime();
 			expense.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			await VehicleExpenseData.RecoverTransaction(expense);
+			await ExpenseData.RecoverTransaction(expense);
 
 			await _toastNotification.ShowAsync("Success", $"Transaction {_recoverTransactionNo} has been recovered successfully.", ToastType.Success);
 		}

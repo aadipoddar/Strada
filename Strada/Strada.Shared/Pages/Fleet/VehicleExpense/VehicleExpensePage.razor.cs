@@ -27,18 +27,18 @@ public partial class VehicleExpensePage
 	private CompanyModel _selectedCompany = new();
 	private FinancialYearModel _selectedFinancialYear = new();
 	private VehicleModel _selectedVehicle = new();
-	private VehicleExpenseTypeModel _selectedExpenseType = null;
+	private ExpenseTypeModel _selectedExpenseType = null;
 	private LedgerModel? _selectedLedger = null;
 	private VehicleExpenseDetailsCartModel _selectedExpensesCart = new();
 	private VehicleExpenseModel _vehicleExpense = new();
 
 	private List<CompanyModel> _companies = [];
 	private List<VehicleModel> _vehicles = [];
-	private List<VehicleExpenseTypeModel> _expenseTypes = [];
+	private List<ExpenseTypeModel> _expenseTypes = [];
 	private List<LedgerModel> _ledgers = [];
 	private List<VehicleExpenseDetailsCartModel> _expensesCart = [];
 
-	private AutoCompleteWithAdd<VehicleExpenseTypeModel?, VehicleExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private AutoCompleteWithAdd<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private SfGrid<VehicleExpenseDetailsCartModel> _sfExpensesCartGrid;
 	private ToastNotification _toastNotification;
 
@@ -82,7 +82,7 @@ public partial class VehicleExpensePage
 	{
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
+		_expenseTypes = await CommonData.LoadTableDataByStatus<ExpenseTypeModel>(FleetNames.ExpenseType);
 		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
@@ -237,17 +237,17 @@ public partial class VehicleExpensePage
 
 		foreach (var item in existingCart)
 		{
-			if (_expenseTypes.FirstOrDefault(s => s.Id == item.VehicleExpenseTypeId) is null)
+			if (_expenseTypes.FirstOrDefault(s => s.Id == item.ExpenseTypeId) is null)
 			{
-				var expenseType = await CommonData.LoadTableDataById<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, item.VehicleExpenseTypeId);
-				await _toastNotification.ShowAsync("Vehicle Expense Type Not Found", $"The vehicle expense type {expenseType?.Name} (ID: {item.VehicleExpenseTypeId}) in the existing transaction cart was not found in the available expense types list. It may have been deleted or is inaccessible.", ToastType.Error);
+				var expenseType = await CommonData.LoadTableDataById<ExpenseTypeModel>(FleetNames.ExpenseType, item.ExpenseTypeId);
+				await _toastNotification.ShowAsync("Expense Type Not Found", $"The Expense Type {expenseType?.Name} (ID: {item.ExpenseTypeId}) in the existing transaction cart was not found in the available expense types list. It may have been deleted or is inaccessible.", ToastType.Error);
 				continue;
 			}
 
 			_expensesCart.Add(new()
 			{
-				VehicleExpenseTypeId = item.VehicleExpenseTypeId,
-				VehicleExpenseTypeName = _expenseTypes.First(s => s.Id == item.VehicleExpenseTypeId).Name,
+				ExpenseTypeId = item.ExpenseTypeId,
+				ExpenseTypeName = _expenseTypes.First(s => s.Id == item.ExpenseTypeId).Name,
 				LedgerId = item.LedgerId,
 				LedgerName = _ledgers.FirstOrDefault(s => s.Id == item.LedgerId)?.Name,
 				Amount = item.Amount,
@@ -290,7 +290,7 @@ public partial class VehicleExpensePage
 	#endregion
 
 	#region Expenses Cart
-	private async Task OnExpensesTypeChanged(ChangeEventArgs<VehicleExpenseTypeModel?, VehicleExpenseTypeModel?> args)
+	private async Task OnExpensesTypeChanged(ChangeEventArgs<ExpenseTypeModel?, ExpenseTypeModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;
@@ -300,8 +300,8 @@ public partial class VehicleExpensePage
 		if (_selectedExpenseType is null)
 			_selectedExpensesCart = new()
 			{
-				VehicleExpenseTypeId = 0,
-				VehicleExpenseTypeName = "",
+				ExpenseTypeId = 0,
+				ExpenseTypeName = "",
 				LedgerId = 0,
 				LedgerName = "",
 				IdentificationNo = "",
@@ -310,8 +310,8 @@ public partial class VehicleExpensePage
 
 		else
 		{
-			_selectedExpensesCart.VehicleExpenseTypeId = _selectedExpenseType.Id;
-			_selectedExpensesCart.VehicleExpenseTypeName = _selectedExpenseType.Name;
+			_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
+			_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
 			_selectedExpensesCart.LedgerId = _selectedLedger?.Id;
 			_selectedExpensesCart.LedgerName = _selectedLedger?.Name;
 		}
@@ -344,14 +344,14 @@ public partial class VehicleExpensePage
 			return;
 		}
 
-		var existingItem = _expensesCart.FirstOrDefault(s => s.VehicleExpenseTypeId == _selectedExpenseType.Id);
+		var existingItem = _expensesCart.FirstOrDefault(s => s.ExpenseTypeId == _selectedExpenseType.Id);
 		if (existingItem is not null)
 			existingItem.Amount += _selectedExpensesCart.Amount;
 		else
 			_expensesCart.Add(new()
 			{
-				VehicleExpenseTypeId = _selectedExpenseType.Id,
-				VehicleExpenseTypeName = _selectedExpenseType.Name,
+				ExpenseTypeId = _selectedExpenseType.Id,
+				ExpenseTypeName = _selectedExpenseType.Name,
 				LedgerId = _selectedLedger?.Id,
 				LedgerName = _selectedLedger?.Name,
 				Amount = _selectedExpensesCart.Amount,
@@ -374,7 +374,7 @@ public partial class VehicleExpensePage
 
 		var selectedCartItem = _sfExpensesCartGrid.SelectedRecords.First();
 
-		_selectedExpenseType = _expenseTypes.FirstOrDefault(s => s.Id == selectedCartItem.VehicleExpenseTypeId);
+		_selectedExpenseType = _expenseTypes.FirstOrDefault(s => s.Id == selectedCartItem.ExpenseTypeId);
 		if (_selectedExpenseType is null)
 			return;
 
@@ -382,8 +382,8 @@ public partial class VehicleExpensePage
 
 		_selectedExpensesCart = new()
 		{
-			VehicleExpenseTypeId = selectedCartItem.VehicleExpenseTypeId,
-			VehicleExpenseTypeName = selectedCartItem.VehicleExpenseTypeName,
+			ExpenseTypeId = selectedCartItem.ExpenseTypeId,
+			ExpenseTypeName = selectedCartItem.ExpenseTypeName,
 			LedgerId = selectedCartItem.LedgerId,
 			LedgerName = selectedCartItem.LedgerName,
 			Amount = selectedCartItem.Amount,
@@ -503,8 +503,8 @@ public partial class VehicleExpensePage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var expenses = VehicleExpenseData.ConvertExpensesCartToDetails(_expensesCart, _vehicleExpense.Id);
-			_vehicleExpense.Id = await VehicleExpenseData.SaveTransaction(_vehicleExpense, expenses);
+			var expenses = ExpenseData.ConvertExpensesCartToDetails(_expensesCart, _vehicleExpense.Id);
+			_vehicleExpense.Id = await ExpenseData.SaveTransaction(_vehicleExpense, expenses);
 
 			if (savePDF)
 			{

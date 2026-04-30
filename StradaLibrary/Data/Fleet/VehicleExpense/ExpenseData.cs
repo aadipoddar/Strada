@@ -10,7 +10,7 @@ using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.VehicleExpense;
 
-public static class VehicleExpenseData
+public static class ExpenseData
 {
 	private static async Task<int> InsertVehicleExpense(VehicleExpenseModel vehicleExpense, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicleExpense, vehicleExpense, sqlDataAccessTransaction)).FirstOrDefault();
@@ -23,7 +23,7 @@ public static class VehicleExpenseData
 		{
 			Id = 0,
 			MasterId = accountingId,
-			VehicleExpenseTypeId = item.VehicleExpenseTypeId,
+			ExpenseTypeId = item.ExpenseTypeId,
 			LedgerId = item.LedgerId,
 			Amount = item.Amount,
 			IdentificationNo = item.IdentificationNo,

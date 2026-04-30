@@ -1,6 +1,6 @@
 namespace StradaLibrary.Models.Fleet.Vehicle;
 
-public class VehicleExpenseTypeModel
+public class ExpenseTypeModel
 {
 	public int Id { get; set; }
 	public string Name { get; set; }

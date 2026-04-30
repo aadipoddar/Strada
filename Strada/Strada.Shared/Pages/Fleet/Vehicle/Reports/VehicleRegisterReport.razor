@@ -392,7 +392,7 @@ else
 								<ChildContent>
 									<GridColumns>
 										<GridColumn Field="@nameof(VehicleRegisterModel.TotalVehicleExpenses)" HeaderText="Total" Width="115" TextAlign="TextAlign.Right" Format="N2" />
-										@foreach (var expType in _activeVehicleExpenseTypes)
+										@foreach (var expType in _activeExpenseTypes)
 										{
 											var capturedId = expType.ExpenseTypeId;
 											var capturedName = expType.ExpenseType;

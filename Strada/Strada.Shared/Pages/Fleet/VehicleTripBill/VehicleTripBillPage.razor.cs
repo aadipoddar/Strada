@@ -50,7 +50,7 @@ public partial class VehicleTripBillPage
 	private List<VehicleTripBillCardPaymentsCartModel> _cardPaymentsCart = [];
 	private List<VehicleTripBillLedgerPaymentsCartModel> _ledgerPaymentsCart = [];
 
-	private AutoCompleteWithAdd<VehicleExpenseTypeModel?, VehicleExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private AutoCompleteWithAdd<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private AutoCompleteWithAdd<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
 	private AutoCompleteWithAdd<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
 	private Syncfusion.Blazor.Inputs.SfTextBox _sfChallanNoTextBox;

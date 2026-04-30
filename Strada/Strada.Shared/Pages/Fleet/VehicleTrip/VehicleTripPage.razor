@@ -395,12 +395,12 @@ else
 					<div class="cart-input-row">
 						<!-- Expense Type -->
 						<div class="cart-field cart-field-wide">
-							<AutoCompleteWithAdd TItem="VehicleExpenseTypeModel" TValue="VehicleExpenseTypeModel"
+							<AutoCompleteWithAdd TItem="ExpenseTypeModel" TValue="ExpenseTypeModel"
 														 @ref="_sfExpenseTypeAutoComplete"
-														 FieldValue="@nameof(VehicleExpenseTypeModel.Name)" Value="_selectedExpenseType"
+														 FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
 														 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
 														 ValueChange="OnExpensesTypeChanged"
-														 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.VehicleExpenseTypeMaster" />
+														 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Amount -->
@@ -457,7 +457,7 @@ else
 							<GridAggregate>
 								<GridAggregateColumns>
 									<GridAggregateColumn
-										Field="@nameof(VehicleTripExpensesCartModel.VehicleExpenseTypeName)"
+										Field="@nameof(VehicleTripExpensesCartModel.ExpenseTypeName)"
 										Type="AggregateType.Count">
 										<FooterTemplate>
 											@{
@@ -485,7 +485,7 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.VehicleExpenseTypeName)"
+							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.ExpenseTypeName)"
 										HeaderText="Name" Width="200" />
 							<GridColumn Field="@nameof(VehicleTripExpensesCartModel.Amount)" HeaderText="Amount" Width="130"
 										TextAlign="TextAlign.Right" Format="N2">

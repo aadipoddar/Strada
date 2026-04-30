@@ -26,8 +26,8 @@ public static class VehicleExpenseInvoiceExport
 		{
 			return new VehicleExpenseDetailsCartModel
 			{
-				VehicleExpenseTypeId = detail.VehicleExpenseTypeId,
-				VehicleExpenseTypeName = detail.ExpenseTypeName,
+				ExpenseTypeId = detail.ExpenseTypeId,
+				ExpenseTypeName = detail.ExpenseTypeName,
 				LedgerId = detail.LedgerId,
 				LedgerName = detail.LedgerName,
 				Amount = detail.ExpenseAmount,
@@ -56,7 +56,7 @@ public static class VehicleExpenseInvoiceExport
 		var columnSettings = new List<InvoiceColumnSetting>
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
-			new(nameof(VehicleExpenseDetailsCartModel.VehicleExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(VehicleExpenseDetailsCartModel.ExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
 			new(nameof(VehicleExpenseDetailsCartModel.LedgerName), "Ledger", exportType, CellAlignment.Left, 60, 30),
 			new(nameof(VehicleExpenseDetailsCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(VehicleExpenseDetailsCartModel.IdentificationNo), "Identification No", exportType, CellAlignment.Left, 100, 30),

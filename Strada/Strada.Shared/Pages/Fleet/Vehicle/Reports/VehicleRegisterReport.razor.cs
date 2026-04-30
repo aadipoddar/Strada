@@ -32,7 +32,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	private List<OMCModel> _omcs = [];
 	private List<VehicleRegisterModel> _transactionOverviews = [];
 	private List<VehicleRegisterExpensesModel> _activeTripExpenseTypes = [];
-	private List<VehicleRegisterExpensesModel> _activeVehicleExpenseTypes = [];
+	private List<VehicleRegisterExpensesModel> _activeExpenseTypes = [];
 
 	private SfGrid<VehicleRegisterModel> _sfGrid;
 	private ToastNotification _toastNotification;
@@ -120,7 +120,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 
 	private async Task LoadExpenseTypes()
 	{
-		var expenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
+		var expenseTypes = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType);
 
 		foreach (var expenseType in expenseTypes)
 			foreach (var vehcicle in _transactionOverviews)
@@ -172,7 +172,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			{
 				var tripExpenses = await CommonData.LoadTableDataByMasterId<VehicleTripExpensesOverviewModel>(FleetNames.VehicleTripExpensesOverview, trip.Id);
 				foreach (var expense in tripExpenses)
-					vehicle.TripExpenses.FirstOrDefault(_ => _.ExpenseTypeId == expense.VehicleExpenseTypeId).ExpenseAmount += expense.ExpenseAmount;
+					vehicle.TripExpenses.FirstOrDefault(_ => _.ExpenseTypeId == expense.ExpenseTypeId).ExpenseAmount += expense.ExpenseAmount;
 			}
 		}
 	}
@@ -196,7 +196,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 
 				foreach (var expenseDetail in expenseDetails)
 				{
-					vehicle.VehicleExpenses.FirstOrDefault(_ => _.ExpenseTypeId == expenseDetail.VehicleExpenseTypeId).ExpenseAmount += expenseDetail.ExpenseAmount;
+					vehicle.VehicleExpenses.FirstOrDefault(_ => _.ExpenseTypeId == expenseDetail.ExpenseTypeId).ExpenseAmount += expenseDetail.ExpenseAmount;
 					vehicle.VehicleExpenseDetailsOverviews.Add(expenseDetail);
 				}
 			}
@@ -231,19 +231,19 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		foreach (var vehicle in _transactionOverviews)
 			vehicle.TripExpenses = [.. vehicle.TripExpenses.Where(te => activeTripExpenseTypeIds.Contains(te.ExpenseTypeId))];
 
-		// Remove vehicle expense types that are 0 across all vehicles
-		var activeVehicleExpenseTypeIds = _transactionOverviews
+		// Remove expense types that are 0 across all vehicles
+		var activeExpenseTypeIds = _transactionOverviews
 			.SelectMany(_ => _.VehicleExpenses)
 			.Where(ve => ve.ExpenseAmount > 0)
 			.Select(ve => ve.ExpenseTypeId)
 			.ToHashSet();
 
 		foreach (var vehicle in _transactionOverviews)
-			vehicle.VehicleExpenses = [.. vehicle.VehicleExpenses.Where(ve => activeVehicleExpenseTypeIds.Contains(ve.ExpenseTypeId))];
+			vehicle.VehicleExpenses = [.. vehicle.VehicleExpenses.Where(ve => activeExpenseTypeIds.Contains(ve.ExpenseTypeId))];
 
 		// Capture expense type metadata for dynamic column rendering (same set across all vehicles after pruning)
 		_activeTripExpenseTypes = _transactionOverviews.FirstOrDefault()?.TripExpenses ?? [];
-		_activeVehicleExpenseTypes = _transactionOverviews.FirstOrDefault()?.VehicleExpenses ?? [];
+		_activeExpenseTypes = _transactionOverviews.FirstOrDefault()?.VehicleExpenses ?? [];
 	}
 	#endregion
 

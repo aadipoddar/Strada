@@ -160,12 +160,12 @@ public static class GenerateCodes
 				decodeTransactionNoModel.PDFStream = await VehicleDocumentTypeExport.ExportMaster(vehicleDocumentTypes, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await VehicleDocumentTypeExport.ExportMaster(vehicleDocumentTypes, ReportExportType.Excel);
 				break;
-			case CodeType.VehicleExpenseType:
-				var vehicleExpenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleExpenseTypeMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleExpenseTypeModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleExpenseTypeExport.ExportMaster(vehicleExpenseTypes, ReportExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleExpenseTypeExport.ExportMaster(vehicleExpenseTypes, ReportExportType.Excel);
+			case CodeType.ExpenseType:
+				var expenseTypes = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<ExpenseTypeModel>(FleetNames.ExpenseType, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.ExpenseTypeMaster}/{(decodeTransactionNoModel.TransactionModel as ExpenseTypeModel).Id}";
+				decodeTransactionNoModel.PDFStream = await ExpenseTypeExport.ExportMaster(expenseTypes, ReportExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await ExpenseTypeExport.ExportMaster(expenseTypes, ReportExportType.Excel);
 				break;
 			default:
 				break;
@@ -233,9 +233,9 @@ public static class GenerateCodes
 					var vehicleDocumentType = await CommonData.LoadTableDataByCode<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleDocumentType is not null;
 					break;
-				case CodeType.VehicleExpenseType:
-					var vehicleExpenseType = await CommonData.LoadTableDataByCode<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleExpenseType is not null;
+				case CodeType.ExpenseType:
+					var expenseType = await CommonData.LoadTableDataByCode<ExpenseTypeModel>(FleetNames.ExpenseType, code, sqlDataAccessTransaction);
+					isDuplicate = expenseType is not null;
 					break;
 			}
 
@@ -544,27 +544,27 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{vehicleDocumentTypePrefix}00001", 5, CodeType.VehicleDocumentType, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateVehicleExpenseTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<string> GenerateExpenseTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var vehicleExpenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType, sqlDataAccessTransaction);
-		var vehicleExpenseTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTypeCodePrefix, sqlDataAccessTransaction)).Value;
+		var expenseTypes = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType, sqlDataAccessTransaction);
+		var expenseTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ExpenseTypeCodePrefix, sqlDataAccessTransaction)).Value;
 
-		var lastVehicleExpenseType = vehicleExpenseTypes.OrderByDescending(v => v.Id).FirstOrDefault();
-		if (lastVehicleExpenseType is not null)
+		var lastExpenseType = expenseTypes.OrderByDescending(v => v.Id).FirstOrDefault();
+		if (lastExpenseType is not null)
 		{
-			var lastVehicleExpenseTypeCode = lastVehicleExpenseType.Code;
-			if (lastVehicleExpenseTypeCode.StartsWith(vehicleExpenseTypePrefix))
+			var lastExpenseTypeCode = lastExpenseType.Code;
+			if (lastExpenseTypeCode.StartsWith(expenseTypePrefix))
 			{
-				var lastNumberPart = lastVehicleExpenseTypeCode[vehicleExpenseTypePrefix.Length..];
+				var lastNumberPart = lastExpenseTypeCode[expenseTypePrefix.Length..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{vehicleExpenseTypePrefix}{nextNumber:D5}", 5, CodeType.VehicleExpenseType, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{expenseTypePrefix}{nextNumber:D5}", 5, CodeType.ExpenseType, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{vehicleExpenseTypePrefix}00001", 5, CodeType.VehicleExpenseType, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{expenseTypePrefix}00001", 5, CodeType.ExpenseType, sqlDataAccessTransaction);
 	}
 	#endregion
 }

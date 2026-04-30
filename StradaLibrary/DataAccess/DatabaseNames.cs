@@ -138,10 +138,10 @@ public static class FleetNames
 	#region Vehicle
 	public static string Vehicle => "Vehicle";
 	public static string VehicleType => "VehicleType";
-	public static string VehicleExpenseType => "VehicleExpenseType";
+	public static string ExpenseType => "ExpenseType";
 
 	public static string InsertVehicle => "Insert_Vehicle";
 	public static string InsertVehicleType => "Insert_VehicleType";
-	public static string InsertVehicleExpenseType => "Insert_VehicleExpenseType";
+	public static string InsertExpenseType => "Insert_ExpenseType";
 	#endregion
 }

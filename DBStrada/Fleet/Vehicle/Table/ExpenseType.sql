@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[VehicleExpenseType]
+﻿CREATE TABLE [dbo].[ExpenseType]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Name] VARCHAR(250) NOT NULL UNIQUE,

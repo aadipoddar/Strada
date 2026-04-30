@@ -29,7 +29,7 @@ public static class VehicleTripData
 		{
 			Id = 0,
 			MasterId = accountingId,
-			VehicleExpenseTypeId = item.VehicleExpenseTypeId,
+			ExpenseTypeId = item.ExpenseTypeId,
 			Amount = item.Amount,
 			Remarks = item.Remarks,
 			Status = true

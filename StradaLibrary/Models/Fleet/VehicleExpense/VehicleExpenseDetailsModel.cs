@@ -4,7 +4,7 @@ public class VehicleExpenseDetailsModel
 {
 	public int Id { get; set; }
 	public int MasterId { get; set; }
-	public int VehicleExpenseTypeId { get; set; }
+	public int ExpenseTypeId { get; set; }
 	public int? LedgerId { get; set; }
 	public decimal Amount { get; set; }
 	public string? IdentificationNo { get; set; }
@@ -14,8 +14,8 @@ public class VehicleExpenseDetailsModel
 
 public class VehicleExpenseDetailsCartModel
 {
-	public int VehicleExpenseTypeId { get; set; }
-	public string VehicleExpenseTypeName { get; set; }
+	public int ExpenseTypeId { get; set; }
+	public string ExpenseTypeName { get; set; }
 	public int? LedgerId { get; set; }
 	public string? LedgerName { get; set; }
 	public decimal Amount { get; set; }
@@ -26,7 +26,7 @@ public class VehicleExpenseDetailsCartModel
 public class VehicleExpenseDetailsOverviewModel
 {
 	public int Id { get; set; }
-	public int VehicleExpenseTypeId { get; set; }
+	public int ExpenseTypeId { get; set; }
 	public string ExpenseTypeName { get; set; }
 	public string ExpenseTypeCode { get; set; }
 	public int? LedgerId { get; set; }

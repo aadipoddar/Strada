@@ -18,7 +18,7 @@ public enum CodeType
 
 	VehicleType,
 	VehicleDocumentType,
-	VehicleExpenseType,
+	ExpenseType,
 }
 
 public class DecodeTransactionNoModel

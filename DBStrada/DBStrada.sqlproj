@@ -154,8 +154,6 @@
     <Build Include="Fleet\VehicleTrip\Load\VehicleTrip_Overview.sql" />
     <Build Include="Fleet\VehicleTrip\Load\VehicleTripExpenses_Overview.sql" />
     <Build Include="Fleet\VehicleTrip\Load\VehicleTripCardPayments_Overview.sql" />
-    <Build Include="Fleet\Vehicle\Table\VehicleExpenseType.sql" />
-    <Build Include="Fleet\Vehicle\Insert\Insert_VehicleExpenseType.sql" />
     <Build Include="Fleet\OMC\Table\OMC.sql" />
     <Build Include="Fleet\OMC\Table\OMCCard.sql" />
     <Build Include="Fleet\OMC\Insert\Insert_OMC.sql" />
@@ -182,6 +180,8 @@
     <Build Include="Fleet\Route\Table\Driver.sql" />
     <Build Include="Fleet\Route\Table\Location.sql" />
     <Build Include="Fleet\Route\Table\Route.sql" />
+    <Build Include="Fleet\Vehicle\Table\ExpenseType.sql" />
+    <Build Include="Fleet\Vehicle\Insert\Insert_ExpenseType.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

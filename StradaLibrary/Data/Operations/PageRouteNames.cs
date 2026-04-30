@@ -67,6 +67,6 @@ public static class PageRouteNames
 
 	public const string VehicleMaster = "/fleet/vehicle";
 	public const string VehicleTypeMaster = "/fleet/vehicle-type";
-	public const string VehicleExpenseTypeMaster = "/fleet/vehicle-expense-type";
+	public const string ExpenseTypeMaster = "/fleet/expense-type";
 	#endregion
 }

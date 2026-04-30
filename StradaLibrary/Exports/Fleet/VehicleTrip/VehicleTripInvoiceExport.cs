@@ -30,13 +30,13 @@ public static class VehicleTripInvoiceExport
 			$" \nVehicle: {(transaction.VehicleEmpty ? "Empty" : "Loaded")}"
 		};
 
-		var expenseTypes = await CommonData.LoadTableData<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
+		var expenseTypes = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType);
 		var lineItems = expenses.Select(detail =>
 		{
 			return new VehicleTripExpensesCartModel
 			{
-				VehicleExpenseTypeId = detail.VehicleExpenseTypeId,
-				VehicleExpenseTypeName = expenseTypes.FirstOrDefault(p => p.Id == detail.VehicleExpenseTypeId).Name,
+				ExpenseTypeId = detail.ExpenseTypeId,
+				ExpenseTypeName = expenseTypes.FirstOrDefault(p => p.Id == detail.ExpenseTypeId).Name,
 				Amount = detail.Amount,
 				Remarks = detail.Remarks
 			};
@@ -69,7 +69,7 @@ public static class VehicleTripInvoiceExport
 		var columnSettings = new List<InvoiceColumnSetting>
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
-			new(nameof(VehicleTripExpensesCartModel.VehicleExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(VehicleTripExpensesCartModel.ExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
 			new(nameof(VehicleTripExpensesCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(VehicleTripExpensesCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 150, 30)
 		};

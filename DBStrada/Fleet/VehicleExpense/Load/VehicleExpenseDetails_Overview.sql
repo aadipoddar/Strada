@@ -2,7 +2,7 @@
 AS
 SELECT
     [tr].[Id],
-	[tr].[VehicleExpenseTypeId],
+	[tr].[ExpenseTypeId],
 	[er].[Name] AS ExpenseTypeName,
 	[er].[Code] AS ExpenseTypeCode,
 	[tr].[LedgerId],
@@ -38,7 +38,7 @@ FROM
 INNER JOIN
 	[dbo].[VehicleExpense] t ON tr.MasterId = t.Id
 INNER JOIN
-	[dbo].[VehicleExpenseType] er ON tr.[VehicleExpenseTypeId] = er.Id
+	[dbo].[ExpenseType] er ON tr.[ExpenseTypeId] = er.Id
 LEFT JOIN
 	[dbo].[Ledger] l ON tr.LedgerId = l.Id
 INNER JOIN

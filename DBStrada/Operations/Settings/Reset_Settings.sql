@@ -18,7 +18,7 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'LocationCodePrefix'					, N'LC'		, N'Prefix for Location Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'RouteCodePrefix'						, N'RT'	, N'Prefix for Route Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'DriverCodePrefix'					, N'DR'		, N'Prefix for Driver Codes')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleExpenseTypeCodePrefix'		, N'VEXT'	, N'Prefix for Vehicle Expense Type Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ExpenseTypeCodePrefix'				, N'EXP'	, N'Prefix for Expense Type Codes')
 	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'ACCT'	, N'Prefix for Financial Accounting Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleTripTransactionPrefix'			, N'VHTR'	, N'Prefix for Vehicle Trip Transaction Numbers')
