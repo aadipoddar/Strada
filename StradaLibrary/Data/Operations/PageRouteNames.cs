@@ -57,7 +57,7 @@ public static class PageRouteNames
 
 	public const string VehicleRouteLocationMaster = "/fleet/vehicle-route-location";
 	public const string VehicleRouteMaster = "/fleet/vehicle-route";
-	public const string VehicleDriverMaster = "/fleet/vehicle-driver";
+	public const string DriverMaster = "/fleet/driver";
 
 	public const string OMCMaster = "/fleet/omc";
 	public const string OMCCardMaster = "/fleet/omc-card";

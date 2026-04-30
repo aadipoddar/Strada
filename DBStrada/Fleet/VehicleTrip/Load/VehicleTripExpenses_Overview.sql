@@ -75,7 +75,7 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Vehicle] v ON t.VehicleId = v.Id
 INNER JOIN
-	[dbo].[VehicleDriver] d ON t.DriverId = d.Id
+	[dbo].[Driver] d ON t.DriverId = d.Id
 INNER JOIN
 	[dbo].[VehicleRoute] r ON t.RouteId = r.Id
 INNER JOIN

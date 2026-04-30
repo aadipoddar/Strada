@@ -112,11 +112,11 @@ public static class FleetNames
 	#region Vehicle Route
 	public static string VehicleRouteLocation => "VehicleRouteLocation";
 	public static string VehicleRoute => "VehicleRoute";
-	public static string VehicleDriver => "VehicleDriver";
+	public static string Driver => "Driver";
 	
 	public static string InsertVehicleRouteLocation => "Insert_VehicleRouteLocation";
 	public static string InsertVehicleRoute => "Insert_VehicleRoute";
-	public static string InsertVehicleDriver => "Insert_VehicleDriver";
+	public static string InsertDriver => "Insert_Driver";
 	#endregion
 	
 	#region OMC

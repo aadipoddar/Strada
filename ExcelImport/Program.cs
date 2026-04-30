@@ -17,7 +17,6 @@ await package.LoadAsync(fileInfo);
 var worksheet1 = package.Workbook.Worksheets[0];
 // var worksheet2 = package.Workbook.Worksheets[1];
 
-await ImportDrivers(worksheet1);
 
 Console.WriteLine("Finished importing Items.");
 Console.ReadLine();
@@ -27,6 +26,9 @@ Console.ReadLine();
 /*
 
 await ImportVehicles(worksheet1);
+
+await ImportDrivers(worksheet1);
+
 
 static async Task ImportVehicles(ExcelWorksheet worksheet1)
 {
@@ -79,10 +81,6 @@ static async Task ImportVehicles(ExcelWorksheet worksheet1)
 	}
 }
 
- */
-
-#endregion
-
 static async Task ImportDrivers(ExcelWorksheet worksheet1)
 {
 	int row = 1;
@@ -102,7 +100,7 @@ static async Task ImportDrivers(ExcelWorksheet worksheet1)
 		number = number.Trim().RemoveSpace();
 
 		Console.WriteLine("Inserting New Driver: " + name);
-		await VehicleDriverData.SaveTransaction(new()
+		await DriverData.SaveTransaction(new()
 		{
 			Name = name,
 			Mobile = number,
@@ -111,3 +109,6 @@ static async Task ImportDrivers(ExcelWorksheet worksheet1)
 		row++;
 	}
 }
+ 
+ */
+#endregion

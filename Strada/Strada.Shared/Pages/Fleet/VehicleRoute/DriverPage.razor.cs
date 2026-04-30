@@ -6,28 +6,30 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.VehicleRoute;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Fleet.VehicleRoute;
 
-public partial class VehicleDriverPage
+public partial class DriverPage
 {
 	private UserModel _user;
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showDeleted = false;
 
-	private VehicleDriverModel _vehicleDriver = new();
+	private DriverModel _driver = new();
 
-	private List<VehicleDriverModel> _vehicleDrivers = [];
+	private List<DriverModel> _drivers = [];
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private SfGrid<VehicleDriverModel> _sfGrid;
+	private SfGrid<DriverModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfTextBox _sfTextBox;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -49,16 +51,21 @@ public partial class VehicleDriverPage
 
 	private async Task LoadData()
 	{
-		_vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver);
+		_drivers = await CommonData.LoadTableData<DriverModel>(FleetNames.Driver);
 
 		if (!_showDeleted)
-			_vehicleDrivers = [.. _vehicleDrivers.Where(vd => vd.Status)];
+			_drivers = [.. _drivers.Where(vd => vd.Status)];
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
 
+		
+
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfTextBox is not null)
+			await _sfTextBox.FocusAsync();
 	}
 	#endregion
 
@@ -78,7 +85,7 @@ public partial class VehicleDriverPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await VehicleDriverData.SaveTransaction(_vehicleDriver);
+			await DriverData.SaveTransaction(_driver);
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -105,11 +112,11 @@ public partial class VehicleDriverPage
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleDriver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, _deleteTransactionId)
+			var driver = await CommonData.LoadTableDataById<DriverModel>(FleetNames.Driver, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicleDriver.Status = false;
-			await VehicleDriverData.InsertVehicleDriver(vehicleDriver);
+			driver.Status = false;
+			await DriverData.InsertDriver(driver);
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -136,11 +143,11 @@ public partial class VehicleDriverPage
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			var vehicleDriver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, _recoverTransactionId)
+			var driver = await CommonData.LoadTableDataById<DriverModel>(FleetNames.Driver, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicleDriver.Status = true;
-			await VehicleDriverData.InsertVehicleDriver(vehicleDriver);
+			driver.Status = true;
+			await DriverData.InsertDriver(driver);
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();
@@ -170,7 +177,7 @@ public partial class VehicleDriverPage
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleDriverExport.ExportMaster(_vehicleDrivers, ReportExportType.Excel);
+			var (stream, fileName) = await DriverExport.ExportMaster(_drivers, ReportExportType.Excel);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -197,7 +204,7 @@ public partial class VehicleDriverPage
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await VehicleDriverExport.ExportMaster(_vehicleDrivers, ReportExportType.PDF);
+			var (stream, fileName) = await DriverExport.ExportMaster(_drivers, ReportExportType.PDF);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -243,7 +250,7 @@ public partial class VehicleDriverPage
 		}
 	}
 
-	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleDriverModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<DriverModel> args)
 	{
 		switch (args.Item.Id)
 		{
@@ -262,9 +269,11 @@ public partial class VehicleDriverPage
 		if (selectedRecords.Count == 0)
 			return;
 
-		_vehicleDriver = await CommonData.LoadTableDataById<VehicleDriverModel>(FleetNames.VehicleDriver, selectedRecords[0].Id);
-		if (_vehicleDriver is null)
+		_driver = await CommonData.LoadTableDataById<DriverModel>(FleetNames.Driver, selectedRecords[0].Id);
+		if (_driver is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+
+		await _sfTextBox.FocusAsync();
 
 		StateHasChanged();
 	}
@@ -316,7 +325,7 @@ public partial class VehicleDriverPage
 	}
 
 	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster, true);
+		NavigationManager.NavigateTo(PageRouteNames.DriverMaster, true);
 
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);

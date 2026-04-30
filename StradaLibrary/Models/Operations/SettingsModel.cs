@@ -23,7 +23,7 @@ public static class SettingsKeys
 	public static string OMCCardCodePrefix => "OMCCardCodePrefix";
 	public static string VehicleRouteLocationCodePrefix => "VehicleRouteLocationCodePrefix";
 	public static string VehicleRouteCodePrefix => "VehicleRouteCodePrefix";
-	public static string VehicleDriverCodePrefix => "VehicleDriverCodePrefix";
+	public static string DriverCodePrefix => "DriverCodePrefix";
 	public static string VehicleExpenseTypeCodePrefix => "VehicleExpenseTypeCodePrefix";
 
 	public static string FinancialAccountingTransactionPrefix => "FinancialAccountingTransactionPrefix";

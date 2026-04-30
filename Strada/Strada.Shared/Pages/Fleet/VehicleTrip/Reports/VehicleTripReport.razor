@@ -175,14 +175,14 @@ else
 
 							<!-- Driver -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel"
+								<AutoCompleteWithAdd TItem="DriverOverviewModel" TValue="DriverOverviewModel"
 													 Value="_selectedDriver"
-													 DataSource="@_vehicleDrivers"
+													 DataSource="@_drivers"
 													 Placeholder="All Drivers"
 													 Label="Driver" Required="true"
 													 ValueChange="OnDriverChanged"
-													 FieldValue="@nameof(VehicleDriverOverviewModel.DisplayName)"
-													 AddNewRoute="@PageRouteNames.VehicleDriverMaster" />
+													 FieldValue="@nameof(DriverOverviewModel.DisplayName)"
+													 AddNewRoute="@PageRouteNames.DriverMaster" />
 							</div>
 
 							<!-- Vehicle Empty -->

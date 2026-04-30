@@ -123,12 +123,12 @@ public static class GenerateCodes
 				decodeTransactionNoModel.PDFStream = await VehicleRouteExport.ExportMaster(vehicleRoutes, ReportExportType.PDF);
 				decodeTransactionNoModel.ExcelStream = await VehicleRouteExport.ExportMaster(vehicleRoutes, ReportExportType.Excel);
 				break;
-			case CodeType.VehicleDriver:
-				var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver);
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<VehicleDriverModel>(FleetNames.VehicleDriver, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleDriverMaster}/{(decodeTransactionNoModel.TransactionModel as VehicleDriverModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleDriverExport.ExportMaster(vehicleDrivers, ReportExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleDriverExport.ExportMaster(vehicleDrivers, ReportExportType.Excel);
+			case CodeType.Driver:
+				var drivers = await CommonData.LoadTableData<DriverModel>(FleetNames.Driver);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<DriverModel>(FleetNames.Driver, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.DriverMaster}/{(decodeTransactionNoModel.TransactionModel as DriverModel).Id}";
+				decodeTransactionNoModel.PDFStream = await DriverExport.ExportMaster(drivers, ReportExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await DriverExport.ExportMaster(drivers, ReportExportType.Excel);
 				break;
 
 			case CodeType.OMC:
@@ -211,9 +211,9 @@ public static class GenerateCodes
 					var vehicleRoute = await CommonData.LoadTableDataByCode<VehicleRouteModel>(FleetNames.VehicleRoute, code, sqlDataAccessTransaction);
 					isDuplicate = vehicleRoute is not null;
 					break;
-				case CodeType.VehicleDriver:
-					var vehicleDriver = await CommonData.LoadTableDataByCode<VehicleDriverModel>(FleetNames.VehicleDriver, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleDriver is not null;
+				case CodeType.Driver:
+					var driver = await CommonData.LoadTableDataByCode<DriverModel>(FleetNames.Driver, code, sqlDataAccessTransaction);
+					isDuplicate = driver is not null;
 					break;
 
 				case CodeType.OMC:
@@ -425,27 +425,27 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{vehicleRoutePrefix}00001", 5, CodeType.VehicleRoute, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateVehicleDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<string> GenerateDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var vehicleDrivers = await CommonData.LoadTableData<VehicleDriverModel>(FleetNames.VehicleDriver, sqlDataAccessTransaction);
-		var vehicleDriverPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleDriverCodePrefix, sqlDataAccessTransaction)).Value;
+		var drivers = await CommonData.LoadTableData<DriverModel>(FleetNames.Driver, sqlDataAccessTransaction);
+		var driverPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.DriverCodePrefix, sqlDataAccessTransaction)).Value;
 
-		var lastVehicleDriver = vehicleDrivers.OrderByDescending(vd => vd.Id).FirstOrDefault();
-		if (lastVehicleDriver is not null)
+		var lastDriver = drivers.OrderByDescending(vd => vd.Id).FirstOrDefault();
+		if (lastDriver is not null)
 		{
-			var lastVehicleDriverCode = lastVehicleDriver.Code;
-			if (lastVehicleDriverCode.StartsWith(vehicleDriverPrefix))
+			var lastDriverCode = lastDriver.Code;
+			if (lastDriverCode.StartsWith(driverPrefix))
 			{
-				var lastNumberPart = lastVehicleDriverCode[vehicleDriverPrefix.Length..];
+				var lastNumberPart = lastDriverCode[driverPrefix.Length..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{vehicleDriverPrefix}{nextNumber:D5}", 5, CodeType.VehicleDriver, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{driverPrefix}{nextNumber:D5}", 5, CodeType.Driver, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{vehicleDriverPrefix}00001", 5, CodeType.VehicleDriver, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{driverPrefix}00001", 5, CodeType.Driver, sqlDataAccessTransaction);
 	}
 	#endregion
 

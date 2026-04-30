@@ -31,7 +31,7 @@ public partial class VehicleTripPage
 	private FinancialYearModel _selectedFinancialYear = new();
 	private OMCModel _selectedOMC = new();
 	private VehicleModel _selectedVehicle = new();
-	private VehicleDriverOverviewModel _selectedDriver = new();
+	private DriverOverviewModel _selectedDriver = new();
 	private VehicleRouteOverviewModel _selectedRoute = new();
 	private VehicleExpenseTypeModel _selectedExpenseType = null;
 	private OMCCardModel _selectedOMCCard = null;
@@ -43,7 +43,7 @@ public partial class VehicleTripPage
 	private List<OMCModel> _omcs = [];
 	private List<OMCCardModel> _omcCards = [];
 	private List<VehicleModel> _vehicles = [];
-	private List<VehicleDriverOverviewModel> _vehicleDrivers = [];
+	private List<DriverOverviewModel> _drivers = [];
 	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
 	private List<VehicleExpenseTypeModel> _expenseTypes = [];
 	private List<VehicleTripExpensesCartModel> _expensesCart = [];
@@ -104,7 +104,7 @@ public partial class VehicleTripPage
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
+		_drivers = await DriverData.LoadDriverOverview();
 		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
 		_expenseTypes = await CommonData.LoadTableDataByStatus<VehicleExpenseTypeModel>(FleetNames.VehicleExpenseType);
 
@@ -116,13 +116,13 @@ public partial class VehicleTripPage
 		_omcCards = [.. _omcCards.OrderBy(s => s.CardNumber)];
 		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
-		_vehicleDrivers = [.. _vehicleDrivers.OrderBy(s => s.Name)];
+		_drivers = [.. _drivers.OrderBy(s => s.Name)];
 		_vehicleRoutes = [.. _vehicleRoutes.OrderBy(s => s.Code)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
 
 		_selectedOMC = _omcs.FirstOrDefault();
 		_selectedVehicle = _vehicles.FirstOrDefault();
-		_selectedDriver = _vehicleDrivers.FirstOrDefault();
+		_selectedDriver = _drivers.FirstOrDefault();
 		_selectedRoute = _vehicleRoutes.FirstOrDefault();
 	}
 
@@ -231,9 +231,9 @@ public partial class VehicleTripPage
 		_vehicleTrip.OMCId = _selectedOMC.Id;
 
 		if (_vehicleTrip.DriverId > 0)
-			_selectedDriver = _vehicleDrivers.FirstOrDefault(s => s.Id == _vehicleTrip.DriverId) ?? _vehicleDrivers.FirstOrDefault();
+			_selectedDriver = _drivers.FirstOrDefault(s => s.Id == _vehicleTrip.DriverId) ?? _drivers.FirstOrDefault();
 		else
-			_selectedDriver = _vehicleDrivers.FirstOrDefault();
+			_selectedDriver = _drivers.FirstOrDefault();
 
 		if (_vehicleTrip.RouteId > 0)
 			_selectedRoute = _vehicleRoutes.FirstOrDefault(s => s.Id == _vehicleTrip.RouteId) ?? _vehicleRoutes.FirstOrDefault();
@@ -393,7 +393,7 @@ public partial class VehicleTripPage
 		await SaveTransactionFile();
 	}
 
-	private async Task OnVehicleDriverChanged(ChangeEventArgs<VehicleDriverOverviewModel, VehicleDriverOverviewModel> args)
+	private async Task OnDriverChanged(ChangeEventArgs<DriverOverviewModel, DriverOverviewModel> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;

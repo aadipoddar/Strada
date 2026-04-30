@@ -221,14 +221,14 @@ else
 
 							<!-- Driver -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="VehicleDriverOverviewModel" TValue="VehicleDriverOverviewModel"
+								<AutoCompleteWithAdd TItem="DriverOverviewModel" TValue="DriverOverviewModel"
 												 Value="_selectedDriver"
-												 DataSource="@_vehicleDrivers"
+												 DataSource="@_drivers"
 												 Placeholder="Select a Driver"
 												 Label="Driver" Required="true"
-												 ValueChange="OnVehicleDriverChanged"
-												 FieldValue="@nameof(VehicleDriverOverviewModel.DisplayName)"
-												 AddNewRoute="@PageRouteNames.VehicleDriverMaster" />
+												 ValueChange="OnDriverChanged"
+												 FieldValue="@nameof(DriverOverviewModel.DisplayName)"
+												 AddNewRoute="@PageRouteNames.DriverMaster" />
 							</div>
 
 							<div class="form-field">

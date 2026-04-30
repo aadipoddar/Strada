@@ -21,7 +21,7 @@ public static class VehicleTripReportExport
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
 		VehicleRouteOverviewModel route = null,
-		VehicleDriverOverviewModel driver = null)
+		DriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{
@@ -222,7 +222,7 @@ public static class VehicleTripReportExport
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
 		VehicleRouteOverviewModel route = null,
-		VehicleDriverOverviewModel driver = null)
+		DriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{
@@ -425,7 +425,7 @@ public static class VehicleTripReportExport
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
 		VehicleRouteOverviewModel route = null,
-		VehicleDriverOverviewModel driver = null)
+		DriverOverviewModel driver = null)
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{

@@ -11,7 +11,7 @@ public enum CodeType
 
 	VehicleRouteLocation,
 	VehicleRoute,
-	VehicleDriver,
+	Driver,
 
 	OMC,
 	OMCCard,

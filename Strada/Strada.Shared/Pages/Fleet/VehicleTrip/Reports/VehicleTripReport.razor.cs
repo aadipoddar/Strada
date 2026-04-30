@@ -34,7 +34,7 @@ public partial class VehicleTripReport : IAsyncDisposable
 	private OMCModel? _selectedOMC = null;
 	private VehicleModel? _selectedVehicle = null;
 	private VehicleRouteOverviewModel? _selectedRoute = null;
-	private VehicleDriverOverviewModel? _selectedDriver = null;
+	private DriverOverviewModel? _selectedDriver = null;
 	private int _vehicleEmptyFilter = TripFilterOptions.All;
 	private int _pendingBillsFilter = TripFilterOptions.All;
 
@@ -42,7 +42,7 @@ public partial class VehicleTripReport : IAsyncDisposable
 	private List<OMCModel> _omcs = [];
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleRouteOverviewModel> _vehicleRoutes = [];
-	private List<VehicleDriverOverviewModel> _vehicleDrivers = [];
+	private List<DriverOverviewModel> _drivers = [];
 	private List<VehicleTripOverviewModel> _transactionOverviews = [];
 
 	private string _deleteTransactionNo = string.Empty;
@@ -92,13 +92,13 @@ public partial class VehicleTripReport : IAsyncDisposable
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_vehicleRoutes = await VehicleRouteData.LoadVehicleRouteOverview();
-		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
+		_drivers = await DriverData.LoadDriverOverview();
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		_omcs = [.. _omcs.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 		_vehicleRoutes = [.. _vehicleRoutes.OrderBy(s => s.Code)];
-		_vehicleDrivers = [.. _vehicleDrivers.OrderBy(s => s.Name)];
+		_drivers = [.. _drivers.OrderBy(s => s.Name)];
 	}
 
 	private async Task LoadTransactionOverviews()
@@ -202,7 +202,7 @@ public partial class VehicleTripReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnDriverChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VehicleDriverOverviewModel, VehicleDriverOverviewModel> args)
+	private async Task OnDriverChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<DriverOverviewModel, DriverOverviewModel> args)
 	{
 		_selectedDriver = args.Value;
 		await LoadTransactionOverviews();

@@ -1,4 +1,4 @@
-CREATE PROCEDURE [dbo].[Insert_VehicleDriver]
+CREATE PROCEDURE [dbo].[Insert_Driver]
 	@Id INT OUTPUT,
 	@Name VARCHAR(MAX),
 	@Mobile VARCHAR(10),
@@ -9,7 +9,7 @@ AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[VehicleDriver]
+		INSERT INTO [dbo].[Driver]
 		(
 			[Name],
 			[Mobile],
@@ -30,7 +30,7 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		UPDATE [dbo].[VehicleDriver]
+		UPDATE [dbo].[Driver]
 		SET
 			[Name] = @Name,
 			[Mobile] = @Mobile,

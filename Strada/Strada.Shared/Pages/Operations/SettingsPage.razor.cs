@@ -38,7 +38,7 @@ public partial class SettingsPage
     private string _omcCardCodePrefix = string.Empty;
     private string _vehicleRouteLocationCodePrefix = string.Empty;
     private string _vehicleRouteCodePrefix = string.Empty;
-    private string _vehicleDriverCodePrefix = string.Empty;
+    private string _driverCodePrefix = string.Empty;
     private string _vehicleExpenseTypeCodePrefix = string.Empty;
 
     // Transaction Prefixes
@@ -131,8 +131,8 @@ public partial class SettingsPage
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleRouteCodePrefix);
         _vehicleRouteCodePrefix = s?.Value ?? string.Empty;
 
-        s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleDriverCodePrefix);
-        _vehicleDriverCodePrefix = s?.Value ?? string.Empty;
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.DriverCodePrefix);
+        _driverCodePrefix = s?.Value ?? string.Empty;
 
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTypeCodePrefix);
         _vehicleExpenseTypeCodePrefix = s?.Value ?? string.Empty;
@@ -262,7 +262,7 @@ public partial class SettingsPage
             await UpdateSetting(SettingsKeys.OMCCardCodePrefix, _omcCardCodePrefix, Desc(SettingsKeys.OMCCardCodePrefix));
             await UpdateSetting(SettingsKeys.VehicleRouteLocationCodePrefix, _vehicleRouteLocationCodePrefix, Desc(SettingsKeys.VehicleRouteLocationCodePrefix));
             await UpdateSetting(SettingsKeys.VehicleRouteCodePrefix, _vehicleRouteCodePrefix, Desc(SettingsKeys.VehicleRouteCodePrefix));
-            await UpdateSetting(SettingsKeys.VehicleDriverCodePrefix, _vehicleDriverCodePrefix, Desc(SettingsKeys.VehicleDriverCodePrefix));
+            await UpdateSetting(SettingsKeys.DriverCodePrefix, _driverCodePrefix, Desc(SettingsKeys.DriverCodePrefix));
             await UpdateSetting(SettingsKeys.VehicleExpenseTypeCodePrefix, _vehicleExpenseTypeCodePrefix, Desc(SettingsKeys.VehicleExpenseTypeCodePrefix));
 
             await UpdateSetting(SettingsKeys.FinancialAccountingTransactionPrefix, _financialAccountingTransactionPrefix, Desc(SettingsKeys.FinancialAccountingTransactionPrefix));

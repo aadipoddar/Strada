@@ -128,7 +128,7 @@
     <Build Include="Fleet\Vehicle\Table\VehicleType.sql" />
     <Build Include="Fleet\VehicleRoute\Table\VehicleRouteLocation.sql" />
     <Build Include="Fleet\VehicleRoute\Table\VehicleRoute.sql" />
-    <Build Include="Fleet\VehicleRoute\Table\VehicleDriver.sql" />
+    <Build Include="Fleet\VehicleRoute\Table\Driver.sql" />
     <Build Include="Accounts\FinancialAccounting\Load\Load_FinancialAccounting_By_Voucher_Reference.sql" />
     <Build Include="Accounts\FinancialAccounting\Table\FinancialAccounting.sql" />
     <Build Include="Accounts\FinancialAccounting\Table\FinancialAccountingDetail.sql" />
@@ -163,7 +163,7 @@
     <Build Include="Fleet\OMC\Table\OMCCard.sql" />
     <Build Include="Fleet\OMC\Insert\Insert_OMC.sql" />
     <Build Include="Fleet\OMC\Insert\Insert_OMCCard.sql" />
-    <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleDriver.sql" />
+    <Build Include="Fleet\VehicleRoute\Insert\Insert_Driver.sql" />
     <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRoute.sql" />
     <Build Include="Fleet\VehicleRoute\Insert\Insert_VehicleRouteLocation.sql" />
     <Build Include="Fleet\VehicleExpense\Table\VehicleExpense.sql" />
