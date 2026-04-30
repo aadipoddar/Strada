@@ -1,6 +1,7 @@
 @attribute [Route(PageRouteNames.VehicleMaster)]
 
 @using StradaLibrary.Models.Accounts.Masters
+@using StradaLibrary.Models.Fleet.OMC
 @using StradaLibrary.Models.Fleet.Vehicle
 
 <PageTitle>Vehicle - Strada</PageTitle>
@@ -120,6 +121,16 @@ else
 						</div>
 
 						<div class="form-field">
+							<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+												 @bind-Value="_selectedOMC"
+												 DataSource="@_omcs"
+												 Placeholder="Select OMC"
+												 FieldValue="@nameof(OMCModel.Name)"
+												 Label="OMC"
+												 AddNewRoute="@PageRouteNames.OMCMaster" />
+						</div>
+
+						<div class="form-field">
 							<label class="field-label">
 								Purchase Date <span class="required">*</span>
 							</label>
@@ -164,8 +175,7 @@ else
 						<GridEvents TValue="VehicleModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleModel.Id)" HeaderText="ID" Width="80"
-										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(VehicleModel.Code)" HeaderText="Code" Width="150" />
 							<GridColumn Field="@nameof(VehicleModel.ShortCode)" HeaderText="Short Code" Width="150" />
 							<GridColumn Field="@nameof(VehicleModel.ChasisCode)" HeaderText="Chasis Code" Width="160" />
@@ -185,6 +195,15 @@ else
 										var item = (context as VehicleModel);
 										var company = _companies.FirstOrDefault(c => c.Id == item.CompanyId);
 										<span>@(company is not null ? company.Name : "N/A")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(VehicleModel.OMCId)" HeaderText="OMC" Width="220">
+								<Template>
+									@{
+										var item = (context as VehicleModel);
+										var omc = _omcs.FirstOrDefault(o => o.Id == item.OMCId);
+										<span>@(omc is not null ? omc.Name : "N/A")</span>
 									}
 								</Template>
 							</GridColumn>

@@ -2,6 +2,7 @@ using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
 
 namespace StradaLibrary.Exports.Fleet.Vehicle;
@@ -14,6 +15,7 @@ public static class VehicleExport
 	{
 		var vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType);
 		var companies = await CommonData.LoadTableData<CompanyModel>(AccountNames.Company);
+		var omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC);
 
 		var enrichedData = vehicleData.Select(vehicle => new
 		{
@@ -26,6 +28,7 @@ public static class VehicleExport
 			vehicle.OpeningKM,
 			VehicleType = vehicleTypes.FirstOrDefault(vt => vt.Id == vehicle.VehicleTypeId)?.Name ?? "N/A",
 			Company = companies.FirstOrDefault(c => c.Id == vehicle.CompanyId)?.Name ?? "N/A",
+			OMC = omcs.FirstOrDefault(o => o.Id == vehicle.OMCId)?.Name ?? "N/A",
 			vehicle.Remarks,
 			Status = vehicle.Status ? "Active" : "Deleted"
 		});
@@ -41,6 +44,7 @@ public static class VehicleExport
 			[nameof(VehicleModel.OpeningKM)] = new() { DisplayName = "Opening KM", Alignment = CellAlignment.Right, Format = "#,##0.00" },
 			["VehicleType"] = new() { DisplayName = "Vehicle Type", Alignment = CellAlignment.Left },
 			["Company"] = new() { DisplayName = "Company", Alignment = CellAlignment.Left },
+			["OMC"] = new() { DisplayName = "OMC", Alignment = CellAlignment.Left },
 			[nameof(VehicleModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left },
 			[nameof(VehicleModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
@@ -56,6 +60,7 @@ public static class VehicleExport
 			nameof(VehicleModel.OpeningKM),
 			"VehicleType",
 			"Company",
+			"OMC",
 			nameof(VehicleModel.Remarks),
 			nameof(VehicleModel.Status)
 		];

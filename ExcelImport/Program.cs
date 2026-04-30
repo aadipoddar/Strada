@@ -1,11 +1,12 @@
 ﻿using OfficeOpenXml;
 using StradaLibrary.Data.Common;
 using StradaLibrary.Data.Fleet.Vehicle;
+using StradaLibrary.Data.Fleet.VehicleRoute;
 using StradaLibrary.DataAccess;
 
 Secrets.SetupConfiguration();
 
-FileInfo fileInfo = new(@"C:\Others\vehicle.xlsx");
+FileInfo fileInfo = new(@"C:\Others\drivers.xlsx");
 
 ExcelPackage.License.SetNonCommercialPersonal("AadiSoft");
 
@@ -16,13 +17,16 @@ await package.LoadAsync(fileInfo);
 var worksheet1 = package.Workbook.Worksheets[0];
 // var worksheet2 = package.Workbook.Worksheets[1];
 
+await ImportDrivers(worksheet1);
 
 Console.WriteLine("Finished importing Items.");
 Console.ReadLine();
 
 #region Unused
 
-/*await ImportVehicles(worksheet1);
+/*
+
+await ImportVehicles(worksheet1);
 
 static async Task ImportVehicles(ExcelWorksheet worksheet1)
 {
@@ -73,6 +77,37 @@ static async Task ImportVehicles(ExcelWorksheet worksheet1)
 
 		row++;
 	}
-}*/
+}
+
+ */
 
 #endregion
+
+static async Task ImportDrivers(ExcelWorksheet worksheet1)
+{
+	int row = 1;
+
+	while (worksheet1.Cells[row, 1].Value != null)
+	{
+		var name = worksheet1.Cells[row, 1].Value.ToString();
+		var number = worksheet1.Cells[row, 2].Value.ToString();
+
+		if (string.IsNullOrWhiteSpace(name) ||
+			string.IsNullOrWhiteSpace(number))
+		{
+			Console.WriteLine("Not Inserted Row = " + row);
+			continue;
+		}
+
+		number = number.Trim().RemoveSpace();
+
+		Console.WriteLine("Inserting New Driver: " + name);
+		await VehicleDriverData.SaveTransaction(new()
+		{
+			Name = name,
+			Mobile = number,
+		});
+
+		row++;
+	}
+}

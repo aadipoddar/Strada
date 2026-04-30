@@ -8,6 +8,7 @@
 	@OpeningKM MONEY,
 	@VehicleTypeId INT,
 	@CompanyId INT,
+	@OMCId INT,
 	@Remarks VARCHAR(MAX),
 	@Status BIT
 AS
@@ -24,6 +25,7 @@ BEGIN
 			[OpeningKM],
 			[VehicleTypeId],
 			[CompanyId],
+			[OMCId],
 			[Remarks],
 			[Status]
 		)
@@ -37,6 +39,7 @@ BEGIN
 			@OpeningKM,
 			@VehicleTypeId,
 			@CompanyId,
+			@OMCId,
 			@Remarks,
 			@Status
 		);
@@ -56,6 +59,7 @@ BEGIN
 			[OpeningKM] = @OpeningKM,
 			[VehicleTypeId] = @VehicleTypeId,
 			[CompanyId] = @CompanyId,
+			[OMCId] = @OMCId,
 			[Remarks] = @Remarks,
 			[Status] = @Status
 		WHERE [Id] = @Id;

@@ -4,6 +4,7 @@ using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.Vehicle;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
@@ -20,10 +21,12 @@ public partial class VehiclePage
 	private VehicleModel _vehicle = new() { PurchaseDate = DateTime.Today };
 	private VehicleTypeModel _selectedVehicleType;
 	private CompanyModel _selectedCompany;
+	private OMCModel? _selectedOMC;
 
 	private List<VehicleModel> _vehicles = [];
 	private List<VehicleTypeModel> _vehicleTypes = [];
 	private List<CompanyModel> _companies = [];
+	private List<OMCModel> _omcs = [];
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
@@ -51,18 +54,21 @@ public partial class VehiclePage
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 		await LoadData();
 	}
-		
+
 	private async Task LoadData()
 	{
 		_vehicles = await CommonData.LoadTableData<VehicleModel>(FleetNames.Vehicle);
 		_vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType);
 		_companies = await CommonData.LoadTableData<CompanyModel>(AccountNames.Company);
+		_omcs = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC);
 
 		_vehicleTypes = [.. _vehicleTypes.OrderBy(vt => vt.Name)];
 		_companies = [.. _companies.OrderBy(c => c.Name)];
+		_omcs = [.. _omcs.OrderBy(o => o.Name)];
 
 		_selectedVehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == _vehicle.VehicleTypeId);
 		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _vehicle.CompanyId);
+		_selectedOMC = null;
 
 		if (!_showDeleted)
 			_vehicles = [.. _vehicles.Where(v => v.Status)];
@@ -93,6 +99,7 @@ public partial class VehiclePage
 
 			_vehicle.VehicleTypeId = _selectedVehicleType?.Id ?? 0;
 			_vehicle.CompanyId = _selectedCompany?.Id ?? 0;
+			_vehicle.OMCId = _selectedOMC?.Id;
 
 			await VehicleData.SaveTransaction(_vehicle);
 
@@ -284,6 +291,11 @@ public partial class VehiclePage
 
 		_selectedVehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == _vehicle.VehicleTypeId);
 		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _vehicle.CompanyId);
+
+		if (_vehicle.OMCId.HasValue)
+			_selectedOMC = _omcs.FirstOrDefault(o => o.Id == _vehicle.OMCId);
+		else
+			_selectedOMC = null;
 
 		StateHasChanged();
 	}
