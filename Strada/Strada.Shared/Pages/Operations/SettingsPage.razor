@@ -259,6 +259,17 @@ else
 								<AutoCompleteEvents TValue="string" TItem="LedgerModel" ValueChange="OnGSTLedgerChange" />
 							</SfAutoComplete>
 						</div>
+
+						<div class="form-field">
+							<label class="field-label">Bill Ledger</label>
+							<SfAutoComplete @bind-Value="_selectedBillLedgerName" TValue="string" TItem="LedgerModel"
+											DataSource="@_ledgers" Placeholder="Select bill ledger"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+								<AutoCompleteEvents TValue="string" TItem="LedgerModel" ValueChange="OnBillLedgerChange" />
+							</SfAutoComplete>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -286,6 +297,17 @@ else
 											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
 								<AutoCompleteFieldSettings Value="Name" />
 								<AutoCompleteEvents TValue="string" TItem="VoucherModel" ValueChange="OnDefaultVoucherChange" />
+							</SfAutoComplete>
+						</div>
+
+						<div class="form-field">
+							<label class="field-label">Bill Voucher</label>
+							<SfAutoComplete @bind-Value="_selectedBillVoucherName" TValue="string" TItem="VoucherModel"
+											DataSource="@_vouchers" Placeholder="Select bill voucher"
+											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+								<AutoCompleteFieldSettings Value="Name" />
+								<AutoCompleteEvents TValue="string" TItem="VoucherModel" ValueChange="OnBillVoucherChange" />
 							</SfAutoComplete>
 						</div>
 					</div>

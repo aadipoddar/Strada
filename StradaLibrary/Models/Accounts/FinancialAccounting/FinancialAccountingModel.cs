@@ -52,6 +52,7 @@ public class FinancialAccountingItemCartModel
 
 public enum ReferenceTypes
 {
+    Bill
 	// TODO - Add reference types as per the requirements
 }
 

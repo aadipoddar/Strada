@@ -50,11 +50,15 @@ public partial class SettingsPage
     private string _selectedCashLedgerName = string.Empty;
     private string _gstLedgerId = string.Empty;
     private string _selectedGSTLedgerName = string.Empty;
+    private string _billLedgerId = string.Empty;
+    private string _selectedBillLedgerName = string.Empty;
     private List<LedgerModel> _ledgers = [];
 
     // Default Values
     private string _defaultSelectedVoucherId = string.Empty;
     private string _selectedDefaultVoucherName = string.Empty;
+    private string _billVoucherId = string.Empty;
+    private string _selectedBillVoucherName = string.Empty;
     private List<VoucherModel> _vouchers = [];
 
     // Report Settings
@@ -156,8 +160,14 @@ public partial class SettingsPage
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.GSTLedgerId);
         _gstLedgerId = s?.Value ?? string.Empty;
 
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.BillLedgerId);
+        _billLedgerId = s?.Value ?? string.Empty;
+
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.DefaultSelectedVoucherId);
         _defaultSelectedVoucherId = s?.Value ?? string.Empty;
+
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId);
+        _billVoucherId = s?.Value ?? string.Empty;
 
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.AutoRefreshReportTimer);
         _autoRefreshReportTimer = int.TryParse(s?.Value, out var v6) ? v6 : 5;
@@ -192,8 +202,14 @@ public partial class SettingsPage
         if (!string.IsNullOrWhiteSpace(_gstLedgerId) && int.TryParse(_gstLedgerId, out var gstId))
             _selectedGSTLedgerName = _ledgers.FirstOrDefault(l => l.Id == gstId)?.Name ?? string.Empty;
 
+        if (!string.IsNullOrWhiteSpace(_billLedgerId) && int.TryParse(_billLedgerId, out var billLedgerId))
+            _selectedBillLedgerName = _ledgers.FirstOrDefault(l => l.Id == billLedgerId)?.Name ?? string.Empty;
+
         if (!string.IsNullOrWhiteSpace(_defaultSelectedVoucherId) && int.TryParse(_defaultSelectedVoucherId, out var voucherId))
             _selectedDefaultVoucherName = _vouchers.FirstOrDefault(v => v.Id == voucherId)?.Name ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(_billVoucherId) && int.TryParse(_billVoucherId, out var billVoucherId))
+            _selectedBillVoucherName = _vouchers.FirstOrDefault(v => v.Id == billVoucherId)?.Name ?? string.Empty;
     }
 
     #endregion
@@ -218,10 +234,22 @@ public partial class SettingsPage
             _gstLedgerId = args.ItemData.Id.ToString();
     }
 
+    private void OnBillLedgerChange(ChangeEventArgs<string, LedgerModel> args)
+    {
+        if (args.ItemData is not null)
+            _billLedgerId = args.ItemData.Id.ToString();
+    }
+
     private void OnDefaultVoucherChange(ChangeEventArgs<string, VoucherModel> args)
     {
         if (args.ItemData is not null)
             _defaultSelectedVoucherId = args.ItemData.Id.ToString();
+    }
+
+    private void OnBillVoucherChange(ChangeEventArgs<string, VoucherModel> args)
+    {
+        if (args.ItemData is not null)
+            _billVoucherId = args.ItemData.Id.ToString();
     }
 
     #endregion
@@ -271,7 +299,9 @@ public partial class SettingsPage
             await UpdateSetting(SettingsKeys.PrimaryCompanyLinkingId, _primaryCompanyLinkingId, Desc(SettingsKeys.PrimaryCompanyLinkingId));
             await UpdateSetting(SettingsKeys.CashLedgerId, _cashLedgerId, Desc(SettingsKeys.CashLedgerId));
             await UpdateSetting(SettingsKeys.GSTLedgerId, _gstLedgerId, Desc(SettingsKeys.GSTLedgerId));
+            await UpdateSetting(SettingsKeys.BillLedgerId, _billLedgerId, Desc(SettingsKeys.BillLedgerId));
             await UpdateSetting(SettingsKeys.DefaultSelectedVoucherId, _defaultSelectedVoucherId, Desc(SettingsKeys.DefaultSelectedVoucherId));
+            await UpdateSetting(SettingsKeys.BillVoucherId, _billVoucherId, Desc(SettingsKeys.BillVoucherId));
             await UpdateSetting(SettingsKeys.AutoRefreshReportTimer, _autoRefreshReportTimer.ToString(), Desc(SettingsKeys.AutoRefreshReportTimer));
 
             await _toastNotification.ShowAsync("Saved", "Settings saved successfully.", ToastType.Success);

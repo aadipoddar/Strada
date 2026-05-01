@@ -33,8 +33,11 @@ public static class SettingsKeys
 
 	public static string PrimaryCompanyLinkingId => "PrimaryCompanyLinkingId";
 
+	public static string BillVoucherId => "BillVoucherId";
+
 	public static string CashLedgerId => "CashLedgerId";
 	public static string GSTLedgerId => "GSTLedgerId";
+	public static string BillLedgerId => "BillLedgerId";
 
 	public static string DefaultSelectedVoucherId => "DefaultSelectedVoucherId";
 

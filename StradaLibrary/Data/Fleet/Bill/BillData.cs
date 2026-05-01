@@ -1,13 +1,17 @@
+using StradaLibrary.Data.Accounts.FinancialAccounting;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Common;
 using StradaLibrary.Data.Fleet.Trip;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Fleet.Bill;
 using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
+using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Fleet.Bill;
 using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Operations;
+using Syncfusion.XlsIO;
 
 namespace StradaLibrary.Data.Fleet.Bill;
 
@@ -63,6 +67,19 @@ public static class BillData
 				throw new InvalidOperationException("Failed to delete Bill transaction.");
 
 			await DeleteTripsBillNo(bill, sqlDataAccessTransaction);
+
+			var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
+			var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
+
+			if (existingAccounting is not null && existingAccounting.Id > 0)
+			{
+				existingAccounting.Status = false;
+				existingAccounting.LastModifiedBy = bill.LastModifiedBy;
+				existingAccounting.LastModifiedAt = bill.LastModifiedAt;
+				existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
+
+				await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
+			}
 		}
 		catch
 		{
@@ -224,6 +241,7 @@ public static class BillData
 		bill.Id = await InsertBill(bill, sqlDataAccessTransaction);
 		await SaveLedgerPaymentDetail(bill, ledgerPayments, update, sqlDataAccessTransaction);
 		await SaveTripsBillNo(bill, trips, update, sqlDataAccessTransaction);
+		await SaveAccounting(bill, update, sqlDataAccessTransaction);
 
 		return bill.Id;
 	}
@@ -289,6 +307,85 @@ public static class BillData
 			if (id <= 0)
 				throw new InvalidOperationException("Failed to save Trips.");
 		}
+	}
+
+	private static async Task SaveAccounting(BillModel bill, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		if (update)
+		{
+			var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
+			var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
+			if (existingAccounting is not null && existingAccounting.Id > 0)
+			{
+				existingAccounting.Status = false;
+				existingAccounting.LastModifiedBy = bill.LastModifiedBy;
+				existingAccounting.LastModifiedAt = bill.LastModifiedAt;
+				existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
+
+				await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
+			}
+		}
+
+		var billOverview = await CommonData.LoadTableDataById<BillOverviewModel>(FleetNames.BillOverview, bill.Id, sqlDataAccessTransaction);
+		if (billOverview is null)
+			return;
+
+		if (billOverview.TotalLedgerPaymentAmount == 0)
+			return;
+
+		var ledgerPayments = await CommonData.LoadTableDataByMasterId<BillLedgerPaymentsOverviewModel>(FleetNames.BillLedgerPaymentsOverview, bill.Id, sqlDataAccessTransaction);
+		if (ledgerPayments is null)
+			return;
+
+		var billLedger = await SettingsData.LoadSettingsByKey(SettingsKeys.BillLedgerId, sqlDataAccessTransaction);
+
+		var accountingCart = new List<FinancialAccountingItemCartModel>
+		{
+			new()
+			{
+				ReferenceId = billOverview.Id,
+				ReferenceType = nameof(ReferenceTypes.Bill),
+				ReferenceNo = billOverview.TransactionNo,
+				LedgerId = int.Parse(billLedger.Value),
+				Debit = null,
+				Credit = billOverview.TotalLedgerPaymentAmount,
+				Remarks = $"Bill Account Posting For Bill {billOverview.TransactionNo}",
+			}
+		};
+
+		foreach (var item in ledgerPayments)
+			accountingCart.Add(new()
+			{
+				LedgerId = item.LedgerId,
+				Debit = item.PaymentAmount,
+				Credit = null,
+				Remarks = $"Ledger Payment Account Posting For Bill {billOverview.TransactionNo}",
+			});
+
+		var voucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
+		var accounting = new FinancialAccountingModel
+		{
+			Id = 0,
+			TransactionNo = "",
+			CompanyId = billOverview.CompanyId,
+			VoucherId = int.Parse(voucher.Value),
+			ReferenceId = billOverview.Id,
+			ReferenceNo = billOverview.TransactionNo,
+			TransactionDateTime = billOverview.TransactionDateTime,
+			FinancialYearId = billOverview.FinancialYearId,
+			TotalDebitLedgers = accountingCart.Count(a => a.Debit.HasValue),
+			TotalCreditLedgers = accountingCart.Count(a => a.Credit.HasValue),
+			TotalDebitAmount = accountingCart.Sum(a => a.Debit ?? 0),
+			TotalCreditAmount = accountingCart.Sum(a => a.Credit ?? 0),
+			Remarks = billOverview.Remarks,
+			CreatedBy = billOverview.CreatedBy,
+			CreatedAt = billOverview.CreatedAt,
+			CreatedFromPlatform = billOverview.CreatedFromPlatform,
+			Status = true
+		};
+
+		var accountingDetails = FinancialAccountingData.ConvertCartToDetails(accountingCart, accounting.Id);
+		await FinancialAccountingData.SaveTransaction(accounting, accountingDetails, false, sqlDataAccessTransaction);
 	}
 	#endregion
 }

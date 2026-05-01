@@ -20,18 +20,21 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'DriverCodePrefix'					, N'DR'		, N'Prefix for Driver Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ExpenseTypeCodePrefix'				, N'ET'		, N'Prefix for Expense Type Codes')
 	
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'ACCT'	, N'Prefix for Financial Accounting Transaction Numbers')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'AC'	, N'Prefix for Financial Accounting Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'TripTransactionPrefix'					, N'TR'		, N'Prefix for Trip Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'BillTransactionPrefix'					, N'BL'		, N'Prefix for Bill Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ExpenseTransactionPrefix'				, N'EX'		, N'Prefix for Expense Transaction Numbers')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PrimaryCompanyLinkingId'			, N'1'		, N'Company Id for the Primary Company Account')
 
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'CashLedgerId'				, N'1', N'Cash ledger account for Cash Entries')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'GSTLedgerId'					, N'2', N'GST ledger account for GST Tax Entries')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'BillVoucherId'					, N'2'		, N'Voucher type for Bill transactions')
 
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'DefaultSelectedVoucherId'	, N'1', N'Default selected voucher type in transactions')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'CashLedgerId'					, N'1'		, N'Cash ledger account for Cash Entries')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'GSTLedgerId'						, N'2'		, N'GST ledger account for GST Tax Entries')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'BillLedgerId'					, N'9'		, N'Ledger account for Bill entries')
 
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'AutoRefreshReportTimer'		, N'5', N'Auto refresh interval for reports in minutes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'DefaultSelectedVoucherId'		, N'1', N'Default selected voucher type in transactions')
+
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'AutoRefreshReportTimer'			, N'5', N'Auto refresh interval for reports in minutes')
 
 END
