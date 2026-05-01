@@ -6,7 +6,7 @@
 
 <PageTitle>Expense Details Report - Strada</PageTitle>
 
-<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.Expense, FormFactor, JSRuntime, NavigationManager)" /> 
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.Expense, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" />
@@ -106,25 +106,25 @@ else
 							<!-- Company -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-												 Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="All Companies"
-												 Label="Company" Required="true"
-												 ValueChange="OnCompanyChanged"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+													 Value="_selectedCompany"
+													 DataSource="@_companies"
+													 Placeholder="All Companies"
+													 Label="Company" Required="true"
+													 ValueChange="OnCompanyChanged"
+													 FieldValue="@nameof(CompanyModel.Name)"
+													 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Vehicle -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
-												 Value="_selectedVehicle"
-												 DataSource="@_vehicles"
-												 Placeholder="All Vehicles"
-												 Label="Vehicle" Required="true"
-												 ValueChange="OnVehicleChanged"
-												 FieldValue="@nameof(VehicleModel.Code)"
-												 AddNewRoute="@PageRouteNames.VehicleMaster" />
+													 Value="_selectedVehicle"
+													 DataSource="@_vehicles"
+													 Placeholder="All Vehicles"
+													 Label="Vehicle" Required="true"
+													 ValueChange="OnVehicleChanged"
+													 FieldValue="@nameof(VehicleModel.Code)"
+													 AddNewRoute="@PageRouteNames.VehicleMaster" />
 							</div>
 						</div>
 					</div>
@@ -223,6 +223,7 @@ else
 						<GridColumns>
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="170" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseTypeCode)" HeaderText="Expense Type Cdode" Width="130" Visible="_showAllColumns" />
+
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="130" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseAmount)" HeaderText="Expense Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>
@@ -236,12 +237,19 @@ else
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.IdentificationNo)" HeaderText="Identification No" Width="170" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseRemarks)" HeaderText="Expense Remarks" Width="170" Visible="_showAllColumns" />
 
-							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
-							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns || _selectedCompany is null || _selectedCompany.Id <= 0)" />
+							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns && (_selectedCompany is null || _selectedCompany.Id <= 0))" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right" Format="N2" />
-							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
+							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = (context as ExpenseDetailsOverviewModel);
+										<span class="grid-total">@item.TotalExpense.ToString("N2")</span>
+									}
+								</Template>
+							</GridColumn>
 
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />

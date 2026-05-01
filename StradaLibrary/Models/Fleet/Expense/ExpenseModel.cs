@@ -25,6 +25,7 @@ public class ExpenseOverviewModel
 	public string TransactionNo { get; set; }
 	public int CompanyId { get; set; }
 	public string CompanyName { get; set; }
+
 	public DateTime TransactionDateTime { get; set; }
 	public int FinancialYearId { get; set; }
 	public string FinancialYear { get; set; }

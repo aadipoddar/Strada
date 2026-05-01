@@ -29,8 +29,10 @@ public class ExpenseDetailsOverviewModel
 	public int ExpenseTypeId { get; set; }
 	public string ExpenseTypeName { get; set; }
 	public string ExpenseTypeCode { get; set; }
+
 	public int? LedgerId { get; set; }
 	public string? LedgerName { get; set; }
+
 	public decimal ExpenseAmount { get; set; }
 	public string? IdentificationNo { get; set; }
 	public string? ExpenseRemarks { get; set; }
@@ -39,6 +41,7 @@ public class ExpenseDetailsOverviewModel
 	public string TransactionNo { get; set; }
 	public int CompanyId { get; set; }
 	public string CompanyName { get; set; }
+
 	public DateTime TransactionDateTime { get; set; }
 	public int FinancialYearId { get; set; }
 	public string FinancialYear { get; set; }

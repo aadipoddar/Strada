@@ -42,12 +42,12 @@ public static class ExpenseReportExport
 		{
 			columnOrder =
 			[
-				nameof(ExpenseOverviewModel.VehicleCode),
+				nameof(ExpenseOverviewModel.TransactionNo),
 				nameof(ExpenseOverviewModel.CompanyName),
 				nameof(ExpenseOverviewModel.TransactionDateTime),
 				nameof(ExpenseOverviewModel.FinancialYear),
+				nameof(ExpenseOverviewModel.VehicleCode),
 				nameof(ExpenseOverviewModel.TotalExpense),
-				nameof(ExpenseOverviewModel.TransactionNo),
 				nameof(ExpenseOverviewModel.Remarks),
 				nameof(ExpenseOverviewModel.CreatedByName),
 				nameof(ExpenseOverviewModel.CreatedAt),
@@ -65,9 +65,8 @@ public static class ExpenseReportExport
 		{
 			columnOrder =
 			[
-				nameof(ExpenseOverviewModel.VehicleCode),
-				nameof(ExpenseOverviewModel.CompanyName),
 				nameof(ExpenseOverviewModel.TransactionDateTime),
+				nameof(ExpenseOverviewModel.VehicleCode),
 				nameof(ExpenseOverviewModel.TotalExpense),
 				nameof(ExpenseOverviewModel.Status)
 			];
@@ -176,10 +175,10 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.ExpenseAmount),
 				nameof(ExpenseDetailsOverviewModel.IdentificationNo),
 				nameof(ExpenseDetailsOverviewModel.ExpenseRemarks),
-				nameof(ExpenseDetailsOverviewModel.VehicleCode),
 				nameof(ExpenseDetailsOverviewModel.CompanyName),
 				nameof(ExpenseDetailsOverviewModel.TransactionDateTime),
 				nameof(ExpenseDetailsOverviewModel.FinancialYear),
+				nameof(ExpenseDetailsOverviewModel.VehicleCode),
 				nameof(ExpenseDetailsOverviewModel.TotalExpense),
 				nameof(ExpenseDetailsOverviewModel.TransactionNo),
 				nameof(ExpenseDetailsOverviewModel.Remarks),
@@ -199,9 +198,8 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.LedgerName),
 				nameof(ExpenseDetailsOverviewModel.ExpenseAmount),
 				nameof(ExpenseDetailsOverviewModel.IdentificationNo),
-				nameof(ExpenseDetailsOverviewModel.VehicleCode),
-				nameof(ExpenseDetailsOverviewModel.CompanyName),
 				nameof(ExpenseDetailsOverviewModel.TransactionDateTime),
+				nameof(ExpenseDetailsOverviewModel.VehicleCode),
 				nameof(ExpenseDetailsOverviewModel.TotalExpense)
 			];
 
