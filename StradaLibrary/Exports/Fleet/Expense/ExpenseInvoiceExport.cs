@@ -3,6 +3,7 @@ using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Expense;
+using StradaLibrary.Models.Fleet.Vehicle;
 
 namespace StradaLibrary.Exports.Fleet.Expense;
 
@@ -13,7 +14,7 @@ public static class ExpenseInvoiceExport
 		var transaction = await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, transactionId) ??
 			throw new InvalidOperationException("Transaction not found.");
 
-		var expenses = await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, transaction.Id);
+		var expenses = await CommonData.LoadTableDataByMasterId<ExpenseDetailsModel>(FleetNames.ExpenseDetails, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
 		LedgerModel ledger = new()
@@ -21,15 +22,17 @@ public static class ExpenseInvoiceExport
 			Name = $"Vehicle: {transaction.VehicleCode}"
 		};
 
+		var expenseTypes = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType);
+		var ledgers = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger);
 		var lineItems = expenses.Select(detail =>
 		{
 			return new ExpenseDetailsCartModel
 			{
 				ExpenseTypeId = detail.ExpenseTypeId,
-				ExpenseTypeName = detail.ExpenseTypeName,
+				ExpenseTypeName = expenseTypes.FirstOrDefault(p => p.Id == detail.ExpenseTypeId).Name,
 				LedgerId = detail.LedgerId,
-				LedgerName = detail.LedgerName,
-				Amount = detail.ExpenseAmount,
+				LedgerName = ledgers.FirstOrDefault(p => p.Id == detail.LedgerId)?.Name,
+				Amount = detail.Amount,
 				IdentificationNo = detail.IdentificationNo,
 				Remarks = detail.Remarks
 			};

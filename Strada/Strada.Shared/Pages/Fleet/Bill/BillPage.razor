@@ -27,7 +27,7 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="@(_bill.Id > 0 ? "Edit Bill" : $"Modify Bill {_bill.TransactionNo}")">
+		<Header Title="@(_bill.Id > 0 ? $"Edit Bill {_bill.TransactionNo}" : "Create Bill")">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
