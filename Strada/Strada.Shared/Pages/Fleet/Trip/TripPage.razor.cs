@@ -15,6 +15,8 @@ using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
+using System.Text.Json;
 
 namespace Strada.Shared.Pages.Fleet.Trip;
 
@@ -27,32 +29,39 @@ public partial class TripPage
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 
-	private CompanyModel _selectedCompany = new();
-	private FinancialYearModel _selectedFinancialYear = new();
-	private OMCModel _selectedOMC = new();
 	private VehicleModel _selectedVehicle = new();
+	private CompanyModel _selectedCompany = new();
+	private OMCModel _selectedOMC = new();
+	private FinancialYearModel _selectedFinancialYear = new();
 	private DriverOverviewModel _selectedDriver = new();
 	private RouteOverviewModel _selectedRoute = new();
 	private ExpenseTypeModel _selectedExpenseType = null;
 	private OMCCardModel _selectedOMCCard = null;
+	private LedgerModel _selectedLedger = null;
 	private TripExpensesCartModel _selectedExpensesCart = new();
-	private TripCardPaymentsCartModel _selectedPaymentCart = new();
+	private TripCardPaymentsCartModel _selectedCardPaymentCart = new();
+	private TripLedgerPaymentsCartModel _selectedLedgerPaymentCart = new();
 	private TripModel _trip = new();
 
+	private List<VehicleModel> _vehicles = [];
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
-	private List<OMCCardModel> _omcCards = [];
-	private List<VehicleModel> _vehicles = [];
 	private List<DriverOverviewModel> _drivers = [];
 	private List<RouteOverviewModel> _routes = [];
 	private List<ExpenseTypeModel> _expenseTypes = [];
+	private List<OMCCardModel> _omcCards = [];
+	private List<LedgerModel> _ledgers = [];
 	private List<TripExpensesCartModel> _expensesCart = [];
-	private List<TripCardPaymentsCartModel> _paymentsCart = [];
+	private List<TripCardPaymentsCartModel> _cardPaymentsCart = [];
+	private List<TripLedgerPaymentsCartModel> _ledgerPaymentsCart = [];
 
 	private AutoCompleteWithAdd<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private AutoCompleteWithAdd<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
+	private AutoCompleteWithAdd<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<TripExpensesCartModel> _sfExpensesCartGrid;
-	private SfGrid<TripCardPaymentsCartModel> _sfPaymentsCartGrid;
+	private SfGrid<TripCardPaymentsCartModel> _sfCardPaymentsCartGrid;
+	private SfGrid<TripLedgerPaymentsCartModel> _sfLedgerPaymentsCartGrid;
+	private AutoCompleteWithAdd<VehicleModel, VehicleModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =
@@ -61,7 +70,13 @@ public partial class TripPage
 		new() { Text = "Delete (Del)", Id = "DeleteCart", IconCss = "e-icons e-delete" }
 	];
 
-	private readonly List<ContextMenuItemModel> _paymentsCartGridContextMenuItems =
+	private readonly List<ContextMenuItemModel> _cardPaymentsCartGridContextMenuItems =
+	[
+		new() { Text = "Edit", Id = "EditCart", IconCss = "e-icons e-edit" },
+		new() { Text = "Delete", Id = "DeleteCart", IconCss = "e-icons e-delete" }
+	];
+
+	private readonly List<ContextMenuItemModel> _ledgerPaymentsCartGridContextMenuItems =
 	[
 		new() { Text = "Edit", Id = "EditCart", IconCss = "e-icons e-edit" },
 		new() { Text = "Delete", Id = "DeleteCart", IconCss = "e-icons e-delete" }
@@ -90,38 +105,41 @@ public partial class TripPage
 		await ResolveTransaction();
 		await LoadSelections();
 		await ResolveExpensesCart();
-		await ResolvePaymentsCart();
+		await ResolveCardPaymentsCart();
+		await ResolveLedgerPaymentsCart();
 
 		_isLoading = false;
 		StateHasChanged();
 
 		await SaveTransactionFile();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
 	{
+		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
-		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
-		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_drivers = await DriverData.LoadDriverOverview();
 		_routes = await StradaLibrary.Data.Fleet.Route.RouteData.LoadRouteOverview();
 		_expenseTypes = await CommonData.LoadTableDataByStatus<ExpenseTypeModel>(FleetNames.ExpenseType);
+		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
+		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 
-		_companies = [.. _companies.OrderBy(s => s.Name)];
-		var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
-		_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
-
-		_omcs = [.. _omcs.OrderBy(s => s.Name)];
-		_omcCards = [.. _omcCards.OrderBy(s => s.CardNumber)];
-		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
+		_companies = [.. _companies.OrderBy(x => x.Name)];
+		_omcs = [.. _omcs.OrderBy(x => x.Name)];
 		_drivers = [.. _drivers.OrderBy(s => s.Name)];
 		_routes = [.. _routes.OrderBy(s => s.Code)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
+		_omcCards = [.. _omcCards.OrderBy(s => s.CardNumber)];
+		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
 
-		_selectedOMC = _omcs.FirstOrDefault();
 		_selectedVehicle = _vehicles.FirstOrDefault();
+		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _selectedVehicle.CompanyId);
+		_selectedOMC = _omcs.FirstOrDefault(c => c.Id == _selectedVehicle.OMCId) ?? _omcs.FirstOrDefault();
 		_selectedDriver = _drivers.FirstOrDefault();
 		_selectedRoute = _routes.FirstOrDefault();
 	}
@@ -168,7 +186,7 @@ public partial class TripPage
 
 		try
 		{
-			_trip = System.Text.Json.JsonSerializer.Deserialize<TripModel>(await DataStorageService.LocalGetAsync(StorageFileNames.TripDataFileName));
+			_trip = JsonSerializer.Deserialize<TripModel>(await DataStorageService.LocalGetAsync(StorageFileNames.TripDataFileName));
 			if (_trip is null)
 				return false;
 
@@ -215,20 +233,20 @@ public partial class TripPage
 
 	private async Task LoadSelections()
 	{
+		if (_trip.VehicleId > 0)
+			_selectedVehicle = _vehicles.FirstOrDefault(s => s.Id == _trip.VehicleId) ?? _vehicles.FirstOrDefault();
+		else
+			_selectedVehicle = _vehicles.FirstOrDefault();
+
 		if (_trip.CompanyId > 0)
 			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _trip.CompanyId) ?? _companies.FirstOrDefault();
 		else
-		{
-			var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
-			_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
-		}
-		_trip.CompanyId = _selectedCompany.Id;
+			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId) ?? _companies.FirstOrDefault();
 
 		if (_trip.OMCId > 0)
 			_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _trip.OMCId) ?? _omcs.FirstOrDefault();
 		else
-			_selectedOMC = _omcs.FirstOrDefault();
-		_trip.OMCId = _selectedOMC.Id;
+			_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _selectedVehicle.OMCId) ?? _omcs.FirstOrDefault();
 
 		if (_trip.DriverId > 0)
 			_selectedDriver = _drivers.FirstOrDefault(s => s.Id == _trip.DriverId) ?? _drivers.FirstOrDefault();
@@ -240,23 +258,12 @@ public partial class TripPage
 		else
 			_selectedRoute = _routes.FirstOrDefault();
 
-		if (_trip.FinancialYearId > 0)
-			_selectedFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, _trip.FinancialYearId);
-
-		if (_selectedFinancialYear is null || _selectedFinancialYear.Id <= 0)
-			_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_trip.TransactionDateTime);
-
-		if (_selectedFinancialYear is not null)
-			_trip.FinancialYearId = _selectedFinancialYear.Id;
-
-		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
-		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
-
-		if (_trip.VehicleId > 0)
-			_selectedVehicle = _vehicles.FirstOrDefault(s => s.Id == _trip.VehicleId) ?? _vehicles.FirstOrDefault();
-		else
-			_selectedVehicle = _vehicles.FirstOrDefault();
+		if (_trip.Id == 0)
+		{
+			var lastTrip = await CommonData.LoadLastTableData<TripModel>(FleetNames.Trip);
+			if (lastTrip is not null)
+				_trip.TransactionDateTime = lastTrip.TransactionDateTime;
+		}
 	}
 
 	private async Task ResolveExpensesCart()
@@ -269,7 +276,7 @@ public partial class TripPage
 				return;
 
 			if (await DataStorageService.LocalExists(StorageFileNames.TripExpensesCartDataFileName))
-				_expensesCart = System.Text.Json.JsonSerializer.Deserialize<List<TripExpensesCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.TripExpensesCartDataFileName));
+				_expensesCart = JsonSerializer.Deserialize<List<TripExpensesCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.TripExpensesCartDataFileName));
 		}
 		catch (Exception ex)
 		{
@@ -306,17 +313,17 @@ public partial class TripPage
 		return true;
 	}
 
-	private async Task ResolvePaymentsCart()
+	private async Task ResolveCardPaymentsCart()
 	{
 		try
 		{
-			_paymentsCart.Clear();
+			_cardPaymentsCart.Clear();
 
-			if (await LoadExistingPaymentsCart())
+			if (await LoadExistingCardPaymentsCart())
 				return;
 
-			if (await DataStorageService.LocalExists(StorageFileNames.TripPaymentsCartDataFileName))
-				_paymentsCart = System.Text.Json.JsonSerializer.Deserialize<List<TripCardPaymentsCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.TripPaymentsCartDataFileName));
+			if (await DataStorageService.LocalExists(StorageFileNames.TripCardPaymentsCartDataFileName))
+				_cardPaymentsCart = JsonSerializer.Deserialize<List<TripCardPaymentsCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.TripCardPaymentsCartDataFileName));
 		}
 		catch (Exception ex)
 		{
@@ -325,7 +332,7 @@ public partial class TripPage
 		}
 	}
 
-	private async Task<bool> LoadExistingPaymentsCart()
+	private async Task<bool> LoadExistingCardPaymentsCart()
 	{
 		if (_trip.Id <= 0)
 			return false;
@@ -341,7 +348,7 @@ public partial class TripPage
 				continue;
 			}
 
-			_paymentsCart.Add(new()
+			_cardPaymentsCart.Add(new()
 			{
 				OMCCardId = item.OMCCardId,
 				OMCCardNumber = _omcCards.First(s => s.Id == item.OMCCardId).CardNumber,
@@ -352,22 +359,74 @@ public partial class TripPage
 
 		return true;
 	}
+
+	private async Task ResolveLedgerPaymentsCart()
+	{
+		try
+		{
+			_ledgerPaymentsCart.Clear();
+
+			if (await LoadExistingLedgerPaymentsCart())
+				return;
+
+			if (await DataStorageService.LocalExists(StorageFileNames.TripLedgerPaymentsCartDataFileName))
+				_ledgerPaymentsCart = JsonSerializer.Deserialize<List<TripLedgerPaymentsCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.TripLedgerPaymentsCartDataFileName));
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("An Error Occurred While Loading Payments Cart Data", ex.Message, ToastType.Error);
+			await ResetPage();
+		}
+	}
+
+	private async Task<bool> LoadExistingLedgerPaymentsCart()
+	{
+		if (_trip.Id <= 0)
+			return false;
+
+		var existingCart = await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsModel>(FleetNames.TripLedgerPayments, _trip.Id);
+
+		foreach (var item in existingCart)
+		{
+			if (_omcCards.FirstOrDefault(s => s.Id == item.LedgerId) is null)
+			{
+				var ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, item.LedgerId);
+				await _toastNotification.ShowAsync("Ledger Not Found", $"The legder {ledger?.Name} (ID: {item.LedgerId}) in the existing transaction cart was not found in the available cards list. It may have been deleted or is inaccessible.", ToastType.Error);
+				continue;
+			}
+
+			_ledgerPaymentsCart.Add(new()
+			{
+				LedgerId = item.LedgerId,
+				LedgerName = _ledgers.First(s => s.Id == item.LedgerId).Name,
+				Amount = item.Amount,
+				Remarks = item.Remarks
+			});
+		}
+
+		return true;
+	}
 	#endregion
 
 	#region Change Events
+	private async Task OnVehicleChanged(ChangeEventArgs<VehicleModel, VehicleModel> args)
+	{
+		if (args.Value is null || args.Value.Id == 0)
+			return;
+
+		_selectedVehicle = args.Value;
+		_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId);
+		_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _selectedVehicle.OMCId) ?? _omcs.FirstOrDefault();
+
+		await SaveTransactionFile();
+	}
+
 	private async Task OnCompanyChanged(ChangeEventArgs<CompanyModel, CompanyModel> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;
 
 		_selectedCompany = args.Value;
-		_trip.CompanyId = _selectedCompany.Id;
-
-		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
-		_selectedVehicle = _vehicles.FirstOrDefault();
-		_trip.VehicleId = _selectedVehicle.Id;
-
 		await SaveTransactionFile();
 	}
 
@@ -377,19 +436,6 @@ public partial class TripPage
 			return;
 
 		_selectedOMC = args.Value;
-		_trip.OMCId = _selectedOMC.Id;
-
-		await SaveTransactionFile();
-	}
-
-	private async Task OnVehicleChanged(ChangeEventArgs<VehicleModel, VehicleModel> args)
-	{
-		if (args.Value is null || args.Value.Id == 0)
-			return;
-
-		_selectedVehicle = args.Value;
-		_trip.VehicleId = _selectedVehicle.Id;
-
 		await SaveTransactionFile();
 	}
 
@@ -399,8 +445,6 @@ public partial class TripPage
 			return;
 
 		_selectedDriver = args.Value;
-		_trip.DriverId = _selectedDriver.Id;
-
 		await SaveTransactionFile();
 	}
 
@@ -410,8 +454,6 @@ public partial class TripPage
 			return;
 
 		_selectedRoute = args.Value;
-		_trip.RouteId = _selectedRoute.Id;
-
 		await SaveTransactionFile();
 	}
 	#endregion
@@ -500,8 +542,8 @@ public partial class TripPage
 	}
 	#endregion
 
-	#region Payments Cart
-	private async Task OnPaymentsTypeChanged(ChangeEventArgs<OMCCardModel?, OMCCardModel?> args)
+	#region Card Payments Cart
+	private async Task OnCardPaymentsTypeChanged(ChangeEventArgs<OMCCardModel?, OMCCardModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;
@@ -509,7 +551,7 @@ public partial class TripPage
 		_selectedOMCCard = args.Value;
 
 		if (_selectedOMCCard is null)
-			_selectedPaymentCart = new()
+			_selectedCardPaymentCart = new()
 			{
 				OMCCardId = 0,
 				OMCCardNumber = "",
@@ -518,56 +560,56 @@ public partial class TripPage
 
 		else
 		{
-			_selectedPaymentCart.OMCCardId = _selectedOMCCard.Id;
-			_selectedPaymentCart.OMCCardNumber = _selectedOMCCard.CardNumber;
-			_selectedPaymentCart.Amount = _trip.TotalExpense - _paymentsCart.Sum(s => s.Amount);
+			_selectedCardPaymentCart.OMCCardId = _selectedOMCCard.Id;
+			_selectedCardPaymentCart.OMCCardNumber = _selectedOMCCard.CardNumber;
+			_selectedCardPaymentCart.Amount = _trip.TotalExpense - _cardPaymentsCart.Sum(s => s.Amount) - _ledgerPaymentsCart.Sum(s => s.Amount);
 		}
 	}
 
-	private async Task AddPaymentsToCart()
+	private async Task AddCardPaymentsToCart()
 	{
-		if (_selectedOMCCard is null || _selectedOMCCard.Id <= 0 || _selectedPaymentCart.Amount <= 0)
+		if (_selectedOMCCard is null || _selectedOMCCard.Id <= 0 || _selectedCardPaymentCart.Amount <= 0)
 		{
 			await _toastNotification.ShowAsync("Invalid Item Details", "Please ensure all item details are correctly filled before adding to the cart.", ToastType.Error);
 			return;
 		}
 
-		if (_paymentsCart.Sum(s => s.Amount) + _selectedPaymentCart.Amount > _trip.TotalExpense)
+		if (_cardPaymentsCart.Sum(s => s.Amount) + _ledgerPaymentsCart.Sum(s => s.Amount) + _selectedCardPaymentCart.Amount > _trip.TotalExpense)
 		{
 			await _toastNotification.ShowAsync("Payment Amount Exceeds Total Expense", "The total payment amount in the cart cannot exceed the total expense of the trip. Please adjust the amount accordingly.", ToastType.Error);
 			return;
 		}
 
-		var existingItem = _paymentsCart.FirstOrDefault(s => s.OMCCardId == _selectedOMCCard.Id);
+		var existingItem = _cardPaymentsCart.FirstOrDefault(s => s.OMCCardId == _selectedOMCCard.Id);
 		if (existingItem is not null)
-			existingItem.Amount += _selectedPaymentCart.Amount;
+			existingItem.Amount += _selectedCardPaymentCart.Amount;
 		else
-			_paymentsCart.Add(new()
+			_cardPaymentsCart.Add(new()
 			{
 				OMCCardId = _selectedOMCCard.Id,
 				OMCCardNumber = _selectedOMCCard.CardNumber,
-				Amount = _selectedPaymentCart.Amount,
-				Remarks = _selectedPaymentCart.Remarks
+				Amount = _selectedCardPaymentCart.Amount,
+				Remarks = _selectedCardPaymentCart.Remarks
 			});
 
 		_selectedOMCCard = null;
-		_selectedPaymentCart = new();
+		_selectedCardPaymentCart = new();
 		await _sfOMCCardAutoComplete.FocusAsync();
 		await SaveTransactionFile();
 	}
 
-	private async Task EditSelectedPaymentsCartItem()
+	private async Task EditSelectedCardPaymentsCartItem()
 	{
-		if (_sfPaymentsCartGrid is null || _sfPaymentsCartGrid.SelectedRecords is null || _sfPaymentsCartGrid.SelectedRecords.Count == 0)
+		if (_sfCardPaymentsCartGrid is null || _sfCardPaymentsCartGrid.SelectedRecords is null || _sfCardPaymentsCartGrid.SelectedRecords.Count == 0)
 			return;
 
-		var selectedCartItem = _sfPaymentsCartGrid.SelectedRecords.First();
+		var selectedCartItem = _sfCardPaymentsCartGrid.SelectedRecords.First();
 
 		_selectedOMCCard = _omcCards.FirstOrDefault(s => s.Id == selectedCartItem.OMCCardId);
 		if (_selectedOMCCard is null)
 			return;
 
-		_selectedPaymentCart = new()
+		_selectedCardPaymentCart = new()
 		{
 			OMCCardId = selectedCartItem.OMCCardId,
 			OMCCardNumber = selectedCartItem.OMCCardNumber,
@@ -576,16 +618,106 @@ public partial class TripPage
 		};
 
 		await _sfOMCCardAutoComplete.FocusAsync();
-		await RemoveSelectedPaymentsCartItem();
+		await RemoveSelectedCardPaymentsCartItem();
 	}
 
-	private async Task RemoveSelectedPaymentsCartItem()
+	private async Task RemoveSelectedCardPaymentsCartItem()
 	{
-		if (_sfPaymentsCartGrid is null || _sfPaymentsCartGrid.SelectedRecords is null || _sfPaymentsCartGrid.SelectedRecords.Count == 0)
+		if (_sfCardPaymentsCartGrid is null || _sfCardPaymentsCartGrid.SelectedRecords is null || _sfCardPaymentsCartGrid.SelectedRecords.Count == 0)
 			return;
 
-		var selectedCartItem = _sfPaymentsCartGrid.SelectedRecords.First();
-		_paymentsCart.Remove(selectedCartItem);
+		var selectedCartItem = _sfCardPaymentsCartGrid.SelectedRecords.First();
+		_cardPaymentsCart.Remove(selectedCartItem);
+		await SaveTransactionFile();
+	}
+	#endregion
+
+	#region Ledger Payments Cart
+	private async Task OnLedgerPaymentsTypeChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
+	{
+		if (args.Value is null || args.Value.Id == 0)
+			return;
+
+		_selectedLedger = args.Value;
+
+		if (_selectedLedger is null)
+			_selectedLedgerPaymentCart = new()
+			{
+				LedgerId = 0,
+				LedgerName = "",
+				Amount = 0
+			};
+
+		else
+		{
+			_selectedLedgerPaymentCart.LedgerId = _selectedLedger.Id;
+			_selectedLedgerPaymentCart.LedgerName = _selectedLedger.Name;
+			_selectedLedgerPaymentCart.Amount = _trip.TotalExpense - _cardPaymentsCart.Sum(s => s.Amount) - _ledgerPaymentsCart.Sum(s => s.Amount);
+		}
+	}
+
+	private async Task AddLedgerPaymentsToCart()
+	{
+		if (_selectedLedger is null || _selectedLedger.Id <= 0 || _selectedLedgerPaymentCart.Amount <= 0)
+		{
+			await _toastNotification.ShowAsync("Invalid Item Details", "Please ensure all item details are correctly filled before adding to the cart.", ToastType.Error);
+			return;
+		}
+
+		if (_cardPaymentsCart.Sum(s => s.Amount) + _ledgerPaymentsCart.Sum(s => s.Amount) + _selectedLedgerPaymentCart.Amount > _trip.TotalExpense)
+		{
+			await _toastNotification.ShowAsync("Payment Amount Exceeds Total Expense", "The total payment amount in the cart cannot exceed the total expense of the trip. Please adjust the amount accordingly.", ToastType.Error);
+			return;
+		}
+
+		var existingItem = _ledgerPaymentsCart.FirstOrDefault(s => s.LedgerId == _selectedLedger.Id);
+		if (existingItem is not null)
+			existingItem.Amount += _selectedLedgerPaymentCart.Amount;
+		else
+			_ledgerPaymentsCart.Add(new()
+			{
+				LedgerId = _selectedLedger.Id,
+				LedgerName = _selectedLedger.Name,
+				Amount = _selectedLedgerPaymentCart.Amount,
+				Remarks = _selectedLedgerPaymentCart.Remarks
+			});
+
+		_selectedLedger = null;
+		_selectedLedgerPaymentCart = new();
+		await _sfLedgerAutoComplete.FocusAsync();
+		await SaveTransactionFile();
+	}
+
+	private async Task EditSelectedLedgerPaymentsCartItem()
+	{
+		if (_sfLedgerPaymentsCartGrid is null || _sfLedgerPaymentsCartGrid.SelectedRecords is null || _sfLedgerPaymentsCartGrid.SelectedRecords.Count == 0)
+			return;
+
+		var selectedCartItem = _sfLedgerPaymentsCartGrid.SelectedRecords.First();
+
+		_selectedLedger = _ledgers.FirstOrDefault(s => s.Id == selectedCartItem.LedgerId);
+		if (_selectedLedger is null)
+			return;
+
+		_selectedLedgerPaymentCart = new()
+		{
+			LedgerId = selectedCartItem.LedgerId,
+			LedgerName = selectedCartItem.LedgerName,
+			Amount = selectedCartItem.Amount,
+			Remarks = selectedCartItem.Remarks
+		};
+
+		await _sfLedgerAutoComplete.FocusAsync();
+		await RemoveSelectedLedgerPaymentsCartItem();
+	}
+
+	private async Task RemoveSelectedLedgerPaymentsCartItem()
+	{
+		if (_sfLedgerPaymentsCartGrid is null || _sfLedgerPaymentsCartGrid.SelectedRecords is null || _sfLedgerPaymentsCartGrid.SelectedRecords.Count == 0)
+			return;
+
+		var selectedCartItem = _sfLedgerPaymentsCartGrid.SelectedRecords.First();
+		_ledgerPaymentsCart.Remove(selectedCartItem);
 		await SaveTransactionFile();
 	}
 	#endregion
@@ -594,28 +726,16 @@ public partial class TripPage
 	private async Task UpdateFinancialDetails()
 	{
 		foreach (var item in _expensesCart.ToList())
-		{
 			if (item.Amount <= 0)
 				_expensesCart.Remove(item);
 
-			item.Remarks = item.Remarks?.Trim();
-			if (string.IsNullOrWhiteSpace(item.Remarks))
-				item.Remarks = null;
-		}
-
-		foreach (var item in _paymentsCart.ToList())
-		{
+		foreach (var item in _cardPaymentsCart.ToList())
 			if (item.Amount <= 0)
-				_paymentsCart.Remove(item);
+				_cardPaymentsCart.Remove(item);
 
-			item.Remarks = item.Remarks?.Trim();
-			if (string.IsNullOrWhiteSpace(item.Remarks))
-				item.Remarks = null;
-		}
-
-		_trip.Remarks = _trip.Remarks?.Trim();
-		if (string.IsNullOrWhiteSpace(_trip.Remarks))
-			_trip.Remarks = null;
+		foreach (var item in _ledgerPaymentsCart.ToList())
+			if (item.Amount <= 0)
+				_ledgerPaymentsCart.Remove(item);
 
 		_trip.CompanyId = _selectedCompany.Id;
 		_trip.OMCId = _selectedOMC.Id;
@@ -623,21 +743,21 @@ public partial class TripPage
 		_trip.DriverId = _selectedDriver.Id;
 		_trip.RouteId = _selectedRoute.Id;
 		_trip.TotalExpense = _expensesCart.Sum(s => s.Amount);
+		_trip.TotalCardPaymentAmount = _cardPaymentsCart.Sum(s => s.Amount);
+		_trip.TotalLedgerPaymentAmount = _ledgerPaymentsCart.Sum(s => s.Amount);
 
-		if (_paymentsCart.Sum(s => s.Amount) > _trip.TotalExpense)
-			_paymentsCart.Clear();
+		if (_trip.TotalCardPaymentAmount + _trip.TotalLedgerPaymentAmount > _trip.TotalExpense)
+		{
+			_cardPaymentsCart.Clear();
+			_ledgerPaymentsCart.Clear();
+		}
 
 		#region Financial Year
 		_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_trip.TransactionDateTime);
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_trip.FinancialYearId = _selectedFinancialYear.Id;
 		else
-		{
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-			_trip.TransactionDateTime = await CommonData.LoadCurrentDateTime();
-			_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_trip.TransactionDateTime);
-			_trip.FinancialYearId = _selectedFinancialYear.Id;
-		}
 		#endregion
 
 		if (Id is null)
@@ -670,9 +790,10 @@ public partial class TripPage
 				return;
 			}
 
-			await DataStorageService.LocalSaveAsync(StorageFileNames.TripDataFileName, System.Text.Json.JsonSerializer.Serialize(_trip));
-			await DataStorageService.LocalSaveAsync(StorageFileNames.TripExpensesCartDataFileName, System.Text.Json.JsonSerializer.Serialize(_expensesCart));
-			await DataStorageService.LocalSaveAsync(StorageFileNames.TripPaymentsCartDataFileName, System.Text.Json.JsonSerializer.Serialize(_paymentsCart));
+			await DataStorageService.LocalSaveAsync(StorageFileNames.TripDataFileName, JsonSerializer.Serialize(_trip));
+			await DataStorageService.LocalSaveAsync(StorageFileNames.TripExpensesCartDataFileName, JsonSerializer.Serialize(_expensesCart));
+			await DataStorageService.LocalSaveAsync(StorageFileNames.TripCardPaymentsCartDataFileName, JsonSerializer.Serialize(_cardPaymentsCart));
+			await DataStorageService.LocalSaveAsync(StorageFileNames.TripLedgerPaymentsCartDataFileName, JsonSerializer.Serialize(_ledgerPaymentsCart));
 		}
 		catch (Exception ex)
 		{
@@ -683,8 +804,11 @@ public partial class TripPage
 			if (_sfExpensesCartGrid is not null)
 				await _sfExpensesCartGrid.Refresh();
 
-			if (_sfPaymentsCartGrid is not null)
-				await _sfPaymentsCartGrid.Refresh();
+			if (_sfCardPaymentsCartGrid is not null)
+				await _sfCardPaymentsCartGrid.Refresh();
+
+			if (_sfLedgerPaymentsCartGrid is not null)
+				await _sfLedgerPaymentsCartGrid.Refresh();
 
 			_isProcessing = false;
 			StateHasChanged();
@@ -704,8 +828,9 @@ public partial class TripPage
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
 			var expenses = TripData.ConvertExpensesCartToDetails(_expensesCart, _trip.Id);
-			var payments = TripData.ConvertPaymentCartToDetails(_paymentsCart, _trip.Id);
-			_trip.Id = await TripData.SaveTransaction(_trip, expenses, payments);
+			var cardPayments = TripData.ConvertCardPaymentCartToDetails(_cardPaymentsCart, _trip.Id);
+			var ledgerPayments = TripData.ConvertLedgerPaymentCartToDetails(_ledgerPaymentsCart, _trip.Id);
+			_trip.Id = await TripData.SaveTransaction(_trip, expenses, cardPayments, ledgerPayments);
 
 			if (savePDF)
 			{
@@ -845,15 +970,28 @@ public partial class TripPage
 		}
 	}
 
-	private async Task OnPaymentsCartGridContextMenuItemClicked(ContextMenuClickEventArgs<TripCardPaymentsCartModel> args)
+	private async Task OnCardPaymentsCartGridContextMenuItemClicked(ContextMenuClickEventArgs<TripCardPaymentsCartModel> args)
 	{
 		switch (args.Item.Id)
 		{
 			case "EditCart":
-				await EditSelectedPaymentsCartItem();
+				await EditSelectedCardPaymentsCartItem();
 				break;
 			case "DeleteCart":
-				await RemoveSelectedPaymentsCartItem();
+				await RemoveSelectedCardPaymentsCartItem();
+				break;
+		}
+	}
+
+	private async Task OnLedgerPaymentsCartGridContextMenuItemClicked(ContextMenuClickEventArgs<TripLedgerPaymentsCartModel> args)
+	{
+		switch (args.Item.Id)
+		{
+			case "EditCart":
+				await EditSelectedCardPaymentsCartItem();
+				break;
+			case "DeleteCart":
+				await RemoveSelectedCardPaymentsCartItem();
 				break;
 		}
 	}
@@ -862,7 +1000,8 @@ public partial class TripPage
 	{
 		await DataStorageService.LocalRemove(StorageFileNames.TripDataFileName);
 		await DataStorageService.LocalRemove(StorageFileNames.TripExpensesCartDataFileName);
-		await DataStorageService.LocalRemove(StorageFileNames.TripPaymentsCartDataFileName);
+		await DataStorageService.LocalRemove(StorageFileNames.TripCardPaymentsCartDataFileName);
+		await DataStorageService.LocalRemove(StorageFileNames.TripLedgerPaymentsCartDataFileName);
 	}
 
 	private async Task ResetPage()

@@ -183,16 +183,16 @@ public partial class SettingsPage
 
     private void MapSelections()
     {
-        if (!string.IsNullOrEmpty(_primaryCompanyLinkingId) && int.TryParse(_primaryCompanyLinkingId, out var companyId))
+        if (!string.IsNullOrWhiteSpace(_primaryCompanyLinkingId) && int.TryParse(_primaryCompanyLinkingId, out var companyId))
             _selectedCompanyName = _companies.FirstOrDefault(c => c.Id == companyId)?.Name ?? string.Empty;
 
-        if (!string.IsNullOrEmpty(_cashLedgerId) && int.TryParse(_cashLedgerId, out var cashId))
+        if (!string.IsNullOrWhiteSpace(_cashLedgerId) && int.TryParse(_cashLedgerId, out var cashId))
             _selectedCashLedgerName = _ledgers.FirstOrDefault(l => l.Id == cashId)?.Name ?? string.Empty;
 
-        if (!string.IsNullOrEmpty(_gstLedgerId) && int.TryParse(_gstLedgerId, out var gstId))
+        if (!string.IsNullOrWhiteSpace(_gstLedgerId) && int.TryParse(_gstLedgerId, out var gstId))
             _selectedGSTLedgerName = _ledgers.FirstOrDefault(l => l.Id == gstId)?.Name ?? string.Empty;
 
-        if (!string.IsNullOrEmpty(_defaultSelectedVoucherId) && int.TryParse(_defaultSelectedVoucherId, out var voucherId))
+        if (!string.IsNullOrWhiteSpace(_defaultSelectedVoucherId) && int.TryParse(_defaultSelectedVoucherId, out var voucherId))
             _selectedDefaultVoucherName = _vouchers.FirstOrDefault(v => v.Id == voucherId)?.Name ?? string.Empty;
     }
 

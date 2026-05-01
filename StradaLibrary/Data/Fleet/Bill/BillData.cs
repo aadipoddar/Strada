@@ -110,15 +110,15 @@ public static class BillData
 	#region Save
 	private static async Task<BillModel> ValidateTransaction(BillModel bill, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
+		bill.BillNo = bill.BillNo?.Trim().ToUpper();
+		if (string.IsNullOrWhiteSpace(bill.BillNo))
+			throw new InvalidOperationException("Please enter a bill number.");
+
 		if (bill.CompanyId <= 0)
 			throw new InvalidOperationException("Please select a company for the transaction.");
 
 		if (bill.OMCId <= 0)
 			throw new InvalidOperationException("Please select an OMC for the transaction.");
-
-		bill.BillNo = bill.BillNo?.Trim().ToUpper();
-		if (string.IsNullOrWhiteSpace(bill.BillNo))
-			throw new InvalidOperationException("Please enter a bill number.");
 
 		if (bill.TotalGrossAmount < 0)
 			throw new InvalidOperationException("Total gross amount cannot be negative.");

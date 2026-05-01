@@ -11,8 +11,10 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyG KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="() => _sfOMCCardAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyG KeyModifiers="[JsKeyModifier.ControlLeft, JsKeyModifier.ShiftLeft]" OnHotkeyPressed="() => _sfLedgerAutoComplete.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="AddExpensesToCart" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
@@ -75,8 +77,9 @@ else
 		<!-- Main Content Container -->
 		<div class="page-container">
 
-			<!-- Top Section: Transaction Summary and Financial Summary Side by Side -->
-			<div class="two-column-layout">
+
+			<div class="four-column-layout">
+
 				<!-- Transaction Summary Section -->
 				<div class="section-card">
 					<div class="section-header">
@@ -96,16 +99,26 @@ else
 
 					<div class="section-body">
 						<div class="form-grid">
-							<!-- Company -->
+
+							<!-- Vehicle -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
-												 Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="Select a Company"
-												 Label="Company" Required="true"
-												 ValueChange="OnCompanyChanged"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+								<AutoCompleteWithAdd @ref="_sfFirstFocus" TItem="VehicleModel" TValue="VehicleModel"
+													 Value="_selectedVehicle"
+													 DataSource="@_vehicles"
+													 Placeholder="Select a Vehicle (Ctrl + F)"
+													 Label="Vehicle" Required="true"
+													 ValueChange="OnVehicleChanged"
+													 FieldValue="@nameof(VehicleModel.Code)"
+													 AddNewRoute="@PageRouteNames.VehicleMaster" />
+							</div>
+
+							<!-- Sl No -->
+							<div class="form-field">
+								<label class="field-label">
+									Sl No
+								</label>
+								<SfTextBox @bind-Value="_trip.SlNo" Placeholder="Enter Sl No..."
+										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
 							</div>
 
 							<!-- Transaction Date -->
@@ -118,119 +131,61 @@ else
 												  Format="dd/MM/yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
 												  CssClass="custom-datepicker">
 									</SfDatePicker>
-									<SfTextBox
-									Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-									Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
-									CssClass="custom-textbox readonly-field" />
+									<SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+											   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+											   TabIndex="-1" CssClass="custom-textbox readonly-field" />
 								</div>
-							</div>
-
-							<!-- Transaction No -->
-							<div class="form-field">
-								<label class="field-label">
-									Transaction No <span class="required">*</span>
-								</label>
-								<SfTextBox @bind-Value="_trip.TransactionNo" Placeholder="Transaction No"
-										   FloatLabelType="FloatLabelType.Never" Readonly="true"
-										   CssClass="custom-textbox readonly-field" />
-							</div>
-
-							<!-- Challan No -->
-							<div class="form-field">
-								<label class="field-label">
-									Challan No
-								</label>
-								<SfTextBox @bind-Value="_trip.ChallanNo" Placeholder="Enter Challan No..."
-										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
-							</div>
-
-							<!-- OMC -->
-							<div class="form-field">
-								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
-												 Value="_selectedOMC"
-												 DataSource="@_omcs"
-												 Placeholder="Select an OMC"
-												 Label="OMC" Required="true"
-												 ValueChange="OnOMCChanged"
-												 FieldValue="@nameof(OMCModel.Name)"
-												 AddNewRoute="@PageRouteNames.OMCMaster" />
-							</div>
-
-							<!-- Vehicle -->
-							<div class="form-field">
-								<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
-												 Value="_selectedVehicle"
-												 DataSource="@_vehicles"
-												 Placeholder="Select a Vehicle"
-												 Label="Vehicle" Required="true"
-												 ValueChange="OnVehicleChanged"
-												 FieldValue="@nameof(VehicleModel.Code)"
-												 AddNewRoute="@PageRouteNames.VehicleMaster" />
-							</div>
-
-							<!-- Quantity -->
-							<div class="form-field">
-								<label class="field-label">
-									Quantity <span class="required">*</span>
-								</label>
-								<SfNumericTextBox @bind-Value="_trip.Quantity" Placeholder="Enter Quantity"
-												  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
 							</div>
 
 							<!-- Route -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="RouteOverviewModel" TValue="RouteOverviewModel"
-												 Value="_selectedRoute"
-												 DataSource="@_routes"
-												 Placeholder="Select a Route"
-												 Label="Route" Required="true"
-												 ValueChange="OnRouteChanged"
-												 FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
-												 AddNewRoute="@PageRouteNames.RouteMaster" />
-							</div>
-
-							<!-- Route Estimated Distance / Cost -->
-							<div class="form-field">
-								<label class="field-label">
-									Estimated Distance / Cost
-								</label>
-								<div class="date-year-wrapper">
-									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedDistance"
-													  Placeholder="Enter estimated distance..." FloatLabelType="FloatLabelType.Never"
-													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
-									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedCost"
-													  Placeholder="Enter estimated cost..." FloatLabelType="FloatLabelType.Never"
-													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
-								</div>
-							</div>
-
-							<!-- Route Estimated Hours / Fuel -->
-							<div class="form-field">
-								<label class="field-label">
-									Estimated Hours / Fuel
-								</label>
-								<div class="date-year-wrapper">
-									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedHours"
-													  Placeholder="Enter estimated hours..." FloatLabelType="FloatLabelType.Never"
-													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
-									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedFuelConsumption"
-													  Placeholder="Enter estimated fuel..." FloatLabelType="FloatLabelType.Never"
-													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
-								</div>
+													 Value="_selectedRoute"
+													 DataSource="@_routes"
+													 Placeholder="Select a Route"
+													 Label="Route" Required="true"
+													 ValueChange="OnRouteChanged"
+													 FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
+													 AddNewRoute="@PageRouteNames.RouteMaster" />
 							</div>
 
 							<!-- Driver -->
 							<div class="form-field">
 								<AutoCompleteWithAdd TItem="DriverOverviewModel" TValue="DriverOverviewModel"
-												 Value="_selectedDriver"
-												 DataSource="@_drivers"
-												 Placeholder="Select a Driver"
-												 Label="Driver" Required="true"
-												 ValueChange="OnDriverChanged"
-												 FieldValue="@nameof(DriverOverviewModel.DisplayName)"
-												 AddNewRoute="@PageRouteNames.DriverMaster" />
+													 Value="_selectedDriver"
+													 DataSource="@_drivers"
+													 Placeholder="Select a Driver"
+													 Label="Driver" Required="true"
+													 ValueChange="OnDriverChanged"
+													 FieldValue="@nameof(DriverOverviewModel.DisplayName)"
+													 AddNewRoute="@PageRouteNames.DriverMaster" />
 							</div>
 
+							<!-- Company -->
+							<div class="form-field">
+								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+													 Value="_selectedCompany"
+													 DataSource="@_companies"
+													 Placeholder="Select a Company"
+													 Label="Company" Required="true"
+													 ValueChange="OnCompanyChanged"
+													 FieldValue="@nameof(CompanyModel.Name)"
+													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+							</div>
+
+							<!-- OMC -->
+							<div class="form-field">
+								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+													 Value="_selectedOMC"
+													 DataSource="@_omcs"
+													 Placeholder="Select an OMC"
+													 Label="OMC" Required="true"
+													 ValueChange="OnOMCChanged"
+													 FieldValue="@nameof(OMCModel.Name)"
+													 AddNewRoute="@PageRouteNames.OMCMaster" />
+							</div>
+
+							<!-- Empty -->
 							<div class="form-field">
 								<label class="field-label">Vehicle Empty</label>
 								<div class="checkbox-wrapper">
@@ -238,15 +193,6 @@ else
 								</div>
 							</div>
 
-							<!-- Remarks -->
-							<div class="form-field">
-								<label class="field-label">
-									Remarks / Narration
-								</label>
-								<SfTextBox @bind-Value="_trip.Remarks" Multiline="true"
-										   Placeholder="Enter remarks..." FloatLabelType="FloatLabelType.Never"
-										   CssClass="custom-textbox" />
-							</div>
 						</div>
 					</div>
 				</div>
@@ -266,111 +212,287 @@ else
 					</div>
 
 					<div class="section-body">
-						<div class="financial-grid">
-							<!-- Total Amount -->
-							<div class="financial-row">
-								<label class="financial-label-total">Total Expense</label>
-								<SfNumericTextBox Value="@_trip.TotalExpense" Readonly="true" TValue="decimal"
+						<div class="form-grid">
+
+							<!-- Challan No -->
+							<div class="form-field">
+								<label class="field-label">
+									Challan No
+								</label>
+								<SfTextBox @bind-Value="_trip.ChallanNo" Placeholder="Enter Challan No..."
+										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							</div>
+
+							<!-- Quantity -->
+							<div class="form-field">
+								<label class="field-label">
+									Quantity <span class="required">*</span>
+								</label>
+								<SfNumericTextBox @bind-Value="_trip.Quantity" Placeholder="Enter Quantity"
+												  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+							</div>
+
+							<!-- Transaction No -->
+							<div class="form-field">
+								<label class="field-label">
+									Transaction No <span class="required">*</span>
+								</label>
+								<SfTextBox Value="@_trip.TransactionNo" Placeholder="Transaction No"
+										   FloatLabelType="FloatLabelType.Never" Readonly="true" TabIndex="-1"
+										   CssClass="custom-textbox readonly-field" />
+							</div>
+
+							<!-- Route Estimated Distance / Cost -->
+							<div class="form-field">
+								<label class="field-label">
+									Estimated Distance / Cost
+								</label>
+								<div class="date-year-wrapper">
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedDistance" TabIndex="-1"
+													  Placeholder="Enter estimated distance..." FloatLabelType="FloatLabelType.Never"
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedCost" TabIndex="-1"
+													  Placeholder="Enter estimated cost..." FloatLabelType="FloatLabelType.Never"
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
+								</div>
+							</div>
+
+							<!-- Route Estimated Hours / Fuel -->
+							<div class="form-field">
+								<label class="field-label">
+									Estimated Hours / Fuel
+								</label>
+								<div class="date-year-wrapper">
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedHours" TabIndex="-1"
+													  Placeholder="Enter estimated hours..." FloatLabelType="FloatLabelType.Never"
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
+									<SfNumericTextBox @bind-Value="_selectedRoute.EstimatedFuelConsumption" TabIndex="-1"
+													  Placeholder="Enter estimated fuel..." FloatLabelType="FloatLabelType.Never"
+													  ShowSpinButton="false" Readonly="true" CssClass="custom-numeric readonly-field" />
+								</div>
+							</div>
+
+							<!-- Total Expense -->
+							<div class="form-field">
+								<label class="field-label">
+									Total Expense
+								</label>
+								<SfNumericTextBox Value="@_trip.TotalExpense" Readonly="true" TValue="decimal" TabIndex="-1"
 												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-												  CssClass="custom-numeric total-field" />
+												  CssClass="custom-numeric readonly-field" />
 							</div>
 
-							<div class="financial-divider"></div>
-
-							<!-- Add Payment to Cart Section -->
-							<div class="cart-input-row">
-								<!-- OMC Card -->
-								<div class="cart-field cart-field-wide">
-									<AutoCompleteWithAdd TItem="OMCCardModel" TValue="OMCCardModel"
-														 @ref="_sfOMCCardAutoComplete"
-														 FieldValue="@nameof(OMCCardModel.CardNumber)" @bind-Value="_selectedOMCCard"
-														 DataSource="@_omcCards" Placeholder="Select OMC Card (Ctrl + Shift + F)"
-														 ValueChange="OnPaymentsTypeChanged"
-														 Label="OMC Card" Required="true" AddNewRoute="@PageRouteNames.OMCCardMaster" />
-								</div>
-
-								<!-- Amount -->
-								<div class="cart-field cart-field-wide">
-									<label class="cart-label">Amount <span class="required">*</span></label>
-									<SfNumericTextBox @bind-Value=@_selectedPaymentCart.Amount TValue="decimal" Min="0"
-													  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-													  CssClass="custom-numeric editable-field" />
-								</div>
-
-								<!-- Remarks -->
-								<div class="cart-field cart-field-wide">
-									<label class="cart-label">Remarks</label>
-									<SfTextBox @bind-Value="_selectedPaymentCart.Remarks" Placeholder="Item Narration..."
-											   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
-								</div>
-
-								<!-- Add Button -->
-								<div class="cart-field cart-field-wide">
-									<label class="cart-label">&nbsp;</label>
-									<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add"
-												Title="Add to Cart" OnClick="AddPaymentsToCart" />
-								</div>
+							<!-- Remarks -->
+							<div class="form-field">
+								<label class="field-label">
+									Remarks / Narration
+								</label>
+								<SfTextBox @bind-Value="_trip.Remarks" Multiline="true"
+										   Placeholder="Enter remarks..." FloatLabelType="FloatLabelType.Never"
+										   CssClass="custom-textbox" />
 							</div>
-
-							<SfGrid ID="_sfCartGrid" @ref="_sfPaymentsCartGrid" DataSource="_paymentsCart"
-									AllowTextWrap="true" AllowPaging="false" AllowSorting="true" AllowResizing="true"
-									AllowFiltering="true" GridLines="GridLine.Horizontal" CssClass="professional-grid"
-									ContextMenuItems="@_paymentsCartGridContextMenuItems">
-
-								<GridEvents TValue="TripCardPaymentsCartModel"
-											ContextMenuItemClicked="OnPaymentsCartGridContextMenuItemClicked" />
-								<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
-
-								<GridAggregates>
-									<GridAggregate>
-										<GridAggregateColumns>
-											<GridAggregateColumn
-												Field="@nameof(TripCardPaymentsCartModel.OMCCardNumber)"
-												Type="AggregateType.Count">
-												<FooterTemplate>
-													@{
-														var aggregate = (context as AggregateTemplateContext);
-													}
-													<div class="aggregate-label">
-														<strong>Total Payment Types: @aggregate.Count</strong>
-													</div>
-												</FooterTemplate>
-											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(TripCardPaymentsCartModel.Amount)"
-																 Type="AggregateType.Sum">
-												<FooterTemplate>
-													@{
-														var aggregate = (context as AggregateTemplateContext);
-														var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
-													}
-													<div class="aggregate-value aggregate-total">
-														<strong>@sum.ToString("N2")</strong>
-													</div>
-												</FooterTemplate>
-											</GridAggregateColumn>
-										</GridAggregateColumns>
-									</GridAggregate>
-								</GridAggregates>
-
-								<GridColumns>
-									<GridColumn Field="@nameof(TripCardPaymentsCartModel.OMCCardNumber)"
-												HeaderText="Name" Width="200" />
-									<GridColumn Field="@nameof(TripCardPaymentsCartModel.Amount)"
-												HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
-										<Template>
-											@{
-												var item = (context as dynamic);
-												<span class="grid-total">@item.Amount.ToString("N2")</span>
-											}
-										</Template>
-									</GridColumn>
-									<GridColumn Field="@nameof(TripCardPaymentsCartModel.Remarks)"
-												HeaderText="Remarks" Width="150" />
-								</GridColumns>
-
-							</SfGrid>
 
 						</div>
+					</div>
+				</div>
+
+				<!-- Card Payments Section -->
+				<div class="section-card">
+					<div class="section-header">
+						<div class="section-title-wrapper">
+							<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+								 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+								 stroke-linecap="round" stroke-linejoin="round">
+								<rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+								<line x1="1" y1="10" x2="23" y2="10" />
+							</svg>
+							<h2 class="section-title">Card Payments</h2>
+						</div>
+					</div>
+
+					<div class="section-body">
+						<div class="cart-input-row">
+							<!-- OMC Card -->
+							<div class="cart-field cart-field-wide">
+								<AutoCompleteWithAdd TItem="OMCCardModel" TValue="OMCCardModel"
+													 @ref="_sfOMCCardAutoComplete"
+													 FieldValue="@nameof(OMCCardModel.CardNumber)" @bind-Value="_selectedOMCCard"
+													 DataSource="@_omcCards" Placeholder="Card (Ctrl + Shift + F)"
+													 ValueChange="OnCardPaymentsTypeChanged"
+													 Label="OMC Card" Required="true" AddNewRoute="@PageRouteNames.OMCCardMaster" />
+							</div>
+
+							<!-- Amount -->
+							<div class="cart-field cart-field-wide">
+								<label class="cart-label">Amount <span class="required">*</span></label>
+								<SfNumericTextBox @bind-Value=@_selectedCardPaymentCart.Amount TValue="decimal" Min="0"
+												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+												  CssClass="custom-numeric editable-field" />
+							</div>
+
+							<!-- Remarks -->
+							<div class="cart-field cart-field-wide">
+								<label class="cart-label">Remarks</label>
+								<SfTextBox @bind-Value="_selectedCardPaymentCart.Remarks" Placeholder="Item Narration..."
+										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							</div>
+
+							<!-- Add Button -->
+							<div class="cart-field cart-field-wide">
+								<label class="cart-label">&nbsp;</label>
+								<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add"
+											Title="Add to Cart" OnClick="AddCardPaymentsToCart" />
+							</div>
+						</div>
+
+						<SfGrid ID="_sfCartGrid" @ref="_sfCardPaymentsCartGrid" DataSource="_cardPaymentsCart"
+								AllowTextWrap="true" AllowPaging="false" AllowSorting="true" AllowResizing="true"
+								AllowFiltering="true" GridLines="GridLine.Horizontal" CssClass="professional-grid"
+								ContextMenuItems="@_cardPaymentsCartGridContextMenuItems">
+
+							<GridEvents TValue="TripCardPaymentsCartModel" ContextMenuItemClicked="OnCardPaymentsCartGridContextMenuItemClicked" />
+							<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+							<GridAggregates>
+								<GridAggregate>
+									<GridAggregateColumns>
+										<GridAggregateColumn Field="@nameof(TripCardPaymentsCartModel.OMCCardNumber)" Type="AggregateType.Count">
+											<FooterTemplate>
+												@{
+													var aggregate = (context as AggregateTemplateContext);
+												}
+												<div class="aggregate-label">
+													<strong>Total Payment Types: @aggregate.Count</strong>
+												</div>
+											</FooterTemplate>
+										</GridAggregateColumn>
+										<GridAggregateColumn Field="@nameof(TripCardPaymentsCartModel.Amount)" Type="AggregateType.Sum">
+											<FooterTemplate>
+												@{
+													var aggregate = (context as AggregateTemplateContext);
+													var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+												}
+												<div class="aggregate-value aggregate-total">
+													<strong>@sum.ToString("N2")</strong>
+												</div>
+											</FooterTemplate>
+										</GridAggregateColumn>
+									</GridAggregateColumns>
+								</GridAggregate>
+							</GridAggregates>
+
+							<GridColumns>
+								<GridColumn Field="@nameof(TripCardPaymentsCartModel.OMCCardNumber)" HeaderText="Name" Width="200" />
+								<GridColumn Field="@nameof(TripCardPaymentsCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
+									<Template>
+										@{
+											var item = (context as dynamic);
+											<span class="grid-total">@item.Amount.ToString("N2")</span>
+										}
+									</Template>
+								</GridColumn>
+								<GridColumn Field="@nameof(TripCardPaymentsCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+							</GridColumns>
+
+						</SfGrid>
+					</div>
+				</div>
+
+				<!-- Ledger Payments Section -->
+				<div class="section-card">
+					<div class="section-header">
+						<div class="section-title-wrapper">
+							<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+								 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+								 stroke-linecap="round" stroke-linejoin="round">
+								<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+								<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+							</svg>
+							<h2 class="section-title">Ledger Payments</h2>
+						</div>
+					</div>
+
+					<div class="section-body">
+						<div class="cart-input-row">
+							<div class="cart-field cart-field-wide">
+								<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
+													 @ref="_sfLedgerAutoComplete"
+													 FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
+													 DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
+													 ValueChange="OnLedgerPaymentsTypeChanged"
+													 Label="Ledger" Required="true" AddNewRoute="@PageRouteNames.LedgerMaster" />
+							</div>
+
+							<div class="cart-field cart-field-wide">
+								<label class="cart-label">Amount <span class="required">*</span></label>
+								<SfNumericTextBox @bind-Value="_selectedLedgerPaymentCart.Amount" TValue="decimal" Min="0"
+												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+												  CssClass="custom-numeric editable-field" />
+							</div>
+
+							<div class="cart-field cart-field-wide">
+								<label class="cart-label">Remarks</label>
+								<SfTextBox @bind-Value="_selectedLedgerPaymentCart.Remarks" Placeholder="Item Narration..."
+										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							</div>
+
+							<div class="cart-field cart-field-wide">
+								<label class="cart-label">&nbsp;</label>
+								<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add"
+											Title="Add Ledger Payment (Ctrl + Shift + Enter)" OnClick="AddLedgerPaymentsToCart" />
+							</div>
+						</div>
+
+						<SfGrid @ref="_sfLedgerPaymentsCartGrid" DataSource="_ledgerPaymentsCart"
+								AllowTextWrap="true" AllowPaging="false" AllowSorting="true" AllowResizing="true"
+								AllowFiltering="true" GridLines="GridLine.Horizontal" CssClass="professional-grid"
+								ContextMenuItems="@_ledgerPaymentsCartGridContextMenuItems">
+
+							<GridEvents TValue="TripLedgerPaymentsCartModel" ContextMenuItemClicked="OnLedgerPaymentsCartGridContextMenuItemClicked" />
+							<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+							<GridAggregates>
+								<GridAggregate>
+									<GridAggregateColumns>
+										<GridAggregateColumn Field="@nameof(TripLedgerPaymentsCartModel.LedgerName)" Type="AggregateType.Count">
+											<FooterTemplate>
+												@{
+													var aggregate = (context as AggregateTemplateContext);
+												}
+												<div class="aggregate-label">
+													<strong>Total Ledgers: @aggregate.Count</strong>
+												</div>
+											</FooterTemplate>
+										</GridAggregateColumn>
+										<GridAggregateColumn Field="@nameof(TripLedgerPaymentsCartModel.Amount)" Type="AggregateType.Sum">
+											<FooterTemplate>
+												@{
+													var aggregate = (context as AggregateTemplateContext);
+													var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+												}
+												<div class="aggregate-value aggregate-total">
+													<strong>@sum.ToString("N2")</strong>
+												</div>
+											</FooterTemplate>
+										</GridAggregateColumn>
+									</GridAggregateColumns>
+								</GridAggregate>
+							</GridAggregates>
+
+							<GridColumns>
+								<GridColumn Field="@nameof(TripLedgerPaymentsCartModel.LedgerName)" HeaderText="Ledger" Width="200" />
+								<GridColumn Field="@nameof(TripLedgerPaymentsCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
+									<Template>
+										@{
+											var item = (context as dynamic);
+											<span class="grid-total">@item.Amount.ToString("N2")</span>
+										}
+									</Template>
+								</GridColumn>
+								<GridColumn Field="@nameof(TripLedgerPaymentsCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+							</GridColumns>
+
+						</SfGrid>
 					</div>
 				</div>
 
@@ -396,11 +518,11 @@ else
 						<!-- Expense Type -->
 						<div class="cart-field cart-field-wide">
 							<AutoCompleteWithAdd TItem="ExpenseTypeModel" TValue="ExpenseTypeModel"
-														 @ref="_sfExpenseTypeAutoComplete"
-														 FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
-														 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
-														 ValueChange="OnExpensesTypeChanged"
-														 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+												 @ref="_sfExpenseTypeAutoComplete"
+												 FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
+												 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + G)"
+												 ValueChange="OnExpensesTypeChanged"
+												 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Amount -->
@@ -456,9 +578,8 @@ else
 						<GridAggregates>
 							<GridAggregate>
 								<GridAggregateColumns>
-									<GridAggregateColumn
-										Field="@nameof(TripExpensesCartModel.ExpenseTypeName)"
-										Type="AggregateType.Count">
+									<GridAggregateColumn Field="@nameof(TripExpensesCartModel.ExpenseTypeName)"
+														 Type="AggregateType.Count">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);

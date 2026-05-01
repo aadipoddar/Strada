@@ -42,7 +42,8 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 
 		await LocalRemove(StorageFileNames.TripDataFileName);
 		await LocalRemove(StorageFileNames.TripExpensesCartDataFileName);
-		await LocalRemove(StorageFileNames.TripPaymentsCartDataFileName);
+		await LocalRemove(StorageFileNames.TripCardPaymentsCartDataFileName);
+		await LocalRemove(StorageFileNames.TripLedgerPaymentsCartDataFileName);
 
 		await LocalRemove(StorageFileNames.BillDataFileName);
 		await LocalRemove(StorageFileNames.BillPendingTripsCartDataFileName);

@@ -10,6 +10,7 @@ SELECT
     [t].[FinancialYearId],
 	CONVERT(VARCHAR(10), fy.StartDate, 103) + ' to ' + CONVERT(VARCHAR(10), fy.EndDate, 103) AS FinancialYear,
 
+    [t].[SlNo],
     [t].[ChallanNo],
 	[t].[OMCId],
 	[o].[Name] AS OMCName,

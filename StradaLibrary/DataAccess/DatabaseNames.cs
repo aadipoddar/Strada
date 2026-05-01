@@ -10,8 +10,9 @@ public static class OperationNames
 	public static string LoadTableDataByCode => "Load_TableData_By_Code";
 	public static string LoadTableDataByTransactionNo => "Load_TableData_By_TransactionNo";
 	public static string LoadTableDataByDate => "Load_TableData_By_Date";
-	public static string LoadLastTableDataByCompanyFinancialYear => "Load_LastTableData_By_Company_FinancialYear";
+	public static string LoadLastTableData => "Load_LastTableData";
 	public static string LoadLastTableDataByFinancialYear => "Load_LastTableData_By_FinancialYear";
+	public static string LoadLastTableDataByCompanyFinancialYear => "Load_LastTableData_By_Company_FinancialYear";
 	public static string LoadCurrentDateTime => "Load_CurrentDateTime";
 	#endregion
 
@@ -87,6 +88,7 @@ public static class FleetNames
 	public static string Trip => "Trip";
 	public static string TripExpenses => "TripExpenses";
 	public static string TripCardPayments => "TripCardPayments";
+	public static string TripLedgerPayments => "TripLedgerPayments";
 
 	public static string TripOverview => "Trip_Overview";
 	public static string TripExpensesOverview => "TripExpenses_Overview";
@@ -96,6 +98,7 @@ public static class FleetNames
 	public static string InsertTrip => "Insert_Trip";
 	public static string InsertTripExpenses => "Insert_TripExpenses";
 	public static string InsertTripCardPayments => "Insert_TripCardPayments";
+	public static string InsertTripLedgerPayments => "Insert_TripLedgerPayments";
 	#endregion
 	
 	#region Expense
