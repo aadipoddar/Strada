@@ -11,7 +11,8 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyG KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="AddExpensesToCart" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
@@ -29,7 +30,7 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="Create Expense">
+		<Header Title="@(_expense.Id > 0 ? "Edit Expense" : $"Modify Expense {_expense.TransactionNo}")">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
@@ -83,12 +84,25 @@ else
 
 				<div class="section-body">
 					<div class="form-grid">
+						<!-- Vehicle -->
+						<div class="form-field">
+							<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
+												 @ref="_sfFirstFocus"
+												 Value="_selectedVehicle"
+												 DataSource="@_vehicles"
+												 Placeholder="Select a Vehicle"
+												 Label="Vehicle" Required="true"
+												 ValueChange="OnVehicleChanged"
+												 FieldValue="@nameof(VehicleModel.Code)"
+												 AddNewRoute="@PageRouteNames.VehicleMaster" />
+						</div>
+
 						<!-- Company -->
 						<div class="form-field">
 							<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
 												 Value="_selectedCompany"
 												 DataSource="@_companies"
-												 Placeholder="Select a Company"
+												 Placeholder="Select a Company (Ctrl + F)"
 												 Label="Company" Required="true"
 												 ValueChange="OnCompanyChanged"
 												 FieldValue="@nameof(CompanyModel.Name)"
@@ -106,7 +120,7 @@ else
 											  CssClass="custom-datepicker">
 								</SfDatePicker>
 								<SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-										   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+										   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never" TabIndex="-1"
 										   CssClass="custom-textbox readonly-field" />
 							</div>
 						</div>
@@ -117,20 +131,8 @@ else
 								Transaction No <span class="required">*</span>
 							</label>
 							<SfTextBox @bind-Value="_expense.TransactionNo" Placeholder="Transaction No"
-									   FloatLabelType="FloatLabelType.Never" Readonly="true"
+									   FloatLabelType="FloatLabelType.Never" Readonly="true" TabIndex="-1"
 									   CssClass="custom-textbox readonly-field" />
-						</div>
-
-						<!-- Vehicle -->
-						<div class="form-field">
-							<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
-												 Value="_selectedVehicle"
-												 DataSource="@_vehicles"
-												 Placeholder="Select a Vehicle"
-												 Label="Vehicle" Required="true"
-												 ValueChange="OnVehicleChanged"
-												 FieldValue="@nameof(VehicleModel.Code)"
-												 AddNewRoute="@PageRouteNames.VehicleMaster" />
 						</div>
 
 						<!-- Total Expense -->
@@ -139,7 +141,7 @@ else
 								Total Expense
 							</label>
 							<SfTextBox Value="@_expense.TotalExpense.ToString("N2")" Placeholder="Total Expense"
-									   FloatLabelType="FloatLabelType.Never" Readonly="true"
+									   FloatLabelType="FloatLabelType.Never" Readonly="true" TabIndex="-1"
 									   CssClass="custom-textbox readonly-field" />
 						</div>
 
@@ -178,7 +180,7 @@ else
 							<AutoCompleteWithAdd TItem="ExpenseTypeModel" TValue="ExpenseTypeModel"
 												 @ref="_sfExpenseTypeAutoComplete"
 												 FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
-												 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
+												 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + G)"
 												 ValueChange="OnExpensesTypeChanged"
 												 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
 						</div>

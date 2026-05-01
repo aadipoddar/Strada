@@ -8,10 +8,12 @@ using StradaLibrary.Exports.Fleet.Expense;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Expense;
+using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
+using System.Text.Json;
 
 namespace Strada.Shared.Pages.Fleet.Expense;
 
@@ -40,6 +42,7 @@ public partial class ExpensePage
 
 	private AutoCompleteWithAdd<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private SfGrid<ExpenseDetailsCartModel> _sfExpensesCartGrid;
+	private AutoCompleteWithAdd<VehicleModel, VehicleModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =
@@ -76,25 +79,25 @@ public partial class ExpensePage
 		StateHasChanged();
 
 		await SaveTransactionFile();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
 	{
-		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
+		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_expenseTypes = await CommonData.LoadTableDataByStatus<ExpenseTypeModel>(FleetNames.ExpenseType);
 		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 
-		_companies = [.. _companies.OrderBy(s => s.Name)];
-		var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
-		_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
-
-		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
+		_companies = [.. _companies.OrderBy(s => s.Name)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
 		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
 
 		_selectedVehicle = _vehicles.FirstOrDefault();
+		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _selectedVehicle.CompanyId);
 	}
 
 	private async Task ResolveTransaction()
@@ -181,32 +184,22 @@ public partial class ExpensePage
 
 	private async Task LoadSelections()
 	{
-		if (_expense.CompanyId > 0)
-			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _expense.CompanyId) ?? _companies.FirstOrDefault();
-		else
-		{
-			var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
-			_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
-		}
-		_expense.CompanyId = _selectedCompany.Id;
-
-		if (_expense.FinancialYearId > 0)
-			_selectedFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, _expense.FinancialYearId);
-
-		if (_selectedFinancialYear is null || _selectedFinancialYear.Id <= 0)
-			_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_expense.TransactionDateTime);
-
-		if (_selectedFinancialYear is not null)
-			_expense.FinancialYearId = _selectedFinancialYear.Id;
-
-		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
-		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
-
 		if (_expense.VehicleId > 0)
 			_selectedVehicle = _vehicles.FirstOrDefault(s => s.Id == _expense.VehicleId) ?? _vehicles.FirstOrDefault();
 		else
 			_selectedVehicle = _vehicles.FirstOrDefault();
+
+		if (_expense.CompanyId > 0)
+			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _expense.CompanyId) ?? _companies.FirstOrDefault();
+		else
+			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId) ?? _companies.FirstOrDefault();
+
+		if (_expense.Id == 0)
+		{
+			var lastTransaction = await CommonData.LoadLastTableData<TripModel>(FleetNames.Expense);
+			if (lastTransaction is not null)
+				_expense.TransactionDateTime = lastTransaction.TransactionDateTime;
+		}
 	}
 
 	private async Task ResolveExpensesCart()
@@ -261,30 +254,23 @@ public partial class ExpensePage
 	#endregion
 
 	#region Change Events
-	private async Task OnCompanyChanged(ChangeEventArgs<CompanyModel, CompanyModel> args)
-	{
-		if (args.Value is null || args.Value.Id == 0)
-			return;
-
-		_selectedCompany = args.Value;
-		_expense.CompanyId = _selectedCompany.Id;
-
-		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
-		_selectedVehicle = _vehicles.FirstOrDefault();
-		_expense.VehicleId = _selectedVehicle.Id;
-
-		await SaveTransactionFile();
-	}
-
 	private async Task OnVehicleChanged(ChangeEventArgs<VehicleModel, VehicleModel> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
 			return;
 
 		_selectedVehicle = args.Value;
-		_expense.VehicleId = _selectedVehicle.Id;
+		_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId);
 
+		await SaveTransactionFile();
+	}
+
+	private async Task OnCompanyChanged(ChangeEventArgs<CompanyModel, CompanyModel> args)
+	{
+		if (args.Value is null || args.Value.Id == 0)
+			return;
+
+		_selectedCompany = args.Value;
 		await SaveTransactionFile();
 	}
 	#endregion
@@ -410,22 +396,8 @@ public partial class ExpensePage
 	private async Task UpdateFinancialDetails()
 	{
 		foreach (var item in _expensesCart.ToList())
-		{
 			if (item.Amount <= 0)
 				_expensesCart.Remove(item);
-
-			item.IdentificationNo = item.IdentificationNo?.Trim();
-			if (string.IsNullOrWhiteSpace(item.IdentificationNo))
-				item.IdentificationNo = null;
-
-			item.Remarks = item.Remarks?.Trim();
-			if (string.IsNullOrWhiteSpace(item.Remarks))
-				item.Remarks = null;
-		}
-
-		_expense.Remarks = _expense.Remarks?.Trim();
-		if (string.IsNullOrWhiteSpace(_expense.Remarks))
-			_expense.Remarks = null;
 
 		_expense.CompanyId = _selectedCompany.Id;
 		_expense.VehicleId = _selectedVehicle.Id;
@@ -436,12 +408,7 @@ public partial class ExpensePage
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_expense.FinancialYearId = _selectedFinancialYear.Id;
 		else
-		{
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-			_expense.TransactionDateTime = await CommonData.LoadCurrentDateTime();
-			_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_expense.TransactionDateTime);
-			_expense.FinancialYearId = _selectedFinancialYear.Id;
-		}
 		#endregion
 
 		if (Id is null)
@@ -474,8 +441,8 @@ public partial class ExpensePage
 				return;
 			}
 
-			await DataStorageService.LocalSaveAsync(StorageFileNames.ExpenseDataFileName, System.Text.Json.JsonSerializer.Serialize(_expense));
-			await DataStorageService.LocalSaveAsync(StorageFileNames.ExpenseDetailsCartDataFileName, System.Text.Json.JsonSerializer.Serialize(_expensesCart));
+			await DataStorageService.LocalSaveAsync(StorageFileNames.ExpenseDataFileName, JsonSerializer.Serialize(_expense));
+			await DataStorageService.LocalSaveAsync(StorageFileNames.ExpenseDetailsCartDataFileName, JsonSerializer.Serialize(_expensesCart));
 		}
 		catch (Exception ex)
 		{

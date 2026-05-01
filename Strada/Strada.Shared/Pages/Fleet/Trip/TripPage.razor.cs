@@ -259,9 +259,9 @@ public partial class TripPage
 
 		if (_trip.Id == 0)
 		{
-			var lastTrip = await CommonData.LoadLastTableData<TripModel>(FleetNames.Trip);
-			if (lastTrip is not null)
-				_trip.TransactionDateTime = lastTrip.TransactionDateTime;
+			var lastTransaction = await CommonData.LoadLastTableData<TripModel>(FleetNames.Trip);
+			if (lastTransaction is not null)
+				_trip.TransactionDateTime = lastTransaction.TransactionDateTime;
 		}
 	}
 

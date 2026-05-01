@@ -224,9 +224,9 @@ public partial class BillPage
 
 		if (_bill.Id == 0)
 		{
-			var lastBill = await CommonData.LoadLastTableData<BillModel>(FleetNames.Bill);
-			if (lastBill is not null)
-				_bill.TransactionDateTime = lastBill.TransactionDateTime;
+			var lastTransaction = await CommonData.LoadLastTableData<BillModel>(FleetNames.Bill);
+			if (lastTransaction is not null)
+				_bill.TransactionDateTime = lastTransaction.TransactionDateTime;
 		}
 	}
 

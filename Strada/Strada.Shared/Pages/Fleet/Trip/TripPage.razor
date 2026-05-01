@@ -32,7 +32,7 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="@(_trip.Id > 0 ? "Edit Trip" : "Modify Trip")">
+		<Header Title="@(_trip.Id > 0 ? "Edit Trip" : $"Modify Trip {_trip.TransactionNo}")">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"

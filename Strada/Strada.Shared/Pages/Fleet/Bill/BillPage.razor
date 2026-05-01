@@ -27,7 +27,7 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="@(_bill.Id > 0 ? "Edit Bill" : "Modify Bill")">
+		<Header Title="@(_bill.Id > 0 ? "Edit Bill" : $"Modify Bill {_bill.TransactionNo}")">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
@@ -108,7 +108,7 @@ else
 												  Format="dd/MM/yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
 												  CssClass="custom-datepicker" />
 									<SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-											   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+											   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never" TabIndex="-1"
 											   CssClass="custom-textbox readonly-field" />
 								</div>
 							</div>
@@ -169,14 +169,14 @@ else
 									Transaction No <span class="required">*</span>
 								</label>
 								<SfTextBox @bind-Value="_bill.TransactionNo" Placeholder="Transaction No"
-										   FloatLabelType="FloatLabelType.Never" Readonly="true"
+										   FloatLabelType="FloatLabelType.Never" Readonly="true" TabIndex="-1"
 										   CssClass="custom-textbox readonly-field" />
 							</div>
 
 							<!-- Total Gross Amount -->
 							<div class="form-field">
 								<label class="field-label">Total Gross Amount</label>
-								<SfNumericTextBox Value="@_bill.TotalGrossAmount" Readonly="true" TValue="decimal"
+								<SfNumericTextBox Value="@_bill.TotalGrossAmount" Readonly="true" TValue="decimal" TabIndex="-1"
 												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 												  CssClass="custom-numeric readonly-field" />
 							</div>
@@ -184,7 +184,7 @@ else
 							<!-- Total Penalty Amount -->
 							<div class="form-field">
 								<label class="field-label">Total Penalty Amount</label>
-								<SfNumericTextBox Value="@_bill.TotalPenaltyAmount" Readonly="true" TValue="decimal"
+								<SfNumericTextBox Value="@_bill.TotalPenaltyAmount" Readonly="true" TValue="decimal" TabIndex="-1"
 												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 												  CssClass="custom-numeric readonly-field" />
 							</div>
@@ -192,7 +192,7 @@ else
 							<!-- Total Net Amount -->
 							<div class="form-field">
 								<label class="field-label">Total Net Amount</label>
-								<SfNumericTextBox Value="@_bill.TotalNetAmount" Readonly="true" TValue="decimal"
+								<SfNumericTextBox Value="@_bill.TotalNetAmount" Readonly="true" TValue="decimal" TabIndex="-1"
 												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 												  CssClass="custom-numeric total-field" />
 							</div>

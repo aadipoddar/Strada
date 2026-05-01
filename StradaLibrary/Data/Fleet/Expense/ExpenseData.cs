@@ -78,6 +78,8 @@ public static class ExpenseData
 
 	private static async Task<ExpenseModel> ValidateTransaction(ExpenseModel expense, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
+		expense.Remarks = string.IsNullOrWhiteSpace(expense.Remarks) ? null : expense.Remarks.Trim();
+
 		if (expense.CompanyId <= 0)
 			throw new InvalidOperationException("Please select a company for the transaction.");
 
@@ -86,10 +88,6 @@ public static class ExpenseData
 
 		if (expense.TotalExpense < 0)
 			throw new InvalidOperationException("Total expense cannot be negative.");
-
-		var vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, expense.VehicleId, sqlDataAccessTransaction);
-		if (vehicle.CompanyId != expense.CompanyId)
-			throw new InvalidOperationException("Selected vehicle does not belong to the selected company.");
 
 		expense.TransactionNo = await GenerateCodes.GenerateExpenseTransactionNo(expense, sqlDataAccessTransaction);
 		await FinancialYearData.ValidateFinancialYear(expense.TransactionDateTime, sqlDataAccessTransaction);
@@ -118,6 +116,12 @@ public static class ExpenseData
 
 		if (expensesDetails.Sum(ed => ed.Amount) != expense.TotalExpense)
 			throw new InvalidOperationException("Total expense amount must be equal to total expense of the transaction.");
+
+		foreach (var item in expensesDetails)
+		{
+			item.Remarks = string.IsNullOrWhiteSpace(item.Remarks) ? null : item.Remarks.Trim();
+			item.IdentificationNo = string.IsNullOrWhiteSpace(item.IdentificationNo) ? null : item.IdentificationNo.Trim();
+		}
 	}
 
 	public static async Task<int> SaveTransaction(
