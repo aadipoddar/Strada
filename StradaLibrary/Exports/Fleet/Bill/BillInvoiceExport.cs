@@ -47,7 +47,6 @@ public static class BillInvoiceExport
 		var summaryFields = new Dictionary<string, string>
 		{
 			["Gross"] = transaction.TotalGrossAmount.FormatIndianCurrency(),
-			["TDS"] = transaction.TotalTDSAmount.FormatIndianCurrency(),
 			["Penalty"] = transaction.TotalPenaltyAmount.FormatIndianCurrency(),
 			["Net"] = transaction.TotalNetAmount.FormatIndianCurrency()
 		};

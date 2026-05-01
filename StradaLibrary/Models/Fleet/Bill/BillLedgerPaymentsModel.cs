@@ -40,10 +40,8 @@ public class BillLedgerPaymentsOverviewModel
 	public string OMCName { get; set; }
 
 	public decimal TotalGrossAmount { get; set; }
-	public decimal TotalTDSAmount { get; set; }
 	public decimal TotalPenaltyAmount { get; set; }
 	public decimal TotalNetAmount { get; set; }
-	public decimal TotalCardPaymentAmount { get; set; }
 	public decimal TotalLedgerPaymentAmount { get; set; }
 
 	public string? Remarks { get; set; }

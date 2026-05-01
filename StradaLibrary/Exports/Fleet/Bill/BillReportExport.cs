@@ -19,6 +19,7 @@ public static class BillReportExport
 	{
 		var columnSettings = new Dictionary<string, ReportColumnSetting>
 		{
+			[nameof(BillOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(BillOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -26,14 +27,11 @@ public static class BillReportExport
 			[nameof(BillOverviewModel.OMCName)] = new() { DisplayName = "OMC", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
 			[nameof(BillOverviewModel.TotalGrossAmount)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
-			[nameof(BillOverviewModel.TotalTDSAmount)] = new() { DisplayName = "TDS", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(BillOverviewModel.TotalPenaltyAmount)] = new() { DisplayName = "Penalty", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(BillOverviewModel.TotalNetAmount)] = new() { DisplayName = "Net Amount", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
-			[nameof(BillOverviewModel.TotalCardPaymentAmount)] = new() { DisplayName = "Card Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(BillOverviewModel.TotalLedgerPaymentAmount)] = new() { DisplayName = "Ledger Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
-			[nameof(BillOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -50,18 +48,16 @@ public static class BillReportExport
 		{
 			columnOrder =
 			[
+				nameof(BillOverviewModel.TransactionNo),
 				nameof(BillOverviewModel.CompanyName),
 				nameof(BillOverviewModel.TransactionDateTime),
 				nameof(BillOverviewModel.FinancialYear),
 				nameof(BillOverviewModel.BillNo),
 				nameof(BillOverviewModel.OMCName),
 				nameof(BillOverviewModel.TotalGrossAmount),
-				nameof(BillOverviewModel.TotalTDSAmount),
 				nameof(BillOverviewModel.TotalPenaltyAmount),
 				nameof(BillOverviewModel.TotalNetAmount),
-				nameof(BillOverviewModel.TotalCardPaymentAmount),
 				nameof(BillOverviewModel.TotalLedgerPaymentAmount),
-				nameof(BillOverviewModel.TransactionNo),
 				nameof(BillOverviewModel.Remarks),
 				nameof(BillOverviewModel.CreatedByName),
 				nameof(BillOverviewModel.CreatedAt),
@@ -79,15 +75,12 @@ public static class BillReportExport
 		{
 			columnOrder =
 			[
-				nameof(BillOverviewModel.CompanyName),
 				nameof(BillOverviewModel.TransactionDateTime),
 				nameof(BillOverviewModel.BillNo),
 				nameof(BillOverviewModel.OMCName),
 				nameof(BillOverviewModel.TotalGrossAmount),
-				nameof(BillOverviewModel.TotalTDSAmount),
 				nameof(BillOverviewModel.TotalPenaltyAmount),
 				nameof(BillOverviewModel.TotalNetAmount),
-				nameof(BillOverviewModel.TotalCardPaymentAmount),
 				nameof(BillOverviewModel.TotalLedgerPaymentAmount),
 				nameof(BillOverviewModel.Status)
 			];
@@ -102,7 +95,7 @@ public static class BillReportExport
 				columnOrder.Remove(nameof(BillOverviewModel.Status));
 		}
 
-		string fileName = $"VEHICLE_TRIP_BILL_REPORT";
+		string fileName = $"BILL_REPORT";
 		if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 			fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 
@@ -165,6 +158,7 @@ public static class BillReportExport
 			[nameof(BillLedgerPaymentsOverviewModel.PaymentAmount)] = new() { DisplayName = "Payment Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(BillLedgerPaymentsOverviewModel.PaymentRemarks)] = new() { DisplayName = "Payment Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
+			[nameof(BillLedgerPaymentsOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -172,14 +166,11 @@ public static class BillReportExport
 			[nameof(BillLedgerPaymentsOverviewModel.OMCName)] = new() { DisplayName = "OMC", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
 			[nameof(BillLedgerPaymentsOverviewModel.TotalGrossAmount)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
-			[nameof(BillLedgerPaymentsOverviewModel.TotalTDSAmount)] = new() { DisplayName = "TDS", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(BillLedgerPaymentsOverviewModel.TotalPenaltyAmount)] = new() { DisplayName = "Penalty", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(BillLedgerPaymentsOverviewModel.TotalNetAmount)] = new() { DisplayName = "Net Amount", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
-			[nameof(BillLedgerPaymentsOverviewModel.TotalCardPaymentAmount)] = new() { DisplayName = "Card Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(BillLedgerPaymentsOverviewModel.TotalLedgerPaymentAmount)] = new() { DisplayName = "Ledger Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
-			[nameof(BillLedgerPaymentsOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -199,18 +190,16 @@ public static class BillReportExport
 				nameof(BillLedgerPaymentsOverviewModel.LedgerCode),
 				nameof(BillLedgerPaymentsOverviewModel.PaymentAmount),
 				nameof(BillLedgerPaymentsOverviewModel.PaymentRemarks),
+				nameof(BillLedgerPaymentsOverviewModel.TransactionNo),
 				nameof(BillLedgerPaymentsOverviewModel.CompanyName),
 				nameof(BillLedgerPaymentsOverviewModel.TransactionDateTime),
 				nameof(BillLedgerPaymentsOverviewModel.FinancialYear),
 				nameof(BillLedgerPaymentsOverviewModel.BillNo),
 				nameof(BillLedgerPaymentsOverviewModel.OMCName),
 				nameof(BillLedgerPaymentsOverviewModel.TotalGrossAmount),
-				nameof(BillLedgerPaymentsOverviewModel.TotalTDSAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalPenaltyAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalNetAmount),
-				nameof(BillLedgerPaymentsOverviewModel.TotalCardPaymentAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalLedgerPaymentAmount),
-				nameof(BillLedgerPaymentsOverviewModel.TransactionNo),
 				nameof(BillLedgerPaymentsOverviewModel.Remarks),
 				nameof(BillLedgerPaymentsOverviewModel.CreatedByName),
 				nameof(BillLedgerPaymentsOverviewModel.CreatedAt),
@@ -226,15 +215,12 @@ public static class BillReportExport
 			[
 				nameof(BillLedgerPaymentsOverviewModel.LedgerName),
 				nameof(BillLedgerPaymentsOverviewModel.PaymentAmount),
-				nameof(BillLedgerPaymentsOverviewModel.CompanyName),
 				nameof(BillLedgerPaymentsOverviewModel.TransactionDateTime),
 				nameof(BillLedgerPaymentsOverviewModel.BillNo),
 				nameof(BillLedgerPaymentsOverviewModel.OMCName),
 				nameof(BillLedgerPaymentsOverviewModel.TotalGrossAmount),
-				nameof(BillLedgerPaymentsOverviewModel.TotalTDSAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalPenaltyAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalNetAmount),
-				nameof(BillLedgerPaymentsOverviewModel.TotalCardPaymentAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalLedgerPaymentAmount)
 			];
 
@@ -245,7 +231,7 @@ public static class BillReportExport
 				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.OMCName));
 		}
 
-		string fileName = $"VEHICLE_TRIP_BILL_LEDGER_PAYMENTS_REPORT";
+		string fileName = $"BILL_LEDGER_PAYMENTS_REPORT";
 		if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 			fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 

@@ -9,7 +9,7 @@ SELECT
 	[tp].[Remarks] AS PaymentRemarks,
 
 	[tp].[MasterId],
-    [t].[TransactionNo],
+	[t].[TransactionNo],
     [t].[CompanyId],
     [c].[Name] AS CompanyName,
 
