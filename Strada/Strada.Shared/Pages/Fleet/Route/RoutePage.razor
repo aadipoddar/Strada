@@ -6,6 +6,7 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
@@ -73,10 +74,10 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<AutoCompleteWithAdd TItem="LocationModel" TValue="LocationModel"
+							<AutoCompleteWithAdd @ref="_sfFirstFocus" TItem="LocationModel" TValue="LocationModel"
 												 @bind-Value="_selectedFromLocation"
 												 DataSource="@_locations"
-												 Placeholder="Select From Location"
+												 Placeholder="Select From Location (Ctrl + F)"
 												 Label="From Location" Required="true"
 												 FieldValue="@nameof(LocationModel.Name)"
 												 AddNewRoute="@PageRouteNames.LocationMaster" />

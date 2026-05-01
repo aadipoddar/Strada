@@ -5,9 +5,9 @@ public enum CodeType
 	FinancialAccounting,
 	Ledger,
 
-	VehicleTrip,
-	VehicleTripBill,
-	VehicleExpense,
+	Trip,
+	Bill,
+	Expense,
 
 	Location,
 	Route,

@@ -6,6 +6,7 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Accounts.Masters;
 
@@ -31,6 +32,7 @@ public partial class LedgerPage
 	private SfGrid<LedgerModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfTextBox _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -65,6 +67,9 @@ public partial class LedgerPage
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -273,6 +278,8 @@ public partial class LedgerPage
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
 		StateHasChanged();
+
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()

@@ -31,7 +31,7 @@ public partial class OMCCardPage
 	private SfGrid<OMCCardModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private SfTextBox _sfTextBox;
+	private SfTextBox _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -50,7 +50,7 @@ public partial class OMCCardPage
 		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 		await LoadData();
 	}
-	
+
 	private async Task LoadData()
 	{
 		_omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
@@ -67,8 +67,8 @@ public partial class OMCCardPage
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfTextBox is not null)
-			await _sfTextBox.FocusAsync();
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -280,9 +280,9 @@ public partial class OMCCardPage
 
 		_selectedOMC = _omcs.FirstOrDefault(omc => omc.Id == _omcCard.OMCId);
 
-		await _sfTextBox.FocusAsync();
-
 		StateHasChanged();
+
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()

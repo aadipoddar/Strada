@@ -29,7 +29,7 @@ public partial class VehicleTypePage
 	private SfGrid<VehicleTypeModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private SfTextBox _sfTextBox;
+	private SfTextBox _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -62,8 +62,8 @@ public partial class VehicleTypePage
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfTextBox is not null)
-			await _sfTextBox.FocusAsync();
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -271,9 +271,9 @@ public partial class VehicleTypePage
 		if (_vehicleType is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
-		await _sfTextBox.FocusAsync();
-
 		StateHasChanged();
+
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()

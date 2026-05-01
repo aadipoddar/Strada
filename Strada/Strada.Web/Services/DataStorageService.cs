@@ -37,17 +37,17 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 		await LocalRemove(StorageFileNames.FinancialAccountingDataFileName);
 		await LocalRemove(StorageFileNames.FinancialAccountingCartDataFileName);
 
-		await LocalRemove(StorageFileNames.VehicleExpenseDataFileName);
-		await LocalRemove(StorageFileNames.VehicleExpenseDetailsCartDataFileName);
+		await LocalRemove(StorageFileNames.ExpenseDataFileName);
+		await LocalRemove(StorageFileNames.ExpenseDetailsCartDataFileName);
 
-		await LocalRemove(StorageFileNames.VehicleTripDataFileName);
-		await LocalRemove(StorageFileNames.VehicleTripExpensesCartDataFileName);
-		await LocalRemove(StorageFileNames.VehicleTripPaymentsCartDataFileName);
+		await LocalRemove(StorageFileNames.TripDataFileName);
+		await LocalRemove(StorageFileNames.TripExpensesCartDataFileName);
+		await LocalRemove(StorageFileNames.TripPaymentsCartDataFileName);
 
-		await LocalRemove(StorageFileNames.VehicleTripBillDataFileName);
-		await LocalRemove(StorageFileNames.VehicleTripBillPendingTripsCartDataFileName);
-		await LocalRemove(StorageFileNames.VehicleTripBillCardPaymentsCartDataFileName);
-		await LocalRemove(StorageFileNames.VehicleTripBillLedgerPaymentsCartDataFileName);
+		await LocalRemove(StorageFileNames.BillDataFileName);
+		await LocalRemove(StorageFileNames.BillPendingTripsCartDataFileName);
+		await LocalRemove(StorageFileNames.BillCardPaymentsCartDataFileName);
+		await LocalRemove(StorageFileNames.BillLedgerPaymentsCartDataFileName);
 	}
 
 

@@ -40,6 +40,7 @@ public partial class VehicleDocumentPage
 	private SfGrid<VehicleDocumentModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfTextBox _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionNo = string.Empty;
@@ -78,6 +79,9 @@ public partial class VehicleDocumentPage
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -429,6 +433,8 @@ public partial class VehicleDocumentPage
 		_selectedVehicle = _vehicles.FirstOrDefault(v => v.Id == _vehicleDocument.VehicleId);
 
 		StateHasChanged();
+
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()

@@ -2,7 +2,6 @@
 	@Id INT OUTPUT,
 	@TransactionNo VARCHAR(100),
 	@TransactionDateTime DATETIME,
-	@FinancialYearId INT,
 	@VehicleDocumentTypeId INT,
 	@VehicleId INT,
 	@CurrentKM MONEY,
@@ -25,7 +24,6 @@ BEGIN
 		(
 			[TransactionNo],
 			[TransactionDateTime],
-			[FinancialYearId],
 			[VehicleDocumentTypeId],
 			[VehicleId],
 			[CurrentKM],
@@ -41,7 +39,6 @@ BEGIN
 		(
 			@TransactionNo,
 			@TransactionDateTime,
-			@FinancialYearId,
 			@VehicleDocumentTypeId,
 			@VehicleId,
 			@CurrentKM,
@@ -63,7 +60,6 @@ BEGIN
 		SET
 			[TransactionNo] = @TransactionNo,
 			[TransactionDateTime] = @TransactionDateTime,
-			[FinancialYearId] = @FinancialYearId,
 			[VehicleDocumentTypeId] = @VehicleDocumentTypeId,
 			[VehicleId] = @VehicleId,
 			[CurrentKM] = @CurrentKM,

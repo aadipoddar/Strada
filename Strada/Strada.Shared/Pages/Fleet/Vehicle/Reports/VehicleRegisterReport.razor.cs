@@ -2,10 +2,10 @@ using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Fleet.Expense;
 using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Fleet.VehicleExpense;
-using StradaLibrary.Models.Fleet.VehicleTrip;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
 
@@ -84,8 +84,8 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 
 			await LoadVehicles();
 			await LoadExpenseTypes();
-			await LoadVehicleTrips();
-			await LoadVehicleExpenses();
+			await LoadTrips();
+			await LoadExpenses();
 			CalculateProfitLoss();
 			await RemoveUnnecessaryTransaction();
 		}
@@ -132,7 +132,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 					ExpenseAmount = 0
 				});
 
-				vehcicle.VehicleExpenses.Add(new()
+				vehcicle.Expenses.Add(new()
 				{
 					ExpenseTypeId = expenseType.Id,
 					ExpenseType = expenseType.Name,
@@ -141,9 +141,9 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			}
 	}
 
-	private async Task LoadVehicleTrips()
+	private async Task LoadTrips()
 	{
-		var trips = await CommonData.LoadTableDataByDate<VehicleTripOverviewModel>(FleetNames.VehicleTripOverview, _fromDate, _toDate);
+		var trips = await CommonData.LoadTableDataByDate<TripOverviewModel>(FleetNames.TripOverview, _fromDate, _toDate);
 		trips = [.. trips.Where(_ => _.Status)];
 
 		if (_selectedCompany?.Id > 0)
@@ -155,31 +155,31 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		foreach (var vehicle in _transactionOverviews)
 		{
 			var vehicleTrips = trips.Where(_ => _.VehicleId == vehicle.VehicleId);
-			vehicle.TotalTrips = vehicleTrips.Count();
-			vehicle.EmptyTrips = vehicleTrips.Count(_ => _.VehicleEmpty);
-			vehicle.LoadedTrips = vehicleTrips.Count(_ => !_.VehicleEmpty);
-			vehicle.TotalQuantity = vehicleTrips.Sum(_ => _.Quantity);
-			vehicle.TotalTripExpenses = vehicleTrips.Sum(_ => _.TotalExpense);
+			vehicle.TotalTrips = Enumerable.Count(vehicleTrips);
+			vehicle.EmptyTrips = Enumerable.Count(vehicleTrips, _ => _.VehicleEmpty);
+			vehicle.LoadedTrips = Enumerable.Count(vehicleTrips, _ => !_.VehicleEmpty);
+			vehicle.TotalQuantity = Enumerable.Sum(vehicleTrips, _ => _.Quantity);
+			vehicle.TotalTripExpenses = Enumerable.Sum(vehicleTrips, _ => _.TotalExpense);
 
-			vehicle.TotalBills = vehicleTrips.Count(_ => _.BillId.HasValue);
+			vehicle.TotalBills = Enumerable.Count(vehicleTrips, _ => _.BillId.HasValue);
 			vehicle.TotalGrossAmount = vehicleTrips.Where(_ => _.GrossAmount.HasValue).Sum(_ => _.GrossAmount.Value);
 			vehicle.TotalTDSAmount = vehicleTrips.Where(_ => _.TDSAmount.HasValue).Sum(_ => _.TDSAmount.Value);
 			vehicle.TotalNetAmount = vehicleTrips.Where(_ => _.NetAmount.HasValue).Sum(_ => _.NetAmount.Value);
 
-			vehicle.VehicleTripOverviews = [.. vehicleTrips];
+			vehicle.TripOverviews = [.. vehicleTrips];
 
 			foreach (var trip in vehicleTrips)
 			{
-				var tripExpenses = await CommonData.LoadTableDataByMasterId<VehicleTripExpensesOverviewModel>(FleetNames.VehicleTripExpensesOverview, trip.Id);
+				var tripExpenses = await CommonData.LoadTableDataByMasterId<TripExpensesOverviewModel>(FleetNames.TripExpensesOverview, trip.Id);
 				foreach (var expense in tripExpenses)
 					vehicle.TripExpenses.FirstOrDefault(_ => _.ExpenseTypeId == expense.ExpenseTypeId).ExpenseAmount += expense.ExpenseAmount;
 			}
 		}
 	}
 
-	private async Task LoadVehicleExpenses()
+	private async Task LoadExpenses()
 	{
-		var expenses = await CommonData.LoadTableDataByDate<VehicleExpenseOverviewModel>(FleetNames.VehicleExpenseOverview, _fromDate, _toDate);
+		var expenses = await CommonData.LoadTableDataByDate<ExpenseOverviewModel>(FleetNames.ExpenseOverview, _fromDate, _toDate);
 		expenses = [.. expenses.Where(_ => _.Status)];
 
 		if (_selectedCompany?.Id > 0)
@@ -188,16 +188,16 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		foreach (var vehicle in _transactionOverviews)
 		{
 			var vehicleExpenses = expenses.Where(_ => _.VehicleId == vehicle.VehicleId);
-			vehicle.TotalVehicleExpenses = vehicleExpenses.Sum(_ => _.TotalExpense);
+			vehicle.TotalExpenses = vehicleExpenses.Sum(_ => _.TotalExpense);
 
 			foreach (var expense in vehicleExpenses)
 			{
-				var expenseDetails = await CommonData.LoadTableDataByMasterId<VehicleExpenseDetailsOverviewModel>(FleetNames.VehicleExpenseDetailsOverview, expense.Id);
+				var expenseDetails = await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id);
 
 				foreach (var expenseDetail in expenseDetails)
 				{
-					vehicle.VehicleExpenses.FirstOrDefault(_ => _.ExpenseTypeId == expenseDetail.ExpenseTypeId).ExpenseAmount += expenseDetail.ExpenseAmount;
-					vehicle.VehicleExpenseDetailsOverviews.Add(expenseDetail);
+					vehicle.Expenses.FirstOrDefault(_ => _.ExpenseTypeId == expenseDetail.ExpenseTypeId).ExpenseAmount += expenseDetail.ExpenseAmount;
+					vehicle.ExpenseDetailsOverviews.Add(expenseDetail);
 				}
 			}
 		}
@@ -206,7 +206,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	private void CalculateProfitLoss()
 	{
 		foreach (var vehicle in _transactionOverviews)
-			vehicle.TotalProfitLoss = vehicle.TotalNetAmount - vehicle.TotalTripExpenses - vehicle.TotalVehicleExpenses;
+			vehicle.TotalProfitLoss = vehicle.TotalNetAmount - vehicle.TotalTripExpenses - vehicle.TotalExpenses;
 	}
 
 	private async Task RemoveUnnecessaryTransaction()
@@ -215,11 +215,11 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		_transactionOverviews = [.. _transactionOverviews.Where(_ =>
 			_.TotalTrips > 0 ||
 			_.TotalTripExpenses > 0 ||
-			_.TotalVehicleExpenses > 0 ||
+			_.TotalExpenses > 0 ||
 			_.TotalBills > 0 ||
 			_.TotalGrossAmount > 0 ||
 			_.TripExpenses.Any(te => te.ExpenseAmount > 0) ||
-			_.VehicleExpenses.Any(ve => ve.ExpenseAmount > 0))];
+			_.Expenses.Any(ve => ve.ExpenseAmount > 0))];
 
 		// Remove trip expense types that are 0 across all vehicles
 		var activeTripExpenseTypeIds = _transactionOverviews
@@ -233,17 +233,17 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 
 		// Remove expense types that are 0 across all vehicles
 		var activeExpenseTypeIds = _transactionOverviews
-			.SelectMany(_ => _.VehicleExpenses)
+			.SelectMany(_ => _.Expenses)
 			.Where(ve => ve.ExpenseAmount > 0)
 			.Select(ve => ve.ExpenseTypeId)
 			.ToHashSet();
 
 		foreach (var vehicle in _transactionOverviews)
-			vehicle.VehicleExpenses = [.. vehicle.VehicleExpenses.Where(ve => activeExpenseTypeIds.Contains(ve.ExpenseTypeId))];
+			vehicle.Expenses = [.. vehicle.Expenses.Where(ve => activeExpenseTypeIds.Contains(ve.ExpenseTypeId))];
 
 		// Capture expense type metadata for dynamic column rendering (same set across all vehicles after pruning)
 		_activeTripExpenseTypes = _transactionOverviews.FirstOrDefault()?.TripExpenses ?? [];
-		_activeExpenseTypes = _transactionOverviews.FirstOrDefault()?.VehicleExpenses ?? [];
+		_activeExpenseTypes = _transactionOverviews.FirstOrDefault()?.Expenses ?? [];
 	}
 	#endregion
 
@@ -291,7 +291,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		var vehicle = args.ParentRow.Data;
 		var rows = new List<ExcelDetailTemplateRow>();
 
-		if (vehicle.VehicleTripOverviews.Count > 0)
+		if (vehicle.TripOverviews.Count > 0)
 		{
 			// Section heading
 			rows.Add(ExcelRow(["TRIPS", .. Enumerable.Repeat("", 13)], bold: true, backColor: "#BDD7EE"));
@@ -299,7 +299,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			// Column headers
 			rows.Add(ExcelRow(["Date", "Challan", "Route", "Driver", "Type", "Qty", "Trip Exp", "Bill No", "Bill Date", "Gross", "TDS", "Net Amt", "Profit/Loss", "Pending Days", "OMC", "Company", "Trip No", "Remarks"], bold: true, backColor: "#DEEAF1"));
 
-			foreach (var trip in vehicle.VehicleTripOverviews)
+			foreach (var trip in vehicle.TripOverviews)
 			{
 				rows.Add(ExcelRow([
 					trip.TransactionDateTime.ToString("dd/MM/yy"),
@@ -327,15 +327,15 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			rows.Add(ExcelRow([""]));
 		}
 
-		if (vehicle.VehicleExpenseDetailsOverviews.Count > 0)
+		if (vehicle.ExpenseDetailsOverviews.Count > 0)
 		{
 			// Section heading
-			rows.Add(ExcelRow(["VEHICLE EXPENSES", .. Enumerable.Repeat("", 3)], bold: true, backColor: "#BDD7EE"));
+			rows.Add(ExcelRow(["EXPENSES", .. Enumerable.Repeat("", 3)], bold: true, backColor: "#BDD7EE"));
 
 			// Column headers
 			rows.Add(ExcelRow(["Date", "Expense Type", "Ledger", "Amount", "Expense Remarks", "Company", "Expense No", "Remarks"], bold: true, backColor: "#DEEAF1"));
 
-			foreach (var expense in vehicle.VehicleExpenseDetailsOverviews)
+			foreach (var expense in vehicle.ExpenseDetailsOverviews)
 			{
 				rows.Add(ExcelRow([
 					expense.TransactionDateTime.ToString("dd/MM/yy"),
@@ -376,14 +376,14 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "VehicleTripReport":
-				NavigationManager.NavigateTo(PageRouteNames.VehicleTripReport);
+			case "TripReport":
+				NavigationManager.NavigateTo(PageRouteNames.TripReport);
 				break;
-			case "VehicleExpenseReport":
-				NavigationManager.NavigateTo(PageRouteNames.VehicleExpenseReport);
+			case "ExpenseReport":
+				NavigationManager.NavigateTo(PageRouteNames.ExpenseReport);
 				break;
-			case "VehicleTripBillReport":
-				NavigationManager.NavigateTo(PageRouteNames.VehicleTripBillReport);
+			case "BillReport":
+				NavigationManager.NavigateTo(PageRouteNames.BillReport);
 				break;
 			case "Refresh":
 				await LoadTransactionOverviews();

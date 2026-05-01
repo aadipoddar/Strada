@@ -8,7 +8,7 @@ CREATE PROCEDURE [dbo].[Insert_Route]
 	@EstimatedFuelConsumption INT,
 	@EstimatedCost MONEY,
 	@Remarks VARCHAR(MAX),
-	@Status BIT = 1
+	@Status BIT
 AS
 BEGIN
 	IF @Id = 0
@@ -43,7 +43,7 @@ BEGIN
 
 	ELSE
 	BEGIN
-		UPDATE [dbo].[VehicleRoute]
+		UPDATE [dbo].[Route]
 		SET
 			[FromLocationId] = @FromLocationId,
 			[ToLocationId] = @ToLocationId,

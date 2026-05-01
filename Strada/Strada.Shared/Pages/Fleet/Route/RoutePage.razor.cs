@@ -1,11 +1,14 @@
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.Route;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Operations;
+using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Fleet.Route;
 
@@ -31,6 +34,7 @@ public partial class RoutePage
 	private SfGrid<RouteModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private AutoCompleteWithAdd<LocationModel, LocationModel> _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -65,6 +69,9 @@ public partial class RoutePage
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -279,6 +286,8 @@ public partial class RoutePage
 		_selectedToLocation = _locations.FirstOrDefault(rl => rl.Id == _route.ToLocationId);
 
 		StateHasChanged();
+
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()

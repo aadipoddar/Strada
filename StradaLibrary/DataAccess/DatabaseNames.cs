@@ -69,44 +69,44 @@ public static class AccountNames
 
 public static class FleetNames
 {
-	#region Vehicle Trip Bill
-	public static string VehicleTripBill => "VehicleTripBill";
-	public static string VehicleTripBillCardPayments => "VehicleTripBillCardPayments";
-	public static string VehicleTripBillLedgerPayments => "VehicleTripBillLedgerPayments";
+	#region Bill
+	public static string Bill => "Bill";
+	public static string BillCardPayments => "BillCardPayments";
+	public static string BillLedgerPayments => "BillLedgerPayments";
 
-	public static string VehicleTripBillOverview => "VehicleTripBill_Overview";
-	public static string VehicleTripBillCardPaymentsOverview => "VehicleTripBillCardPayments_Overview";
-	public static string VehicleTripBillLedgerPaymentsOverview => "VehicleTripBillLedgerPayments_Overview";
+	public static string BillOverview => "Bill_Overview";
+	public static string BillCardPaymentsOverview => "BillCardPayments_Overview";
+	public static string BillLedgerPaymentsOverview => "BillLedgerPayments_Overview";
 
-	public static string InsertVehicleTripBill => "Insert_VehicleTripBill";
-	public static string InsertVehicleTripBillCardPayments => "Insert_VehicleTripBillCardPayments";
-	public static string InsertVehicleTripBillLedgerPayments => "Insert_VehicleTripBillLedgerPayments";
+	public static string InsertBill => "Insert_Bill";
+	public static string InsertBillCardPayments => "Insert_BillCardPayments";
+	public static string InsertBillLedgerPayments => "Insert_BillLedgerPayments";
 	#endregion
 
-	#region Vehicle Trip
-	public static string VehicleTrip => "VehicleTrip";
-	public static string VehicleTripExpenses => "VehicleTripExpenses";
-	public static string VehicleTripCardPayments => "VehicleTripCardPayments";
+	#region Trip
+	public static string Trip => "Trip";
+	public static string TripExpenses => "TripExpenses";
+	public static string TripCardPayments => "TripCardPayments";
 
-	public static string VehicleTripOverview => "VehicleTrip_Overview";
-	public static string VehicleTripExpensesOverview => "VehicleTripExpenses_Overview";
-	public static string VehicleTripCardPaymentsOverview => "VehicleTripCardPayments_Overview";
-	public static string LoadVehicleTripOverviewByBillIdDate => "Load_VehicleTrip_Overview_By_BillId_Date";
+	public static string TripOverview => "Trip_Overview";
+	public static string TripExpensesOverview => "TripExpenses_Overview";
+	public static string TripCardPaymentsOverview => "TripCardPayments_Overview";
+	public static string LoadTripOverviewByBillIdDate => "Load_Trip_Overview_By_BillId_Date";
 
-	public static string InsertVehicleTrip => "Insert_VehicleTrip";
-	public static string InsertVehicleTripExpenses => "Insert_VehicleTripExpenses";
-	public static string InsertVehicleTripCardPayments => "Insert_VehicleTripCardPayments";
+	public static string InsertTrip => "Insert_Trip";
+	public static string InsertTripExpenses => "Insert_TripExpenses";
+	public static string InsertTripCardPayments => "Insert_TripCardPayments";
 	#endregion
 	
-	#region Vehicle Expense
-	public static string VehicleExpense => "VehicleExpense";
-	public static string VehicleExpenseDetails => "VehicleExpenseDetails";
+	#region Expense
+	public static string Expense => "Expense";
+	public static string ExpenseDetails => "ExpenseDetails";
 
-	public static string VehicleExpenseOverview => "VehicleExpense_Overview";
-	public static string VehicleExpenseDetailsOverview => "VehicleExpenseDetails_Overview";
+	public static string ExpenseOverview => "Expense_Overview";
+	public static string ExpenseDetailsOverview => "ExpenseDetails_Overview";
 
-	public static string InsertVehicleExpense => "Insert_VehicleExpense";
-	public static string InsertVehicleExpenseDetails => "Insert_VehicleExpenseDetails";
+	public static string InsertExpense => "Insert_Expense";
+	public static string InsertExpenseDetails => "Insert_ExpenseDetails";
 	#endregion
 
 	#region Route

@@ -45,7 +45,7 @@ else
 				</div>
 			</div>
 
-			<!-- VEHICLE TRIP REPORTS -->
+			<!-- TRIP REPORTS -->
 			<div class="section-card">
 				<div class="section-header">
 					<div class="section-title-wrapper">
@@ -61,7 +61,7 @@ else
 				<div class="section-body">
 					<div class="dashboard-grid">
 
-						<FileCard Title="Trip Report" Description="Summary of all vehicle trips filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripReport)">
+						<FileCard Title="Trip Report" Description="Summary of all trips filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -72,7 +72,7 @@ else
 							</IconContent>
 						</FileCard>
 
-						<FileCard Title="Trip Expenses Report" Description="Itemised breakdown of all expenses recorded against trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripExpensesReport)">
+						<FileCard Title="Trip Expenses Report" Description="Itemised breakdown of all expenses recorded against trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripExpensesReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -83,7 +83,7 @@ else
 							</IconContent>
 						</FileCard>
 
-						<FileCard Title="Trip Payments Report" Description="OMC card payments collected against vehicle trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripPaymentsReport)">
+						<FileCard Title="Trip Payments Report" Description="OMC card payments collected against trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripPaymentsReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
@@ -97,7 +97,7 @@ else
 				</div>
 			</div>
 
-			<!-- TRIP BILL REPORTS -->
+			<!-- BILL REPORTS -->
 			<div class="section-card">
 				<div class="section-header">
 					<div class="section-title-wrapper">
@@ -110,12 +110,12 @@ else
 						</svg>
 						<h2 class="section-title">Billing Reports</h2>
 					</div>
-					<p class="section-subtitle">Billing summaries, card payments and ledger settlements recorded on trip bills</p>
+					<p class="section-subtitle">Billing summaries, card payments and ledger settlements recorded on Bills</p>
 				</div>
 				<div class="section-body">
 					<div class="dashboard-grid">
 
-						<FileCard Title="Bill Report" Description="Summary of all trip bills filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripBillReport)">
+						<FileCard Title="Bill Report" Description="Summary of all Bills filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.BillReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -127,7 +127,7 @@ else
 							</IconContent>
 						</FileCard>
 
-						<FileCard Title="Bill Card Payments Report" Description="OMC card payments collected against trip bills" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripBillCardPaymentsReport)">
+						<FileCard Title="Bill Card Payments Report" Description="OMC card payments collected against Bills" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.BillCardPaymentsReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
@@ -138,7 +138,7 @@ else
 							</IconContent>
 						</FileCard>
 
-						<FileCard Title="Bill Ledger Payments Report" Description="Ledger settlements recorded against trip bills" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTripBillLedgerPaymentsReport)">
+						<FileCard Title="Bill Ledger Payments Report" Description="Ledger settlements recorded against Bills" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.BillLedgerPaymentsReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M4 2h13l3 3v17a1 1 0 0 1-1.5.87L17 22l-2 .87L13 22l-2 .87L9 22l-2 .87L5 22l-1.5.87A1 1 0 0 1 2 22V4a2 2 0 0 1 2-2z" />
@@ -154,7 +154,7 @@ else
 				</div>
 			</div>
 
-			<!-- VEHICLE EXPENSE REPORTS -->
+			<!-- EXPENSE REPORTS -->
 			<div class="section-card">
 				<div class="section-header">
 					<div class="section-title-wrapper">
@@ -169,7 +169,7 @@ else
 				<div class="section-body">
 					<div class="dashboard-grid">
 
-						<FileCard Title="Expense Report" Description="Summary of expense transactions grouped by vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleExpenseReport)">
+						<FileCard Title="Expense Report" Description="Summary of expense transactions grouped by vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ExpenseReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -180,7 +180,7 @@ else
 							</IconContent>
 						</FileCard>
 
-						<FileCard Title="Expense Details Report" Description="Line-item breakdown of every expense entry by vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleExpenseDetailsReport)">
+						<FileCard Title="Expense Details Report" Description="Line-item breakdown of every expense entry by vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ExpenseDetailsReport)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<circle cx="11" cy="11" r="8" />

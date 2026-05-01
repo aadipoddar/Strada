@@ -51,10 +51,6 @@ public static class DriverData
 
 		var allDrivers = await CommonData.LoadTableData<DriverModel>(FleetNames.Driver);
 
-		var existingByName = allDrivers.FirstOrDefault(vd => vd.Id != driver.Id && vd.Name.Equals(driver.Name, StringComparison.OrdinalIgnoreCase));
-		if (existingByName is not null)
-			throw new Exception($"Driver name '{driver.Name}' already exists. Please choose a different name.");
-
 		var existingByMobile = allDrivers.FirstOrDefault(vd => vd.Id != driver.Id && vd.Mobile.Equals(driver.Mobile, StringComparison.OrdinalIgnoreCase));
 		if (existingByMobile is not null)
 			throw new Exception($"Mobile '{driver.Mobile}' already exists. Please choose a different mobile number.");

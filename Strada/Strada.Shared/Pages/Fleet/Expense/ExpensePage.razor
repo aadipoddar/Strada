@@ -1,0 +1,304 @@
+﻿@attribute [Route(PageRouteNames.Expense)]
+@attribute [Route(PageRouteNames.Expense + "/{Id:int}")]
+
+@using StradaLibrary.Models.Accounts.Masters
+@using StradaLibrary.Models.Fleet.OMC
+@using StradaLibrary.Models.Fleet.Vehicle
+@using StradaLibrary.Models.Fleet.Route
+@using StradaLibrary.Models.Fleet.Expense
+
+<PageTitle>Expense - Strada</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
+<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfExpenseTypeAutoComplete.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="AddExpensesToCart" />
+<MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(savePDF: true)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportPdfInvoice" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ExportExcelInvoice" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedExpensesCartItem" />
+<MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="RemoveSelectedExpensesCartItem" />
+
+@if (_isLoading || _user is null)
+{
+	<LoadingScreen />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Create Expense">
+			<LeftContent>
+				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" OnOpen='async () => await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0)' />
+					<MenuItems>
+						<MenuItem Text="File" IconCss="e-icons e-folder">
+							<MenuItems>
+								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Save & PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="SavePdfInvoice" Disabled="@_isProcessing" />
+								<MenuItem Text="Save & Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="SaveExcelInvoice" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Export PDF (Alt + P)" IconCss="e-icons e-export-pdf" Id="ExportPdfInvoice" Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
+								<MenuItem Text="Export Excel (Alt + E)" IconCss="e-icons e-export-excel" Id="ExportExcelInvoice" Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
+							</MenuItems>
+						</MenuItem>
+						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
+							<MenuItems>
+								<MenuItem Text="Transaction History Report (Ctrl + H)" Id="TransactionHistory" Disabled="@_isProcessing" />
+								<MenuItem Text="Expenses Report" Id="ExpensesReport" Disabled="@_isProcessing" />
+							</MenuItems>
+						</MenuItem>
+					</MenuItems>
+				</SfMenu>
+			</LeftContent>
+			<RightContent>
+				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
+			</RightContent>
+		</Header>
+
+		<!-- Main Content Container -->
+		<div class="page-container">
+
+			<!-- Transaction Summary Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+							 stroke-linecap="round" stroke-linejoin="round">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+							<polyline points="14 2 14 8 20 8" />
+							<line x1="16" y1="13" x2="8" y2="13" />
+							<line x1="16" y1="17" x2="8" y2="17" />
+							<polyline points="10 9 9 9 8 9" />
+						</svg>
+						<h2 class="section-title">Transaction Summary</h2>
+					</div>
+				</div>
+
+				<div class="section-body">
+					<div class="form-grid">
+						<!-- Company -->
+						<div class="form-field">
+							<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+												 Value="_selectedCompany"
+												 DataSource="@_companies"
+												 Placeholder="Select a Company"
+												 Label="Company" Required="true"
+												 ValueChange="OnCompanyChanged"
+												 FieldValue="@nameof(CompanyModel.Name)"
+												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+						</div>
+
+						<!-- Transaction Date -->
+						<div class="form-field">
+							<label class="field-label">
+								Transaction Date <span class="required">*</span> / Financial Year
+							</label>
+							<div class="date-year-wrapper">
+								<SfDatePicker @bind-Value="_expense.TransactionDateTime" TValue="DateTime"
+											  Format="dd/MM/yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
+											  CssClass="custom-datepicker">
+								</SfDatePicker>
+								<SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+										   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+										   CssClass="custom-textbox readonly-field" />
+							</div>
+						</div>
+
+						<!-- Transaction No -->
+						<div class="form-field">
+							<label class="field-label">
+								Transaction No <span class="required">*</span>
+							</label>
+							<SfTextBox @bind-Value="_expense.TransactionNo" Placeholder="Transaction No"
+									   FloatLabelType="FloatLabelType.Never" Readonly="true"
+									   CssClass="custom-textbox readonly-field" />
+						</div>
+
+						<!-- Vehicle -->
+						<div class="form-field">
+							<AutoCompleteWithAdd TItem="VehicleModel" TValue="VehicleModel"
+												 Value="_selectedVehicle"
+												 DataSource="@_vehicles"
+												 Placeholder="Select a Vehicle"
+												 Label="Vehicle" Required="true"
+												 ValueChange="OnVehicleChanged"
+												 FieldValue="@nameof(VehicleModel.Code)"
+												 AddNewRoute="@PageRouteNames.VehicleMaster" />
+						</div>
+
+						<!-- Total Expense -->
+						<div class="form-field">
+							<label class="field-label">
+								Total Expense
+							</label>
+							<SfTextBox Value="@_expense.TotalExpense.ToString("N2")" Placeholder="Total Expense"
+									   FloatLabelType="FloatLabelType.Never" Readonly="true"
+									   CssClass="custom-textbox readonly-field" />
+						</div>
+
+						<!-- Remarks -->
+						<div class="form-field">
+							<label class="field-label">
+								Remarks / Narration
+							</label>
+							<SfTextBox @bind-Value="_expense.Remarks" Multiline="true"
+									   Placeholder="Enter remarks..." FloatLabelType="FloatLabelType.Never"
+									   CssClass="custom-textbox" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Add to Cart Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<circle cx="9" cy="21" r="1" />
+							<circle cx="20" cy="21" r="1" />
+							<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+						</svg>
+						<h2 class="section-title">Add Expenses to Cart</h2>
+					</div>
+				</div>
+
+				<div class="section-body">
+					<div class="cart-input-row">
+						<!-- Expense Type -->
+						<div class="cart-field cart-field-wide">
+							<AutoCompleteWithAdd TItem="ExpenseTypeModel" TValue="ExpenseTypeModel"
+												 @ref="_sfExpenseTypeAutoComplete"
+												 FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
+												 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + F)"
+												 ValueChange="OnExpensesTypeChanged"
+												 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+						</div>
+
+						<!-- Ledger -->
+						<div class="cart-field">
+							<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
+												 FieldValue="@nameof(LedgerModel.Name)" @bind-Value="_selectedLedger"
+												 DataSource="@_ledgers" Placeholder="Select Ledger"
+												 ValueChange="OnLedgerChanged"
+												 Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
+						</div>
+
+						<!-- Amount -->
+						<div class="cart-field">
+							<label class="cart-label">Amount <span class="required">*</span></label>
+							<SfNumericTextBox @bind-Value=@_selectedExpensesCart.Amount TValue="decimal" Min="0"
+											  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+											  CssClass="custom-numeric editable-field" />
+						</div>
+
+						<!-- Identification -->
+						<div class="cart-field cart-field-wide">
+							<label class="cart-label">Identification</label>
+							<SfTextBox @bind-Value="_selectedExpensesCart.IdentificationNo" Placeholder="Enter identification..."
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<!-- Remarks -->
+						<div class="cart-field cart-field-wide">
+							<label class="cart-label">Remarks</label>
+							<SfTextBox @bind-Value="_selectedExpensesCart.Remarks" Placeholder="Item Narration..."
+									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+						</div>
+
+						<!-- Add Button -->
+						<div class="cart-field">
+							<label class="cart-label">&nbsp;</label>
+							<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart"
+										OnClick="AddExpensesToCart" />
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- Expenses Cart Grid Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M3 3h7a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H3V3z" />
+							<path d="M14 3h7v17h-7V3z" />
+						</svg>
+						<h2 class="section-title">Expenses Cart</h2>
+					</div>
+				</div>
+
+				<div class="section-body grid-body">
+					<SfGrid ID="_sfCartGrid" @ref="_sfExpensesCartGrid" DataSource="_expensesCart" AllowTextWrap="true"
+							AllowPaging="false" AllowSorting="true" AllowResizing="true" AllowFiltering="true"
+							GridLines="GridLine.Horizontal" CssClass="professional-grid"
+							ContextMenuItems="@_expensesCartGridContextMenuItems" Toolbar="@(new List<string>() { "Search" })">
+
+						<GridEvents TValue="ExpenseDetailsCartModel" ContextMenuItemClicked="OnExpensesCartGridContextMenuItemClicked" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+						<GridAggregates>
+							<GridAggregate>
+								<GridAggregateColumns>
+									<GridAggregateColumn Field="@nameof(ExpenseDetailsCartModel.ExpenseTypeName)" Type="AggregateType.Count">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Expense Types: @aggregate.Count</strong>
+											</div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(ExpenseDetailsCartModel.Amount)" Type="AggregateType.Sum">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+											}
+											<div class="aggregate-value aggregate-total">
+												<strong>@sum.ToString("N2")</strong>
+											</div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+								</GridAggregateColumns>
+							</GridAggregate>
+						</GridAggregates>
+
+						<GridColumns>
+							<GridColumn Field="@nameof(ExpenseDetailsCartModel.ExpenseTypeName)" HeaderText="Name" Width="200" />
+							<GridColumn Field="@nameof(ExpenseDetailsCartModel.LedgerName)" HeaderText="Ledger" Width="200" />
+							<GridColumn Field="@nameof(ExpenseDetailsCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
+								<Template>
+									@{
+										var item = (context as dynamic);
+										<span class="grid-total">@item.Amount.ToString("N2")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(ExpenseDetailsCartModel.IdentificationNo)" HeaderText="Identification No" Width="150" />
+							<GridColumn Field="@nameof(ExpenseDetailsCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+						</GridColumns>
+
+					</SfGrid>
+				</div>
+			</div>
+
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<ToastNotification @ref="_toastNotification" />

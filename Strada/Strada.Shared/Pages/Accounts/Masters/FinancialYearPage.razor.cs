@@ -5,6 +5,7 @@ using StradaLibrary.Exports.Accounts.Masters;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
+using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Masters;
@@ -28,6 +29,7 @@ public partial class FinancialYearPage
 	private SfGrid<FinancialYearModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private SfDatePicker<DateOnly> _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -59,6 +61,9 @@ public partial class FinancialYearPage
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -307,6 +312,8 @@ public partial class FinancialYearPage
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
 		StateHasChanged();
+
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()

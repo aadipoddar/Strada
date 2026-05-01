@@ -1,7 +1,5 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Common;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
@@ -43,9 +41,9 @@ public partial class SettingsPage
 
     // Transaction Prefixes
     private string _financialAccountingTransactionPrefix = string.Empty;
-    private string _vehicleTripTransactionPrefix = string.Empty;
-    private string _vehicleTripBillTransactionPrefix = string.Empty;
-    private string _vehicleExpenseTransactionPrefix = string.Empty;
+    private string _tripTransactionPrefix = string.Empty;
+    private string _billTransactionPrefix = string.Empty;
+    private string _expenseTransactionPrefix = string.Empty;
 
     // Ledger Linking
     private string _cashLedgerId = string.Empty;
@@ -140,14 +138,14 @@ public partial class SettingsPage
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.FinancialAccountingTransactionPrefix);
         _financialAccountingTransactionPrefix = s?.Value ?? string.Empty;
 
-        s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTripTransactionPrefix);
-        _vehicleTripTransactionPrefix = s?.Value ?? string.Empty;
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.TripTransactionPrefix);
+        _tripTransactionPrefix = s?.Value ?? string.Empty;
 
-        s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTripBillTransactionPrefix);
-        _vehicleTripBillTransactionPrefix = s?.Value ?? string.Empty;
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.BillTransactionPrefix);
+        _billTransactionPrefix = s?.Value ?? string.Empty;
 
-        s = await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTransactionPrefix);
-        _vehicleExpenseTransactionPrefix = s?.Value ?? string.Empty;
+        s = await SettingsData.LoadSettingsByKey(SettingsKeys.ExpenseTransactionPrefix);
+        _expenseTransactionPrefix = s?.Value ?? string.Empty;
 
         s = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
         _primaryCompanyLinkingId = s?.Value ?? string.Empty;
@@ -266,9 +264,9 @@ public partial class SettingsPage
             await UpdateSetting(SettingsKeys.ExpenseTypeCodePrefix, _expenseTypeCodePrefix, Desc(SettingsKeys.ExpenseTypeCodePrefix));
 
             await UpdateSetting(SettingsKeys.FinancialAccountingTransactionPrefix, _financialAccountingTransactionPrefix, Desc(SettingsKeys.FinancialAccountingTransactionPrefix));
-            await UpdateSetting(SettingsKeys.VehicleTripTransactionPrefix, _vehicleTripTransactionPrefix, Desc(SettingsKeys.VehicleTripTransactionPrefix));
-            await UpdateSetting(SettingsKeys.VehicleTripBillTransactionPrefix, _vehicleTripBillTransactionPrefix, Desc(SettingsKeys.VehicleTripBillTransactionPrefix));
-            await UpdateSetting(SettingsKeys.VehicleExpenseTransactionPrefix, _vehicleExpenseTransactionPrefix, Desc(SettingsKeys.VehicleExpenseTransactionPrefix));
+            await UpdateSetting(SettingsKeys.TripTransactionPrefix, _tripTransactionPrefix, Desc(SettingsKeys.TripTransactionPrefix));
+            await UpdateSetting(SettingsKeys.BillTransactionPrefix, _billTransactionPrefix, Desc(SettingsKeys.BillTransactionPrefix));
+            await UpdateSetting(SettingsKeys.ExpenseTransactionPrefix, _expenseTransactionPrefix, Desc(SettingsKeys.ExpenseTransactionPrefix));
 
             await UpdateSetting(SettingsKeys.PrimaryCompanyLinkingId, _primaryCompanyLinkingId, Desc(SettingsKeys.PrimaryCompanyLinkingId));
             await UpdateSetting(SettingsKeys.CashLedgerId, _cashLedgerId, Desc(SettingsKeys.CashLedgerId));

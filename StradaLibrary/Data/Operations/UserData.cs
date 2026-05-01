@@ -11,7 +11,7 @@ public static class UserData
 
 	private static async Task ValidateTransaction(UserModel user)
 	{
-		user.Name = user.Name?.Trim() ?? string.Empty;
+		user.Name = user.Name?.Trim().ToUpper() ?? string.Empty;
 		user.Phone = user.Phone?.Trim() ?? string.Empty;
 		user.Email = user.Email?.Trim() ?? string.Empty;
 		user.Password = user.Password?.Trim() ?? string.Empty;

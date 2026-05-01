@@ -29,7 +29,7 @@ public partial class DriverPage
 	private SfGrid<DriverModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private SfTextBox _sfTextBox;
+	private SfTextBox _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -62,8 +62,8 @@ public partial class DriverPage
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfTextBox is not null)
-			await _sfTextBox.FocusAsync();
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -271,9 +271,9 @@ public partial class DriverPage
 		if (_driver is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
-		await _sfTextBox.FocusAsync();
-
 		StateHasChanged();
+
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()

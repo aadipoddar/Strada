@@ -8,7 +8,7 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfTextBox.FocusAsync()" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
@@ -78,7 +78,7 @@ else
 							<label class="field-label">
 								Code <span class="required">*</span>
 							</label>
-							<SfTextBox @bind-Value="_vehicle.Code" Placeholder="Enter vehicle code (Ctrl + F)"
+							<SfTextBox @ref="_sfFirstFocus" @bind-Value="_vehicle.Code" Placeholder="Enter vehicle code (Ctrl + F)"
 									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
 						</div>
 
@@ -107,6 +107,7 @@ else
 												 @bind-Value="_selectedVehicleType"
 												 DataSource="@_vehicleTypes"
 												 Placeholder="Select vehicle type"
+												 FieldValue="@nameof(VehicleTypeModel.Name)"
 												 Label="Vehicle Type" Required="true"
 												 AddNewRoute="@PageRouteNames.VehicleTypeMaster" />
 						</div>

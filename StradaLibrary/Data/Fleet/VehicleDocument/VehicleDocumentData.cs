@@ -42,18 +42,6 @@ public static class VehicleDocumentData
 		if (existingByTransactionNo is not null)
 			throw new Exception($"Vehicle Document transaction number '{vehicleDocument.TransactionNo}' already exists. Please choose a different transaction number.");
 
-		if (vehicleDocument.Id > 0)
-		{
-			var existingVehicleDocument = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, vehicleDocument.Id)
-				?? throw new Exception("Vehicle Document transaction not found for updating.");
-
-			await FinancialYearData.ValidateFinancialYear(existingVehicleDocument.TransactionDateTime);
-		}
-		
-		await FinancialYearData.ValidateFinancialYear(vehicleDocument.TransactionDateTime);
-		var financialYear = await FinancialYearData.LoadFinancialYearByDateTime(vehicleDocument.TransactionDateTime);
-		vehicleDocument.FinancialYearId = financialYear.Id;
-
 		vehicleDocument.Remarks = vehicleDocument.Remarks?.Trim() ?? string.Empty;
 		if (string.IsNullOrWhiteSpace(vehicleDocument.Remarks))
 			vehicleDocument.Remarks = null;

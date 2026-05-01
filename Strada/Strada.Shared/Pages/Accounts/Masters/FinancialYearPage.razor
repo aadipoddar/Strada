@@ -6,6 +6,7 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
@@ -80,7 +81,7 @@ else
                         <!-- Start Date -->
                         <div class="form-field">
                             <label class="field-label">Start Date <span class="required">*</span></label>
-                            <SfDatePicker @bind-Value="_financialYear.StartDate" Placeholder="Select start date"
+                            <SfDatePicker @ref="_sfFirstFocus" @bind-Value="_financialYear.StartDate" Placeholder="Select start date (Ctrl + F)"
                                           FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Format="dd-MMM-yyyy" />
                         </div>
 

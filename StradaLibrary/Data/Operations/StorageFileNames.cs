@@ -8,15 +8,15 @@ public static class StorageFileNames
 	public static string FinancialAccountingDataFileName => "financial_accounting_data.json";
 	public static string FinancialAccountingCartDataFileName => "financial_accounting_cart_data.json";
 
-	public static string VehicleExpenseDataFileName => "vehicle_expense_data.json";
-	public static string VehicleExpenseDetailsCartDataFileName => "vehicle_expense_details_cart_data.json";
+	public static string ExpenseDataFileName => "expense_data.json";
+	public static string ExpenseDetailsCartDataFileName => "expense_details_cart_data.json";
 
-	public static string VehicleTripDataFileName => "vehicle_trip_data.json";
-	public static string VehicleTripExpensesCartDataFileName => "vehicle_trip_expenses_cart_data.json";
-	public static string VehicleTripPaymentsCartDataFileName => "vehicle_trip_payments_cart_data.json";
+	public static string TripDataFileName => "trip_data.json";
+	public static string TripExpensesCartDataFileName => "trip_expenses_cart_data.json";
+	public static string TripPaymentsCartDataFileName => "trip_payments_cart_data.json";
 	
-	public static string VehicleTripBillDataFileName => "vehicle_trip_bill_data.json";
-	public static string VehicleTripBillPendingTripsCartDataFileName => "vehicle_trip_bill_pending_trips_cart_data.json";
-	public static string VehicleTripBillCardPaymentsCartDataFileName => "vehicle_trip_bill_card_payments_cart_data.json";
-	public static string VehicleTripBillLedgerPaymentsCartDataFileName => "vehicle_trip_bill_ledger_payments_cart_data.json";
+	public static string BillDataFileName => "bill_data.json";
+	public static string BillPendingTripsCartDataFileName => "bill_pending_trips_cart_data.json";
+	public static string BillCardPaymentsCartDataFileName => "bill_card_payments_cart_data.json";
+	public static string BillLedgerPaymentsCartDataFileName => "bill_ledger_payments_cart_data.json";
 }

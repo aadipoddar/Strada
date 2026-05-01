@@ -5,7 +5,6 @@ public class VehicleDocumentModel
     public int Id { get; set; }
     public string TransactionNo { get; set; }
     public DateTime TransactionDateTime { get; set; }
-    public int FinancialYearId { get; set; }
     public int VehicleDocumentTypeId { get; set; }
     public int VehicleId { get; set; }
     public decimal CurrentKM { get; set; }

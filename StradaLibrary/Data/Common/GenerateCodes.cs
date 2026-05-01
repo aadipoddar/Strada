@@ -6,9 +6,7 @@ using StradaLibrary.Exports.Fleet.OMC;
 using StradaLibrary.Exports.Fleet.Route;
 using StradaLibrary.Exports.Fleet.Vehicle;
 using StradaLibrary.Exports.Fleet.VehicleDocument;
-using StradaLibrary.Exports.Fleet.VehicleExpense;
-using StradaLibrary.Exports.Fleet.VehicleTrip;
-using StradaLibrary.Exports.Fleet.VehicleTripBill;
+using StradaLibrary.Exports.Fleet.Trip;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
@@ -16,10 +14,12 @@ using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleDocument;
-using StradaLibrary.Models.Fleet.VehicleExpense;
-using StradaLibrary.Models.Fleet.VehicleTrip;
-using StradaLibrary.Models.Fleet.VehicleTripBill;
+using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Operations;
+using StradaLibrary.Models.Fleet.Expense;
+using StradaLibrary.Exports.Fleet.Expense;
+using StradaLibrary.Models.Fleet.Bill;
+using StradaLibrary.Exports.Fleet.Bill;
 
 namespace StradaLibrary.Data.Common;
 
@@ -90,23 +90,23 @@ public static class GenerateCodes
 				decodeTransactionNoModel.ExcelStream = await LedgerExport.ExportMaster(ledgers, ReportExportType.Excel);
 				break;
 
-			case CodeType.VehicleTrip:
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<VehicleTripModel>(FleetNames.VehicleTrip, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleTrip}/{(decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleTripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id, InvoiceExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleTripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripModel).Id, InvoiceExportType.Excel);
+			case CodeType.Trip:
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<TripModel>(FleetNames.Trip, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.Trip}/{(decodeTransactionNoModel.TransactionModel as TripModel).Id}";
+				decodeTransactionNoModel.PDFStream = await TripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as TripModel).Id, InvoiceExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await TripInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as TripModel).Id, InvoiceExportType.Excel);
 				break;
-			case CodeType.VehicleTripBill:
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<VehicleTripBillModel>(FleetNames.VehicleTripBill, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleTripBill}/{(decodeTransactionNoModel.TransactionModel as VehicleTripBillModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleTripBillInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripBillModel).Id, InvoiceExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleTripBillInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleTripBillModel).Id, InvoiceExportType.Excel);
+			case CodeType.Bill:
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<BillModel>(FleetNames.Bill, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.Bill}/{(decodeTransactionNoModel.TransactionModel as BillModel).Id}";
+				decodeTransactionNoModel.PDFStream = await BillInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as BillModel).Id, InvoiceExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await BillInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as BillModel).Id, InvoiceExportType.Excel);
 				break;
-			case CodeType.VehicleExpense:
-				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<VehicleExpenseModel>(FleetNames.VehicleExpense, transactionNo);
-				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.VehicleExpense}/{(decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id}";
-				decodeTransactionNoModel.PDFStream = await VehicleExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id, InvoiceExportType.PDF);
-				decodeTransactionNoModel.ExcelStream = await VehicleExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as VehicleExpenseModel).Id, InvoiceExportType.Excel);
+			case CodeType.Expense:
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<ExpenseModel>(FleetNames.Expense, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.Expense}/{(decodeTransactionNoModel.TransactionModel as ExpenseModel).Id}";
+				decodeTransactionNoModel.PDFStream = await ExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as ExpenseModel).Id, InvoiceExportType.PDF);
+				decodeTransactionNoModel.ExcelStream = await ExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as ExpenseModel).Id, InvoiceExportType.Excel);
 				break;
 
 			case CodeType.Location:
@@ -190,17 +190,17 @@ public static class GenerateCodes
 					isDuplicate = ledger is not null;
 					break;
 
-				case CodeType.VehicleTrip:
-					var vehicleTrip = await CommonData.LoadTableDataByTransactionNo<VehicleTripModel>(FleetNames.VehicleTrip, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleTrip is not null;
+				case CodeType.Trip:
+					var trip = await CommonData.LoadTableDataByTransactionNo<TripModel>(FleetNames.Trip, code, sqlDataAccessTransaction);
+					isDuplicate = trip is not null;
 					break;
-				case CodeType.VehicleTripBill:
-					var vehicleTripBill = await CommonData.LoadTableDataByTransactionNo<VehicleTripBillModel>(FleetNames.VehicleTripBill, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleTripBill is not null;
+				case CodeType.Bill:
+					var bill = await CommonData.LoadTableDataByTransactionNo<BillModel>(FleetNames.Bill, code, sqlDataAccessTransaction);
+					isDuplicate = bill is not null;
 					break;
-				case CodeType.VehicleExpense:
-					var vehicleExpense = await CommonData.LoadTableDataByTransactionNo<VehicleExpenseModel>(FleetNames.VehicleExpense, code, sqlDataAccessTransaction);
-					isDuplicate = vehicleExpense is not null;
+				case CodeType.Expense:
+					var expense = await CommonData.LoadTableDataByTransactionNo<ExpenseModel>(FleetNames.Expense, code, sqlDataAccessTransaction);
+					isDuplicate = expense is not null;
 					break;
 
 				case CodeType.Location:
@@ -305,76 +305,76 @@ public static class GenerateCodes
 	#endregion
 
 	#region Vehicle Transactions
-	public static async Task<string> GenerateVehicleTripTransactionNo(VehicleTripModel vehicleTrip, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<string> GenerateTripTransactionNo(TripModel trip, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, vehicleTrip.FinancialYearId, sqlDataAccessTransaction);
-		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, vehicleTrip.CompanyId, sqlDataAccessTransaction)).Code;
-		var tripPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTripTransactionPrefix, sqlDataAccessTransaction)).Value;
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, trip.FinancialYearId, sqlDataAccessTransaction);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, trip.CompanyId, sqlDataAccessTransaction)).Code;
+		var tripPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.TripTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastVehicleTrip = await CommonData.LoadLastTableDataByFinancialYear<VehicleTripModel>(FleetNames.VehicleTrip, vehicleTrip.FinancialYearId, sqlDataAccessTransaction);
-		if (lastVehicleTrip is not null)
+		var lastTrip = await CommonData.LoadLastTableDataByFinancialYear<TripModel>(FleetNames.Trip, trip.FinancialYearId, sqlDataAccessTransaction);
+		if (lastTrip is not null)
 		{
-			var lastTransactionNo = lastVehicleTrip.TransactionNo;
+			var lastTransactionNo = lastTrip.TransactionNo;
 			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{tripPrefix}"))
 			{
 				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + tripPrefix.Length)..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}{nextNumber:D5}", 5, CodeType.VehicleTrip, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}{nextNumber:D5}", 5, CodeType.Trip, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}00001", 5, CodeType.VehicleTrip, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}00001", 5, CodeType.Trip, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateVehicleTripBillTransactionNo(VehicleTripBillModel vehicleTripBill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<string> GenerateBillTransactionNo(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, vehicleTripBill.FinancialYearId, sqlDataAccessTransaction);
-		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, vehicleTripBill.CompanyId, sqlDataAccessTransaction)).Code;
-		var billPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTripBillTransactionPrefix, sqlDataAccessTransaction)).Value;
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, bill.FinancialYearId, sqlDataAccessTransaction);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, bill.CompanyId, sqlDataAccessTransaction)).Code;
+		var billPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.BillTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastVehicleTripBill = await CommonData.LoadLastTableDataByFinancialYear<VehicleTripBillModel>(FleetNames.VehicleTripBill, vehicleTripBill.FinancialYearId, sqlDataAccessTransaction);
-		if (lastVehicleTripBill is not null)
+		var lastBill = await CommonData.LoadLastTableDataByFinancialYear<BillModel>(FleetNames.Bill, bill.FinancialYearId, sqlDataAccessTransaction);
+		if (lastBill is not null)
 		{
-			var lastTransactionNo = lastVehicleTripBill.TransactionNo;
+			var lastTransactionNo = lastBill.TransactionNo;
 			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{billPrefix}"))
 			{
 				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + billPrefix.Length)..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}{nextNumber:D5}", 5, CodeType.VehicleTripBill, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}{nextNumber:D5}", 5, CodeType.Bill, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}00001", 5, CodeType.VehicleTripBill, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{billPrefix}00001", 5, CodeType.Bill, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateVehicleExpenseTransactionNo(VehicleExpenseModel vehicleExpense, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<string> GenerateExpenseTransactionNo(ExpenseModel expense, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, vehicleExpense.FinancialYearId, sqlDataAccessTransaction);
-		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, vehicleExpense.CompanyId, sqlDataAccessTransaction)).Code;
-		var expensePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleExpenseTransactionPrefix, sqlDataAccessTransaction)).Value;
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, expense.FinancialYearId, sqlDataAccessTransaction);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, expense.CompanyId, sqlDataAccessTransaction)).Code;
+		var expensePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ExpenseTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastVehicleExpense = await CommonData.LoadLastTableDataByFinancialYear<VehicleExpenseModel>(FleetNames.VehicleExpense, vehicleExpense.FinancialYearId, sqlDataAccessTransaction);
-		if (lastVehicleExpense is not null)
+		var lastExpense = await CommonData.LoadLastTableDataByFinancialYear<ExpenseModel>(FleetNames.Expense, expense.FinancialYearId, sqlDataAccessTransaction);
+		if (lastExpense is not null)
 		{
-			var lastTransactionNo = lastVehicleExpense.TransactionNo;
+			var lastTransactionNo = lastExpense.TransactionNo;
 			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{expensePrefix}"))
 			{
 				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + expensePrefix.Length)..];
 				if (int.TryParse(lastNumberPart, out int lastNumber))
 				{
 					int nextNumber = lastNumber + 1;
-					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}{nextNumber:D5}", 5, CodeType.VehicleExpense, sqlDataAccessTransaction);
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}{nextNumber:D5}", 5, CodeType.Expense, sqlDataAccessTransaction);
 				}
 			}
 		}
 
-		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}00001", 5, CodeType.VehicleExpense, sqlDataAccessTransaction);
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{expensePrefix}00001", 5, CodeType.Expense, sqlDataAccessTransaction);
 	}
 	#endregion
 

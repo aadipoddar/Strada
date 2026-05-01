@@ -41,19 +41,19 @@ public static class PageRouteNames
 
 	public const string VehicleRegisterReport = "/fleet/vehicle-register-report";
 
-	public const string VehicleExpense = "/fleet/vehicle-expense";
-	public const string VehicleExpenseReport = "/fleet/vehicle-expense-report";
-	public const string VehicleExpenseDetailsReport = "/fleet/vehicle-expense-details-report";
+	public const string Expense = "/fleet/expense";
+	public const string ExpenseReport = "/fleet/expense-report";
+	public const string ExpenseDetailsReport = "/fleet/expense-details-report";
 
-	public const string VehicleTrip = "/fleet/vehicle-trip";
-	public const string VehicleTripReport = "/fleet/vehicle-trip-report";
-	public const string VehicleTripExpensesReport = "/fleet/vehicle-trip-expenses-report";
-	public const string VehicleTripPaymentsReport = "/fleet/vehicle-trip-payments-report";
+	public const string Trip = "/fleet/trip";
+	public const string TripReport = "/fleet/trip-report";
+	public const string TripExpensesReport = "/fleet/trip-expenses-report";
+	public const string TripPaymentsReport = "/fleet/trip-payments-report";
 
-	public const string VehicleTripBill = "/fleet/vehicle-trip-bill";
-	public const string VehicleTripBillReport = "/fleet/vehicle-trip-bill-report";
-	public const string VehicleTripBillCardPaymentsReport = "/fleet/vehicle-trip-bill-card-payments-report";
-	public const string VehicleTripBillLedgerPaymentsReport = "/fleet/vehicle-trip-bill-ledger-payments-report";
+	public const string Bill = "/fleet/bill";
+	public const string BillReport = "/fleet/bill-report";
+	public const string BillCardPaymentsReport = "/fleet/bill-card-payments-report";
+	public const string BillLedgerPaymentsReport = "/fleet/bill-ledger-payments-report";
 
 	public const string LocationMaster = "/fleet/location";
 	public const string RouteMaster = "/fleet/route";

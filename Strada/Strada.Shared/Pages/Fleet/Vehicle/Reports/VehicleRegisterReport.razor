@@ -3,8 +3,8 @@
 @using StradaLibrary.Models.Accounts.Masters
 @using StradaLibrary.Models.Fleet.OMC
 @using StradaLibrary.Models.Fleet.Vehicle
-@using StradaLibrary.Models.Fleet.VehicleTrip
-@using StradaLibrary.Models.Fleet.VehicleExpense
+@using StradaLibrary.Models.Fleet.Trip
+@using StradaLibrary.Models.Fleet.Expense
 
 <PageTitle>Vehicle Register - Strada</PageTitle>
 
@@ -45,9 +45,9 @@ else
 						</MenuItem>
 						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
 							<MenuItems>
-								<MenuItem Text="Vehicle Trip Report" Id="VehicleTripReport" Disabled="@_isProcessing" />
-								<MenuItem Text="Vehicle Expense Report" Id="VehicleExpenseReport" Disabled="@_isProcessing" />
-								<MenuItem Text="Trip Bill Report" Id="VehicleTripBillReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Trip Report" Id="TripReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Expense Report" Id="ExpenseReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Bill Report" Id="BillReport" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Periods" IconCss="e-icons e-clock">
@@ -148,41 +148,41 @@ else
 										var vehicle = context as VehicleRegisterModel;
 									}
 									<div class="detail-panel">
-										@if (vehicle.VehicleTripOverviews.Count > 0)
+										@if (vehicle.TripOverviews.Count > 0)
 										{
 											<div class="detail-section">
 												<div class="detail-section-header">
 													<span class="detail-section-title">Trips</span>
-													<span class="detail-section-badge">@vehicle.VehicleTripOverviews.Count</span>
+													<span class="detail-section-badge">@vehicle.TripOverviews.Count</span>
 												</div>
-												<SfGrid TValue="VehicleTripOverviewModel" DataSource="vehicle.VehicleTripOverviews" AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Both">
+												<SfGrid TValue="TripOverviewModel" DataSource="vehicle.TripOverviews" AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Both">
 													<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 													<GridColumns>
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.TransactionDateTime)" HeaderText="Date" Width="105" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.ChallanNo)" HeaderText="Challan" Width="120" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.RouteDisplay)" HeaderText="Route" Width="200" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.DriverDisplay)" HeaderText="Driver" Width="160" />
+														<GridColumn Field="@nameof(TripOverviewModel.TransactionDateTime)" HeaderText="Date" Width="105" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
+														<GridColumn Field="@nameof(TripOverviewModel.ChallanNo)" HeaderText="Challan" Width="120" />
+														<GridColumn Field="@nameof(TripOverviewModel.RouteDisplay)" HeaderText="Route" Width="200" />
+														<GridColumn Field="@nameof(TripOverviewModel.DriverDisplay)" HeaderText="Driver" Width="160" />
 														<GridColumn HeaderText="Type" Width="80" TextAlign="TextAlign.Center">
 															<Template Context="tripCtx">
 																@{
-																	var trip = tripCtx as VehicleTripOverviewModel;
+																	var trip = tripCtx as TripOverviewModel;
 																	<span class="@(trip.VehicleEmpty ? "trip-badge-empty" : "trip-badge-loaded")">
 																		@(trip.VehicleEmpty ? "Empty" : "Loaded")
 																	</span>
 																}
 															</Template>
 														</GridColumn>
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.Quantity)" HeaderText="Qty" Width="100" TextAlign="TextAlign.Right" Format="N2" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.TotalExpense)" HeaderText="Trip Exp" Width="110" TextAlign="TextAlign.Right" Format="N2" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.BillNo)" HeaderText="Bill No" Width="120" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.BillDateTime)" HeaderText="Bill Date" Width="120" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.GrossAmount)" HeaderText="Gross" Width="120" TextAlign="TextAlign.Right" Format="N2" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.TDSAmount)" HeaderText="TDS" Width="120" TextAlign="TextAlign.Right" Format="N2" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.NetAmount)" HeaderText="Net Amt" Width="120" TextAlign="TextAlign.Right" Format="N2" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.ProfitLoss)" HeaderText="P&amp;L" Width="120" TextAlign="TextAlign.Right">
+														<GridColumn Field="@nameof(TripOverviewModel.Quantity)" HeaderText="Qty" Width="100" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(TripOverviewModel.TotalExpense)" HeaderText="Trip Exp" Width="110" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(TripOverviewModel.BillNo)" HeaderText="Bill No" Width="120" />
+														<GridColumn Field="@nameof(TripOverviewModel.BillDateTime)" HeaderText="Bill Date" Width="120" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
+														<GridColumn Field="@nameof(TripOverviewModel.GrossAmount)" HeaderText="Gross" Width="120" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(TripOverviewModel.TDSAmount)" HeaderText="TDS" Width="120" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(TripOverviewModel.NetAmount)" HeaderText="Net Amt" Width="120" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(TripOverviewModel.ProfitLoss)" HeaderText="P&amp;L" Width="120" TextAlign="TextAlign.Right">
 															<Template Context="tripCtxPL">
 																@{
-																	var trip = tripCtxPL as VehicleTripOverviewModel;
+																	var trip = tripCtxPL as TripOverviewModel;
 																	if (trip.ProfitLoss.HasValue)
 																	{
 																		<span class="@(trip.ProfitLoss >= 0 ? "grid-credit" : "grid-debit")">
@@ -192,33 +192,33 @@ else
 																}
 															</Template>
 														</GridColumn>
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.PendingDays)" HeaderText="Pending Days" Width="110" TextAlign="TextAlign.Right" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.OMCName)" HeaderText="OMC" Width="150" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.CompanyName)" HeaderText="Company" Width="200" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.TransactionNo)" HeaderText="Trip No" Width="180" />
-														<GridColumn Field="@nameof(VehicleTripOverviewModel.Remarks)" HeaderText="Remarks" MinWidth="150" />
+														<GridColumn Field="@nameof(TripOverviewModel.PendingDays)" HeaderText="Pending Days" Width="110" TextAlign="TextAlign.Right" />
+														<GridColumn Field="@nameof(TripOverviewModel.OMCName)" HeaderText="OMC" Width="150" />
+														<GridColumn Field="@nameof(TripOverviewModel.CompanyName)" HeaderText="Company" Width="200" />
+														<GridColumn Field="@nameof(TripOverviewModel.TransactionNo)" HeaderText="Trip No" Width="180" />
+														<GridColumn Field="@nameof(TripOverviewModel.Remarks)" HeaderText="Remarks" MinWidth="150" />
 													</GridColumns>
 												</SfGrid>
 											</div>
 										}
-										@if (vehicle.VehicleExpenseDetailsOverviews.Count > 0)
+										@if (vehicle.ExpenseDetailsOverviews.Count > 0)
 										{
 											<div class="detail-section">
 												<div class="detail-section-header">
-													<span class="detail-section-title">Vehicle Expenses</span>
-													<span class="detail-section-badge">@vehicle.VehicleExpenseDetailsOverviews.Count</span>
+													<span class="detail-section-title">Expenses</span>
+													<span class="detail-section-badge">@vehicle.ExpenseDetailsOverviews.Count</span>
 												</div>
-												<SfGrid TValue="VehicleExpenseDetailsOverviewModel" DataSource="vehicle.VehicleExpenseDetailsOverviews" AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Both">
+												<SfGrid TValue="ExpenseDetailsOverviewModel" DataSource="vehicle.ExpenseDetailsOverviews" AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Both">
 													<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 													<GridColumns>
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="105" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="250" />
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="250" />
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseAmount)" HeaderText="Amount" Width="250" TextAlign="TextAlign.Right" Format="N2" />
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.ExpenseRemarks)" HeaderText="Expense Remarks" Width="250" />
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="250" />
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.TransactionNo)" HeaderText="Expense No" Width="250" />
-														<GridColumn Field="@nameof(VehicleExpenseDetailsOverviewModel.Remarks)" HeaderText="Remarks" MinWidth="150" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="105" Format="dd/MM/yy" Type="ColumnType.DateTime" TextAlign="TextAlign.Center" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="250" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="250" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseAmount)" HeaderText="Amount" Width="250" TextAlign="TextAlign.Right" Format="N2" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseRemarks)" HeaderText="Expense Remarks" Width="250" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="250" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TransactionNo)" HeaderText="Expense No" Width="250" />
+														<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.Remarks)" HeaderText="Remarks" MinWidth="150" />
 													</GridColumns>
 												</SfGrid>
 											</div>
@@ -291,7 +291,7 @@ else
 											<div><strong>@aggregate.Sum</strong></div>
 										</FooterTemplate>
 									</GridAggregateColumn>
-									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalVehicleExpenses)"
+									<GridAggregateColumn Field="@nameof(VehicleRegisterModel.TotalExpenses)"
 														 Type="AggregateType.Sum" Format="N2">
 										<FooterTemplate>
 											@{
@@ -387,11 +387,11 @@ else
 								</ChildContent>
 							</GridColumn>
 
-							<!-- Vehicle Expenses: stacked header with total + per-type breakdown -->
-							<GridColumn HeaderText="Vehicle Expenses" TextAlign="TextAlign.Center">
+							<!-- Expenses: stacked header with total + per-type breakdown -->
+							<GridColumn HeaderText="Expenses" TextAlign="TextAlign.Center">
 								<ChildContent>
 									<GridColumns>
-										<GridColumn Field="@nameof(VehicleRegisterModel.TotalVehicleExpenses)" HeaderText="Total" Width="115" TextAlign="TextAlign.Right" Format="N2" />
+										<GridColumn Field="@nameof(VehicleRegisterModel.TotalExpenses)" HeaderText="Total" Width="115" TextAlign="TextAlign.Right" Format="N2" />
 										@foreach (var expType in _activeExpenseTypes)
 										{
 											var capturedId = expType.ExpenseTypeId;
@@ -401,7 +401,7 @@ else
 												<Template>
 													@{
 														var item = context as VehicleRegisterModel;
-														var amt = item?.VehicleExpenses.FirstOrDefault(e => e.ExpenseTypeId == capturedId)?.ExpenseAmount ?? 0;
+														var amt = item?.Expenses.FirstOrDefault(e => e.ExpenseTypeId == capturedId)?.ExpenseAmount ?? 0;
 														<span>@amt.ToString("N2")</span>
 													}
 												</Template>

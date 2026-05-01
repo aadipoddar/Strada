@@ -12,8 +12,7 @@ else if (_isUpdating)
 	<div class="update-overlay">
 		<div class="update-container">
 			<div class="update-header">
-				<svg class="update-icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-					 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<svg class="update-icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
 				</svg>
 				<h2 class="update-title">Updating Strada</h2>
@@ -31,8 +30,7 @@ else if (_isUpdating)
 				<div class="time-remaining">
 					@if (_timeRemaining > 0)
 					{
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-							 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 							<circle cx="12" cy="12" r="10" />
 							<polyline points="12 6 12 12 16 14" />
 						</svg>
@@ -57,8 +55,7 @@ else
 	<div class="page-shell">
 		<Header Title="Dashboard">
 			<RightContent>
-				<IconButton Icon="IconType.Refresh" Title="Force Update" Disabled="@(_isLoading || _isUpdating)"
-							OnClick="ForceUpdate" />
+				<IconButton Icon="IconType.Refresh" Title="Force Update" Disabled="@(_isLoading || _isUpdating)" OnClick="ForceUpdate" />
 			</RightContent>
 		</Header>
 
@@ -70,8 +67,7 @@ else
 				<!-- ACCOUNTS -->
 				@if (_user.Accounts)
 				{
-					<FolderCard Title="Accounts" Description="Financial accounting, ledger reports and master data"
-								OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard)">
+					<FolderCard Title="Accounts" Description="Financial accounting, ledger reports and master data" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard)">
 						<IconContent>
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 								<line x1="12" y1="1" x2="12" y2="23" />
@@ -87,8 +83,7 @@ else
 				{
 					@if (_user.Fleet)
 					{
-						<FolderCard Title="Fleet Masters" Description="Manage vehicles, routes, drivers, OMC and document types"
-									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard)">
+						<FolderCard Title="Fleet Masters" Description="Manage vehicles, routes, drivers, OMC and document types" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<ellipse cx="12" cy="5" rx="9" ry="3" />
@@ -101,8 +96,7 @@ else
 
 					@if (_user.Fleet)
 					{
-						<FolderCard Title="Fleet Transactions" Description="Record vehicle trips, trip bills and vehicle expenses"
-									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard)">
+						<FolderCard Title="Fleet Transactions" Description="Record Trips, Bills and Expenses" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M12 20h9" />
@@ -114,8 +108,7 @@ else
 
 					@if (_user.Reports)
 					{
-						<FolderCard Title="Fleet Reports" Description="View trip, billing and expense reports across the fleet"
-									OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard)">
+						<FolderCard Title="Fleet Reports" Description="View trip, billing and expense reports across the fleet" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard)">
 							<IconContent>
 								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M3 3v18h18" />
@@ -127,7 +120,7 @@ else
 						</FolderCard>
 					}
 				}
-				
+
 				<!-- ADMINISTRATION -->
 				@if (_user.Admin)
 				{
@@ -135,7 +128,8 @@ else
 						<IconContent>
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 								<circle cx="12" cy="12" r="3" />
-								<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+								<path
+								d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
 							</svg>
 						</IconContent>
 					</FolderCard>
@@ -144,8 +138,8 @@ else
 			</div>
 		</div>
 
-	<Footer />
-</div>
+		<Footer />
+	</div>
 }
 
 <style>
@@ -242,16 +236,16 @@ else
 		overflow: hidden;
 	}
 
-		.progress-bar-fill::after {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: 0;
-			bottom: 0;
-			right: 0;
-			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-			animation: shimmer 1.5s infinite;
-		}
+	.progress-bar-fill::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+		animation: shimmer 1.5s infinite;
+	}
 
 	.time-remaining {
 		display: flex;
@@ -262,9 +256,9 @@ else
 		justify-content: center;
 	}
 
-		.time-remaining svg {
-			color: #94a3b8;
-		}
+	.time-remaining svg {
+		color: #94a3b8;
+	}
 
 	.update-status {
 		display: flex;
