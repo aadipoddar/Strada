@@ -5,7 +5,6 @@ using StradaLibrary.Exports.Fleet.Trip;
 using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.Trip;
-using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.Trip;

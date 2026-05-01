@@ -52,7 +52,6 @@ public static class PageRouteNames
 
 	public const string Bill = "/fleet/bill";
 	public const string BillReport = "/fleet/bill-report";
-	public const string BillCardPaymentsReport = "/fleet/bill-card-payments-report";
 	public const string BillLedgerPaymentsReport = "/fleet/bill-ledger-payments-report";
 
 	public const string LocationMaster = "/fleet/location";

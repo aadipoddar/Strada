@@ -18,6 +18,5 @@ public static class StorageFileNames
 	
 	public static string BillDataFileName => "bill_data.json";
 	public static string BillPendingTripsCartDataFileName => "bill_pending_trips_cart_data.json";
-	public static string BillCardPaymentsCartDataFileName => "bill_card_payments_cart_data.json";
 	public static string BillLedgerPaymentsCartDataFileName => "bill_ledger_payments_cart_data.json";
 }

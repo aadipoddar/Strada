@@ -163,7 +163,6 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 
 			vehicle.TotalBills = Enumerable.Count(vehicleTrips, _ => _.BillId.HasValue);
 			vehicle.TotalGrossAmount = vehicleTrips.Where(_ => _.GrossAmount.HasValue).Sum(_ => _.GrossAmount.Value);
-			vehicle.TotalTDSAmount = vehicleTrips.Where(_ => _.TDSAmount.HasValue).Sum(_ => _.TDSAmount.Value);
 			vehicle.TotalNetAmount = vehicleTrips.Where(_ => _.NetAmount.HasValue).Sum(_ => _.NetAmount.Value);
 
 			vehicle.TripOverviews = [.. vehicleTrips];
@@ -312,7 +311,6 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 					trip.BillNo ?? "",
 					trip.BillDateTime?.ToString("dd/MM/yy") ?? "",
 					trip.GrossAmount?.ToString("N2") ?? "",
-					trip.TDSAmount?.ToString("N2") ?? "",
 					trip.NetAmount?.ToString("N2") ?? "",
 					trip.ProfitLoss?.ToString("N2") ?? "",
 					trip.PendingDays.HasValue ? trip.PendingDays.Value.ToString() : "",

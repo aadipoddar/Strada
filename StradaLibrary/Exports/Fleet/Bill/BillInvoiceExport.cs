@@ -17,7 +17,6 @@ public static class BillInvoiceExport
 			throw new InvalidOperationException("Transaction not found.");
 
 		var trips = await TripData.LoadTripOverviewByBillIdDate(transaction.Id);
-		var cardPayments = await CommonData.LoadTableDataByMasterId<BillCardPaymentsModel>(FleetNames.BillCardPayments, transaction.Id);
 		var ledgerPayments = await CommonData.LoadTableDataByMasterId<BillLedgerPaymentsModel>(FleetNames.BillLedgerPayments, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
@@ -26,11 +25,8 @@ public static class BillInvoiceExport
 			Name = $"Bill: {transaction.BillNo ?? "N/A"}"
 		};
 
-		var omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
 		var ledgers = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger);
 		Dictionary<string, decimal> paymentModes = [];
-		foreach (var payment in cardPayments)
-			paymentModes.Add(omcCards.FirstOrDefault(c => c.Id == payment.OMCCardId).CardNumber, payment.Amount);
 		foreach (var payment in ledgerPayments)
 			paymentModes.Add(ledgers.FirstOrDefault(l => l.Id == payment.LedgerId).Name, payment.Amount);
 
@@ -64,7 +60,6 @@ public static class BillInvoiceExport
 			new(nameof(TripOverviewModel.RouteDisplay), "Route", exportType, CellAlignment.Left, 0, 30),
 			new(nameof(TripOverviewModel.Quantity), "Qty", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(TripOverviewModel.GrossAmount), "Gross", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
-			new(nameof(TripOverviewModel.TDSAmount), "TDS", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(TripOverviewModel.PenaltyAmount), "Penalty", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 			new(nameof(TripOverviewModel.NetAmount), "Net", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
 		};

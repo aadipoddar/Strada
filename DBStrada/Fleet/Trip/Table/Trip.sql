@@ -18,7 +18,6 @@
     [VehicleEmpty] BIT NOT NULL DEFAULT 0,
     [BillId] INT NULL,
     [GrossAmount] MONEY NULL,
-    [TDSAmount] MONEY NULL,
     [PenaltyAmount] MONEY NULL,
     [NetAmount] MONEY NULL,
     [Remarks] VARCHAR(MAX) NULL,

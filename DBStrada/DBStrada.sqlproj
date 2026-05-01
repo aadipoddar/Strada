@@ -166,12 +166,9 @@
     <Build Include="Fleet\Expense\Load\ExpenseDetails_Overview.sql" />
     <Build Include="Fleet\Bill\Table\Bill.sql" />
     <Build Include="Fleet\Bill\Table\BillLedgerPayments.sql" />
-    <Build Include="Fleet\Bill\Table\BillCardPayments.sql" />
     <Build Include="Fleet\Bill\Insert\Insert_Bill.sql" />
-    <Build Include="Fleet\Bill\Insert\Insert_BillCardPayments.sql" />
     <Build Include="Fleet\Bill\Insert\Insert_BillLedgerPayments.sql" />
     <Build Include="Fleet\Bill\Load\Bill_Overview.sql" />
-    <Build Include="Fleet\Bill\Load\BillCardPayments_Overview.sql" />
     <Build Include="Fleet\Bill\Load\BillLedgerPayments_Overview.sql" />
     <Build Include="Fleet\Trip\Load\Load_Trip_Overview_By_BillId_Date.sql" />
     <Build Include="Fleet\Route\Insert\Insert_Route.sql" />

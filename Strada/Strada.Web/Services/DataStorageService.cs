@@ -47,7 +47,6 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 
 		await LocalRemove(StorageFileNames.BillDataFileName);
 		await LocalRemove(StorageFileNames.BillPendingTripsCartDataFileName);
-		await LocalRemove(StorageFileNames.BillCardPaymentsCartDataFileName);
 		await LocalRemove(StorageFileNames.BillLedgerPaymentsCartDataFileName);
 	}
 

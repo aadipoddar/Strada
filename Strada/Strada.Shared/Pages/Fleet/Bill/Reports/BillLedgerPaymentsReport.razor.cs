@@ -308,9 +308,6 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 			case "TransactionHistory":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager);
 				break;
-			case "CardPaymentsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BillCardPaymentsReport, FormFactor, JSRuntime, NavigationManager);
-				break;
 			case "PeriodToday":
 				await HandleDatesChanged(DateRangeType.Today);
 				break;

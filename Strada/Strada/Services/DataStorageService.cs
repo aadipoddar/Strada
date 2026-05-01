@@ -34,7 +34,6 @@ public class DataStorageService : IDataStorageService
 
 		await LocalRemove(StorageFileNames.BillDataFileName);
 		await LocalRemove(StorageFileNames.BillPendingTripsCartDataFileName);
-		await LocalRemove(StorageFileNames.BillCardPaymentsCartDataFileName);
 		await LocalRemove(StorageFileNames.BillLedgerPaymentsCartDataFileName);
 	}
 

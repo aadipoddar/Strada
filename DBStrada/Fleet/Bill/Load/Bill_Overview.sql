@@ -15,10 +15,8 @@ SELECT
 	[o].[Name] AS OMCName,
 	
 	[t].[TotalGrossAmount],
-	[t].[TotalTDSAmount],
 	[t].[TotalPenaltyAmount],
 	[t].[TotalNetAmount],
-	[t].[TotalCardPaymentAmount],
 	[t].[TotalLedgerPaymentAmount],
 
     [t].[Remarks],

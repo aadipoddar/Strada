@@ -16,7 +16,8 @@ public static class TripInvoiceExport
 			throw new InvalidOperationException("Transaction not found.");
 
 		var expenses = await CommonData.LoadTableDataByMasterId<TripExpensesModel>(FleetNames.TripExpenses, transaction.Id);
-		var payments = await CommonData.LoadTableDataByMasterId<TripCardPaymentsModel>(FleetNames.TripCardPayments, transaction.Id);
+		var cardPayments = await CommonData.LoadTableDataByMasterId<TripCardPaymentsModel>(FleetNames.TripCardPayments, transaction.Id);
+		var ledgerPayments = await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsModel>(FleetNames.TripLedgerPayments, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
 		LedgerModel ledger = new()
@@ -43,9 +44,12 @@ public static class TripInvoiceExport
 		}).ToList();
 
 		var omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
+		var ledgers = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger);
 		Dictionary<string, decimal> paymentModes = [];
-		foreach (var payment in payments)
+		foreach (var payment in cardPayments)
 			paymentModes.Add(omcCards.FirstOrDefault(c => c.Id == payment.OMCCardId).CardNumber, payment.Amount);
+		foreach (var payment in ledgerPayments)
+			paymentModes.Add(ledgers.FirstOrDefault(l => l.Id == payment.LedgerId).Name, payment.Amount);
 
 		var invoiceData = new InvoiceData
 		{

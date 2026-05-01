@@ -390,9 +390,6 @@ public partial class BillReport : IAsyncDisposable
 			case "DeleteRecoverSelected":
 				await DeleteRecoverSelectedTransaction();
 				break;
-			case "CardPaymentsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BillCardPaymentsReport, FormFactor, JSRuntime, NavigationManager);
-				break;
 			case "LedgerPaymentsReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;

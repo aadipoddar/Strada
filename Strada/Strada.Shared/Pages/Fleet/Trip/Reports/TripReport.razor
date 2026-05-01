@@ -342,27 +342,6 @@ else
 											}
 										</GroupCaptionTemplate>
 									</GridAggregateColumn>
-									<GridAggregateColumn Field="@nameof(TripOverviewModel.TDSAmount)"
-														 Type="AggregateType.Sum" Format="N2">
-										<FooterTemplate>
-											@{
-												var aggregate = (context as AggregateTemplateContext);
-												<div><strong>@aggregate.Sum</strong></div>
-											}
-										</FooterTemplate>
-										<GroupFooterTemplate>
-											@{
-												var aggregate = (context as AggregateTemplateContext);
-												<div><strong>@aggregate.Sum</strong></div>
-											}
-										</GroupFooterTemplate>
-										<GroupCaptionTemplate>
-											@{
-												var aggregate = (context as AggregateTemplateContext);
-												<div><strong>@aggregate.Sum</strong></div>
-											}
-										</GroupCaptionTemplate>
-									</GridAggregateColumn>
 									<GridAggregateColumn Field="@nameof(TripOverviewModel.PenaltyAmount)"
 														 Type="AggregateType.Sum" Format="N2">
 										<FooterTemplate>
@@ -485,7 +464,6 @@ else
 							<GridColumn Field="@nameof(TripOverviewModel.BillNo)" HeaderText="Bill No" Width="150" />
 							<GridColumn Field="@nameof(TripOverviewModel.BillDateTime)" HeaderText="Bill Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(TripOverviewModel.GrossAmount)" HeaderText="Gross Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripOverviewModel.TDSAmount)" HeaderText="TDS Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(TripOverviewModel.PenaltyAmount)" HeaderText="Penalty Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(TripOverviewModel.NetAmount)" HeaderText="Net Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>

@@ -50,7 +50,6 @@ public static class TripReportExport
 			[nameof(TripOverviewModel.BillNo)] = new() { DisplayName = "Bill No", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(TripOverviewModel.BillDateTime)] = new() { DisplayName = "Bill Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(TripOverviewModel.GrossAmount)] = new() { DisplayName = "Gross Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
-			[nameof(TripOverviewModel.TDSAmount)] = new() { DisplayName = "TDS Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(TripOverviewModel.PenaltyAmount)] = new() { DisplayName = "Penalty Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(TripOverviewModel.NetAmount)] = new() { DisplayName = "Net Amt", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
@@ -95,7 +94,6 @@ public static class TripReportExport
 				nameof(TripOverviewModel.BillNo),
 				nameof(TripOverviewModel.BillDateTime),
 				nameof(TripOverviewModel.GrossAmount),
-				nameof(TripOverviewModel.TDSAmount),
 				nameof(TripOverviewModel.PenaltyAmount),
 				nameof(TripOverviewModel.NetAmount),
 				nameof(TripOverviewModel.ProfitLoss),
@@ -131,7 +129,6 @@ public static class TripReportExport
 				nameof(TripOverviewModel.BillNo),
 				nameof(TripOverviewModel.BillDateTime),
 				nameof(TripOverviewModel.GrossAmount),
-				nameof(TripOverviewModel.TDSAmount),
 				nameof(TripOverviewModel.PenaltyAmount),
 				nameof(TripOverviewModel.NetAmount),
 				nameof(TripOverviewModel.ProfitLoss),
