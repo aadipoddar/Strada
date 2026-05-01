@@ -14,7 +14,7 @@ using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Fleet.Trip.Reports;
 
-public partial class TripPaymentsReport : IAsyncDisposable
+public partial class TripCardPaymentsReport : IAsyncDisposable
 {
 	private PeriodicTimer _autoRefreshTimer;
 	private CancellationTokenSource _autoRefreshCts;
@@ -225,7 +225,7 @@ public partial class TripPaymentsReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await TripReportExport.ExportPaymentsReport(
+			var (stream, fileName) = await TripReportExport.ExportCardPaymentsReport(
 				_transactionOverviews,
 				ReportExportType.Excel,
 				DateOnly.FromDateTime(_fromDate),
@@ -263,7 +263,7 @@ public partial class TripPaymentsReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await TripReportExport.ExportPaymentsReport(
+			var (stream, fileName) = await TripReportExport.ExportCardPaymentsReport(
 				_transactionOverviews,
 				ReportExportType.PDF,
 				DateOnly.FromDateTime(_fromDate),
@@ -390,6 +390,9 @@ public partial class TripPaymentsReport : IAsyncDisposable
 				break;
 			case "ExpensesReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripExpensesReport, FormFactor, JSRuntime, NavigationManager);
+				break;
+			case "LedgerPaymentReport":
+				await AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "PeriodToday":
 				await HandleDatesChanged(DateRangeType.Today);

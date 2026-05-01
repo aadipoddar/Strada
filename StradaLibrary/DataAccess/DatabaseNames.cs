@@ -93,6 +93,7 @@ public static class FleetNames
 	public static string TripOverview => "Trip_Overview";
 	public static string TripExpensesOverview => "TripExpenses_Overview";
 	public static string TripCardPaymentsOverview => "TripCardPayments_Overview";
+	public static string TripLedgerPaymentsOverview => "TripLedgerPayments_Overview";
 	public static string LoadTripOverviewByBillIdDate => "Load_Trip_Overview_By_BillId_Date";
 
 	public static string InsertTrip => "Insert_Trip";

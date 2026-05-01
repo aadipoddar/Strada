@@ -950,8 +950,11 @@ public partial class TripPage
 			case "ExpensesReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripExpensesReport, FormFactor, JSRuntime, NavigationManager);
 				break;
-			case "PaymentsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.TripPaymentsReport, FormFactor, JSRuntime, NavigationManager);
+			case "CardPaymentsReport":
+				await AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager);
+				break;
+			case "LedgerPaymentReport":
+				await AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 		}
 	}

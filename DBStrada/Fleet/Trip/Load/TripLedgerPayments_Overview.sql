@@ -1,14 +1,14 @@
-﻿CREATE VIEW [dbo].[TripExpenses_Overview]
+﻿CREATE VIEW [dbo].[TripLedgerPayments_Overview]
 AS
 SELECT
-    [te].[Id],
-	[te].[ExpenseTypeId],
-	[er].[Name] AS ExpenseTypeName,
-	[er].[Code] AS ExpenseTypeCode,
-	[te].[Amount] AS ExpenseAmount,
-	[te].[Remarks] AS ExpenseRemarks,
+    [tp].[Id],
+	[tp].[LedgerId],
+	[l].[Name] AS LedgerName,
+	[l].[Code] AS LedgerCode,
+	[tp].[Amount] AS PaymentAmount,
+	[tp].[Remarks] AS PaymentRemarks,
 
-	[te].[MasterId],
+	[tp].[MasterId],
     [t].[TransactionNo],
     [t].[CompanyId],
     [c].[Name] AS CompanyName,
@@ -61,11 +61,11 @@ SELECT
 	[t].[LastModifiedFromPlatform]
 
 FROM
-    [dbo].[TripExpenses] te
+    [dbo].[TripLedgerPayments] tp
 INNER JOIN
-	[dbo].[Trip] t ON te.MasterId = t.Id
+	[dbo].[Trip] t ON tp.MasterId = t.Id
 INNER JOIN
-	[dbo].[ExpenseType] er ON te.[ExpenseTypeId] = er.Id
+	[dbo].[Ledger] l ON tp.LedgerId = l.Id
 INNER JOIN
     [dbo].[Company] c ON t.CompanyId = c.Id
 INNER JOIN
@@ -90,5 +90,5 @@ LEFT JOIN
 	[dbo].[User] AS lm ON t.LastModifiedBy = lm.Id
 
 WHERE
-	[te].[Status] = 1 AND
+	[tp].[Status] = 1 AND
 	[t].[Status] = 1;

@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRouteNames.TripExpensesReport)]
+﻿@attribute [Route(PageRouteNames.TripCardPaymentsReport)]
 
 @using StradaLibrary.Models.Accounts.Masters
 @using StradaLibrary.Models.Fleet.OMC
@@ -6,7 +6,7 @@
 @using StradaLibrary.Models.Fleet.Route
 @using StradaLibrary.Models.Fleet.Trip
 
-<PageTitle>Trip Expenses Report - Strada</PageTitle>
+<PageTitle>Trip Card Payments Report - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.Trip, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
@@ -27,7 +27,7 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="Trip Expenses Report">
+		<Header Title="Trip Card Payments Report">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
@@ -45,9 +45,9 @@ else
 						</MenuItem>
 						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
 							<MenuItems>
-								<MenuItem Text="Trip Report (Ctrl + H)" Id="TransactionHistory" Disabled="@_isProcessing" />
-								<MenuItem Text="Card Payments Report" Id="CardPaymentsReport" Disabled="@_isProcessing" />
-								<MenuItem Text="Ledger Payments Report" Id="LedgerPaymentsReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Transaction History Report (Ctrl + H)" Id="TransactionHistory" Disabled="@_isProcessing" />
+								<MenuItem Text="Expenses Report" Id="ExpensesReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Ledger Payment Report" Id="LedgerPaymentReport" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Periods" IconCss="e-icons e-clock">
@@ -212,13 +212,14 @@ else
 					</div>
 				</div>
 				<div class="section-body grid-body">
-					<SfGrid @ref="_sfGrid" TValue="TripExpensesOverviewModel" DataSource="_transactionOverviews"
-							AllowTextWrap="true" AllowPaging="true" AllowSorting="true" AllowResizing="true"
-							AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true" GridLines="GridLine.Horizontal"
-							AllowGrouping="true" CssClass="professional-grid" ContextMenuItems="@_gridContextMenuItems"
-							Toolbar="@(new List<string>() { "Search" })">
+					<SfGrid @ref="_sfGrid" TValue="TripCardPaymentsOverviewModel"
+							DataSource="_transactionOverviews" AllowTextWrap="true" AllowPaging="true" AllowSorting="true"
+							AllowResizing="true" AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true"
+							GridLines="GridLine.Horizontal" AllowGrouping="true" CssClass="professional-grid"
+							ContextMenuItems="@_gridContextMenuItems" Toolbar="@(new List<string>() { "Search" })">
 
-						<GridEvents TValue="TripExpensesOverviewModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
+						<GridEvents TValue="TripCardPaymentsOverviewModel"
+									ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
@@ -226,43 +227,55 @@ else
 						<GridAggregates>
 							<GridAggregate>
 								<GridAggregateColumns>
-									<GridAggregateColumn Field="@nameof(TripExpensesOverviewModel.TransactionNo)" Type="AggregateType.Count">
+									<GridAggregateColumn Field="@nameof(TripCardPaymentsOverviewModel.TransactionNo)" Type="AggregateType.Count">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
 											}
-											<div class="aggregate-label"><strong>Total Transactions: @aggregate.Count</strong></div>
+											<div class="aggregate-label">
+												<strong>Total Transactions: @aggregate.Count</strong>
+											</div>
 										</FooterTemplate>
 										<GroupFooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
 											}
-											<div class="aggregate-label"><strong>Total Transactions: @aggregate.Count</strong></div>
+											<div class="aggregate-label">
+												<strong>Total Transactions: @aggregate.Count</strong>
+											</div>
 										</GroupFooterTemplate>
 										<GroupCaptionTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
 											}
-											<div class="aggregate-label"><strong>Total Transactions: @aggregate.Count</strong></div>
+											<div class="aggregate-label">
+												<strong>Total Transactions: @aggregate.Count</strong>
+											</div>
 										</GroupCaptionTemplate>
 									</GridAggregateColumn>
-									<GridAggregateColumn Field="@nameof(TripExpensesOverviewModel.ExpenseAmount)" Type="AggregateType.Sum" Format="N2">
+									<GridAggregateColumn Field="@nameof(TripCardPaymentsOverviewModel.PaymentAmount)" Type="AggregateType.Sum" Format="N2">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
-												<div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
 											}
 										</FooterTemplate>
 										<GroupFooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
-												<div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
 											}
 										</GroupFooterTemplate>
 										<GroupCaptionTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
-												<div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
 											}
 										</GroupCaptionTemplate>
 									</GridAggregateColumn>
@@ -494,52 +507,53 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="170" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.ExpenseTypeCode)" HeaderText="Expense Type Code" Width="130" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.ExpenseAmount)" HeaderText="Expense Amt" Width="150" TextAlign="TextAlign.Right">
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.OMCCardNumber)" HeaderText="Card Number" Width="170" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.OMCCardCode)" HeaderText="Card Code" Width="130" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.PaymentAmount)" HeaderText="Payment Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>
 									@{
-										var item = (context as TripExpensesOverviewModel);
-										<span class="grid-total">@item.ExpenseAmount.ToString("N2")</span>
+										var item = (context as TripCardPaymentsOverviewModel);
+										<span class="grid-total">@item.PaymentAmount.ToString("N2")</span>
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.ExpenseRemarks)" HeaderText="Expense Remarks" Width="170" Visible="_showAllColumns" />
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns && (_selectedCompany is null || _selectedCompany.Id <= 0))" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="220" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.PaymentRemarks)" HeaderText="Payment Remarks" Width="170" Visible="_showAllColumns" />
+							
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns && (_selectedCompany is null || _selectedCompany.Id <= 0))" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="220" Visible="_showAllColumns" />
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.SlNo)" HeaderText="Sl No" Width="130" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.ChallanNo)" HeaderText="Challan" Width="170" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.OMCName)" HeaderText="OMC" Width="100" Visible="@(_showAllColumns && (_selectedOMC is null || _selectedOMC.Id <= 0))" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.FromLocation)" HeaderText="From Location" Width="170" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.ToLocation)" HeaderText="To Location" Width="170" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.RouteDisplay)" HeaderText="Route" Width="220" Visible="@(_showAllColumns || _selectedRoute is null || _selectedRoute.Id <= 0)" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.DriverName)" HeaderText="Driver Name" Width="170" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.DriverMobile)" HeaderText="Driver Mobile" Width="170" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.DriverDisplay)" HeaderText="Driver" Width="170" Visible="@(_showAllColumns || _selectedDriver is null || _selectedDriver.Id <= 0)" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.SlNo)" HeaderText="Sl No" Width="130" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.ChallanNo)" HeaderText="Challan" Width="170" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.OMCName)" HeaderText="OMC" Width="100" Visible="@(_showAllColumns && (_selectedOMC is null || _selectedOMC.Id <= 0))" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.FromLocation)" HeaderText="From Location" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.ToLocation)" HeaderText="To Location" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.RouteDisplay)" HeaderText="Route" Width="220" Visible="@(_showAllColumns || _selectedRoute is null || _selectedRoute.Id <= 0)" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.DriverName)" HeaderText="Driver Name" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.DriverMobile)" HeaderText="Driver Mobile" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.DriverDisplay)" HeaderText="Driver" Width="170" Visible="@(_showAllColumns || _selectedDriver is null || _selectedDriver.Id <= 0)" />
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.Quantity)" HeaderText="Qty" Width="100" TextAlign="TextAlign.Right" Format="N2" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.EstimatedDistance)" HeaderText="Est. Dist" Width="130" TextAlign="TextAlign.Right" Format="N2" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.EstimatedHours)" HeaderText="Est. Hours" Width="130" TextAlign="TextAlign.Right" Visible="_showAllColumns" Format="N2" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.EstimatedFuelConsumption)" HeaderText="Est. Fuel" Width="130" TextAlign="TextAlign.Right" Visible="_showAllColumns" Format="N2" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.EstimatedCost)" HeaderText="Est. Cost" Width="130" TextAlign="TextAlign.Right" Format="N2" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right">
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.Quantity)" HeaderText="Qty" Width="100" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.EstimatedDistance)" HeaderText="Est. Dist" Width="130" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.EstimatedHours)" HeaderText="Est. Hours" Width="130" TextAlign="TextAlign.Right" Visible="_showAllColumns" Format="N2" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.EstimatedFuelConsumption)" HeaderText="Est. Fuel" Width="130" TextAlign="TextAlign.Right" Visible="_showAllColumns" Format="N2" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.EstimatedCost)" HeaderText="Est. Cost" Width="130" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right">
 								<Template>
 									@{
-										var item = (context as TripExpensesOverviewModel);
+										var item = (context as TripCardPaymentsOverviewModel);
 										<span class="grid-total">@item.TotalExpense.ToString("N2")</span>
 									}
 								</Template>
 							</GridColumn>
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.VehicleEmpty)" HeaderText="Empty" Width="110" TextAlign="TextAlign.Center" Visible="_showAllColumns">
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.VehicleEmpty)" HeaderText="Empty" Width="110" TextAlign="TextAlign.Center" Visible="_showAllColumns">
 								<Template>
 									@{
-										var item = (context as TripExpensesOverviewModel);
+										var item = (context as TripCardPaymentsOverviewModel);
 										<span class="@(item.VehicleEmpty ? "grid-debit" : string.Empty)">
 											@(item.VehicleEmpty ? "Empty" : "Loaded")
 										</span>
@@ -547,23 +561,23 @@ else
 								</Template>
 							</GridColumn>
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.BillNo)" HeaderText="Bill No" Width="150" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.BillDateTime)" HeaderText="Bill Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.GrossAmount)" HeaderText="Gross Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.PenaltyAmount)" HeaderText="Penalty Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.NetAmount)" HeaderText="Net Amt" Width="150" TextAlign="TextAlign.Right">
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.BillNo)" HeaderText="Bill No" Width="150" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.BillDateTime)" HeaderText="Bill Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.GrossAmount)" HeaderText="Gross Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.PenaltyAmount)" HeaderText="Penalty Amt" Width="130" TextAlign="TextAlign.Right" Format="N2" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.NetAmount)" HeaderText="Net Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>
 									@{
-										var item = (context as TripExpensesOverviewModel);
+										var item = (context as TripCardPaymentsOverviewModel);
 										<span class="grid-total">@(item.NetAmount?.ToString("N2") ?? string.Empty)</span>
 									}
 								</Template>
 							</GridColumn>
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.ProfitLoss)" HeaderText="P&L" Width="140" TextAlign="TextAlign.Right">
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.ProfitLoss)" HeaderText="P&L" Width="140" TextAlign="TextAlign.Right">
 								<Template>
 									@{
-										var item = (context as TripExpensesOverviewModel);
+										var item = (context as TripCardPaymentsOverviewModel);
 										if (item.ProfitLoss.HasValue)
 										{
 											<span class="@(item.ProfitLoss >= 0 ? "grid-credit" : "grid-debit")">
@@ -573,15 +587,15 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.PendingDays)" HeaderText="Pending Days" Width="130" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.PendingDays)" HeaderText="Pending Days" Width="130" TextAlign="TextAlign.Right" />
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="300" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="300" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="300" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="300" Visible="_showAllColumns" />
 						</GridColumns>
 					</SfGrid>
 				</div>

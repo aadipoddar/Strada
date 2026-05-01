@@ -21,9 +21,9 @@ public class TripLedgerPaymentsCartModel
 public class TripLedgerPaymentsOverviewModel
 {
 	public int Id { get; set; }
-	public int OMCCardId { get; set; }
-	public string OMCCardNumber { get; set; }
-	public string OMCCardCode { get; set; }
+	public int LedgerId { get; set; }
+	public string LedgerName { get; set; }
+	public string LedgerCode { get; set; }
 	public decimal PaymentAmount { get; set; }
 	public string? PaymentRemarks { get; set; }
 
@@ -35,6 +35,7 @@ public class TripLedgerPaymentsOverviewModel
 	public int FinancialYearId { get; set; }
 	public string FinancialYear { get; set; }
 
+	public string? SlNo { get; set; }
 	public string? ChallanNo { get; set; }
 	public int OMCId { get; set; }
 	public string OMCName { get; set; }
@@ -62,7 +63,6 @@ public class TripLedgerPaymentsOverviewModel
 	public string? BillNo { get; set; }
 	public DateTime? BillDateTime { get; set; }
 	public decimal? GrossAmount { get; set; }
-	public decimal? TDSAmount { get; set; }
 	public decimal? PenaltyAmount { get; set; }
 	public decimal? NetAmount { get; set; }
 

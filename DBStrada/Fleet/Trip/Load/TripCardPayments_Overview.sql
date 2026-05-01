@@ -16,6 +16,7 @@ SELECT
     [t].[FinancialYearId],
 	CONVERT(VARCHAR(10), fy.StartDate, 103) + ' to ' + CONVERT(VARCHAR(10), fy.EndDate, 103) AS FinancialYear,
 
+    [t].[SlNo],
     [t].[ChallanNo],
 	[t].[OMCId],
 	[o].[Name] AS OMCName,
@@ -29,7 +30,7 @@ SELECT
 	[d].[Name] AS DriverName,
 	[d].[Mobile] AS DriverMobile,
 	[d].[Name] + ' (' + [d].[Mobile] + ')' AS DriverDisplay,
-
+	
 	[t].[Quantity],
 	[r].[EstimatedDistance],
 	[r].[EstimatedHours],

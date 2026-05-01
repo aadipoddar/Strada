@@ -96,7 +96,7 @@ BEGIN
 			[CompanyId] = @CompanyId,
 			[TransactionDateTime] = @TransactionDateTime,
 			[FinancialYearId] = @FinancialYearId,
-			[SlNo] = @ChallanNo,
+			[SlNo] = @SlNo,
 			[ChallanNo] = @ChallanNo,
 			[OMCId] = @OMCId,
 			[VehicleId] = @VehicleId,

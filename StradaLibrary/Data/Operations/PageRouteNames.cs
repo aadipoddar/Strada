@@ -48,7 +48,8 @@ public static class PageRouteNames
 	public const string Trip = "/fleet/trip";
 	public const string TripReport = "/fleet/trip-report";
 	public const string TripExpensesReport = "/fleet/trip-expenses-report";
-	public const string TripPaymentsReport = "/fleet/trip-payments-report";
+	public const string TripCardPaymentsReport = "/fleet/trip-card-payments-report";
+	public const string TripLedgerPaymentsReport = "/fleet/trip-ledger-payments-report";
 
 	public const string Bill = "/fleet/bill";
 	public const string BillReport = "/fleet/bill-report";

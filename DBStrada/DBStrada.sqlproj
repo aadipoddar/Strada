@@ -182,6 +182,7 @@
     <Build Include="Fleet\Trip\Table\TripLedgerPayments.sql" />
     <Build Include="Operations\Common\Load_LastTableData.sql" />
     <Build Include="Fleet\Trip\Insert\Insert_TripLedgerPayments.sql" />
+    <Build Include="Fleet\Trip\Load\TripLedgerPayments_Overview.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />
