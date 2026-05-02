@@ -177,8 +177,7 @@ else
 												DataSource="@TripFilterOptions.YesNo" Value="_vehicleEmptyFilter"
 												CssClass="custom-textbox" FloatLabelType="FloatLabelType.Never">
 									<DropDownListFieldSettings Text="Name" Value="Id" />
-									<DropDownListEvents TValue="int" TItem="YesNoFilterOption"
-														ValueChange="OnVehicleEmptyFilterChanged" />
+									<DropDownListEvents TValue="int" TItem="YesNoFilterOption" ValueChange="OnVehicleEmptyFilterChanged" />
 								</SfDropDownList>
 							</div>
 
@@ -189,8 +188,7 @@ else
 												DataSource="@TripFilterOptions.YesNo" Value="_pendingBillsFilter"
 												CssClass="custom-textbox" FloatLabelType="FloatLabelType.Never">
 									<DropDownListFieldSettings Text="Name" Value="Id" />
-									<DropDownListEvents TValue="int" TItem="YesNoFilterOption"
-														ValueChange="OnPendingBillsFilterChanged" />
+									<DropDownListEvents TValue="int" TItem="YesNoFilterOption" ValueChange="OnPendingBillsFilterChanged" />
 								</SfDropDownList>
 							</div>
 						</div>
@@ -222,8 +220,7 @@ else
 							AllowGrouping="true" CssClass="professional-grid" ContextMenuItems="@_gridContextMenuItems"
 							Toolbar="@(new List<string>() { "Search" })">
 
-						<GridEvents TValue="TripOverviewModel"
-									ContextMenuItemClicked="OnGridContextMenuItemClicked" />
+						<GridEvents TValue="TripOverviewModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />

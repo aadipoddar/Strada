@@ -1,6 +1,3 @@
-@typeparam TValue
-@typeparam TItem
-
 @if (_isFocused && AddNewRoute is not null)
 {
 	<MudBlazor.MudHotkey Key="JsKey.F12" OnHotkeyPressed="NavigateToAddNew" />
@@ -15,24 +12,31 @@
 			{
 				<span class="required">*</span>
 			}
+			@if (FinancialYear is not null)
+			{
+				<text> / Financial Year</text>
+			}
 		</label>
 	}
 
 	<div class="mac-input">
-		<SfAutoComplete @ref="_sfAutoComplete" TValue="TValue" TItem="TItem"
-						Value="@Value"
-						DataSource="@DataSource"
-						Placeholder="@Placeholder"
-						FloatLabelType="FloatLabelType.Never"
-						AllowFiltering="true"
-						Autofill="true"
-						AllowCustom="false"
-						Enabled="@(!Disabled)"
-						FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-						CssClass="custom-autocomplete">
-			<AutoCompleteEvents TItem="TItem" TValue="TValue" ValueChange="@OnValueChangeInternal" Focus="@OnFocus" Blur="@OnBlur" />
-			<AutoCompleteFieldSettings Value="@FieldValue" />
-		</SfAutoComplete>
+		<div class="date-year-wrapper">
+			<SfDatePicker @ref="_sfDatePicker" TValue="DateTime" Value="@Value"
+						  EnableMask="true" Format="dd/MM/yy"
+						  Placeholder="@Placeholder"
+						  FloatLabelType="FloatLabelType.Never"
+						  Enabled="@(!Disabled)"
+						  CssClass="custom-datepicker">
+				<DatePickerEvents TValue="DateTime" ValueChange="@OnValueChangeInternal" Focus="@OnFocus" Blur="@OnBlur" />
+			</SfDatePicker>
+			@if (FinancialYear is not null)
+			{
+				<SfTextBox Value="@($"{FinancialYear.StartDate:yyyy} to {FinancialYear.EndDate:yyyy}")"
+						   Readonly="true" Placeholder="Financial Year"
+						   FloatLabelType="FloatLabelType.Never"
+						   TabIndex="-1" CssClass="custom-textbox readonly-field" />
+			}
+		</div>
 	</div>
 
 	@if (Label is not null && AddNewRoute is not null && !Disabled)

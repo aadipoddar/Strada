@@ -111,18 +111,8 @@ else
 
 						<!-- Transaction Date -->
 						<div class="form-field">
-							<label class="field-label">
-								Transaction Date <span class="required">*</span> / Financial Year
-							</label>
-							<div class="date-year-wrapper">
-								<SfDatePicker @bind-Value="_expense.TransactionDateTime" TValue="DateTime"
-											  Format="dd/MM/yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
-											  CssClass="custom-datepicker">
-								</SfDatePicker>
-								<SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-										   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never" TabIndex="-1"
-										   CssClass="custom-textbox readonly-field" />
-							</div>
+							<DatePickerWithAdd @bind-Value="_expense.TransactionDateTime"
+											   FinancialYear="@_selectedFinancialYear" />
 						</div>
 
 						<!-- Transaction No -->
