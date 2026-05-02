@@ -178,7 +178,7 @@ public static class BillData
 			throw new InvalidOperationException("All Trips included in the bill must have a valid challan number.");
 
 		if (trips.Any(vt => vt.GrossAmount is null || vt.PenaltyAmount is null || vt.NetAmount is null))
-			throw new InvalidOperationException("All Trips included in the bill must have gross amount, TDS amount, penalty amount and net amount specified.");
+			throw new InvalidOperationException("All Trips included in the bill must have gross amount, penalty amount and net amount specified.");
 
 		if (trips.Sum(vt => vt.GrossAmount) != bill.TotalGrossAmount)
 			throw new InvalidOperationException("Sum of gross amounts of all Trips must be equal to bill's total gross amount.");

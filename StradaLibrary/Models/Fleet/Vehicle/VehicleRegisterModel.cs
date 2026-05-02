@@ -21,7 +21,6 @@ public class VehicleRegisterModel
 
 	public int TotalBills { get; set; }
 	public decimal TotalGrossAmount { get; set; }
-	public decimal TotalTDSAmount { get; set; }
 	public decimal TotalPenaltyAmount { get; set; }
 	public decimal TotalNetAmount { get; set; }
 

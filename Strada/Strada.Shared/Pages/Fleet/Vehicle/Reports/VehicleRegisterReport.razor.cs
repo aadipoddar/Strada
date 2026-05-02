@@ -296,27 +296,31 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			rows.Add(ExcelRow(["TRIPS", .. Enumerable.Repeat("", 13)], bold: true, backColor: "#BDD7EE"));
 
 			// Column headers
-			rows.Add(ExcelRow(["Date", "Challan", "Route", "Driver", "Type", "Qty", "Trip Exp", "Bill No", "Bill Date", "Gross", "TDS", "Net Amt", "Profit/Loss", "Pending Days", "OMC", "Company", "Trip No", "Remarks"], bold: true, backColor: "#DEEAF1"));
+			rows.Add(ExcelRow(["Date", "Sl No", "Challan", "OMC", "Route", "Driver", "Qty", "Est Dist", "Est Hours", "Est Fuel", "Est Cost", "Trip Exp", "Empty", "Bill No", "Bill Date", "Gross Amt", "Penalty Amt", "Net Amt", "Profit/Loss", "Pending Days", "Remarks"], bold: true, backColor: "#DEEAF1"));
 
 			foreach (var trip in vehicle.TripOverviews)
 			{
 				rows.Add(ExcelRow([
 					trip.TransactionDateTime.ToString("dd/MM/yy"),
+					trip.SlNo?? "",
 					trip.ChallanNo ?? "",
+					trip.OMCName ?? "",
 					trip.RouteDisplay ?? "",
 					trip.DriverDisplay ?? "",
-					trip.VehicleEmpty ? "Empty" : "Loaded",
 					trip.Quantity.ToString("N2"),
+					trip.EstimatedDistance.ToString("N2"),
+					trip.EstimatedHours.ToString("N2"),
+					trip.EstimatedFuelConsumption.ToString("N2"),
+					trip.EstimatedCost.ToString("N2"),
 					trip.TotalExpense.ToString("N2"),
+					trip.VehicleEmpty ? "Empty" : "Loaded",
 					trip.BillNo ?? "",
 					trip.BillDateTime?.ToString("dd/MM/yy") ?? "",
 					trip.GrossAmount?.ToString("N2") ?? "",
+					trip.PenaltyAmount?.ToString("N2") ?? "",
 					trip.NetAmount?.ToString("N2") ?? "",
 					trip.ProfitLoss?.ToString("N2") ?? "",
 					trip.PendingDays.HasValue ? trip.PendingDays.Value.ToString() : "",
-					trip.OMCName ?? "",
-					trip.CompanyName ?? "",
-					trip.TransactionNo ?? "",
 					trip.Remarks ?? ""
 				]));
 			}
@@ -331,7 +335,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 			rows.Add(ExcelRow(["EXPENSES", .. Enumerable.Repeat("", 3)], bold: true, backColor: "#BDD7EE"));
 
 			// Column headers
-			rows.Add(ExcelRow(["Date", "Expense Type", "Ledger", "Amount", "Expense Remarks", "Company", "Expense No", "Remarks"], bold: true, backColor: "#DEEAF1"));
+			rows.Add(ExcelRow(["Date", "Expense Type", "Ledger", "Amount", "Identification No", "Expense Remarks", "Total Expense", "Remarks"], bold: true, backColor: "#DEEAF1"));
 
 			foreach (var expense in vehicle.ExpenseDetailsOverviews)
 			{
@@ -340,9 +344,9 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 					expense.ExpenseTypeName ?? "",
 					expense.LedgerName ?? "",
 					expense.ExpenseAmount.ToString("N2"),
+					expense.IdentificationNo ?? "",
 					expense.ExpenseRemarks ?? "",
-					expense.CompanyName ?? "",
-					expense.TransactionNo ?? "",
+					expense.TotalExpense.ToString("N2"),
 					expense.Remarks ?? ""
 				]));
 			}
