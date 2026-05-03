@@ -874,7 +874,7 @@ public partial class TripPage
 			_isProcessing = true;
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await GenerateCodes.DecodeTransactionNo(_trip.TransactionNo);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_trip.TransactionNo, true, false, CodeType.Trip);
 			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -905,7 +905,7 @@ public partial class TripPage
 			_isProcessing = true;
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await GenerateCodes.DecodeTransactionNo(_trip.TransactionNo);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_trip.TransactionNo, false, true, CodeType.Trip);
 			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);

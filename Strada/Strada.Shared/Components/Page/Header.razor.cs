@@ -73,7 +73,7 @@ public partial class Header
 	{
 		try
 		{
-			var decodedTransaction = await DecodeSearchTransactionAsync(searchText);
+			var decodedTransaction = await DecodeSearchTransactionAsync(searchText, false);
 			if (!string.IsNullOrWhiteSpace(decodedTransaction.PageRouteName))
 			{
 				NavigationManager.NavigateTo(decodedTransaction.PageRouteName, true);
@@ -97,7 +97,7 @@ public partial class Header
 
 		try
 		{
-			var decodedTransaction = await DecodeSearchTransactionAsync(searchText);
+			var decodedTransaction = await DecodeSearchTransactionAsync(searchText, true);
 			if (decodedTransaction.PDFStream.stream is not null && !string.IsNullOrWhiteSpace(decodedTransaction.PDFStream.fileName))
 				await SaveAndViewService.SaveAndView(decodedTransaction.PDFStream.fileName, decodedTransaction.PDFStream.stream);
 		}
@@ -107,17 +107,17 @@ public partial class Header
 		}
 	}
 
-	private static async Task<DecodeTransactionNoModel> DecodeSearchTransactionAsync(string searchText)
+	private static async Task<DecodeTransactionNoModel> DecodeSearchTransactionAsync(string searchText, bool pdf)
 	{
-		var decodedTransaction = await GenerateCodes.DecodeTransactionNo(searchText);
-		if (!string.IsNullOrWhiteSpace(decodedTransaction.PageRouteName) || decodedTransaction.PDFStream.stream is not null)
+		var decodedTransaction = await DecodeCode.DecodeTransactionNo(searchText);
+		if (!string.IsNullOrWhiteSpace(decodedTransaction.PageRouteName) || (pdf && decodedTransaction.PDFStream.stream is not null))
 			return decodedTransaction;
 
 		var upperSearchText = searchText.ToUpperInvariant();
 		if (!searchText.Equals(upperSearchText, StringComparison.Ordinal))
 		{
-			var upperDecodedTransaction = await GenerateCodes.DecodeTransactionNo(upperSearchText);
-			if (!string.IsNullOrWhiteSpace(upperDecodedTransaction.PageRouteName) || upperDecodedTransaction.PDFStream.stream is not null)
+			var upperDecodedTransaction = await DecodeCode.DecodeTransactionNo(upperSearchText);
+			if (!string.IsNullOrWhiteSpace(upperDecodedTransaction.PageRouteName) || (pdf && upperDecodedTransaction.PDFStream.stream is not null))
 				return upperDecodedTransaction;
 		}
 

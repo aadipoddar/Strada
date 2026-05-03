@@ -11,7 +11,6 @@ using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Fleet.Bill;
 using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Operations;
-using Syncfusion.XlsIO;
 
 namespace StradaLibrary.Data.Fleet.Bill;
 
@@ -54,37 +53,30 @@ public static class BillData
 			}
 
 			await BillNotify.Notify(bill.Id, NotifyType.Deleted);
+			return;
 		}
 
-		try
+		await FinancialYearData.ValidateFinancialYear(bill.TransactionDateTime, sqlDataAccessTransaction);
+
+		bill.Status = false;
+		var id = await InsertBill(bill, sqlDataAccessTransaction);
+
+		if (id <= 0)
+			throw new InvalidOperationException("Failed to delete Bill transaction.");
+
+		await DeleteTripsBillNo(bill, sqlDataAccessTransaction);
+
+		var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
+		var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
+
+		if (existingAccounting is not null && existingAccounting.Id > 0)
 		{
-			await FinancialYearData.ValidateFinancialYear(bill.TransactionDateTime, sqlDataAccessTransaction);
+			existingAccounting.Status = false;
+			existingAccounting.LastModifiedBy = bill.LastModifiedBy;
+			existingAccounting.LastModifiedAt = bill.LastModifiedAt;
+			existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
 
-			bill.Status = false;
-			var id = await InsertBill(bill, sqlDataAccessTransaction);
-
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to delete Bill transaction.");
-
-			await DeleteTripsBillNo(bill, sqlDataAccessTransaction);
-
-			var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
-			var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
-
-			if (existingAccounting is not null && existingAccounting.Id > 0)
-			{
-				existingAccounting.Status = false;
-				existingAccounting.LastModifiedBy = bill.LastModifiedBy;
-				existingAccounting.LastModifiedAt = bill.LastModifiedAt;
-				existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
-
-				await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
-			}
-		}
-		catch
-		{
-			sqlDataAccessTransaction.RollbackTransaction();
-			throw;
+			await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
 		}
 	}
 

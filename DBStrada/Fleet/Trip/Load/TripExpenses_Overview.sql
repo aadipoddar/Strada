@@ -58,7 +58,9 @@ SELECT
 	[t].[LastModifiedBy],
 	[lm].[Name] AS LastModifiedByUserName,
 	[t].[LastModifiedAt],
-	[t].[LastModifiedFromPlatform]
+	[t].[LastModifiedFromPlatform],
+
+	[t].[Status]
 
 FROM
     [dbo].[TripExpenses] te
@@ -90,5 +92,4 @@ LEFT JOIN
 	[dbo].[User] AS lm ON t.LastModifiedBy = lm.Id
 
 WHERE
-	[te].[Status] = 1 AND
-	[t].[Status] = 1;
+	[te].[Status] = 1;

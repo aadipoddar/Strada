@@ -78,25 +78,18 @@ public static class TripData
 			}
 
 			await TripNotify.Notify(trip.Id, NotifyType.Deleted);
+			return;
 		}
 
-		try
-		{
-			await FinancialYearData.ValidateFinancialYear(trip.TransactionDateTime, sqlDataAccessTransaction);
+		await FinancialYearData.ValidateFinancialYear(trip.TransactionDateTime, sqlDataAccessTransaction);
 
-			if (trip.BillId is not null)
-				throw new InvalidOperationException("Cannot delete a trip transaction that is associated with a bill.");
+		if (trip.BillId is not null)
+			throw new InvalidOperationException("Cannot delete a trip transaction that is associated with a bill.");
 
-			trip.Status = false;
-			var id = await InsertTrip(trip, sqlDataAccessTransaction);
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to delete trip transaction.");
-		}
-		catch
-		{
-			sqlDataAccessTransaction.RollbackTransaction();
-			throw;
-		}
+		trip.Status = false;
+		var id = await InsertTrip(trip, sqlDataAccessTransaction);
+		if (id <= 0)
+			throw new InvalidOperationException("Failed to delete trip transaction.");
 	}
 
 	public static async Task RecoverTransaction(TripModel trip)

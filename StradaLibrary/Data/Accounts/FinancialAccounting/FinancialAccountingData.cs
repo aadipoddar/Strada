@@ -57,20 +57,13 @@ public static class FinancialAccountingData
 			}
 
 			await FinancialAccountingNotify.Notify(accounting.Id, NotifyType.Deleted);
+			return;
 		}
 
-		try
-		{
-			await FinancialYearData.ValidateFinancialYear(accounting.TransactionDateTime, sqlDataAccessTransaction);
+		await FinancialYearData.ValidateFinancialYear(accounting.TransactionDateTime, sqlDataAccessTransaction);
 
-			accounting.Status = false;
-			await InsertFinancialAccounting(accounting, sqlDataAccessTransaction);
-		}
-		catch
-		{
-			sqlDataAccessTransaction.RollbackTransaction();
-			throw;
-		}
+		accounting.Status = false;
+		await InsertFinancialAccounting(accounting, sqlDataAccessTransaction);
 	}
 
 	public static async Task RecoverTransaction(FinancialAccountingModel accounting)

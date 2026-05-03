@@ -650,7 +650,7 @@ public partial class BillPage
 			_isProcessing = true;
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await GenerateCodes.DecodeTransactionNo(_bill.TransactionNo);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_bill.TransactionNo, true, false, CodeType.Bill);
 			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -681,7 +681,7 @@ public partial class BillPage
 			_isProcessing = true;
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await GenerateCodes.DecodeTransactionNo(_bill.TransactionNo);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_bill.TransactionNo, false, true, CodeType.Bill);
 			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);

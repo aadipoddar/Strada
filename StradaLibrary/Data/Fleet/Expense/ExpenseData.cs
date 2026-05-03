@@ -4,7 +4,6 @@ using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Fleet.Expense;
 using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.Expense;
 using StradaLibrary.Models.Operations;
 
@@ -50,20 +49,13 @@ public static class ExpenseData
 			}
 
 			await ExpenseNotify.Notify(expense.Id, NotifyType.Deleted);
+			return;
 		}
 
-		try
-		{
-			await FinancialYearData.ValidateFinancialYear(expense.TransactionDateTime, sqlDataAccessTransaction);
+		await FinancialYearData.ValidateFinancialYear(expense.TransactionDateTime, sqlDataAccessTransaction);
 
-			expense.Status = false;
-			await InsertExpense(expense, sqlDataAccessTransaction);
-		}
-		catch
-		{
-			sqlDataAccessTransaction.RollbackTransaction();
-			throw;
-		}
+		expense.Status = false;
+		await InsertExpense(expense, sqlDataAccessTransaction);
 	}
 
 	public static async Task RecoverTransaction(ExpenseModel expense)

@@ -215,6 +215,7 @@ public static class TripReportExport
 		DateOnly? dateRangeStart = null,
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
+		bool showDeleted = false,
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
@@ -268,7 +269,8 @@ public static class TripReportExport
 			[nameof(TripExpensesOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(TripExpensesOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(TripExpensesOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(TripExpensesOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false }
+			[nameof(TripExpensesOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(TripExpensesOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -315,7 +317,8 @@ public static class TripReportExport
 				nameof(TripExpensesOverviewModel.CreatedFromPlatform),
 				nameof(TripExpensesOverviewModel.LastModifiedByUserName),
 				nameof(TripExpensesOverviewModel.LastModifiedAt),
-				nameof(TripExpensesOverviewModel.LastModifiedFromPlatform)
+				nameof(TripExpensesOverviewModel.LastModifiedFromPlatform),
+				nameof(TripExpensesOverviewModel.Status)
 			];
 		}
 		else
@@ -338,7 +341,8 @@ public static class TripReportExport
 				nameof(TripExpensesOverviewModel.BillDateTime),
 				nameof(TripExpensesOverviewModel.NetAmount),
 				nameof(TripExpensesOverviewModel.ProfitLoss),
-				nameof(TripExpensesOverviewModel.PendingDays)
+				nameof(TripExpensesOverviewModel.PendingDays),
+				nameof(TripExpensesOverviewModel.Status)
 			];
 
 			if (company is not null)
@@ -355,6 +359,9 @@ public static class TripReportExport
 
 			if (driver is not null)
 				columnOrder.Remove(nameof(TripExpensesOverviewModel.DriverDisplay));
+
+			if (!showDeleted)
+				columnOrder.Remove(nameof(TripExpensesOverviewModel.Status));
 		}
 
 		string fileName = $"TRIP_EXPENSES_REPORT";
