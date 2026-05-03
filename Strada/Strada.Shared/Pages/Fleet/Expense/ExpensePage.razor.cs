@@ -586,10 +586,10 @@ public partial class ExpensePage
 			case "ExportExcelInvoice":
 				await ExportExcelInvoice();
 				break;
-			case "TransactionHistory":
+			case "TripReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager);
 				break;
-			case "ExpensesReport":
+			case "ExpenseDetailsReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseDetailsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 		}

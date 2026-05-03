@@ -31,9 +31,9 @@ public static class ExpenseReportExport
 			[nameof(ExpenseOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(ExpenseOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(ExpenseOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(ExpenseOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(ExpenseOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
-			[nameof(ExpenseOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(ExpenseOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(ExpenseOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false },
 		};
 
 		List<string> columnOrder;
@@ -134,6 +134,7 @@ public static class ExpenseReportExport
 		DateOnly? dateRangeStart = null,
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
+		bool showDeleted = false,
 		CompanyModel company = null,
 		VehicleModel vehicle = null)
 	{
@@ -160,7 +161,8 @@ public static class ExpenseReportExport
 			[nameof(ExpenseDetailsOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(ExpenseDetailsOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(ExpenseDetailsOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
-			[nameof(ExpenseDetailsOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(ExpenseDetailsOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(ExpenseDetailsOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -187,8 +189,12 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.CreatedFromPlatform),
 				nameof(ExpenseDetailsOverviewModel.LastModifiedByUserName),
 				nameof(ExpenseDetailsOverviewModel.LastModifiedAt),
-				nameof(ExpenseDetailsOverviewModel.LastModifiedFromPlatform)
+				nameof(ExpenseDetailsOverviewModel.LastModifiedFromPlatform),
+				nameof(ExpenseDetailsOverviewModel.Status)
 			];
+
+			if (!showDeleted)
+				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.Status));
 		}
 		else
 		{
@@ -200,7 +206,8 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.IdentificationNo),
 				nameof(ExpenseDetailsOverviewModel.TransactionDateTime),
 				nameof(ExpenseDetailsOverviewModel.VehicleCode),
-				nameof(ExpenseDetailsOverviewModel.TotalExpense)
+				nameof(ExpenseDetailsOverviewModel.TotalExpense),
+				nameof(ExpenseDetailsOverviewModel.Status)
 			];
 
 			if (company is not null)
@@ -208,6 +215,9 @@ public static class ExpenseReportExport
 
 			if (vehicle is not null)
 				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.VehicleCode));
+
+			if (!showDeleted)
+				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.Status));
 		}
 
 		string fileName = $"EXPENSE_DETAILS_REPORT";

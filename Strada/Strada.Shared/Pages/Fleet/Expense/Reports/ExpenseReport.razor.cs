@@ -292,8 +292,14 @@ public partial class ExpenseReport : IAsyncDisposable
 	#region Actions
 	private async Task ViewSelectedTransaction()
 	{
-		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0 || !_sfGrid.SelectedRecords.First().Status)
+		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
+
+		if (!_sfGrid.SelectedRecords.First().Status)
+		{
+			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it or download invoice.", ToastType.Warning);
+			return;
+		}
 
 		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false, CodeType.Expense);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
@@ -456,7 +462,7 @@ public partial class ExpenseReport : IAsyncDisposable
 			case "DeleteRecoverSelected":
 				await DeleteRecoverSelectedTransaction();
 				break;
-			case "ExpensesReport":
+			case "ExpenseDetailsReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseDetailsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "PeriodToday":
@@ -499,15 +505,12 @@ public partial class ExpenseReport : IAsyncDisposable
 			case "View":
 				await ViewSelectedTransaction();
 				break;
-
 			case "ExportPDF":
 				await ExportSelectedTransactionPdf();
 				break;
-
 			case "ExportExcel":
 				await ExportSelectedTransactionExcel();
 				break;
-
 			case "DeleteRecover":
 				await DeleteRecoverSelectedTransaction();
 				break;

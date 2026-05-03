@@ -1,5 +1,6 @@
 ﻿using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
+using StradaLibrary.Data.Fleet.Expense;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.Expense;
 using StradaLibrary.Exports.Utils;
@@ -21,6 +22,15 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
+	private bool _showDeleted = false;
+
+	private string _deleteTransactionNo;
+	private int _deleteTransactionId;
+	private string _recoverTransactionNo;
+	private int _recoverTransactionId;
+
+	private DeleteConfirmationDialog _deleteConfirmationDialog;
+	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
@@ -38,7 +48,8 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
 		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
-		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" }
+		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	#region Load Data
@@ -88,6 +99,9 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 				FleetNames.ExpenseDetailsOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MinValue));
+
+			if (!_showDeleted)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.Status)];
 
 			if (_selectedCompany?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
@@ -165,6 +179,7 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
+				_showDeleted,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null
 			);
@@ -200,6 +215,7 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
+				_showDeleted,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null
 			 );
@@ -279,8 +295,135 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
 
+		if (!_sfGrid.SelectedRecords.First().Status)
+		{
+			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it or download invoice.", ToastType.Warning);
+			return;
+		}
+
 		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false, CodeType.Expense);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
+	}
+
+	private async Task ConfirmDelete()
+	{
+		if (_isProcessing || _deleteTransactionId == 0)
+			return;
+
+		try
+		{
+			if (!_user.Admin)
+				throw new UnauthorizedAccessException("You do not have permission to delete this transaction.");
+
+			await _deleteConfirmationDialog.HideAsync();
+			_isProcessing = true;
+			StateHasChanged();
+
+			await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
+
+			var expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
+			expense.Status = false;
+			expense.LastModifiedBy = _user.Id;
+			expense.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+			expense.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			await ExpenseData.DeleteTransaction(expense);
+
+			await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"An error occurred while deleting transaction: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_deleteTransactionId = 0;
+			_deleteTransactionNo = string.Empty;
+			_isProcessing = false;
+			StateHasChanged();
+			await LoadTransactionOverviews();
+		}
+	}
+
+	private async Task ConfirmRecover()
+	{
+		if (_isProcessing || _recoverTransactionId == 0)
+			return;
+
+		try
+		{
+			if (!_user.Admin)
+				throw new UnauthorizedAccessException("You do not have permission to recover this transaction.");
+
+			await _recoverConfirmationDialog.HideAsync();
+			_isProcessing = true;
+			StateHasChanged();
+
+			await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
+
+			var expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, _recoverTransactionId)
+				?? throw new Exception("Transaction not found.");
+			expense.Status = true;
+			expense.LastModifiedBy = _user.Id;
+			expense.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+			expense.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			await ExpenseData.RecoverTransaction(expense);
+
+			await _toastNotification.ShowAsync("Success", $"Transaction {_recoverTransactionNo} has been recovered successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"An error occurred while recovering transaction: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_recoverTransactionId = 0;
+			_recoverTransactionNo = string.Empty;
+			_isProcessing = false;
+			StateHasChanged();
+			await LoadTransactionOverviews();
+		}
+	}
+
+	private async Task DeleteRecoverSelectedTransaction()
+	{
+		if (_sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
+			return;
+
+		if (_sfGrid.SelectedRecords.First().Status)
+			await ShowDeleteConfirmation();
+		else
+			await ShowRecoverConfirmation();
+	}
+
+	private async Task ShowDeleteConfirmation()
+	{
+		_deleteTransactionId = _sfGrid.SelectedRecords.First().MasterId;
+		_deleteTransactionNo = _sfGrid.SelectedRecords.First().TransactionNo;
+		StateHasChanged();
+		await _deleteConfirmationDialog.ShowAsync();
+	}
+
+	private async Task CancelDelete()
+	{
+		_deleteTransactionId = 0;
+		_deleteTransactionNo = string.Empty;
+		await _deleteConfirmationDialog.HideAsync();
+	}
+
+	private async Task ShowRecoverConfirmation()
+	{
+		_recoverTransactionId = _sfGrid.SelectedRecords.First().MasterId;
+		_recoverTransactionNo = _sfGrid.SelectedRecords.First().TransactionNo;
+		StateHasChanged();
+		await _recoverConfirmationDialog.ShowAsync();
+	}
+
+	private async Task CancelRecover()
+	{
+		_recoverTransactionId = 0;
+		_recoverTransactionNo = string.Empty;
+		await _recoverConfirmationDialog.HideAsync();
 	}
 	#endregion
 
@@ -294,6 +437,9 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 				break;
 			case "Refresh":
 				await LoadTransactionOverviews();
+				break;
+			case "ToggleDeleted":
+				await ToggleDeleted();
 				break;
 			case "ToggleDetailsView":
 				await ToggleDetailsView();
@@ -313,7 +459,10 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 			case "DownloadSelectedExcel":
 				await ExportSelectedTransactionExcel();
 				break;
-			case "TransactionHistory":
+			case "DeleteRecoverSelected":
+				await DeleteRecoverSelectedTransaction();
+				break;
+			case "ExpenseReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "PeriodToday":
@@ -356,13 +505,14 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 			case "View":
 				await ViewSelectedTransaction();
 				break;
-
 			case "ExportPDF":
 				await ExportSelectedTransactionPdf();
 				break;
-
 			case "ExportExcel":
 				await ExportSelectedTransactionExcel();
+				break;
+			case "DeleteRecover":
+				await DeleteRecoverSelectedTransaction();
 				break;
 		}
 	}
@@ -374,6 +524,13 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
+	}
+
+	private async Task ToggleDeleted()
+	{
+		_showDeleted = !_showDeleted;
+		await LoadTransactionOverviews();
+		StateHasChanged();
 	}
 	private void NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard, true);

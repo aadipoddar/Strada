@@ -45,7 +45,7 @@ else
 						</MenuItem>
 						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
 							<MenuItems>
-								<MenuItem Text="Expenses Report" Id="ExpensesReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Expense Details Report" Id="ExpenseDetailsReport" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Periods" IconCss="e-icons e-clock">
@@ -239,8 +239,15 @@ else
 								</Template>
 							</GridColumn>
 
-							<GridColumn Field="@nameof(ExpenseOverviewModel.Status)" HeaderText="Status" Width="110"
-										TextAlign="TextAlign.Center" Visible="_showDeleted">
+							<GridColumn Field="@nameof(ExpenseOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
+
+							<GridColumn Field="@nameof(ExpenseOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
 										var item = (context as ExpenseOverviewModel);
@@ -250,13 +257,6 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(ExpenseOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(ExpenseOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(ExpenseOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(ExpenseOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(ExpenseOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(ExpenseOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(ExpenseOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
 						</GridColumns>
 					</SfGrid>
 				</div>
@@ -267,11 +267,11 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Accounting Transaction"
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Expense Transaction"
 						  IdentifierLabel="Transaction No" IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing"
 						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Accounting Transaction"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Expense Transaction"
 						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverTransactionNo" Disabled="@_isProcessing"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 

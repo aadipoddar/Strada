@@ -534,7 +534,7 @@ public partial class TripCardPaymentsReport : IAsyncDisposable
 			case "DeleteRecoverSelected":
 				await DeleteRecoverSelectedTransaction();
 				break;
-			case "TransactionHistory":
+			case "TripReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "ExpensesReport":

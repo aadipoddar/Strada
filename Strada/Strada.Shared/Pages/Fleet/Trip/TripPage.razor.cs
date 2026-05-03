@@ -944,7 +944,7 @@ public partial class TripPage
 			case "ExportExcelInvoice":
 				await ExportExcelInvoice();
 				break;
-			case "TransactionHistory":
+			case "TripReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "ExpensesReport":

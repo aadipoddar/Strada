@@ -531,7 +531,7 @@ public partial class TripExpensesReport : IAsyncDisposable
 			case "DownloadSelectedExcel":
 				await ExportSelectedTransactionExcel();
 				break;
-			case "TransactionHistory":
+			case "TripReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "CardPaymentsReport":
