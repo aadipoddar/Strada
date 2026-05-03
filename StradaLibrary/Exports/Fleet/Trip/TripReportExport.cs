@@ -426,6 +426,7 @@ public static class TripReportExport
 		DateOnly? dateRangeStart = null,
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
+		bool showDeleted = false,
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
@@ -480,6 +481,7 @@ public static class TripReportExport
 			[nameof(TripCardPaymentsOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(TripCardPaymentsOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(TripCardPaymentsOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(TripCardPaymentsOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -526,8 +528,12 @@ public static class TripReportExport
 				nameof(TripCardPaymentsOverviewModel.CreatedFromPlatform),
 				nameof(TripCardPaymentsOverviewModel.LastModifiedByUserName),
 				nameof(TripCardPaymentsOverviewModel.LastModifiedAt),
-				nameof(TripCardPaymentsOverviewModel.LastModifiedFromPlatform)
+				nameof(TripCardPaymentsOverviewModel.LastModifiedFromPlatform),
+				nameof(TripCardPaymentsOverviewModel.Status)
 			];
+
+			if (!showDeleted)
+				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.Status));
 		}
 		else
 		{
@@ -549,7 +555,8 @@ public static class TripReportExport
 				nameof(TripCardPaymentsOverviewModel.BillDateTime),
 				nameof(TripCardPaymentsOverviewModel.NetAmount),
 				nameof(TripCardPaymentsOverviewModel.ProfitLoss),
-				nameof(TripCardPaymentsOverviewModel.PendingDays)
+				nameof(TripCardPaymentsOverviewModel.PendingDays),
+				nameof(TripCardPaymentsOverviewModel.Status)
 			];
 
 			if (company is not null)
@@ -566,9 +573,12 @@ public static class TripReportExport
 
 			if (driver is not null)
 				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.DriverDisplay));
+
+			if (!showDeleted)
+				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.Status));
 		}
 
-		string fileName = $"TRIP_PAYMENTS_REPORT";
+		string fileName = $"TRIP_CARD_PAYMENTS_REPORT";
 		if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 			fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 
@@ -576,7 +586,7 @@ public static class TripReportExport
 		{
 			var stream = await PDFReportExportUtil.ExportToPdf(
 				paymentsData,
-				"TRIP PAYMENTS REPORT",
+				"TRIP CARD PAYMENTS REPORT",
 				dateRangeStart,
 				dateRangeEnd,
 				columnSettings,
@@ -600,8 +610,8 @@ public static class TripReportExport
 		{
 			var stream = await ExcelReportExportUtil.ExportToExcel(
 				paymentsData,
-				"TRIP PAYMENTS REPORT",
-				"Trip Payments Transactions",
+				"TRIP CARD PAYMENTS REPORT",
+				"Trip Card Payments Transactions",
 				dateRangeStart,
 				dateRangeEnd,
 				columnSettings,
