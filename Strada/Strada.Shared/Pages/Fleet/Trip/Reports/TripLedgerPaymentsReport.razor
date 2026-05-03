@@ -14,6 +14,8 @@
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" />
 <MudBlazor.MudHotkey Key=JsKey.KeyQ KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDetailsView" />
+<MudBlazor.MudHotkey Key=JsKey.Delete KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDeleted" />
+<MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="DeleteRecoverSelectedTransaction" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
 <MudBlazor.MudHotkey Key=JsKey.KeyO KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ViewSelectedTransaction" />
@@ -27,7 +29,7 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="Trip Card Payments Report">
+		<Header Title="Trip Ledger Payments Report">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
@@ -37,6 +39,7 @@ else
 							<MenuItems>
 								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
 								<MenuItem Text="Refresh Data (Ctrl + R / F5)" IconCss="e-icons e-refresh" Id="Refresh" Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash" Id="ToggleDeleted" Disabled="@_isProcessing" />
 								<MenuItem Text="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")" IconCss="e-icons e-table" Id="ToggleDetailsView" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
 								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf" Disabled="@_isProcessing" />
@@ -47,7 +50,7 @@ else
 							<MenuItems>
 								<MenuItem Text="Transaction History Report (Ctrl + H)" Id="TransactionHistory" Disabled="@_isProcessing" />
 								<MenuItem Text="Expenses Report" Id="ExpensesReport" Disabled="@_isProcessing" />
-								<MenuItem Text="Card Payment Report" Id="CardPaymentReport" Disabled="@_isProcessing" />
+								<MenuItem Text="Card Payments Report" Id="CardPaymentsReport" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Periods" IconCss="e-icons e-clock">
@@ -69,6 +72,8 @@ else
 								<MenuItem Text="View (Alt + O)" IconCss="e-icons e-eye" Id="ViewSelected" Disabled="@_isProcessing" />
 								<MenuItem Text="Export PDF (Alt + P)" IconCss="e-icons e-export-pdf" Id="DownloadSelectedPdf" Disabled="@_isProcessing" />
 								<MenuItem Text="Export Excel (Alt + E)" IconCss="e-icons e-export-excel" Id="DownloadSelectedExcel" Disabled="@_isProcessing" />
+								<MenuItem Separator="true" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 					</MenuItems>
@@ -595,6 +600,17 @@ else
 							<GridColumn Field="@nameof(TripLedgerPaymentsOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(TripLedgerPaymentsOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(TripLedgerPaymentsOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="300" Visible="_showAllColumns" />
+
+							<GridColumn Field="@nameof(TripLedgerPaymentsOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
+								<Template>
+									@{
+										var item = (context as TripLedgerPaymentsOverviewModel);
+										<span class="@(item.Status ? string.Empty : "grid-debit")">
+											@(item.Status ? "Active" : "Deleted")
+										</span>
+									}
+								</Template>
+							</GridColumn>
 						</GridColumns>
 					</SfGrid>
 				</div>
@@ -604,5 +620,13 @@ else
 		<Footer />
 	</div>
 }
+
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Trip Transaction"
+						  IdentifierLabel="Transaction No" IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
+
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Trip Transaction"
+						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverTransactionNo" Disabled="@_isProcessing"
+						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

@@ -953,7 +953,7 @@ public partial class TripPage
 			case "CardPaymentsReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
-			case "LedgerPaymentReport":
+			case "LedgerPaymentsReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 		}
@@ -993,7 +993,7 @@ public partial class TripPage
 				await EditSelectedCardPaymentsCartItem();
 				break;
 			case "DeleteCart":
-				await RemoveSelectedCardPaymentsCartItem();
+				await RemoveSelectedLedgerPaymentsCartItem();
 				break;
 		}
 	}

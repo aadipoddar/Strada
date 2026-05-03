@@ -531,7 +531,7 @@ public partial class TripExpensesReport : IAsyncDisposable
 			case "CardPaymentsReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
-			case "LedgerPaymentReport":
+			case "LedgerPaymentsReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "PeriodToday":
