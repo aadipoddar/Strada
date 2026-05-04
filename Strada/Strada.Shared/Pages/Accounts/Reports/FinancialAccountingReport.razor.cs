@@ -450,7 +450,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             case "DeleteRecoverSelected":
                 await DeleteRecoverSelectedTransaction();
                 break;
-            case "ItemReport":
+            case "LedgerReport":
                 await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager);
                 break;
             case "TrialBalance":
@@ -502,15 +502,12 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             case "View":
                 await ViewSelectedTransaction();
                 break;
-
             case "ExportPDF":
                 await ExportSelectedTransactionPdf();
                 break;
-
             case "ExportExcel":
                 await ExportSelectedTransactionExcel();
                 break;
-
             case "DeleteRecover":
                 await DeleteRecoverSelectedTransaction();
                 break;

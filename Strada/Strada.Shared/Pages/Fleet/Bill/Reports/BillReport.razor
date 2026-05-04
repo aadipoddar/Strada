@@ -302,6 +302,15 @@ else
 								</Template>
 							</GridColumn>
 							<GridColumn Field="@nameof(BillOverviewModel.TotalLedgerPaymentAmount)" HeaderText="Ledger Payment" Width="140" TextAlign="TextAlign.Right" Format="N2" />
+
+							<GridColumn Field="@nameof(BillOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(BillOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(BillOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(BillOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(BillOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(BillOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(BillOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
+
 							<GridColumn Field="@nameof(BillOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
@@ -312,14 +321,6 @@ else
 									}
 								</Template>
 							</GridColumn>
-
-							<GridColumn Field="@nameof(BillOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(BillOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(BillOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(BillOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(BillOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(BillOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
-							<GridColumn Field="@nameof(BillOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
 						</GridColumns>
 					</SfGrid>
 				</div>

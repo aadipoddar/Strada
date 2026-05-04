@@ -34,10 +34,10 @@ public static class AccountNames
 {
 	#region Financial Accounting
 	public static string FinancialAccounting => "FinancialAccounting";
-	public static string FinancialAccountingDetail => "FinancialAccountingDetail";
+	public static string FinancialAccountingLedger => "FinancialAccountingLedger";
 
 	public static string InsertFinancialAccounting => "Insert_FinancialAccounting";
-	public static string InsertFinancialAccountingDetail => "Insert_FinancialAccountingDetail";
+	public static string InsertFinancialAccountingLedger => "Insert_FinancialAccountingLedger";
 
 	public static string LoadFinancialAccountingByVoucherReference => "Load_FinancialAccounting_By_Voucher_Reference";
 	public static string LoadTrialBalanceByCompanyDate => "Load_TrialBalance_By_Company_Date";

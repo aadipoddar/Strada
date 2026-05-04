@@ -331,7 +331,7 @@ public static class BillData
 
 		var billLedger = await SettingsData.LoadSettingsByKey(SettingsKeys.BillLedgerId, sqlDataAccessTransaction);
 
-		var accountingCart = new List<FinancialAccountingItemCartModel>
+		var accountingCart = new List<FinancialAccountingLedgerCartModel>
 		{
 			new()
 			{
@@ -376,8 +376,8 @@ public static class BillData
 			Status = true
 		};
 
-		var accountingDetails = FinancialAccountingData.ConvertCartToDetails(accountingCart, accounting.Id);
-		await FinancialAccountingData.SaveTransaction(accounting, accountingDetails, false, sqlDataAccessTransaction);
+		var ledgers = FinancialAccountingData.ConvertCartToDetails(accountingCart, accounting.Id);
+		await FinancialAccountingData.SaveTransaction(accounting, ledgers, false, sqlDataAccessTransaction);
 	}
 	#endregion
 }

@@ -13,7 +13,7 @@ public static class FinancialAccountingInvoiceExport
         var transaction = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, transactionId) ??
             throw new InvalidOperationException("Transaction not found.");
 
-        var transactionDetails = await CommonData.LoadTableDataByMasterId<FinancialAccountingDetailModel>(AccountNames.FinancialAccountingDetail, transaction.Id);
+        var transactionDetails = await CommonData.LoadTableDataByMasterId<FinancialAccountingLedgerModel>(AccountNames.FinancialAccountingLedger, transaction.Id);
         if (transactionDetails is null || transactionDetails.Count == 0)
             throw new InvalidOperationException("No transaction details found for the transaction.");
 
@@ -24,7 +24,7 @@ public static class FinancialAccountingInvoiceExport
         var cartItems = transactionDetails.Select(detail =>
         {
             var ledger = allLedgers.FirstOrDefault(l => l.Id == detail.LedgerId);
-            return new FinancialAccountingItemCartModel
+            return new FinancialAccountingLedgerCartModel
             {
                 LedgerId = detail.LedgerId,
                 LedgerName = ledger?.Name ?? $"Ledger #{detail.LedgerId}",
@@ -57,11 +57,11 @@ public static class FinancialAccountingInvoiceExport
         var columnSettings = new List<InvoiceColumnSetting>
         {
             new("#", "#", exportType, CellAlignment.Center, 25, 5),
-            new(nameof(FinancialAccountingItemCartModel.LedgerName), "Ledger", exportType, CellAlignment.Left, 0, 35),
-            new(nameof(FinancialAccountingItemCartModel.ReferenceNo), "Ref No", exportType, CellAlignment.Left, 80, 15),
-            new(nameof(FinancialAccountingItemCartModel.Debit), "Dr", exportType, CellAlignment.Right, 70, 15, "#,##0.00"),
-            new(nameof(FinancialAccountingItemCartModel.Credit), "Cr", exportType, CellAlignment.Right, 70, 15, "#,##0.00"),
-            new(nameof(FinancialAccountingItemCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 100, 25)
+            new(nameof(FinancialAccountingLedgerCartModel.LedgerName), "Ledger", exportType, CellAlignment.Left, 0, 35),
+            new(nameof(FinancialAccountingLedgerCartModel.ReferenceNo), "Ref No", exportType, CellAlignment.Left, 80, 15),
+            new(nameof(FinancialAccountingLedgerCartModel.Debit), "Dr", exportType, CellAlignment.Right, 70, 15, "#,##0.00"),
+            new(nameof(FinancialAccountingLedgerCartModel.Credit), "Cr", exportType, CellAlignment.Right, 70, 15, "#,##0.00"),
+            new(nameof(FinancialAccountingLedgerCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 100, 25)
         };
 
         var summaryFields = new Dictionary<string, string>

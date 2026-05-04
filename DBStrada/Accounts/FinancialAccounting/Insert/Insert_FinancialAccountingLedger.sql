@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Insert_FinancialAccountingDetail]
+﻿CREATE PROCEDURE [dbo].[Insert_FinancialAccountingLedger]
 	@Id INT OUTPUT,
 	@MasterId INT,
 	@LedgerId INT,
@@ -13,7 +13,7 @@ AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[FinancialAccountingDetail]
+		INSERT INTO [dbo].[FinancialAccountingLedger]
 		(
 			[MasterId],
 			[LedgerId],
@@ -42,7 +42,7 @@ BEGIN
 
 	ELSE
 	BEGIN
-		UPDATE [dbo].[FinancialAccountingDetail]
+		UPDATE [dbo].[FinancialAccountingLedger]
 		SET
 			[MasterId] = @MasterId,
 			[LedgerId] = @LedgerId,

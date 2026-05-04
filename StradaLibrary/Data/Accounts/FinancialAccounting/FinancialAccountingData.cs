@@ -14,8 +14,8 @@ public static class FinancialAccountingData
 	private static async Task<int> InsertFinancialAccounting(FinancialAccountingModel accounting, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialAccounting, accounting, sqlDataAccessTransaction)).FirstOrDefault();
 
-	private static async Task<int> InsertFinancialAccountingDetail(FinancialAccountingDetailModel accountingDetails, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialAccountingDetail, accountingDetails, sqlDataAccessTransaction)).FirstOrDefault();
+	private static async Task<int> InsertFinancialAccountingLedger(FinancialAccountingLedgerModel ledger, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialAccountingLedger, ledger, sqlDataAccessTransaction)).FirstOrDefault();
 
 	public static async Task<FinancialAccountingModel> LoadFinancialAccountingByVoucherReference(int VoucherId, int ReferenceId, string ReferenceNo, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<FinancialAccountingModel, dynamic>(AccountNames.LoadFinancialAccountingByVoucherReference, new { VoucherId, ReferenceId, ReferenceNo }, sqlDataAccessTransaction)).FirstOrDefault();
@@ -23,8 +23,8 @@ public static class FinancialAccountingData
 	public static async Task<List<TrialBalanceModel>> LoadTrialBalanceByCompanyDate(int CompanyId, DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<TrialBalanceModel, dynamic>(AccountNames.LoadTrialBalanceByCompanyDate, new { CompanyId, StartDate, EndDate });
 
-	public static List<FinancialAccountingDetailModel> ConvertCartToDetails(List<FinancialAccountingItemCartModel> cart, int accountingId = 0) =>
-		[.. cart.Select(item => new FinancialAccountingDetailModel
+	public static List<FinancialAccountingLedgerModel> ConvertCartToDetails(List<FinancialAccountingLedgerCartModel> cart, int accountingId = 0) =>
+		[.. cart.Select(item => new FinancialAccountingLedgerModel
 		{
 			Id = 0,
 			MasterId = accountingId,
@@ -69,9 +69,9 @@ public static class FinancialAccountingData
 	public static async Task RecoverTransaction(FinancialAccountingModel accounting)
 	{
 		accounting.Status = true;
-		var accountingDetails = await CommonData.LoadTableDataByMasterId<FinancialAccountingDetailModel>(AccountNames.FinancialAccountingDetail, accounting.Id);
+		var ledgers = await CommonData.LoadTableDataByMasterId<FinancialAccountingLedgerModel>(AccountNames.FinancialAccountingLedger, accounting.Id);
 
-		await SaveTransaction(accounting, accountingDetails, false);
+		await SaveTransaction(accounting, ledgers, false);
 
 		await FinancialAccountingNotify.Notify(accounting.Id, NotifyType.Recovered);
 	}
@@ -113,22 +113,22 @@ public static class FinancialAccountingData
 		return accounting;
 	}
 
-	private static void ValidateTransactionDetails(FinancialAccountingModel accounting, List<FinancialAccountingDetailModel> accountingDetails)
+	private static void ValidateTransactionLedgers(FinancialAccountingModel accounting, List<FinancialAccountingLedgerModel> ledgers)
 	{
-		if (accountingDetails is null || accountingDetails.Count == 0)
-			throw new InvalidOperationException("The transaction must have at least one accounting detail item.");
+		if (ledgers is null || ledgers.Count == 0)
+			throw new InvalidOperationException("The transaction must have at least one accounting ledger.");
 
-		if (accountingDetails.Any(d => !d.Status))
-			throw new InvalidOperationException("Accounting detail items must be active.");
+		if (ledgers.Any(d => !d.Status))
+			throw new InvalidOperationException("Accounting ledgers must be active.");
 
-		if (accountingDetails.Any(d => (d.Credit ?? 0) < 0 || (d.Debit ?? 0) < 0))
-			throw new InvalidOperationException("Accounting detail items cannot have negative amounts.");
+		if (ledgers.Any(d => (d.Credit ?? 0) < 0 || (d.Debit ?? 0) < 0))
+			throw new InvalidOperationException("Accounting ledgers cannot have negative amounts.");
 
-		if (accountingDetails.Count != (accounting.TotalDebitLedgers + accounting.TotalCreditLedgers))
-			throw new InvalidOperationException("The number of accounting detail items does not match the transaction summary.");
+		if (ledgers.Count != (accounting.TotalDebitLedgers + accounting.TotalCreditLedgers))
+			throw new InvalidOperationException("The number of accounting ledgers does not match the transaction summary.");
 	}
 
-	public static async Task<int> SaveTransaction(FinancialAccountingModel accounting, List<FinancialAccountingDetailModel> accountingDetails, bool showNotification = true, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	public static async Task<int> SaveTransaction(FinancialAccountingModel accounting, List<FinancialAccountingLedgerModel> ledgers, bool showNotification = true, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		bool update = accounting.Id > 0;
 
@@ -143,7 +143,7 @@ public static class FinancialAccountingData
 			try
 			{
 				newSqlDataAccessTransaction.StartTransaction();
-				accounting.Id = await SaveTransaction(accounting, accountingDetails, showNotification, newSqlDataAccessTransaction);
+				accounting.Id = await SaveTransaction(accounting, ledgers, showNotification, newSqlDataAccessTransaction);
 				newSqlDataAccessTransaction.CommitTransaction();
 			}
 			catch
@@ -159,32 +159,32 @@ public static class FinancialAccountingData
 		}
 
 		accounting = await ValidateTransaction(accounting, update, sqlDataAccessTransaction);
-		ValidateTransactionDetails(accounting, accountingDetails);
+		ValidateTransactionLedgers(accounting, ledgers);
 		accounting.Id = await InsertFinancialAccounting(accounting, sqlDataAccessTransaction);
-		await SaveTransactionDetail(accounting, accountingDetails, update, sqlDataAccessTransaction);
+		await SaveTransactionLedgerDetails(accounting, ledgers, update, sqlDataAccessTransaction);
 
 		return accounting.Id;
 	}
 
-	private static async Task SaveTransactionDetail(FinancialAccountingModel accounting, List<FinancialAccountingDetailModel> accountingDetails, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
+	private static async Task SaveTransactionLedgerDetails(FinancialAccountingModel accounting, List<FinancialAccountingLedgerModel> ledgers, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
 		if (update)
 		{
-			var existingAccountingDetails = await CommonData.LoadTableDataByMasterId<FinancialAccountingDetailModel>(AccountNames.FinancialAccountingDetail, accounting.Id, sqlDataAccessTransaction);
-			foreach (var item in existingAccountingDetails)
+			var existingLedgers = await CommonData.LoadTableDataByMasterId<FinancialAccountingLedgerModel>(AccountNames.FinancialAccountingLedger, accounting.Id, sqlDataAccessTransaction);
+			foreach (var item in existingLedgers)
 			{
 				item.Status = false;
-				await InsertFinancialAccountingDetail(item, sqlDataAccessTransaction);
+				await InsertFinancialAccountingLedger(item, sqlDataAccessTransaction);
 			}
 		}
 
-		foreach (var item in accountingDetails)
+		foreach (var item in ledgers)
 		{
 			item.MasterId = accounting.Id;
-			var id = await InsertFinancialAccountingDetail(item, sqlDataAccessTransaction);
+			var id = await InsertFinancialAccountingLedger(item, sqlDataAccessTransaction);
 
 			if (id <= 0)
-				throw new InvalidOperationException("Failed to save accounting detail item.");
+				throw new InvalidOperationException("Failed to save accounting ledger item.");
 		}
 	}
 }

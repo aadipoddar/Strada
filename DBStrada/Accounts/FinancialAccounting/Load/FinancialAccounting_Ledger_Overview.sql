@@ -1,45 +1,72 @@
-﻿CREATE VIEW [dbo].[FinancialAccounting_Ledger_Overview]
+CREATE VIEW [dbo].[FinancialAccounting_Ledger_Overview]
 	AS
 SELECT
-	[l].[Id],
+	[ad].[Id],
+	[ad].[LedgerId],
 	[l].[Name] AS LedgerName,
 	[l].[Code] AS LedgerCode,
+
 	[l].[AccountTypeId],
 	[at].[Name] AS AccountTypeName,
 	[l].[GroupId],
 	[g].[Name] AS GroupName,
 
-	[a].[Id] AS MasterId,
-	[a].[TransactionNo],
-	[a].[TransactionDateTime],
-	[a].[CompanyId],
-	[c].[Name] AS CompanyName,
-	[a].[Remarks] AS AccountingRemarks,
+	[ad].[ReferenceId] AS LedgerReferenceId,
+	[ad].[ReferenceType] AS LedgerReferenceType,
+	[ad].[ReferenceNo] AS LedgerReferenceNo,
 
-	[ad].[ReferenceId],
-	[ad].[ReferenceType],
-	[ad].[ReferenceNo],
+	(CASE
+		WHEN [ad].[ReferenceType] = 'Bill' THEN
+			(SELECT TransactionDateTime FROM [dbo].[Bill_Overview] WHERE Id = [ad].[ReferenceId])
+	END) AS LedgerReferenceDateTime,
 
-	NULL AS ReferenceDateTime,
-	NULL AS ReferenceAmount,
-
-	--(CASE
-	--	WHEN [ad].[ReferenceType] = 'Challan' THEN
-	--		(SELECT TransactionDateTime FROM [dbo].[Sale_Overview] WHERE Id = [ad].[ReferenceId])
-	--END) AS ReferenceDateTime,
-
-	--(CASE
-	--	WHEN [ad].[ReferenceType] = 'Challan' THEN
-	--		(SELECT TotalAmount FROM [dbo].[Sale_Overview] WHERE Id = [ad].[ReferenceId])
-	--END) AS ReferenceAmount,
+	(CASE
+		WHEN [ad].[ReferenceType] = 'Bill' THEN
+			(SELECT TotalLedgerPaymentAmount FROM [dbo].[Bill_Overview] WHERE Id = [ad].[ReferenceId])
+	END) AS LedgerReferenceAmount,
 
 	[ad].[Debit] AS Debit,
 	[ad].[Credit] AS Credit,
 
-	[ad].[Remarks]
+	[ad].[Remarks] AS LedgerRemarks,
+
+	[ad].[MasterId],
+    [a].[TransactionNo],
+    [a].[CompanyId],
+    [c].[Name] AS CompanyName,
+    [a].[VoucherId],
+    [v].[Name] AS VoucherName,
+
+    [a].[ReferenceId],
+    [a].[ReferenceNo],
+
+    [a].[TransactionDateTime],
+    [a].[FinancialYearId],
+	CONVERT(VARCHAR(10), fy.StartDate, 103) + ' to ' + CONVERT(VARCHAR(10), fy.EndDate, 103) AS FinancialYear,
+
+    [a].[TotalCreditLedgers] + [a].[TotalDebitLedgers] AS TotalLedgers,
+
+    [a].[TotalCreditLedgers],
+    [a].[TotalDebitLedgers],
+    [a].[TotalDebitAmount],
+    [a].[TotalCreditAmount],
+
+    [a].[TotalDebitAmount] + [a].[TotalCreditAmount] AS TotalAmount,
+
+    [a].[Remarks],
+	[a].[CreatedBy],
+	[u].[Name] AS CreatedByName,
+	[a].[CreatedAt],
+	[a].[CreatedFromPlatform],
+	[a].[LastModifiedBy],
+	[lm].[Name] AS LastModifiedByUserName,
+	[a].[LastModifiedAt],
+	[a].[LastModifiedFromPlatform],
+
+	[a].[Status]
 
 FROM
-	[dbo].[FinancialAccountingDetail] ad
+	[dbo].[FinancialAccountingLedger] ad
 
 INNER JOIN
 	[dbo].[FinancialAccounting] a ON ad.[MasterId] = a.Id
@@ -50,29 +77,15 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Group] g ON l.GroupId = g.Id
 INNER JOIN
-	[dbo].[Company] c ON a.CompanyId = c.Id
+    [dbo].[Company] c ON a.CompanyId = c.Id
+INNER JOIN
+    [dbo].[Voucher] v ON a.VoucherId = v.Id
+INNER JOIN
+    [dbo].[FinancialYear] fy ON a.FinancialYearId = fy.Id
+INNER JOIN
+	[dbo].[User] AS u ON a.CreatedBy = u.Id
+LEFT JOIN
+	[dbo].[User] AS lm ON a.LastModifiedBy = lm.Id
 
 WHERE
-	[a].[Status] = 1 AND
-	[ad].[Status] = 1
-
-GROUP BY
-	[l].[Id],
-	[l].[Name],
-	[l].[Code],
-	[l].[AccountTypeId],
-	[at].[Name],
-	[l].[GroupId],
-	[g].[Name],
-	[a].[Id],
-	[a].[TransactionNo],
-	[a].[TransactionDateTime],
-	[a].[CompanyId],
-	[c].[Name],
-	[a].[Remarks],
-	[ad].[ReferenceId],
-	[ad].[ReferenceType],
-	[ad].[ReferenceNo],
-	[ad].[Debit],
-	[ad].[Credit],
-	[ad].[Remarks]
+	[ad].[Status] = 1;

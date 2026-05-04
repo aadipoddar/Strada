@@ -168,6 +168,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
+				_showDeleted,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null
 			);
@@ -203,6 +204,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
+				_showDeleted,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null
 			);
