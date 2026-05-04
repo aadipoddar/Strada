@@ -1,5 +1,6 @@
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Fleet.Expense;
 using StradaLibrary.Exports.Mailing;
@@ -12,10 +13,12 @@ namespace StradaLibrary.Data.Fleet.Expense;
 public static class ExpenseData
 {
 	private static async Task<int> InsertExpense(ExpenseModel expense, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpense, expense, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpense, expense, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Expense.");
 
 	private static async Task<int> InsertExpenseDetails(ExpenseDetailsModel expenseDetails, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpenseDetails, expenseDetails, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpenseDetails, expenseDetails, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Expense Detail.");
 
 	public static List<ExpenseDetailsModel> ConvertExpensesCartToDetails(List<ExpenseDetailsCartModel> cart, int accountingId = 0) =>
 		[.. cart.Select(item => new ExpenseDetailsModel
@@ -56,6 +59,15 @@ public static class ExpenseData
 
 		expense.Status = false;
 		await InsertExpense(expense, sqlDataAccessTransaction);
+
+		await AuditTrailData.SaveAuditTrail(new()
+		{
+			Action = AuditTrailActionTypes.Delete.ToString(),
+			TableName = FleetNames.Expense,
+			RecordNo = expense.TransactionNo,
+			CreatedBy = expense.LastModifiedBy.Value,
+			CreatedFromPlatform = expense.LastModifiedFromPlatform
+		}, sqlDataAccessTransaction);
 	}
 
 	public static async Task RecoverTransaction(ExpenseModel expense)
@@ -63,7 +75,7 @@ public static class ExpenseData
 		expense.Status = true;
 		var expensesDetails = await CommonData.LoadTableDataByMasterId<ExpenseDetailsModel>(FleetNames.ExpenseDetails, expense.Id);
 
-		await SaveTransaction(expense, expensesDetails);
+		await SaveTransaction(expense, expensesDetails, true);
 
 		await ExpenseNotify.Notify(expense.Id, NotifyType.Recovered);
 	}
@@ -119,23 +131,21 @@ public static class ExpenseData
 	public static async Task<int> SaveTransaction(
 		ExpenseModel expense,
 		List<ExpenseDetailsModel> expensesDetails,
-		bool showNotification = true,
+		bool recover = false,
 		SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		bool update = expense.Id > 0;
 
 		if (sqlDataAccessTransaction is null)
 		{
-			(MemoryStream, string)? previousInvoice = null;
-			if (update)
-				previousInvoice = await ExpenseInvoiceExport.ExportInvoice(expense.Id, InvoiceExportType.PDF);
+			(MemoryStream, string)? previousInvoice = update && !recover ? await ExpenseInvoiceExport.ExportInvoice(expense.Id, InvoiceExportType.PDF) : null;
 
 			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
 
 			try
 			{
 				newSqlDataAccessTransaction.StartTransaction();
-				expense.Id = await SaveTransaction(expense, expensesDetails, showNotification, newSqlDataAccessTransaction);
+				expense.Id = await SaveTransaction(expense, expensesDetails, recover, newSqlDataAccessTransaction);
 				newSqlDataAccessTransaction.CommitTransaction();
 			}
 			catch
@@ -144,7 +154,7 @@ public static class ExpenseData
 				throw;
 			}
 
-			if (showNotification)
+			if (!recover)
 				await ExpenseNotify.Notify(expense.Id, update ? NotifyType.Updated : NotifyType.Created, previousInvoice);
 
 			return expense.Id;
@@ -152,8 +162,13 @@ public static class ExpenseData
 
 		expense = await ValidateTransaction(expense, update, sqlDataAccessTransaction);
 		ValidateExpensesDetails(expense, expensesDetails);
+
+		var previousExpense = update && !recover ? await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, expense.Id, sqlDataAccessTransaction) : null;
+		var previousExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id, sqlDataAccessTransaction) : null;
+
 		expense.Id = await InsertExpense(expense, sqlDataAccessTransaction);
 		await SaveExpensesDetail(expense, expensesDetails, update, sqlDataAccessTransaction);
+		await SaveAuditTrail(expense, update, recover, previousExpense, previousExpensesDetails, sqlDataAccessTransaction);
 
 		return expense.Id;
 	}
@@ -173,10 +188,34 @@ public static class ExpenseData
 		foreach (var item in expensesDetails)
 		{
 			item.MasterId = expense.Id;
-			var id = await InsertExpenseDetails(item, sqlDataAccessTransaction);
-
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to save Expense detail item.");
+			await InsertExpenseDetails(item, sqlDataAccessTransaction);
 		}
+	}
+
+	private static async Task SaveAuditTrail(
+		ExpenseModel expense,
+		bool update,
+		bool recover,
+		ExpenseOverviewModel previousExpense = null,
+		List<ExpenseDetailsOverviewModel> previousExpensesDetails = null,
+		SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var currentExpense = update && !recover ? await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, expense.Id, sqlDataAccessTransaction) : null;
+		var currentExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id, sqlDataAccessTransaction) : null;
+
+		var expenseDifference = update && !recover ? await AuditTrailData.GetTransactionDifference([previousExpense, currentExpense]) : null;
+		var expenseDetailsDifference = update && !recover ? await AuditTrailData.GetTransactionDifference([previousExpensesDetails, currentExpensesDetails]) : null;
+
+		var difference = update && !recover ? expenseDifference + Environment.NewLine + expenseDetailsDifference : null;
+
+		await AuditTrailData.SaveAuditTrail(new()
+		{
+			Action = recover ? AuditTrailActionTypes.Recover.ToString() : update ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+			TableName = FleetNames.Expense,
+			RecordNo = expense.TransactionNo,
+			RecordValue = difference,
+			CreatedBy = update ? expense.LastModifiedBy.Value : expense.CreatedBy,
+			CreatedFromPlatform = update ? expense.LastModifiedFromPlatform : expense.CreatedFromPlatform
+		}, sqlDataAccessTransaction);
 	}
 }

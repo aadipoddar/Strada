@@ -59,7 +59,7 @@ public class FinancialAccountingOverviewModel
     public bool Status { get; set; }
 }
 
-public enum ReferenceTypes
+public enum AccountingReferenceTypes
 {
 	Bill
 }

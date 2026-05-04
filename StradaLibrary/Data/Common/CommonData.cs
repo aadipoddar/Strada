@@ -34,6 +34,6 @@ public static class CommonData
 	public static async Task<T> LoadLastTableDataByCompanyFinancialYear<T>(string TableName, int CompanyId, int FinancialYearId, SqlDataAccessTransaction sqlDataAccessTransaction = null) where T : new() =>
 		(await SqlDataAccess.LoadData<T, dynamic>(OperationNames.LoadLastTableDataByCompanyFinancialYear, new { TableName, CompanyId, FinancialYearId }, sqlDataAccessTransaction)).FirstOrDefault();
 
-	public static async Task<DateTime> LoadCurrentDateTime() =>
-		(await SqlDataAccess.LoadData<DateTime, dynamic>(OperationNames.LoadCurrentDateTime, new { })).FirstOrDefault();
+	public static async Task<DateTime> LoadCurrentDateTime(SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+		(await SqlDataAccess.LoadData<DateTime, dynamic>(OperationNames.LoadCurrentDateTime, new { }, sqlDataAccessTransaction)).FirstOrDefault();
 }

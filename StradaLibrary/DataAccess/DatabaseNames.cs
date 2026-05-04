@@ -28,6 +28,11 @@ public static class OperationNames
 	public static string User => "User";
 	public static string InsertUser => "Insert_User";
 	#endregion
+
+	#region Audit Trail
+	public static string AuditTrail => "AuditTrail";
+	public static string InsertAuditTrail => "Insert_AuditTrail";
+	#endregion
 }
 
 public static class AccountNames

@@ -336,7 +336,7 @@ public static class BillData
 			new()
 			{
 				ReferenceId = billOverview.Id,
-				ReferenceType = nameof(ReferenceTypes.Bill),
+				ReferenceType = nameof(AccountingReferenceTypes.Bill),
 				ReferenceNo = billOverview.TransactionNo,
 				LedgerId = int.Parse(billLedger.Value),
 				Debit = null,
