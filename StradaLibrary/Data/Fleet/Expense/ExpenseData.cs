@@ -200,13 +200,20 @@ public static class ExpenseData
 		List<ExpenseDetailsOverviewModel> previousExpensesDetails = null,
 		SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
-		var currentExpense = update && !recover ? await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, expense.Id, sqlDataAccessTransaction) : null;
-		var currentExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id, sqlDataAccessTransaction) : null;
+		string difference = null;
 
-		var expenseDifference = update && !recover ? await AuditTrailData.GetTransactionDifference([previousExpense, currentExpense]) : null;
-		var expenseDetailsDifference = update && !recover ? await AuditTrailData.GetTransactionDifference([previousExpensesDetails, currentExpensesDetails]) : null;
+		if (update && !recover)
+		{
+			var currentExpense = await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, expense.Id, sqlDataAccessTransaction);
+			var currentExpensesDetails = await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id, sqlDataAccessTransaction);
 
-		var difference = update && !recover ? expenseDifference + Environment.NewLine + expenseDetailsDifference : null;
+			var headerDiff = AuditTrailData.GetDifference(previousExpense, currentExpense);
+			var detailsDiff = AuditTrailData.GetDifference(previousExpensesDetails, currentExpensesDetails, typeof(ExpenseOverviewModel));
+
+			difference = AuditTrailData.CombineDifferences(
+				(null, headerDiff),
+				("Details", detailsDiff));
+		}
 
 		await AuditTrailData.SaveAuditTrail(new()
 		{
