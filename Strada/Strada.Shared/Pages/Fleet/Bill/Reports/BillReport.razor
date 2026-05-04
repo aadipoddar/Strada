@@ -68,7 +68,7 @@ else
 								<MenuItem Text="Export PDF (Alt + P)" IconCss="e-icons e-export-pdf" Id="DownloadSelectedPdf" Disabled="@_isProcessing" />
 								<MenuItem Text="Export Excel (Alt + E)" IconCss="e-icons e-export-excel" Id="DownloadSelectedExcel" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Delete (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected" Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelected" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 					</MenuItems>
@@ -158,8 +158,7 @@ else
 							AllowGrouping="true" CssClass="professional-grid" ContextMenuItems="@_gridContextMenuItems"
 							Toolbar="@(new List<string>() { "Search" })">
 
-						<GridEvents TValue="BillOverviewModel"
-									ContextMenuItemClicked="OnGridContextMenuItemClicked" />
+						<GridEvents TValue="BillOverviewModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />

@@ -266,7 +266,7 @@ else
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
-										var item = (context as ExpenseOverviewModel);
+										var item = (context as ExpenseDetailsOverviewModel);
 										<span class="@(item.Status ? string.Empty : "grid-debit")">
 											@(item.Status ? "Active" : "Deleted")
 										</span>

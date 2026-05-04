@@ -1,4 +1,4 @@
-﻿CREATE VIEW [dbo].[BillLedgerPayments_Overview]
+CREATE VIEW [dbo].[BillLedgerPayments_Overview]
 AS
 SELECT
     [tp].[Id],
@@ -20,7 +20,7 @@ SELECT
     [t].[BillNo],
 	[t].[OMCId],
 	[o].[Name] AS OMCName,
-	
+
 	[t].[TotalGrossAmount],
 	[t].[TotalPenaltyAmount],
 	[t].[TotalNetAmount],
@@ -34,7 +34,9 @@ SELECT
 	[t].[LastModifiedBy],
 	[lm].[Name] AS LastModifiedByUserName,
 	[t].[LastModifiedAt],
-	[t].[LastModifiedFromPlatform]
+	[t].[LastModifiedFromPlatform],
+
+	[t].[Status]
 
 FROM
     [dbo].[BillLedgerPayments] tp
@@ -54,5 +56,4 @@ LEFT JOIN
 	[dbo].[User] AS lm ON t.LastModifiedBy = lm.Id
 
 WHERE
-	[tp].[Status] = 1 AND
-	[t].[Status] = 1;
+	[tp].[Status] = 1;

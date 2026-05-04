@@ -46,7 +46,7 @@ public partial class BillReport : IAsyncDisposable
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
 		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
 		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
-		new() { Text = "Delete (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	#region Load Data
@@ -281,14 +281,16 @@ public partial class BillReport : IAsyncDisposable
 	#region Actions
 	private async Task ViewSelectedTransaction()
 	{
-		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0 || !_sfGrid.SelectedRecords.First().Status)
+		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
 
-		await _toastNotification.ShowAsync("Not Allowed", "Tranaction viewing will come soon in a future update.", ToastType.Info);
-		return;
+		if (!_sfGrid.SelectedRecords.First().Status)
+		{
+			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it or download invoice.", ToastType.Warning);
+			return;
+		}
 
-		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false, CodeType.Bill);
-		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
+		await _toastNotification.ShowAsync("Not Allowed", "Transaction viewing will come soon in a future update.", ToastType.Info);
 	}
 
 	private async Task ConfirmDelete()
@@ -433,15 +435,12 @@ public partial class BillReport : IAsyncDisposable
 			case "View":
 				await ViewSelectedTransaction();
 				break;
-
 			case "ExportPDF":
 				await ExportSelectedTransactionPdf();
 				break;
-
 			case "ExportExcel":
 				await ExportSelectedTransactionExcel();
 				break;
-
 			case "DeleteRecover":
 				await DeleteRecoverSelectedTransaction();
 				break;

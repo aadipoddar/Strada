@@ -1,5 +1,6 @@
 using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Accounts.Masters;
+using StradaLibrary.Data.Fleet.Bill;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.Bill;
 using StradaLibrary.Exports.Utils;
@@ -21,6 +22,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
+	private bool _showDeleted = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
@@ -32,13 +34,19 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	private List<OMCModel> _omcs = [];
 	private List<BillLedgerPaymentsOverviewModel> _transactionOverviews = [];
 
+	private string _deleteTransactionNo = string.Empty;
+	private int _deleteTransactionId = 0;
+
+	private DeleteConfirmationDialog _deleteConfirmationDialog;
+
 	private SfGrid<BillLedgerPaymentsOverviewModel> _sfGrid;
 	private ToastNotification _toastNotification;
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
 		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
-		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" }
+		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
+		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	#region Load Data
@@ -88,6 +96,9 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 				FleetNames.BillLedgerPaymentsOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MinValue));
+
+			if (!_showDeleted)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.Status)];
 
 			if (_selectedCompany?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
@@ -271,8 +282,77 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
 
+		if (!_sfGrid.SelectedRecords.First().Status)
+		{
+			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it or download invoice.", ToastType.Warning);
+			return;
+		}
+
 		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false, CodeType.Bill);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
+	}
+
+	private async Task ConfirmDelete()
+	{
+		if (_isProcessing || _deleteTransactionId == 0)
+			return;
+
+		try
+		{
+			if (!_user.Admin)
+				throw new UnauthorizedAccessException("You do not have permission to delete this transaction.");
+
+			await _deleteConfirmationDialog.HideAsync();
+			_isProcessing = true;
+			StateHasChanged();
+
+			await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
+
+			var bill = await CommonData.LoadTableDataById<BillModel>(FleetNames.Bill, _deleteTransactionId)
+				?? throw new Exception("Transaction not found.");
+			bill.LastModifiedBy = _user.Id;
+			bill.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+			bill.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			await BillData.DeleteTransaction(bill);
+
+			await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"An error occurred while deleting transaction: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_deleteTransactionId = 0;
+			_deleteTransactionNo = string.Empty;
+			_isProcessing = false;
+			StateHasChanged();
+			await LoadTransactionOverviews();
+		}
+	}
+
+	private async Task DeleteRecoverSelectedTransaction()
+	{
+		if (_sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
+			return;
+
+		if (_sfGrid.SelectedRecords.First().Status)
+			await ShowDeleteConfirmation();
+	}
+
+	private async Task ShowDeleteConfirmation()
+	{
+		_deleteTransactionId = _sfGrid.SelectedRecords.First().MasterId;
+		_deleteTransactionNo = _sfGrid.SelectedRecords.First().TransactionNo;
+		StateHasChanged();
+		await _deleteConfirmationDialog.ShowAsync();
+	}
+
+	private async Task CancelDelete()
+	{
+		_deleteTransactionId = 0;
+		_deleteTransactionNo = string.Empty;
+		await _deleteConfirmationDialog.HideAsync();
 	}
 	#endregion
 
@@ -286,6 +366,9 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 				break;
 			case "Refresh":
 				await LoadTransactionOverviews();
+				break;
+			case "ToggleDeleted":
+				await ToggleDeleted();
 				break;
 			case "ToggleDetailsView":
 				await ToggleDetailsView();
@@ -304,6 +387,9 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 				break;
 			case "DownloadSelectedExcel":
 				await ExportSelectedTransactionExcel();
+				break;
+			case "DeleteRecoverSelected":
+				await DeleteRecoverSelectedTransaction();
 				break;
 			case "TransactionHistory":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager);
@@ -348,13 +434,14 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 			case "View":
 				await ViewSelectedTransaction();
 				break;
-
 			case "ExportPDF":
 				await ExportSelectedTransactionPdf();
 				break;
-
 			case "ExportExcel":
 				await ExportSelectedTransactionExcel();
+				break;
+			case "DeleteRecover":
+				await DeleteRecoverSelectedTransaction();
 				break;
 		}
 	}
@@ -366,6 +453,13 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
+	}
+
+	private async Task ToggleDeleted()
+	{
+		_showDeleted = !_showDeleted;
+		await LoadTransactionOverviews();
+		StateHasChanged();
 	}
 
 	private void NavigateBack() =>
