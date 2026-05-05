@@ -83,7 +83,7 @@ public partial class StateUTPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait...", ToastType.Info);
 
-			await StateUTData.SaveTransaction(_stateUT);
+			await StateUTData.SaveTransaction(_stateUT, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -169,8 +169,7 @@ public partial class StateUTPage
 			var stateUT = await CommonData.LoadTableDataById<StateUTModel>(AccountNames.StateUT, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			stateUT.Status = false;
-			await StateUTData.InsertStateUT(stateUT);
+			await StateUTData.DeleteTransaction(stateUT, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -200,8 +199,7 @@ public partial class StateUTPage
 			var stateUT = await CommonData.LoadTableDataById<StateUTModel>(AccountNames.StateUT, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			stateUT.Status = true;
-			await StateUTData.InsertStateUT(stateUT);
+			await StateUTData.RecoverTransaction(stateUT, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

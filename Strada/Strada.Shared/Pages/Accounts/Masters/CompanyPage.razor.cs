@@ -85,7 +85,7 @@ public partial class CompanyPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await CompanyData.SaveTransaction(_company);
+			await CompanyData.SaveTransaction(_company, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -115,8 +115,7 @@ public partial class CompanyPage
 			var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			company.Status = false;
-			await CompanyData.InsertCompany(company);
+			await CompanyData.DeleteTransaction(company, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -146,8 +145,7 @@ public partial class CompanyPage
 			var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			company.Status = true;
-			await CompanyData.InsertCompany(company);
+			await CompanyData.RecoverTransaction(company, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

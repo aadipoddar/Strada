@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Accounts.Masters;
 
 public static class CompanyData
 {
-	public static async Task<int> InsertCompany(CompanyModel company, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertCompany, company, sqlDataAccessTransaction)).FirstOrDefault();
+	private static async Task<int> InsertCompany(CompanyModel company, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertCompany, company, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Company.");
+
+	public static async Task DeleteTransaction(CompanyModel company, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			company.Status = false;
+			await InsertCompany(company, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = AccountNames.Company,
+				RecordNo = company.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(CompanyModel company, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			company.Status = true;
+			await InsertCompany(company, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = AccountNames.Company,
+				RecordNo = company.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(CompanyModel company)
 	{
@@ -72,9 +105,29 @@ public static class CompanyData
 		}
 	}
 
-	public static async Task<int> SaveTransaction(CompanyModel company)
+	public static async Task<int> SaveTransaction(CompanyModel company, int userId, string platform)
 	{
 		await ValidateTransaction(company);
-		return await InsertCompany(company);
+
+		var isUpdate = company.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, company.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertCompany(company, transaction);
+			var diff = AuditTrailData.GetDifference(previous, company);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = AccountNames.Company,
+				RecordNo = company.Name,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Accounts.Masters;
 
 public static class GroupData
 {
-	public static async Task<int> InsertGroup(GroupModel group) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertGroup, group)).FirstOrDefault();
+	private static async Task<int> InsertGroup(GroupModel group, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertGroup, group, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Group.");
+
+	public static async Task DeleteTransaction(GroupModel group, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			group.Status = false;
+			await InsertGroup(group, transaction);
+			await AuditTrailData.SaveAuditTrail(new ()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = AccountNames.Group,
+				RecordNo = group.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(GroupModel group, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			group.Status = true;
+			await InsertGroup(group, transaction);
+			await AuditTrailData.SaveAuditTrail(new ()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = AccountNames.Group,
+				RecordNo = group.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(GroupModel group)
 	{
@@ -31,9 +64,29 @@ public static class GroupData
 			throw new Exception($"Group name '{group.Name}' already exists. Please choose a different name.");
 	}
 
-	public static async Task<int> SaveTransaction(GroupModel group)
+	public static async Task<int> SaveTransaction(GroupModel group, int userId, string platform)
 	{
 		await ValidateTransaction(group);
-		return await InsertGroup(group);
+
+		var isUpdate = group.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<GroupModel>(AccountNames.Group, group.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertGroup(group, transaction);
+			var diff = AuditTrailData.GetDifference(previous, group);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = AccountNames.Group,
+				RecordNo = group.Name,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

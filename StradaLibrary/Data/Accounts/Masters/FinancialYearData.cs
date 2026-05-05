@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Accounts.Masters;
 
 public static class FinancialYearData
 {
-	public static async Task<int> InsertFinancialYear(FinancialYearModel financialYear) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialYear, financialYear)).FirstOrDefault();
+	private static async Task<int> InsertFinancialYear(FinancialYearModel financialYear, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialYear, financialYear, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Financial Year.");
+
+	public static async Task DeleteTransaction(FinancialYearModel financialYear, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			financialYear.Status = false;
+			await InsertFinancialYear(financialYear, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = AccountNames.FinancialYear,
+				RecordNo = $"FY{financialYear.YearNo}",
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(FinancialYearModel financialYear, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			financialYear.Status = true;
+			await InsertFinancialYear(financialYear, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = AccountNames.FinancialYear,
+				RecordNo = $"FY{financialYear.YearNo}",
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	public static async Task<FinancialYearModel> LoadFinancialYearByDateTime(DateTime TransactionDateTime, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<FinancialYearModel, dynamic>(AccountNames.LoadFinancialYearByDateTime, new { TransactionDateTime }, sqlDataAccessTransaction)).FirstOrDefault();
@@ -56,10 +89,30 @@ public static class FinancialYearData
 			throw new Exception($"Date range overlaps with existing financial year ({overlapping.StartDate:dd-MMM-yyyy} to {overlapping.EndDate:dd-MMM-yyyy}).");
 	}
 
-	public static async Task<int> SaveTransaction(FinancialYearModel financialYear)
+	public static async Task<int> SaveTransaction(FinancialYearModel financialYear, int userId, string platform)
 	{
 		await ValidateTransaction(financialYear);
-		return await InsertFinancialYear(financialYear);
+
+		var isUpdate = financialYear.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, financialYear.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertFinancialYear(financialYear, transaction);
+			var diff = AuditTrailData.GetDifference(previous, financialYear);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = AccountNames.FinancialYear,
+				RecordNo = $"FY{financialYear.YearNo}",
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 
 	public static async Task<(DateTime FromDate, DateTime ToDate)> GetDateRange(DateRangeType rangeType, DateTime referenceFromDate, DateTime referenceToDate)

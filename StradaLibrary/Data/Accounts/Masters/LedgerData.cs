@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Accounts.Masters;
 
 public static class LedgerData
 {
-	public static async Task<int> InsertLedger(LedgerModel ledger, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertLedger, ledger, sqlDataAccessTransaction)).FirstOrDefault();
+	private static async Task<int> InsertLedger(LedgerModel ledger, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertLedger, ledger, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Ledger.");
+
+	public static async Task DeleteTransaction(LedgerModel ledger, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			ledger.Status = false;
+			await InsertLedger(ledger, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = AccountNames.Ledger,
+				RecordNo = ledger.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(LedgerModel ledger, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			ledger.Status = true;
+			await InsertLedger(ledger, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = AccountNames.Ledger,
+				RecordNo = ledger.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(LedgerModel ledger)
 	{
@@ -73,9 +106,29 @@ public static class LedgerData
 		}
 	}
 
-	public static async Task<int> SaveTransaction(LedgerModel ledger)
+	public static async Task<int> SaveTransaction(LedgerModel ledger, int userId, string platform)
 	{
 		await ValidateTransaction(ledger);
-		return await InsertLedger(ledger);
+
+		var isUpdate = ledger.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, ledger.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertLedger(ledger, transaction);
+			var diff = AuditTrailData.GetDifference(previous, ledger);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = AccountNames.Ledger,
+				RecordNo = ledger.Name,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

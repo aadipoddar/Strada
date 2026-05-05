@@ -85,7 +85,7 @@ public partial class GroupPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait...", ToastType.Info);
 
-			await GroupData.SaveTransaction(_group);
+			await GroupData.SaveTransaction(_group, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -115,8 +115,7 @@ public partial class GroupPage
 			var group = await CommonData.LoadTableDataById<GroupModel>(AccountNames.Group, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			group.Status = false;
-			await GroupData.InsertGroup(group);
+			await GroupData.DeleteTransaction(group, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -146,8 +145,7 @@ public partial class GroupPage
 			var group = await CommonData.LoadTableDataById<GroupModel>(AccountNames.Group, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			group.Status = true;
-			await GroupData.InsertGroup(group);
+			await GroupData.RecoverTransaction(group, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

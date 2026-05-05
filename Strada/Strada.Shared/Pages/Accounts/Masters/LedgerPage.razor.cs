@@ -89,7 +89,7 @@ public partial class LedgerPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await LedgerData.SaveTransaction(_ledger);
+			await LedgerData.SaveTransaction(_ledger, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -119,8 +119,7 @@ public partial class LedgerPage
 			var ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			ledger.Status = false;
-			await LedgerData.InsertLedger(ledger);
+			await LedgerData.DeleteTransaction(ledger, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -150,8 +149,7 @@ public partial class LedgerPage
 			var ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			ledger.Status = true;
-			await LedgerData.InsertLedger(ledger);
+			await LedgerData.RecoverTransaction(ledger, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

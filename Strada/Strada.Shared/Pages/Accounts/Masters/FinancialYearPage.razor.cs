@@ -83,7 +83,7 @@ public partial class FinancialYearPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await FinancialYearData.SaveTransaction(_financialYear);
+			await FinancialYearData.SaveTransaction(_financialYear, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -150,8 +150,7 @@ public partial class FinancialYearPage
 			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			financialYear.Status = false;
-			await FinancialYearData.InsertFinancialYear(financialYear);
+			await FinancialYearData.DeleteTransaction(financialYear, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -181,8 +180,7 @@ public partial class FinancialYearPage
 			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			financialYear.Status = true;
-			await FinancialYearData.InsertFinancialYear(financialYear);
+			await FinancialYearData.RecoverTransaction(financialYear, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

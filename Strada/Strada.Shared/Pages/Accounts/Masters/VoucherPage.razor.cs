@@ -83,7 +83,7 @@ public partial class VoucherPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait...", ToastType.Info);
 
-			await VoucherData.SaveTransaction(_voucher);
+			await VoucherData.SaveTransaction(_voucher, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -113,8 +113,7 @@ public partial class VoucherPage
 			var voucher = await CommonData.LoadTableDataById<VoucherModel>(AccountNames.Voucher, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			voucher.Status = false;
-			await VoucherData.InsertVoucher(voucher);
+			await VoucherData.DeleteTransaction(voucher, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -144,8 +143,7 @@ public partial class VoucherPage
 			var voucher = await CommonData.LoadTableDataById<VoucherModel>(AccountNames.Voucher, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			voucher.Status = true;
-			await VoucherData.InsertVoucher(voucher);
+			await VoucherData.RecoverTransaction(voucher, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

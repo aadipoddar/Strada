@@ -83,7 +83,7 @@ public partial class AccountTypePage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait...", ToastType.Info);
 
-			await AccountTypeData.SaveTransaction(_accountType);
+			await AccountTypeData.SaveTransaction(_accountType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -113,8 +113,7 @@ public partial class AccountTypePage
 			var accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			accountType.Status = false;
-			await AccountTypeData.InsertAccountType(accountType);
+			await AccountTypeData.DeleteTransaction(accountType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -144,8 +143,7 @@ public partial class AccountTypePage
 			var accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			accountType.Status = true;
-			await AccountTypeData.InsertAccountType(accountType);
+			await AccountTypeData.RecoverTransaction(accountType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();
