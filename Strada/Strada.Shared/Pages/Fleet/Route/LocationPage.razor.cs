@@ -83,7 +83,7 @@ public partial class LocationPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await LocationData.SaveTransaction(_location);
+			await LocationData.SaveTransaction(_location, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -113,8 +113,7 @@ public partial class LocationPage
 			var location = await CommonData.LoadTableDataById<LocationModel>(FleetNames.Location, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			location.Status = false;
-			await LocationData.InsertLocation(location);
+			await LocationData.DeleteTransaction(location, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -144,8 +143,7 @@ public partial class LocationPage
 			var location = await CommonData.LoadTableDataById<LocationModel>(FleetNames.Location, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			location.Status = true;
-			await LocationData.InsertLocation(location);
+			await LocationData.RecoverTransaction(location, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.VehicleDocument;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.VehicleDocument;
 
 public static class VehicleDocumentData
 {
-	public static async Task<int> InsertVehicleDocument(VehicleDocumentModel vehicleDocument) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertDocument, vehicleDocument)).FirstOrDefault();
+	public static async Task<int> InsertVehicleDocument(VehicleDocumentModel vehicleDocument, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertDocument, vehicleDocument, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Vehicle Document.");
+
+	public static async Task DeleteTransaction(VehicleDocumentModel vehicleDocument) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			vehicleDocument.Status = false;
+			await InsertVehicleDocument(vehicleDocument, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = FleetNames.VehicleDocument,
+				RecordNo = vehicleDocument.TransactionNo,
+				CreatedBy = vehicleDocument.LastModifiedBy.Value,
+				CreatedFromPlatform = vehicleDocument.LastModifiedFromPlatform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(VehicleDocumentModel vehicleDocument) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			vehicleDocument.Status = true;
+			await InsertVehicleDocument(vehicleDocument, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = FleetNames.VehicleDocument,
+				RecordNo = vehicleDocument.TransactionNo,
+				CreatedBy = vehicleDocument.LastModifiedBy.Value,
+				CreatedFromPlatform = vehicleDocument.LastModifiedFromPlatform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(VehicleDocumentModel vehicleDocument)
 	{
@@ -53,6 +86,10 @@ public static class VehicleDocumentData
 		string documentUrlToDelete = null)
 	{
 		await ValidateTransaction(vehicleDocument);
+		var isUpdate = vehicleDocument.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, vehicleDocument.Id)
+			: null;
 
 		if (pendingDocumentStream is not null && !string.IsNullOrWhiteSpace(pendingDocumentFileName))
 		{
@@ -60,7 +97,22 @@ public static class VehicleDocumentData
 			vehicleDocument.DocumentUrl = await BlobStorageAccess.UploadFileToBlobStorage(pendingDocumentStream, fileName, BlobStorageContainers.vehicledocument);
 		}
 
-		vehicleDocument.Id = await InsertVehicleDocument(vehicleDocument);
+		vehicleDocument.Id = await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertVehicleDocument(vehicleDocument, transaction);
+			var current = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, id, transaction);
+			var diff = AuditTrailData.GetDifference(previous, current);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = FleetNames.VehicleDocument,
+				RecordNo = vehicleDocument.TransactionNo,
+				RecordValue = diff,
+				CreatedBy = isUpdate ? vehicleDocument.LastModifiedBy.Value : vehicleDocument.CreatedBy,
+				CreatedFromPlatform = isUpdate ? vehicleDocument.LastModifiedFromPlatform : vehicleDocument.CreatedFromPlatform
+			}, transaction);
+			return id;
+		});
 
 		if (!string.IsNullOrWhiteSpace(documentUrlToDelete))
 		{

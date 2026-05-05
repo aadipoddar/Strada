@@ -83,7 +83,7 @@ public partial class ExpenseTypePage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await ExpenseTypeData.SaveTransaction(_expenseType);
+			await ExpenseTypeData.SaveTransaction(_expenseType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -113,8 +113,7 @@ public partial class ExpenseTypePage
 			var expenseType = await CommonData.LoadTableDataById<ExpenseTypeModel>(FleetNames.ExpenseType, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			expenseType.Status = false;
-			await ExpenseTypeData.InsertExpenseType(expenseType);
+			await ExpenseTypeData.DeleteTransaction(expenseType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -144,8 +143,7 @@ public partial class ExpenseTypePage
 			var expenseType = await CommonData.LoadTableDataById<ExpenseTypeModel>(FleetNames.ExpenseType, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			expenseType.Status = true;
-			await ExpenseTypeData.InsertExpenseType(expenseType);
+			await ExpenseTypeData.RecoverTransaction(expenseType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

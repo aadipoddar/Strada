@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.Vehicle;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.Vehicle;
 
 public static class ExpenseTypeData
 {
-	public static async Task<int> InsertExpenseType(ExpenseTypeModel expenseType) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpenseType, expenseType)).FirstOrDefault();
+	public static async Task<int> InsertExpenseType(ExpenseTypeModel expenseType, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpenseType, expenseType, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Expense Type.");
+
+	public static async Task DeleteTransaction(ExpenseTypeModel expenseType, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			expenseType.Status = false;
+			await InsertExpenseType(expenseType, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = FleetNames.ExpenseType,
+				RecordNo = expenseType.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(ExpenseTypeModel expenseType, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			expenseType.Status = true;
+			await InsertExpenseType(expenseType, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = FleetNames.ExpenseType,
+				RecordNo = expenseType.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(ExpenseTypeModel expenseType)
 	{
@@ -39,9 +72,29 @@ public static class ExpenseTypeData
 			throw new Exception($"Expense Type code '{expenseType.Code}' already exists. Please choose a different code.");
 	}
 
-	public static async Task<int> SaveTransaction(ExpenseTypeModel expenseType)
+	public static async Task<int> SaveTransaction(ExpenseTypeModel expenseType, int userId, string platform)
 	{
 		await ValidateTransaction(expenseType);
-		return await InsertExpenseType(expenseType);
+
+		var isUpdate = expenseType.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<ExpenseTypeModel>(FleetNames.ExpenseType, expenseType.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertExpenseType(expenseType, transaction);
+			var diff = AuditTrailData.GetDifference(previous, expenseType);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = FleetNames.ExpenseType,
+				RecordNo = expenseType.Name,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

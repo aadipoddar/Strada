@@ -83,7 +83,7 @@ public partial class VehicleTypePage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await VehicleTypeData.SaveTransaction(_vehicleType);
+			await VehicleTypeData.SaveTransaction(_vehicleType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -113,8 +113,7 @@ public partial class VehicleTypePage
 			var vehicleType = await CommonData.LoadTableDataById<VehicleTypeModel>(FleetNames.VehicleType, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicleType.Status = false;
-			await VehicleTypeData.InsertVehicleType(vehicleType);
+			await VehicleTypeData.DeleteTransaction(vehicleType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -144,8 +143,7 @@ public partial class VehicleTypePage
 			var vehicleType = await CommonData.LoadTableDataById<VehicleTypeModel>(FleetNames.VehicleType, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicleType.Status = true;
-			await VehicleTypeData.InsertVehicleType(vehicleType);
+			await VehicleTypeData.RecoverTransaction(vehicleType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

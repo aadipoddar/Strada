@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.Route;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.Route;
 
 public static class DriverData
 {
-	public static async Task<int> InsertDriver(DriverModel driver) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertDriver, driver)).FirstOrDefault();
+	public static async Task<int> InsertDriver(DriverModel driver, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertDriver, driver, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Driver.");
+
+	public static async Task DeleteTransaction(DriverModel driver, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			driver.Status = false;
+			await InsertDriver(driver, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = FleetNames.Driver,
+				RecordNo = driver.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(DriverModel driver, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			driver.Status = true;
+			await InsertDriver(driver, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = FleetNames.Driver,
+				RecordNo = driver.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	public static async Task<List<DriverOverviewModel>> LoadDriverOverview()
 	{
@@ -60,9 +93,29 @@ public static class DriverData
 			throw new Exception($"Driver code '{driver.Code}' already exists. Please choose a different code.");
 	}
 
-	public static async Task<int> SaveTransaction(DriverModel driver)
+	public static async Task<int> SaveTransaction(DriverModel driver, int userId, string platform)
 	{
 		await ValidateTransaction(driver);
-		return await InsertDriver(driver);
+
+		var isUpdate = driver.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<DriverModel>(FleetNames.Driver, driver.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertDriver(driver, transaction);
+			var diff = AuditTrailData.GetDifference(previous, driver);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = FleetNames.Driver,
+				RecordNo = driver.Name,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

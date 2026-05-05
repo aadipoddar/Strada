@@ -90,7 +90,7 @@ public partial class OMCCardPage
 
 			_omcCard.OMCId = _selectedOMC?.Id ?? 0;
 
-			await OMCCardData.SaveTransaction(_omcCard);
+			await OMCCardData.SaveTransaction(_omcCard, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -120,8 +120,7 @@ public partial class OMCCardPage
 			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			omcCard.Status = false;
-			await OMCCardData.InsertOMCCard(omcCard);
+			await OMCCardData.DeleteTransaction(omcCard, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -151,8 +150,7 @@ public partial class OMCCardPage
 			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			omcCard.Status = true;
-			await OMCCardData.InsertOMCCard(omcCard);
+			await OMCCardData.RecoverTransaction(omcCard, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

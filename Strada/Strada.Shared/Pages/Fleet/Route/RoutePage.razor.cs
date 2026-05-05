@@ -92,7 +92,7 @@ public partial class RoutePage
 			_route.FromLocationId = _selectedFromLocation?.Id ?? 0;
 			_route.ToLocationId = _selectedToLocation?.Id ?? 0;
 
-			await RouteData.SaveTransaction(_route);
+			await RouteData.SaveTransaction(_route, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -122,8 +122,7 @@ public partial class RoutePage
 			var route = await CommonData.LoadTableDataById<RouteModel>(FleetNames.Route, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			route.Status = false;
-			await RouteData.InsertRoute(route);
+			await RouteData.DeleteTransaction(route, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -153,8 +152,7 @@ public partial class RoutePage
 			var route = await CommonData.LoadTableDataById<RouteModel>(FleetNames.Route, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			route.Status = true;
-			await RouteData.InsertRoute(route);
+			await RouteData.RecoverTransaction(route, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

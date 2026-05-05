@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.OMC;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.OMC;
 
 public static class OMCCardData
 {
-	public static async Task<int> InsertOMCCard(OMCCardModel omcCard) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertOMCCard, omcCard)).FirstOrDefault();
+	public static async Task<int> InsertOMCCard(OMCCardModel omcCard, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertOMCCard, omcCard, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert OMC Card.");
+
+	public static async Task DeleteTransaction(OMCCardModel omcCard, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			omcCard.Status = false;
+			await InsertOMCCard(omcCard, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = FleetNames.OMCCard,
+				RecordNo = omcCard.CardNumber,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(OMCCardModel omcCard, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			omcCard.Status = true;
+			await InsertOMCCard(omcCard, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = FleetNames.OMCCard,
+				RecordNo = omcCard.CardNumber,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(OMCCardModel omcCard)
 	{
@@ -51,9 +84,29 @@ public static class OMCCardData
 			throw new Exception($"OMC card code '{omcCard.Code}' already exists. Please choose a different code.");
 	}
 
-	public static async Task<int> SaveTransaction(OMCCardModel omcCard)
+	public static async Task<int> SaveTransaction(OMCCardModel omcCard, int userId, string platform)
 	{
 		await ValidateTransaction(omcCard);
-		return await InsertOMCCard(omcCard);
+
+		var isUpdate = omcCard.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, omcCard.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertOMCCard(omcCard, transaction);
+			var diff = AuditTrailData.GetDifference(previous, omcCard);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = FleetNames.OMCCard,
+				RecordNo = omcCard.CardNumber,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

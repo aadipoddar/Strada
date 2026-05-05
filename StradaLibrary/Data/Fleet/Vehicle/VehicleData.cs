@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.Vehicle;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.Vehicle;
 
 public static class VehicleData
 {
-	public static async Task<int> InsertVehicle(VehicleModel vehicle) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicle, vehicle)).FirstOrDefault();
+	public static async Task<int> InsertVehicle(VehicleModel vehicle, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertVehicle, vehicle, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Vehicle.");
+
+	public static async Task DeleteTransaction(VehicleModel vehicle, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			vehicle.Status = false;
+			await InsertVehicle(vehicle, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = FleetNames.Vehicle,
+				RecordNo = vehicle.Code,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(VehicleModel vehicle, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			vehicle.Status = true;
+			await InsertVehicle(vehicle, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = FleetNames.Vehicle,
+				RecordNo = vehicle.Code,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(VehicleModel vehicle)
 	{
@@ -63,9 +96,29 @@ public static class VehicleData
 		}
 	}
 
-	public static async Task<int> SaveTransaction(VehicleModel vehicle)
+	public static async Task<int> SaveTransaction(VehicleModel vehicle, int userId, string platform)
 	{
 		await ValidateTransaction(vehicle);
-		return await InsertVehicle(vehicle);
+
+		var isUpdate = vehicle.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, vehicle.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertVehicle(vehicle, transaction);
+			var diff = AuditTrailData.GetDifference(previous, vehicle);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = FleetNames.Vehicle,
+				RecordNo = vehicle.Code,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

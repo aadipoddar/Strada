@@ -181,7 +181,7 @@ public partial class VehicleDocumentPage
 			vehicleDocument.LastModifiedAt = currentDateTime;
 			vehicleDocument.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 
-			await VehicleDocumentData.InsertVehicleDocument(vehicleDocument);
+			await VehicleDocumentData.DeleteTransaction(vehicleDocument);
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -218,7 +218,7 @@ public partial class VehicleDocumentPage
 			vehicleDocument.LastModifiedAt = currentDateTime;
 			vehicleDocument.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 
-			await VehicleDocumentData.InsertVehicleDocument(vehicleDocument);
+			await VehicleDocumentData.RecoverTransaction(vehicleDocument);
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

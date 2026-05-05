@@ -83,7 +83,7 @@ public partial class OMCPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await OMCData.SaveTransaction(_omc);
+			await OMCData.SaveTransaction(_omc, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -113,8 +113,7 @@ public partial class OMCPage
 			var omc = await CommonData.LoadTableDataById<OMCModel>(FleetNames.OMC, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			omc.Status = false;
-			await OMCData.InsertOMC(omc);
+			await OMCData.DeleteTransaction(omc, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -144,8 +143,7 @@ public partial class OMCPage
 			var omc = await CommonData.LoadTableDataById<OMCModel>(FleetNames.OMC, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			omc.Status = true;
-			await OMCData.InsertOMC(omc);
+			await OMCData.RecoverTransaction(omc, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

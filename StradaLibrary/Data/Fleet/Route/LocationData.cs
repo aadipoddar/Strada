@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.Route;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.Route;
 
 public static class LocationData
 {
-	public static async Task<int> InsertLocation(LocationModel location) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertLocation, location)).FirstOrDefault();
+	public static async Task<int> InsertLocation(LocationModel location, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertLocation, location, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Location.");
+
+	public static async Task DeleteTransaction(LocationModel location, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			location.Status = false;
+			await InsertLocation(location, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = FleetNames.Location,
+				RecordNo = location.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(LocationModel location, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			location.Status = true;
+			await InsertLocation(location, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = FleetNames.Location,
+				RecordNo = location.Name,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	private static async Task ValidateTransaction(LocationModel location)
 	{
@@ -39,9 +72,29 @@ public static class LocationData
 			throw new Exception($"Location code '{location.Code}' already exists. Please choose a different code.");
 	}
 
-	public static async Task<int> SaveTransaction(LocationModel location)
+	public static async Task<int> SaveTransaction(LocationModel location, int userId, string platform)
 	{
 		await ValidateTransaction(location);
-		return await InsertLocation(location);
+
+		var isUpdate = location.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<LocationModel>(FleetNames.Location, location.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertLocation(location, transaction);
+			var diff = AuditTrailData.GetDifference(previous, location);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = FleetNames.Location,
+				RecordNo = location.Name,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

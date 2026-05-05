@@ -83,7 +83,7 @@ public partial class DriverPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			await DriverData.SaveTransaction(_driver);
+			await DriverData.SaveTransaction(_driver, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -113,8 +113,7 @@ public partial class DriverPage
 			var driver = await CommonData.LoadTableDataById<DriverModel>(FleetNames.Driver, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			driver.Status = false;
-			await DriverData.InsertDriver(driver);
+			await DriverData.DeleteTransaction(driver, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -144,8 +143,7 @@ public partial class DriverPage
 			var driver = await CommonData.LoadTableDataById<DriverModel>(FleetNames.Driver, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			driver.Status = true;
-			await DriverData.InsertDriver(driver);
+			await DriverData.RecoverTransaction(driver, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

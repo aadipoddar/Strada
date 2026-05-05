@@ -106,7 +106,7 @@ public partial class VehiclePage
 			_vehicle.CompanyId = _selectedCompany?.Id ?? 0;
 			_vehicle.OMCId = _selectedOMC?.Id;
 
-			await VehicleData.SaveTransaction(_vehicle);
+			await VehicleData.SaveTransaction(_vehicle, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
 			ResetPage();
@@ -136,8 +136,7 @@ public partial class VehiclePage
 			var vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicle.Status = false;
-			await VehicleData.InsertVehicle(vehicle);
+			await VehicleData.DeleteTransaction(vehicle, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Deleted", "Transaction has been deleted successfully.", ToastType.Success);
 			ResetPage();
@@ -167,8 +166,7 @@ public partial class VehiclePage
 			var vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
 
-			vehicle.Status = true;
-			await VehicleData.InsertVehicle(vehicle);
+			await VehicleData.RecoverTransaction(vehicle, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Recovered", "Transaction has been recovered successfully.", ToastType.Success);
 			ResetPage();

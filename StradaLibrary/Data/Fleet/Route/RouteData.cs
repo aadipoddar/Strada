@@ -1,13 +1,46 @@
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Models.Fleet.Route;
+using StradaLibrary.Models.Operations;
 
 namespace StradaLibrary.Data.Fleet.Route;
 
 public static class RouteData
 {
-	public static async Task<int> InsertRoute(RouteModel route) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertRoute, route)).FirstOrDefault();
+	public static async Task<int> InsertRoute(RouteModel route, SqlDataAccessTransaction transaction = null) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertRoute, route, transaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Route.");
+
+	public static async Task DeleteTransaction(RouteModel route, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			route.Status = false;
+			await InsertRoute(route, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = FleetNames.Route,
+				RecordNo = route.Code,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(RouteModel route, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			route.Status = true;
+			await InsertRoute(route, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = FleetNames.Route,
+				RecordNo = route.Code,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
 
 	public static async Task<List<RouteOverviewModel>> LoadRouteOverview()
 	{
@@ -95,9 +128,29 @@ public static class RouteData
 			throw new Exception($"Route code '{route.Code}' already exists. Please choose a different code.");
 	}
 
-	public static async Task<int> SaveTransaction(RouteModel route)
+	public static async Task<int> SaveTransaction(RouteModel route, int userId, string platform)
 	{
 		await ValidateTransaction(route);
-		return await InsertRoute(route);
+
+		var isUpdate = route.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<RouteModel>(FleetNames.Route, route.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertRoute(route, transaction);
+			var diff = AuditTrailData.GetDifference(previous, route);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = FleetNames.Route,
+				RecordNo = route.Code,
+				RecordValue = diff,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }
