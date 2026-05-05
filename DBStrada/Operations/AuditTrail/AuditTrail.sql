@@ -7,7 +7,7 @@
 	[RecordValue] VARCHAR(MAX) NULL,
 	[CreatedBy] INT NOT NULL,
 	[CreatedByName] VARCHAR(MAX) NOT NULL,
-	[CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
+	[TransactionDateTime] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
 	[CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
 	CONSTRAINT [FK_AuditTrail_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 )

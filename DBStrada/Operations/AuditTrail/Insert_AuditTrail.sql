@@ -6,7 +6,7 @@ CREATE PROCEDURE [dbo].[Insert_AuditTrail]
 	@RecordValue VARCHAR(MAX),
 	@CreatedBy INT,
 	@CreatedByName VARCHAR(MAX),
-	@CreatedAt DATETIME,
+	@TransactionDateTime DATETIME,
 	@CreatedFromPlatform VARCHAR(MAX)
 AS
 BEGIN

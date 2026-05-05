@@ -9,7 +9,7 @@ public class AuditTrailModel
     public string? RecordValue { get; set; }
     public int CreatedBy { get; set; }
     public string CreatedByName { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime TransactionDateTime { get; set; } = DateTime.Now;
     public string CreatedFromPlatform { get; set; }
 }
 
