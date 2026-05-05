@@ -140,7 +140,7 @@ public partial class ExpensePage
 
 		try
 		{
-			_expense = System.Text.Json.JsonSerializer.Deserialize<ExpenseModel>(await DataStorageService.LocalGetAsync(StorageFileNames.ExpenseDataFileName));
+			_expense = JsonSerializer.Deserialize<ExpenseModel>(await DataStorageService.LocalGetAsync(StorageFileNames.ExpenseDataFileName));
 			if (_expense is null)
 				return false;
 
@@ -210,7 +210,7 @@ public partial class ExpensePage
 				return;
 
 			if (await DataStorageService.LocalExists(StorageFileNames.ExpenseDetailsCartDataFileName))
-				_expensesCart = System.Text.Json.JsonSerializer.Deserialize<List<ExpenseDetailsCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.ExpenseDetailsCartDataFileName));
+				_expensesCart = JsonSerializer.Deserialize<List<ExpenseDetailsCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.ExpenseDetailsCartDataFileName));
 		}
 		catch (Exception ex)
 		{
@@ -279,6 +279,7 @@ public partial class ExpensePage
 		if (args.Value is null || args.Value.Id == 0)
 		{
 			_selectedExpenseType = null;
+			_selectedExpensesCart = new();
 			return;
 		}
 

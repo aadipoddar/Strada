@@ -184,11 +184,11 @@ public static class ExpenseData
 			var currentExpense = await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, expense.Id, sqlDataAccessTransaction);
 			var currentExpensesDetails = await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id, sqlDataAccessTransaction);
 
-			var headerDiff = AuditTrailData.GetDifference(previousExpense, currentExpense);
+			var expenseDiff = AuditTrailData.GetDifference(previousExpense, currentExpense);
 			var detailsDiff = AuditTrailData.GetDifference(previousExpensesDetails, currentExpensesDetails, typeof(ExpenseOverviewModel));
 
 			difference = AuditTrailData.CombineDifferences(
-				(null, headerDiff),
+				(null, expenseDiff),
 				("Details", detailsDiff));
 		}
 

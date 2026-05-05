@@ -105,7 +105,6 @@ public partial class FinancialAccountingPage
 		{
 			await _toastNotification.ShowAsync("Transaction Not Found", "The requested transaction could not be found.", ToastType.Error);
 			NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting, true);
-			return false;
 		}
 
 		return true;
@@ -313,30 +312,21 @@ public partial class FinancialAccountingPage
 	private async Task OnItemChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedLedger = null;
+			_selectedCart = new();
 			return;
+		}
 
 		_selectedLedger = args.Value;
 
-		if (_selectedLedger is null)
-			_selectedCart = new()
-			{
-				LedgerId = 0,
-				LedgerName = string.Empty,
-				Credit = null,
-				Debit = null,
-				ReferenceId = null,
-				ReferenceNo = null,
-				ReferenceType = null,
-				Remarks = string.Empty
-			};
-
-		else
-		{
-			_selectedCart.LedgerId = _selectedLedger.Id;
-			_selectedCart.LedgerName = _selectedLedger.Name;
-			_selectedCart.Credit = null;
-			_selectedCart.Debit = null;
-		}
+		_selectedCart.LedgerId = _selectedLedger.Id;
+		_selectedCart.LedgerName = _selectedLedger.Name;
+		_selectedCart.Credit = null;
+		_selectedCart.Debit = null;
+		_selectedCart.ReferenceId = null;
+		_selectedCart.ReferenceNo = null;
+		_selectedCart.ReferenceType = null;
 	}
 
 	private void OnReferenceChanged(ChangeEventArgs<FinancialAccountingLedgerOverviewModel, FinancialAccountingLedgerOverviewModel> args)
@@ -432,8 +422,7 @@ public partial class FinancialAccountingPage
 			if (_sfCartGrid is null || _sfCartGrid.SelectedRecords is null || _sfCartGrid.SelectedRecords.Count == 0)
 				return;
 
-			_cart.Remove(_sfCartGrid.SelectedRecords.First());
-			return;
+			cartItem = _sfCartGrid.SelectedRecords.First();
 		}
 
 		_cart.Remove(cartItem);
@@ -575,6 +564,7 @@ public partial class FinancialAccountingPage
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
 		_accounting.Status = true;
 		_accounting.TransactionDateTime = DateOnly.FromDateTime(_accounting.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+		_accounting.CreatedAt = currentDateTime;
 		_accounting.LastModifiedAt = currentDateTime;
 		_accounting.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 		_accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
