@@ -63,20 +63,7 @@ public static class TripData
 	{
 		if (sqlDataAccessTransaction is null)
 		{
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				await DeleteTransaction(trip, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
-
+			await SqlDataAccessTransaction.Run(transaction => DeleteTransaction(trip, transaction));
 			await TripNotify.Notify(trip.Id, NotifyType.Deleted);
 			return;
 		}
@@ -215,19 +202,7 @@ public static class TripData
 			if (update)
 				previousInvoice = await TripInvoiceExport.ExportInvoice(trip.Id, InvoiceExportType.PDF);
 
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				trip.Id = await SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, showNotification, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
+			trip.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, showNotification, transaction));
 
 			if (showNotification)
 				await TripNotify.Notify(trip.Id, update ? NotifyType.Updated : NotifyType.Created, previousInvoice);

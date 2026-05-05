@@ -38,20 +38,7 @@ public static class BillData
 	{
 		if (sqlDataAccessTransaction is null)
 		{
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				await DeleteTransaction(bill, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
-
+			await SqlDataAccessTransaction.Run(transaction => DeleteTransaction(bill, transaction));
 			await BillNotify.Notify(bill.Id, NotifyType.Deleted);
 			return;
 		}
@@ -206,19 +193,7 @@ public static class BillData
 			if (update)
 				previousInvoice = await BillInvoiceExport.ExportInvoice(bill.Id, InvoiceExportType.PDF);
 
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				bill.Id = await SaveTransaction(bill, ledgerPayments, trips, showNotification, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
+			bill.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(bill, ledgerPayments, trips, showNotification, transaction));
 
 			if (showNotification)
 				await BillNotify.Notify(bill.Id, update ? NotifyType.Updated : NotifyType.Created, previousInvoice);

@@ -37,20 +37,7 @@ public static class ExpenseData
 	{
 		if (sqlDataAccessTransaction is null)
 		{
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				await DeleteTransaction(expense, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
-
+			await SqlDataAccessTransaction.Run(transaction => DeleteTransaction(expense, transaction));
 			await ExpenseNotify.Notify(expense.Id, NotifyType.Deleted);
 			return;
 		}
@@ -142,19 +129,7 @@ public static class ExpenseData
 		{
 			(MemoryStream, string)? previousInvoice = update && !recover ? await ExpenseInvoiceExport.ExportInvoice(expense.Id, InvoiceExportType.PDF) : null;
 
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				expense.Id = await SaveTransaction(expense, expensesDetails, recover, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
+			expense.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(expense, expensesDetails, recover, transaction));
 
 			if (!recover)
 				await ExpenseNotify.Notify(expense.Id, update ? NotifyType.Updated : NotifyType.Created, previousInvoice);

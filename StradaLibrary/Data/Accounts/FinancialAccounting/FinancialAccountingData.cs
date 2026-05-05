@@ -42,20 +42,7 @@ public static class FinancialAccountingData
 	{
 		if (sqlDataAccessTransaction is null)
 		{
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				await DeleteTransaction(accounting, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
-
+			await SqlDataAccessTransaction.Run(transaction => DeleteTransaction(accounting, transaction));
 			await FinancialAccountingNotify.Notify(accounting.Id, NotifyType.Deleted);
 			return;
 		}
@@ -138,19 +125,7 @@ public static class FinancialAccountingData
 			if (update)
 				previousInvoice = await FinancialAccountingInvoiceExport.ExportInvoice(accounting.Id, InvoiceExportType.PDF);
 
-			using SqlDataAccessTransaction newSqlDataAccessTransaction = new();
-
-			try
-			{
-				newSqlDataAccessTransaction.StartTransaction();
-				accounting.Id = await SaveTransaction(accounting, ledgers, showNotification, newSqlDataAccessTransaction);
-				newSqlDataAccessTransaction.CommitTransaction();
-			}
-			catch
-			{
-				newSqlDataAccessTransaction.RollbackTransaction();
-				throw;
-			}
+			accounting.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(accounting, ledgers, showNotification, transaction));
 
 			if (showNotification)
 				await FinancialAccountingNotify.Notify(accounting.Id, update ? NotifyType.Updated : NotifyType.Created, previousInvoice);
