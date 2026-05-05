@@ -1,5 +1,6 @@
-﻿using StradaLibrary.Data.Accounts.Masters;
+using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Operations;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Fleet.Trip;
 using StradaLibrary.Exports.Mailing;
@@ -12,47 +13,51 @@ namespace StradaLibrary.Data.Fleet.Trip;
 public static class TripData
 {
 	internal static async Task<int> InsertTrip(TripModel trip, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTrip, trip, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTrip, trip, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Trip.");
 
 	private static async Task<int> InsertTripExpenses(TripExpensesModel tripExpenses, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTripExpenses, tripExpenses, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTripExpenses, tripExpenses, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Trip Expense.");
 
 	private static async Task<int> InsertTripCardPayments(TripCardPaymentsModel tripCardPayments, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTripCardPayments, tripCardPayments, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTripCardPayments, tripCardPayments, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Trip Card Payment.");
 
 	private static async Task<int> InsertTripLedgerPayments(TripLedgerPaymentsModel tripLedgerPayments, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTripLedgerPayments, tripLedgerPayments, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertTripLedgerPayments, tripLedgerPayments, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Trip Ledger Payment.");
 
 	public static async Task<List<TripOverviewModel>> LoadTripOverviewByBillIdDate(int? BillId = null, DateTime? StartDate = null, DateTime? EndDate = null, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		await SqlDataAccess.LoadData<TripOverviewModel, dynamic>(FleetNames.LoadTripOverviewByBillIdDate, new { BillId, StartDate, EndDate }, sqlDataAccessTransaction);
 
-	public static List<TripExpensesModel> ConvertExpensesCartToDetails(List<TripExpensesCartModel> cart, int accountingId = 0) =>
+	public static List<TripExpensesModel> ConvertExpensesCartToDetails(List<TripExpensesCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new TripExpensesModel
 		{
 			Id = 0,
-			MasterId = accountingId,
+			MasterId = masterId,
 			ExpenseTypeId = item.ExpenseTypeId,
 			Amount = item.Amount,
 			Remarks = item.Remarks,
 			Status = true
 		})];
 
-	public static List<TripCardPaymentsModel> ConvertCardPaymentCartToDetails(List<TripCardPaymentsCartModel> cart, int accountingId = 0) =>
+	public static List<TripCardPaymentsModel> ConvertCardPaymentCartToDetails(List<TripCardPaymentsCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new TripCardPaymentsModel
 		{
 			Id = 0,
-			MasterId = accountingId,
+			MasterId = masterId,
 			OMCCardId = item.OMCCardId,
 			Amount = item.Amount,
 			Remarks = item.Remarks,
 			Status = true
 		})];
 
-	public static List<TripLedgerPaymentsModel> ConvertLedgerPaymentCartToDetails(List<TripLedgerPaymentsCartModel> cart, int accountingId = 0) =>
+	public static List<TripLedgerPaymentsModel> ConvertLedgerPaymentCartToDetails(List<TripLedgerPaymentsCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new TripLedgerPaymentsModel
 		{
 			Id = 0,
-			MasterId = accountingId,
+			MasterId = masterId,
 			LedgerId = item.LedgerId,
 			Amount = item.Amount,
 			Remarks = item.Remarks,
@@ -74,9 +79,16 @@ public static class TripData
 			throw new InvalidOperationException("Cannot delete a trip transaction that is associated with a bill.");
 
 		trip.Status = false;
-		var id = await InsertTrip(trip, sqlDataAccessTransaction);
-		if (id <= 0)
-			throw new InvalidOperationException("Failed to delete trip transaction.");
+		await InsertTrip(trip, sqlDataAccessTransaction);
+
+		await AuditTrailData.SaveAuditTrail(new()
+		{
+			Action = AuditTrailActionTypes.Delete.ToString(),
+			TableName = FleetNames.Trip,
+			RecordNo = trip.TransactionNo,
+			CreatedBy = trip.LastModifiedBy.Value,
+			CreatedFromPlatform = trip.LastModifiedFromPlatform
+		}, sqlDataAccessTransaction);
 	}
 
 	public static async Task RecoverTransaction(TripModel trip)
@@ -85,7 +97,7 @@ public static class TripData
 		var expensesDetails = await CommonData.LoadTableDataByMasterId<TripExpensesModel>(FleetNames.TripExpenses, trip.Id);
 		var cardPaymentDetails = await CommonData.LoadTableDataByMasterId<TripCardPaymentsModel>(FleetNames.TripCardPayments, trip.Id);
 		var ledgerPaymentDetails = await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsModel>(FleetNames.TripLedgerPayments, trip.Id);
-		await SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, false);
+		await SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, recover: true);
 
 		await TripNotify.Notify(trip.Id, NotifyType.Recovered);
 	}
@@ -124,7 +136,9 @@ public static class TripData
 		if (trip.BillId is not null)
 			throw new InvalidOperationException("Cannot edit a trip transaction that is associated with a bill.");
 
-		trip.TransactionNo = await GenerateCodes.GenerateTripTransactionNo(trip, sqlDataAccessTransaction);
+		if (!update)
+			trip.TransactionNo = await GenerateCodes.GenerateTripTransactionNo(trip, sqlDataAccessTransaction);
+
 		await FinancialYearData.ValidateFinancialYear(trip.TransactionDateTime, sqlDataAccessTransaction);
 
 		if (update)
@@ -191,20 +205,18 @@ public static class TripData
 		List<TripExpensesModel> expensesDetails,
 		List<TripCardPaymentsModel> cardPaymentDetails,
 		List<TripLedgerPaymentsModel> ledgerPaymentDetails,
-		bool showNotification = true,
+		bool recover = false,
 		SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		bool update = trip.Id > 0;
 
 		if (sqlDataAccessTransaction is null)
 		{
-			(MemoryStream, string)? previousInvoice = null;
-			if (update)
-				previousInvoice = await TripInvoiceExport.ExportInvoice(trip.Id, InvoiceExportType.PDF);
+			(MemoryStream, string)? previousInvoice = update && !recover ? await TripInvoiceExport.ExportInvoice(trip.Id, InvoiceExportType.PDF) : null;
 
-			trip.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, showNotification, transaction));
+			trip.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, recover,transaction));
 
-			if (showNotification)
+			if (!recover)
 				await TripNotify.Notify(trip.Id, update ? NotifyType.Updated : NotifyType.Created, previousInvoice);
 
 			return trip.Id;
@@ -214,10 +226,17 @@ public static class TripData
 		ValidateExpensesDetails(trip, expensesDetails);
 		await ValidateCardPaymentDetails(trip, cardPaymentDetails);
 		await ValidateLedgerPaymentDetails(trip, ledgerPaymentDetails);
+
+		var previousTrip = update && !recover ? await CommonData.LoadTableDataById<TripOverviewModel>(FleetNames.TripOverview, trip.Id, sqlDataAccessTransaction) : null;
+		var previousExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripExpensesOverviewModel>(FleetNames.TripExpensesOverview, trip.Id, sqlDataAccessTransaction) : null;
+		var previousCardPaymentDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripCardPaymentsOverviewModel>(FleetNames.TripCardPaymentsOverview, trip.Id, sqlDataAccessTransaction) : null;
+		var previousLedgerPaymentDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsOverviewModel>(FleetNames.TripLedgerPaymentsOverview, trip.Id, sqlDataAccessTransaction) : null;
+
 		trip.Id = await InsertTrip(trip, sqlDataAccessTransaction);
 		await SaveExpensesDetail(trip, expensesDetails, update, sqlDataAccessTransaction);
 		await SaveCardPaymentDetail(trip, cardPaymentDetails, update, sqlDataAccessTransaction);
 		await SaveLedgerPaymentDetail(trip, ledgerPaymentDetails, update, sqlDataAccessTransaction);
+		await SaveAuditTrail(trip, update, recover, previousTrip, previousExpensesDetails, previousCardPaymentDetails, previousLedgerPaymentDetails, sqlDataAccessTransaction);
 
 		return trip.Id;
 	}
@@ -230,20 +249,14 @@ public static class TripData
 			foreach (var item in existingExpensesDetails)
 			{
 				item.Status = false;
-				var id = await InsertTripExpenses(item, sqlDataAccessTransaction);
-
-				if (id <= 0)
-					throw new InvalidOperationException("Failed to save trip expenses detail item.");
+				await InsertTripExpenses(item, sqlDataAccessTransaction);
 			}
 		}
 
 		foreach (var item in expensesDetails)
 		{
 			item.MasterId = trip.Id;
-			var id = await InsertTripExpenses(item, sqlDataAccessTransaction);
-
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to save trip expenses detail item.");
+			await InsertTripExpenses(item, sqlDataAccessTransaction);
 		}
 	}
 
@@ -255,20 +268,14 @@ public static class TripData
 			foreach (var item in existingPaymentDetails)
 			{
 				item.Status = false;
-				var id = await InsertTripCardPayments(item, sqlDataAccessTransaction);
-
-				if (id <= 0)
-					throw new InvalidOperationException("Failed to save trip OMC card payments detail item.");
+				await InsertTripCardPayments(item, sqlDataAccessTransaction);
 			}
 		}
 
 		foreach (var item in paymentDetails)
 		{
 			item.MasterId = trip.Id;
-			var id = await InsertTripCardPayments(item, sqlDataAccessTransaction);
-
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to save trip OMC card payments detail item.");
+			await InsertTripCardPayments(item, sqlDataAccessTransaction);
 		}
 	}
 
@@ -280,21 +287,58 @@ public static class TripData
 			foreach (var item in existingPaymentDetails)
 			{
 				item.Status = false;
-				var id = await InsertTripLedgerPayments(item, sqlDataAccessTransaction);
-
-				if (id <= 0)
-					throw new InvalidOperationException("Failed to save trip ledger payments detail item.");
+				await InsertTripLedgerPayments(item, sqlDataAccessTransaction);
 			}
 		}
 
 		foreach (var item in paymentDetails)
 		{
 			item.MasterId = trip.Id;
-			var id = await InsertTripLedgerPayments(item, sqlDataAccessTransaction);
-
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to save trip ledger payments detail item.");
+			await InsertTripLedgerPayments(item, sqlDataAccessTransaction);
 		}
 	}
+
+	private static async Task SaveAuditTrail(
+		TripModel trip,
+		bool update,
+		bool recover,
+		TripOverviewModel previousTrip = null,
+		List<TripExpensesOverviewModel> previousExpensesDetails = null,
+		List<TripCardPaymentsOverviewModel> previousCardPaymentDetails = null,
+		List<TripLedgerPaymentsOverviewModel> previousLedgerPaymentDetails = null,
+		SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		string difference = null;
+
+		if (update && !recover)
+		{
+			var currentTrip = await CommonData.LoadTableDataById<TripOverviewModel>(FleetNames.TripOverview, trip.Id, sqlDataAccessTransaction);
+			var currentExpensesDetails = await CommonData.LoadTableDataByMasterId<TripExpensesOverviewModel>(FleetNames.TripExpensesOverview, trip.Id, sqlDataAccessTransaction);
+			var currentCardPaymentDetails = await CommonData.LoadTableDataByMasterId<TripCardPaymentsOverviewModel>(FleetNames.TripCardPaymentsOverview, trip.Id, sqlDataAccessTransaction);
+			var currentLedgerPaymentDetails = await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsOverviewModel>(FleetNames.TripLedgerPaymentsOverview, trip.Id, sqlDataAccessTransaction);
+
+			var headerDiff = AuditTrailData.GetDifference(previousTrip, currentTrip);
+			var expensesDiff = AuditTrailData.GetDifference(previousExpensesDetails, currentExpensesDetails, typeof(TripOverviewModel));
+			var cardPaymentDiff = AuditTrailData.GetDifference(previousCardPaymentDetails, currentCardPaymentDetails, typeof(TripOverviewModel));
+			var ledgerPaymentDiff = AuditTrailData.GetDifference(previousLedgerPaymentDetails, currentLedgerPaymentDetails, typeof(TripOverviewModel));
+
+			difference = AuditTrailData.CombineDifferences(
+				(null, headerDiff),
+				("Expenses", expensesDiff),
+				("Card Payments", cardPaymentDiff),
+				("Ledger Payments", ledgerPaymentDiff));
+		}
+
+		await AuditTrailData.SaveAuditTrail(new()
+		{
+			Action = recover ? AuditTrailActionTypes.Recover.ToString() : update ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+			TableName = FleetNames.Trip,
+			RecordNo = trip.TransactionNo,
+			RecordValue = difference,
+			CreatedBy = update ? trip.LastModifiedBy.Value : trip.CreatedBy,
+			CreatedFromPlatform = update ? trip.LastModifiedFromPlatform : trip.CreatedFromPlatform
+		}, sqlDataAccessTransaction);
+	}
+
 	#endregion
 }

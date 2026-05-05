@@ -1,10 +1,8 @@
-﻿using StradaLibrary.Data.Common;
+using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Trip;
-using StradaLibrary.Models.Fleet.Vehicle;
 
 namespace StradaLibrary.Exports.Fleet.Trip;
 
@@ -15,9 +13,9 @@ public static class TripInvoiceExport
 		var transaction = await CommonData.LoadTableDataById<TripOverviewModel>(FleetNames.TripOverview, transactionId) ??
 			throw new InvalidOperationException("Transaction not found.");
 
-		var expenses = await CommonData.LoadTableDataByMasterId<TripExpensesModel>(FleetNames.TripExpenses, transaction.Id);
-		var cardPayments = await CommonData.LoadTableDataByMasterId<TripCardPaymentsModel>(FleetNames.TripCardPayments, transaction.Id);
-		var ledgerPayments = await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsModel>(FleetNames.TripLedgerPayments, transaction.Id);
+		var expenses = await CommonData.LoadTableDataByMasterId<TripExpensesOverviewModel>(FleetNames.TripExpensesOverview, transaction.Id);
+		var cardPayments = await CommonData.LoadTableDataByMasterId<TripCardPaymentsOverviewModel>(FleetNames.TripCardPaymentsOverview, transaction.Id);
+		var ledgerPayments = await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsOverviewModel>(FleetNames.TripLedgerPaymentsOverview, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
 		LedgerModel ledger = new()
@@ -31,25 +29,11 @@ public static class TripInvoiceExport
 			$" \nVehicle: {(transaction.VehicleEmpty ? "Empty" : "Loaded")}"
 		};
 
-		var expenseTypes = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType);
-		var lineItems = expenses.Select(detail =>
-		{
-			return new TripExpensesCartModel
-			{
-				ExpenseTypeId = detail.ExpenseTypeId,
-				ExpenseTypeName = expenseTypes.FirstOrDefault(p => p.Id == detail.ExpenseTypeId).Name,
-				Amount = detail.Amount,
-				Remarks = detail.Remarks
-			};
-		}).ToList();
-
-		var omcCards = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard);
-		var ledgers = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger);
 		Dictionary<string, decimal> paymentModes = [];
 		foreach (var payment in cardPayments)
-			paymentModes.Add(omcCards.FirstOrDefault(c => c.Id == payment.OMCCardId).CardNumber, payment.Amount);
+			paymentModes.Add(payment.OMCCardNumber, payment.PaymentAmount);
 		foreach (var payment in ledgerPayments)
-			paymentModes.Add(ledgers.FirstOrDefault(l => l.Id == payment.LedgerId).Name, payment.Amount);
+			paymentModes.Add(payment.LedgerName, payment.PaymentAmount);
 
 		var invoiceData = new InvoiceData
 		{
@@ -73,9 +57,9 @@ public static class TripInvoiceExport
 		var columnSettings = new List<InvoiceColumnSetting>
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
-			new(nameof(TripExpensesCartModel.ExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
-			new(nameof(TripExpensesCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
-			new(nameof(TripExpensesCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 150, 30)
+			new(nameof(TripExpensesOverviewModel.ExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(TripExpensesOverviewModel.ExpenseAmount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
+			new(nameof(TripExpensesOverviewModel.ExpenseRemarks), "Remarks", exportType, CellAlignment.Left, 150, 30)
 		};
 
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
@@ -85,7 +69,7 @@ public static class TripInvoiceExport
 		{
 			var stream = await PDFInvoiceExportUtil.ExportInvoiceToPdf(
 				invoiceData,
-				lineItems,
+				expenses,
 				columnSettings,
 				null,
 				summaryFields
@@ -98,7 +82,7 @@ public static class TripInvoiceExport
 		{
 			var stream = await ExcelInvoiceExportUtil.ExportInvoiceToExcel(
 				invoiceData,
-				lineItems,
+				expenses,
 				columnSettings,
 				null,
 				summaryFields

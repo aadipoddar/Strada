@@ -172,7 +172,6 @@ public partial class TripPage
 		{
 			await _toastNotification.ShowAsync("Transaction Not Found", "The requested transaction could not be found.", ToastType.Error);
 			NavigationManager.NavigateTo(PageRouteNames.Trip, true);
-			return false;
 		}
 
 		return true;
@@ -387,10 +386,10 @@ public partial class TripPage
 
 		foreach (var item in existingCart)
 		{
-			if (_omcCards.FirstOrDefault(s => s.Id == item.LedgerId) is null)
+			if (_ledgers.FirstOrDefault(s => s.Id == item.LedgerId) is null)
 			{
 				var ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, item.LedgerId);
-				await _toastNotification.ShowAsync("Ledger Not Found", $"The legder {ledger?.Name} (ID: {item.LedgerId}) in the existing transaction cart was not found in the available cards list. It may have been deleted or is inaccessible.", ToastType.Error);
+				await _toastNotification.ShowAsync("Ledger Not Found", $"The ledger {ledger?.Name} (ID: {item.LedgerId}) in the existing transaction cart was not found in the available ledgers list. It may have been deleted or is inaccessible.", ToastType.Error);
 				continue;
 			}
 
@@ -461,23 +460,16 @@ public partial class TripPage
 	private async Task OnExpensesTypeChanged(ChangeEventArgs<ExpenseTypeModel?, ExpenseTypeModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedExpenseType = null;
+			_selectedExpensesCart = new();
 			return;
+		}
 
 		_selectedExpenseType = args.Value;
 
-		if (_selectedExpenseType is null)
-			_selectedExpensesCart = new()
-			{
-				ExpenseTypeId = 0,
-				ExpenseTypeName = "",
-				Amount = 0
-			};
-
-		else
-		{
-			_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
-			_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
-		}
+		_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
+		_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
 	}
 
 	private async Task AddExpensesToCart()
@@ -545,24 +537,17 @@ public partial class TripPage
 	private async Task OnCardPaymentsTypeChanged(ChangeEventArgs<OMCCardModel?, OMCCardModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedOMCCard = null;
+			_selectedCardPaymentCart = new();
 			return;
+		}
 
 		_selectedOMCCard = args.Value;
 
-		if (_selectedOMCCard is null)
-			_selectedCardPaymentCart = new()
-			{
-				OMCCardId = 0,
-				OMCCardNumber = "",
-				Amount = 0
-			};
-
-		else
-		{
-			_selectedCardPaymentCart.OMCCardId = _selectedOMCCard.Id;
-			_selectedCardPaymentCart.OMCCardNumber = _selectedOMCCard.CardNumber;
-			_selectedCardPaymentCart.Amount = _trip.TotalExpense - _cardPaymentsCart.Sum(s => s.Amount) - _ledgerPaymentsCart.Sum(s => s.Amount);
-		}
+		_selectedCardPaymentCart.OMCCardId = _selectedOMCCard.Id;
+		_selectedCardPaymentCart.OMCCardNumber = _selectedOMCCard.CardNumber;
+		_selectedCardPaymentCart.Amount = _trip.TotalExpense - _cardPaymentsCart.Sum(s => s.Amount) - _ledgerPaymentsCart.Sum(s => s.Amount);
 	}
 
 	private async Task AddCardPaymentsToCart()
@@ -635,24 +620,17 @@ public partial class TripPage
 	private async Task OnLedgerPaymentsTypeChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedLedger = null;
+			_selectedLedgerPaymentCart = new();
 			return;
+		}
 
 		_selectedLedger = args.Value;
 
-		if (_selectedLedger is null)
-			_selectedLedgerPaymentCart = new()
-			{
-				LedgerId = 0,
-				LedgerName = "",
-				Amount = 0
-			};
-
-		else
-		{
-			_selectedLedgerPaymentCart.LedgerId = _selectedLedger.Id;
-			_selectedLedgerPaymentCart.LedgerName = _selectedLedger.Name;
-			_selectedLedgerPaymentCart.Amount = _trip.TotalExpense - _cardPaymentsCart.Sum(s => s.Amount) - _ledgerPaymentsCart.Sum(s => s.Amount);
-		}
+		_selectedLedgerPaymentCart.LedgerId = _selectedLedger.Id;
+		_selectedLedgerPaymentCart.LedgerName = _selectedLedger.Name;
+		_selectedLedgerPaymentCart.Amount = _trip.TotalExpense - _cardPaymentsCart.Sum(s => s.Amount) - _ledgerPaymentsCart.Sum(s => s.Amount);
 	}
 
 	private async Task AddLedgerPaymentsToCart()
@@ -765,6 +743,7 @@ public partial class TripPage
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
 		_trip.Status = true;
 		_trip.TransactionDateTime = DateOnly.FromDateTime(_trip.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+		_trip.CreatedAt = currentDateTime;
 		_trip.LastModifiedAt = currentDateTime;
 		_trip.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 		_trip.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
@@ -990,7 +969,7 @@ public partial class TripPage
 		switch (args.Item.Id)
 		{
 			case "EditCart":
-				await EditSelectedCardPaymentsCartItem();
+				await EditSelectedLedgerPaymentsCartItem();
 				break;
 			case "DeleteCart":
 				await RemoveSelectedLedgerPaymentsCartItem();
