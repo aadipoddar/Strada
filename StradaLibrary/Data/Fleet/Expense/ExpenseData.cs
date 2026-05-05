@@ -20,11 +20,11 @@ public static class ExpenseData
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpenseDetails, expenseDetails, sqlDataAccessTransaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Expense Detail.");
 
-	public static List<ExpenseDetailsModel> ConvertExpensesCartToDetails(List<ExpenseDetailsCartModel> cart, int accountingId = 0) =>
+	public static List<ExpenseDetailsModel> ConvertExpensesCartToDetails(List<ExpenseDetailsCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new ExpenseDetailsModel
 		{
 			Id = 0,
-			MasterId = accountingId,
+			MasterId = masterId,
 			ExpenseTypeId = item.ExpenseTypeId,
 			LedgerId = item.LedgerId,
 			Amount = item.Amount,
@@ -93,7 +93,9 @@ public static class ExpenseData
 		if (expense.TotalExpense < 0)
 			throw new InvalidOperationException("Total expense cannot be negative.");
 
-		expense.TransactionNo = await GenerateCodes.GenerateExpenseTransactionNo(expense, sqlDataAccessTransaction);
+		if (!update)
+			expense.TransactionNo = await GenerateCodes.GenerateExpenseTransactionNo(expense, sqlDataAccessTransaction);
+
 		await FinancialYearData.ValidateFinancialYear(expense.TransactionDateTime, sqlDataAccessTransaction);
 
 		if (update)

@@ -81,7 +81,7 @@ public static class ExpenseReportExport
 				columnOrder.Remove(nameof(ExpenseOverviewModel.Status));
 		}
 
-		string fileName = $"EXPENSE_REPORT";
+		string fileName = "EXPENSE_REPORT";
 		if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 			fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 

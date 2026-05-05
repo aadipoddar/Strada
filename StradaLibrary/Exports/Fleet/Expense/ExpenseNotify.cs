@@ -30,7 +30,7 @@ internal static class ExpenseNotify
             {
                 ["Transaction Number"] = expense.TransactionNo,
                 ["Vehicle"] = $"{expense.VehicleCode}",
-                ["Expenses"] = expense.TotalExpense.ToString(),
+                ["Expenses"] = expense.TotalExpense.FormatIndianCurrency(),
                 [type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = expense.LastModifiedByUserName ?? expense.CreatedByName
             },
             Remarks = expense.Remarks

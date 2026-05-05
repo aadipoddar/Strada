@@ -8,7 +8,6 @@ using StradaLibrary.Exports.Fleet.Expense;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Expense;
-using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
@@ -28,8 +27,8 @@ public partial class ExpensePage
 
 	private CompanyModel _selectedCompany = new();
 	private FinancialYearModel _selectedFinancialYear = new();
-	private VehicleModel _selectedVehicle = new();
-	private ExpenseTypeModel _selectedExpenseType = null;
+	private VehicleModel? _selectedVehicle = null;
+	private ExpenseTypeModel? _selectedExpenseType = null;
 	private LedgerModel? _selectedLedger = null;
 	private ExpenseDetailsCartModel _selectedExpensesCart = new();
 	private ExpenseModel _expense = new();
@@ -129,7 +128,6 @@ public partial class ExpensePage
 		{
 			await _toastNotification.ShowAsync("Transaction Not Found", "The requested transaction could not be found.", ToastType.Error);
 			NavigationManager.NavigateTo(PageRouteNames.Expense, true);
-			return false;
 		}
 
 		return true;
@@ -137,7 +135,7 @@ public partial class ExpensePage
 
 	private async Task<bool> TryRestoreFromLocalStorage()
 	{
-		if (!await DataStorageService.LocalExists(StorageFileNames.ExpenseDetailsCartDataFileName))
+		if (!await DataStorageService.LocalExists(StorageFileNames.ExpenseDataFileName))
 			return false;
 
 		try
@@ -196,7 +194,7 @@ public partial class ExpensePage
 
 		if (_expense.Id == 0)
 		{
-			var lastTransaction = await CommonData.LoadLastTableData<TripModel>(FleetNames.Expense);
+			var lastTransaction = await CommonData.LoadLastTableData<ExpenseModel>(FleetNames.Expense);
 			if (lastTransaction is not null)
 				_expense.TransactionDateTime = lastTransaction.TransactionDateTime;
 		}
@@ -279,28 +277,17 @@ public partial class ExpensePage
 	private async Task OnExpensesTypeChanged(ChangeEventArgs<ExpenseTypeModel?, ExpenseTypeModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedExpenseType = null;
 			return;
+		}
 
 		_selectedExpenseType = args.Value;
 
-		if (_selectedExpenseType is null)
-			_selectedExpensesCart = new()
-			{
-				ExpenseTypeId = 0,
-				ExpenseTypeName = "",
-				LedgerId = 0,
-				LedgerName = "",
-				IdentificationNo = "",
-				Amount = 0
-			};
-
-		else
-		{
-			_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
-			_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
-			_selectedExpensesCart.LedgerId = _selectedLedger?.Id;
-			_selectedExpensesCart.LedgerName = _selectedLedger?.Name;
-		}
+		_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
+		_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
+		_selectedExpensesCart.LedgerId = _selectedLedger?.Id;
+		_selectedExpensesCart.LedgerName = _selectedLedger?.Name;
 	}
 
 	private async Task OnLedgerChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
@@ -417,6 +404,7 @@ public partial class ExpensePage
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
 		_expense.Status = true;
 		_expense.TransactionDateTime = DateOnly.FromDateTime(_expense.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+		_expense.CreatedAt = currentDateTime;
 		_expense.LastModifiedAt = currentDateTime;
 		_expense.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 		_expense.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();

@@ -1,5 +1,3 @@
-using StradaLibrary.Models.Operations;
-
 namespace StradaLibrary.Models.Fleet.Expense;
 
 public class ExpenseDetailsModel

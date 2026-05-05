@@ -3,7 +3,6 @@ using StradaLibrary.DataAccess;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Expense;
-using StradaLibrary.Models.Fleet.Vehicle;
 
 namespace StradaLibrary.Exports.Fleet.Expense;
 
@@ -14,29 +13,13 @@ public static class ExpenseInvoiceExport
 		var transaction = await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, transactionId) ??
 			throw new InvalidOperationException("Transaction not found.");
 
-		var expenses = await CommonData.LoadTableDataByMasterId<ExpenseDetailsModel>(FleetNames.ExpenseDetails, transaction.Id);
+		var expenses = await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
 		LedgerModel ledger = new()
 		{
 			Name = $"Vehicle: {transaction.VehicleCode}"
 		};
-
-		var expenseTypes = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType);
-		var ledgers = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger);
-		var lineItems = expenses.Select(detail =>
-		{
-			return new ExpenseDetailsCartModel
-			{
-				ExpenseTypeId = detail.ExpenseTypeId,
-				ExpenseTypeName = expenseTypes.FirstOrDefault(p => p.Id == detail.ExpenseTypeId).Name,
-				LedgerId = detail.LedgerId,
-				LedgerName = ledgers.FirstOrDefault(p => p.Id == detail.LedgerId)?.Name,
-				Amount = detail.Amount,
-				IdentificationNo = detail.IdentificationNo,
-				Remarks = detail.Remarks
-			};
-		}).ToList();
 
 		var invoiceData = new InvoiceData
 		{
@@ -58,11 +41,11 @@ public static class ExpenseInvoiceExport
 		var columnSettings = new List<InvoiceColumnSetting>
 		{
 			new("#", "#", exportType, CellAlignment.Center, 25, 5),
-			new(nameof(ExpenseDetailsCartModel.ExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
-			new(nameof(ExpenseDetailsCartModel.LedgerName), "Ledger", exportType, CellAlignment.Left, 60, 30),
-			new(nameof(ExpenseDetailsCartModel.Amount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
-			new(nameof(ExpenseDetailsCartModel.IdentificationNo), "Identification No", exportType, CellAlignment.Left, 100, 30),
-			new(nameof(ExpenseDetailsCartModel.Remarks), "Remarks", exportType, CellAlignment.Left, 150, 30)
+			new(nameof(ExpenseDetailsOverviewModel.ExpenseTypeName), "Expense", exportType, CellAlignment.Left, 0, 30),
+			new(nameof(ExpenseDetailsOverviewModel.LedgerName), "Ledger", exportType, CellAlignment.Left, 60, 30),
+			new(nameof(ExpenseDetailsOverviewModel.ExpenseAmount), "Amount", exportType, CellAlignment.Right, 55, 15, "#,##0.00"),
+			new(nameof(ExpenseDetailsOverviewModel.IdentificationNo), "Identification No", exportType, CellAlignment.Left, 100, 30),
+			new(nameof(ExpenseDetailsOverviewModel.ExpenseRemarks), "Remarks", exportType, CellAlignment.Left, 150, 30)
 		};
 
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
@@ -72,7 +55,7 @@ public static class ExpenseInvoiceExport
 		{
 			var stream = await PDFInvoiceExportUtil.ExportInvoiceToPdf(
 				invoiceData,
-				lineItems,
+				expenses,
 				columnSettings,
 				null,
 				summaryFields
@@ -85,7 +68,7 @@ public static class ExpenseInvoiceExport
 		{
 			var stream = await ExcelInvoiceExportUtil.ExportInvoiceToExcel(
 				invoiceData,
-				lineItems,
+				expenses,
 				columnSettings,
 				null,
 				summaryFields
