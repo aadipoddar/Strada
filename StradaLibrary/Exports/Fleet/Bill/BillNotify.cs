@@ -1,6 +1,5 @@
 using StradaLibrary.Data.Common;
 using StradaLibrary.DataAccess;
-using StradaLibrary.Exports.Fleet.Trip;
 using StradaLibrary.Exports.Mailing;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.Bill;
@@ -9,40 +8,38 @@ namespace StradaLibrary.Exports.Fleet.Bill;
 
 internal static class BillNotify
 {
-    internal static async Task Notify(int tripId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
+    internal static async Task Notify(int billId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
     {
         if (type == NotifyType.Created)
             return;
 
-        await NotifyByMail(tripId, type, previousInvoice);
+        await NotifyByMail(billId, type, previousInvoice);
     }
 
-    private static async Task NotifyByMail(int tripId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
+    private static async Task NotifyByMail(int billId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
     {
-        var trip = await CommonData.LoadTableDataById<BillOverviewModel>(FleetNames.BillOverview, tripId);
+        var bill = await CommonData.LoadTableDataById<BillOverviewModel>(FleetNames.BillOverview, billId);
 
         var emailData = new TransactionMailing.TransactionEmailData
         {
             TransactionType = "Bill",
-            TransactionNo = trip.TransactionNo,
+            TransactionNo = bill.TransactionNo,
             Action = type,
-            LocationName = trip.OMCName,
+            LocationName = bill.OMCName,
             Details = new Dictionary<string, string>
             {
-                ["Transaction Number"] = trip.TransactionNo,
-                ["Bill Number"] = trip.BillNo,
-                ["Net Amount"] = trip.TotalNetAmount.ToString(),
-                [type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = trip.LastModifiedByUserName ?? trip.CreatedByName
+                ["Transaction Number"] = bill.TransactionNo,
+                ["Bill Number"] = bill.BillNo,
+                ["Net Amount"] = bill.TotalNetAmount.FormatIndianCurrency(),
+                [type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = bill.LastModifiedByUserName ?? bill.CreatedByName
             },
-            Remarks = trip.Remarks
+            Remarks = bill.Remarks
         };
 
-        // For update emails, include before and after invoices
         if (type == NotifyType.Updated && previousInvoice.HasValue)
         {
-            var (afterStream, afterFileName) = await TripInvoiceExport.ExportInvoice(tripId, InvoiceExportType.PDF);
+            var (afterStream, afterFileName) = await BillInvoiceExport.ExportInvoice(billId, InvoiceExportType.PDF);
 
-            // Rename files to make it clear which is which
             var beforeFileName = $"BEFORE_{previousInvoice.Value.Item2}";
             var afterFileNameWithPrefix = $"AFTER_{afterFileName}";
 
@@ -51,8 +48,7 @@ internal static class BillNotify
         }
         else
         {
-            // For delete/recover, just attach the current invoice
-            var (pdfStream, pdfFileName) = await TripInvoiceExport.ExportInvoice(tripId, InvoiceExportType.PDF);
+            var (pdfStream, pdfFileName) = await BillInvoiceExport.ExportInvoice(billId, InvoiceExportType.PDF);
             emailData.Attachments = new Dictionary<MemoryStream, string> { { pdfStream, pdfFileName } };
         }
 

@@ -8,6 +8,7 @@ using StradaLibrary.Exports.Accounts.FinancialAccounting;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
+using StradaLibrary.Models.Fleet.Expense;
 using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
@@ -187,6 +188,13 @@ public partial class FinancialAccountingPage
 
 		if (_selectedFinancialYear is not null)
 			_accounting.FinancialYearId = _selectedFinancialYear.Id;
+
+		if (_accounting.Id == 0)
+		{
+			var lastTransaction = await CommonData.LoadLastTableData<FinancialAccountingModel>(AccountNames.FinancialAccounting);
+			if (lastTransaction is not null)
+				_accounting.TransactionDateTime = lastTransaction.TransactionDateTime;
+		}
 	}
 
 	private async Task LoadCart()

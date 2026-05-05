@@ -5,7 +5,7 @@ using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.Bill;
 using StradaLibrary.Data.Fleet.Trip;
 using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.Trip;
+using StradaLibrary.Exports.Fleet.Bill;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Bill;
@@ -150,7 +150,6 @@ public partial class BillPage
 		{
 			await _toastNotification.ShowAsync("Transaction Not Found", "The requested transaction could not be found.", ToastType.Error);
 			NavigationManager.NavigateTo(PageRouteNames.Bill, true);
-			return false;
 		}
 
 		return true;
@@ -344,24 +343,17 @@ public partial class BillPage
 	private async Task OnLedgerPaymentsTypeChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
 	{
 		if (args.Value is null || args.Value.Id == 0)
+		{
+			_selectedLedger = null;
+			_selectedLedgerPaymentCart = new();
 			return;
+		}
 
 		_selectedLedger = args.Value;
 
-		if (_selectedLedger is null)
-			_selectedLedgerPaymentCart = new()
-			{
-				LedgerId = 0,
-				LedgerName = "",
-				Amount = 0
-			};
-
-		else
-		{
-			_selectedLedgerPaymentCart.LedgerId = _selectedLedger.Id;
-			_selectedLedgerPaymentCart.LedgerName = _selectedLedger.Name;
-			_selectedLedgerPaymentCart.Amount = _bill.TotalNetAmount - _ledgerPaymentsCart.Sum(s => s.Amount);
-		}
+		_selectedLedgerPaymentCart.LedgerId = _selectedLedger.Id;
+		_selectedLedgerPaymentCart.LedgerName = _selectedLedger.Name;
+		_selectedLedgerPaymentCart.Amount = _bill.TotalNetAmount - _ledgerPaymentsCart.Sum(s => s.Amount);
 	}
 
 	private async Task AddLedgerPaymentsToCart()
@@ -544,6 +536,7 @@ public partial class BillPage
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
 		_bill.Status = true;
 		_bill.TransactionDateTime = DateOnly.FromDateTime(_bill.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+		_bill.CreatedAt = currentDateTime;
 		_bill.LastModifiedAt = currentDateTime;
 		_bill.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 		_bill.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
@@ -609,13 +602,13 @@ public partial class BillPage
 
 			if (savePDF)
 			{
-				var (pdfStream, pdfFileName) = await TripInvoiceExport.ExportInvoice(_bill.Id, InvoiceExportType.PDF);
+				var (pdfStream, pdfFileName) = await BillInvoiceExport.ExportInvoice(_bill.Id, InvoiceExportType.PDF);
 				await SaveAndViewService.SaveAndView(pdfFileName, pdfStream);
 			}
 
 			if (saveExcel)
 			{
-				var (excelStream, excelFileName) = await TripInvoiceExport.ExportInvoice(_bill.Id, InvoiceExportType.Excel);
+				var (excelStream, excelFileName) = await BillInvoiceExport.ExportInvoice(_bill.Id, InvoiceExportType.Excel);
 				await SaveAndViewService.SaveAndView(excelFileName, excelStream);
 			}
 

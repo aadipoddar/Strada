@@ -17,16 +17,18 @@ namespace StradaLibrary.Data.Fleet.Bill;
 public static class BillData
 {
 	private static async Task<int> InsertBill(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertBill, bill, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertBill, bill, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Bill.");
 
 	private static async Task<int> InsertBillLedgerPayments(BillLedgerPaymentsModel billLedgerPayments, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertBillLedgerPayments, billLedgerPayments, sqlDataAccessTransaction)).FirstOrDefault();
+		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertBillLedgerPayments, billLedgerPayments, sqlDataAccessTransaction)).FirstOrDefault()
+			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Bill Ledger Payment.");
 
-	public static List<BillLedgerPaymentsModel> ConvertLedgerPaymentCartToDetails(List<BillLedgerPaymentsCartModel> cart, int billId = 0) =>
+	public static List<BillLedgerPaymentsModel> ConvertLedgerPaymentCartToDetails(List<BillLedgerPaymentsCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new BillLedgerPaymentsModel
 		{
 			Id = 0,
-			MasterId = billId,
+			MasterId = masterId,
 			LedgerId = item.LedgerId,
 			Amount = item.Amount,
 			Remarks = item.Remarks,
@@ -46,25 +48,19 @@ public static class BillData
 		await FinancialYearData.ValidateFinancialYear(bill.TransactionDateTime, sqlDataAccessTransaction);
 
 		bill.Status = false;
-		var id = await InsertBill(bill, sqlDataAccessTransaction);
-
-		if (id <= 0)
-			throw new InvalidOperationException("Failed to delete Bill transaction.");
+		await InsertBill(bill, sqlDataAccessTransaction);
 
 		await DeleteTripsBillNo(bill, sqlDataAccessTransaction);
+		await DeleteAccounting(bill, sqlDataAccessTransaction);
 
-		var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
-		var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
-
-		if (existingAccounting is not null && existingAccounting.Id > 0)
+		await AuditTrailData.SaveAuditTrail(new()
 		{
-			existingAccounting.Status = false;
-			existingAccounting.LastModifiedBy = bill.LastModifiedBy;
-			existingAccounting.LastModifiedAt = bill.LastModifiedAt;
-			existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
-
-			await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
-		}
+			Action = AuditTrailActionTypes.Delete.ToString(),
+			TableName = FleetNames.Bill,
+			RecordNo = bill.TransactionNo,
+			CreatedBy = bill.LastModifiedBy.Value,
+			CreatedFromPlatform = bill.LastModifiedFromPlatform
+		}, sqlDataAccessTransaction);
 	}
 
 	private static async Task DeleteTripsBillNo(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction)
@@ -81,10 +77,23 @@ public static class BillData
 			trip.GrossAmount = null;
 			trip.PenaltyAmount = null;
 			trip.NetAmount = null;
-			var id = await TripData.InsertTrip(trip, sqlDataAccessTransaction);
+			await TripData.InsertTrip(trip, sqlDataAccessTransaction);
+		}
+	}
+	
+	private static async Task DeleteAccounting(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
+		var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
 
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to save Trips.");
+		if (existingAccounting is not null && existingAccounting.Id > 0)
+		{
+			existingAccounting.Status = false;
+			existingAccounting.LastModifiedBy = bill.LastModifiedBy;
+			existingAccounting.LastModifiedAt = bill.LastModifiedAt;
+			existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
+
+			await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
 		}
 	}
 	#endregion
@@ -116,7 +125,9 @@ public static class BillData
 		if (bill.TotalGrossAmount - bill.TotalPenaltyAmount != bill.TotalNetAmount)
 			throw new InvalidOperationException("Total net amount must equal total gross amount minus penalty.");
 
-		bill.TransactionNo = await GenerateCodes.GenerateBillTransactionNo(bill, sqlDataAccessTransaction);
+		if (!update)
+			bill.TransactionNo = await GenerateCodes.GenerateBillTransactionNo(bill, sqlDataAccessTransaction);
+
 		await FinancialYearData.ValidateFinancialYear(bill.TransactionDateTime, sqlDataAccessTransaction);
 
 		if (update)
@@ -205,10 +216,15 @@ public static class BillData
 		ValidateLedgerPaymentDetails(bill, ledgerPayments);
 		await ValidateTrips(bill, trips, sqlDataAccessTransaction);
 
+		var previousBill = update ? await CommonData.LoadTableDataById<BillOverviewModel>(FleetNames.BillOverview, bill.Id, sqlDataAccessTransaction) : null;
+		var previousLedgerPayments = update ? await CommonData.LoadTableDataByMasterId<BillLedgerPaymentsOverviewModel>(FleetNames.BillLedgerPaymentsOverview, bill.Id, sqlDataAccessTransaction) : null;
+		var previousTrips = update ? await TripData.LoadTripOverviewByBillIdDate(bill.Id, null, null, sqlDataAccessTransaction) : null;
+
 		bill.Id = await InsertBill(bill, sqlDataAccessTransaction);
 		await SaveLedgerPaymentDetail(bill, ledgerPayments, update, sqlDataAccessTransaction);
 		await SaveTripsBillNo(bill, trips, update, sqlDataAccessTransaction);
 		await SaveAccounting(bill, update, sqlDataAccessTransaction);
+		await SaveAuditTrail(bill, update, previousBill, previousLedgerPayments, previousTrips, sqlDataAccessTransaction);
 
 		return bill.Id;
 	}
@@ -221,20 +237,14 @@ public static class BillData
 			foreach (var item in existingLedgerPayments)
 			{
 				item.Status = false;
-				var id = await InsertBillLedgerPayments(item, sqlDataAccessTransaction);
-
-				if (id <= 0)
-					throw new InvalidOperationException("Failed to save Bill ledger payments detail item.");
+				await InsertBillLedgerPayments(item, sqlDataAccessTransaction);
 			}
 		}
 
 		foreach (var item in ledgerPayments)
 		{
 			item.MasterId = bill.Id;
-			var id = await InsertBillLedgerPayments(item, sqlDataAccessTransaction);
-
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to save Bill ledger payments detail item.");
+			await InsertBillLedgerPayments(item, sqlDataAccessTransaction);
 		}
 	}
 
@@ -254,10 +264,7 @@ public static class BillData
 				trip.GrossAmount = null;
 				trip.PenaltyAmount = null;
 				trip.NetAmount = null;
-				var id = await TripData.InsertTrip(trip, sqlDataAccessTransaction);
-
-				if (id <= 0)
-					throw new InvalidOperationException("Failed to save Trips.");
+				await TripData.InsertTrip(trip, sqlDataAccessTransaction);
 			}
 		}
 
@@ -269,10 +276,7 @@ public static class BillData
 			trip.GrossAmount = item.GrossAmount;
 			trip.PenaltyAmount = item.PenaltyAmount;
 			trip.NetAmount = item.NetAmount;
-			var id = await TripData.InsertTrip(trip, sqlDataAccessTransaction);
-
-			if (id <= 0)
-				throw new InvalidOperationException("Failed to save Trips.");
+			await TripData.InsertTrip(trip, sqlDataAccessTransaction);
 		}
 	}
 
@@ -353,6 +357,43 @@ public static class BillData
 
 		var ledgers = FinancialAccountingData.ConvertCartToDetails(accountingCart, accounting.Id);
 		await FinancialAccountingData.SaveTransaction(accounting, ledgers, false, sqlDataAccessTransaction);
+	}
+
+	private static async Task SaveAuditTrail(
+		BillModel bill,
+		bool update,
+		BillOverviewModel previousBill = null,
+		List<BillLedgerPaymentsOverviewModel> previousLedgerPayments = null,
+		List<TripOverviewModel> previousTrips = null,
+		SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		string difference = null;
+
+		if (update)
+		{
+			var currentBill = await CommonData.LoadTableDataById<BillOverviewModel>(FleetNames.BillOverview, bill.Id, sqlDataAccessTransaction);
+			var currentLedgerPayments = await CommonData.LoadTableDataByMasterId<BillLedgerPaymentsOverviewModel>(FleetNames.BillLedgerPaymentsOverview, bill.Id, sqlDataAccessTransaction);
+			var currentTrips = await TripData.LoadTripOverviewByBillIdDate(bill.Id, null, null, sqlDataAccessTransaction);
+
+			var headerDiff = AuditTrailData.GetDifference(previousBill, currentBill);
+			var ledgerPaymentsDiff = AuditTrailData.GetDifference(previousLedgerPayments, currentLedgerPayments, typeof(BillOverviewModel));
+			var tripsDiff = AuditTrailData.GetDifference(previousTrips, currentTrips, typeof(BillOverviewModel));
+
+			difference = AuditTrailData.CombineDifferences(
+				(null, headerDiff),
+				("Ledger Payments", ledgerPaymentsDiff),
+				("Trips", tripsDiff));
+		}
+
+		await AuditTrailData.SaveAuditTrail(new()
+		{
+			Action = update ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+			TableName = FleetNames.Bill,
+			RecordNo = bill.TransactionNo,
+			RecordValue = difference,
+			CreatedBy = update ? bill.LastModifiedBy.Value : bill.CreatedBy,
+			CreatedFromPlatform = update ? bill.LastModifiedFromPlatform : bill.CreatedFromPlatform
+		}, sqlDataAccessTransaction);
 	}
 	#endregion
 }

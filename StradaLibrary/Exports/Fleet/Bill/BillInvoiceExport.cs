@@ -16,7 +16,7 @@ public static class BillInvoiceExport
 			throw new InvalidOperationException("Transaction not found.");
 
 		var trips = await TripData.LoadTripOverviewByBillIdDate(transaction.Id);
-		var ledgerPayments = await CommonData.LoadTableDataByMasterId<BillLedgerPaymentsModel>(FleetNames.BillLedgerPayments, transaction.Id);
+		var ledgerPayments = await CommonData.LoadTableDataByMasterId<BillLedgerPaymentsOverviewModel>(FleetNames.BillLedgerPaymentsOverview, transaction.Id);
 		var company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, transaction.CompanyId);
 
 		LedgerModel ledger = new()
@@ -24,10 +24,9 @@ public static class BillInvoiceExport
 			Name = $"Bill: {transaction.BillNo ?? "N/A"}"
 		};
 
-		var ledgers = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger);
 		Dictionary<string, decimal> paymentModes = [];
 		foreach (var payment in ledgerPayments)
-			paymentModes.Add(ledgers.FirstOrDefault(l => l.Id == payment.LedgerId).Name, payment.Amount);
+			paymentModes.Add(payment.LedgerName, payment.PaymentAmount);
 
 		var invoiceData = new InvoiceData
 		{
@@ -63,7 +62,7 @@ public static class BillInvoiceExport
 		};
 
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
-		string fileName = $"VEHICLE_TRIP_BILL_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}";
+		string fileName = $"BILL_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}";
 
 		if (exportType == InvoiceExportType.PDF)
 		{
