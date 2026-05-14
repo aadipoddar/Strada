@@ -71,16 +71,19 @@ else
 					<div class="form-grid">
 						<!-- Start Date -->
 						<div class="form-field">
-							<label class="field-label">Start Date <span class="required">*</span></label>
-							<SfDatePicker @ref="_sfFirstFocus" @bind-Value="_financialYear.StartDate" Placeholder="Select start date (Ctrl + F)"
-										  EnableMask="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Format="dd/MM/yy" />
+							<CustomDatePicker @ref="_sfFirstFocus"
+												 Value="StartDateTime"
+												 ValueChanged="OnStartDateChanged"
+												 Label="Start Date"
+												 ShowFinancialYear="false" />
 						</div>
 
 						<!-- End Date -->
 						<div class="form-field">
-							<label class="field-label">End Date <span class="required">*</span></label>
-							<SfDatePicker @bind-Value="_financialYear.EndDate" Placeholder="Select end date" EnableMask="true"
-										  FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Format="dd/MM/yy" />
+							<CustomDatePicker Value="EndDateTime"
+												 ValueChanged="OnEndDateChanged"
+												 Label="End Date"
+												 ShowFinancialYear="false" />
 						</div>
 
 						<!-- Year No -->

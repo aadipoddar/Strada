@@ -1,11 +1,13 @@
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
+
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Accounts.Masters;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
-using Syncfusion.Blazor.Calendars;
+
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Masters;
@@ -29,7 +31,13 @@ public partial class FinancialYearPage
 	private SfGrid<FinancialYearModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private SfDatePicker<DateOnly> _sfFirstFocus;
+	private CustomDatePicker _sfFirstFocus;
+
+	private DateTime StartDateTime => _financialYear.StartDate == default ? default : _financialYear.StartDate.ToDateTime(TimeOnly.MinValue);
+	private DateTime EndDateTime => _financialYear.EndDate == default ? default : _financialYear.EndDate.ToDateTime(TimeOnly.MinValue);
+
+	private void OnStartDateChanged(DateTime value) => _financialYear.StartDate = DateOnly.FromDateTime(value);
+	private void OnEndDateChanged(DateTime value) => _financialYear.EndDate = DateOnly.FromDateTime(value);
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;

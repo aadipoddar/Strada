@@ -44,7 +44,7 @@ public partial class FinancialAccountingPage
 		new() { Text = "Delete (Del)", Id = "DeleteCart", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private CustomAutoComplete<LedgerModel, LedgerModel> _sfLedgerAutoComplete;
+	private CustomAutoComplete<LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<FinancialAccountingLedgerCartModel> _sfCartGrid;
 
 	private ToastNotification _toastNotification;
@@ -289,46 +289,40 @@ public partial class FinancialAccountingPage
 	#endregion
 
 	#region Change Events
-	private async Task OnCompanyChanged(ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedCompany = args.Value;
-		_accounting.CompanyId = args.Value.Id;
+		_selectedCompany = value;
+		_accounting.CompanyId = value.Id;
 
 		await SaveTransactionFile();
 	}
 
-	private async Task OnVoucherChanged(ChangeEventArgs<VoucherModel, VoucherModel> args)
+	private async Task OnVoucherChanged(VoucherModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedVoucher = args.Value;
-		_accounting.VoucherId = args.Value.Id;
+		_selectedVoucher = value;
+		_accounting.VoucherId = value.Id;
 
-		await SaveTransactionFile();
-	}
-
-	private async Task OnTransactionDateChanged(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime> args)
-	{
-		_accounting.TransactionDateTime = args.Value;
 		await SaveTransactionFile();
 	}
 	#endregion
 
 	#region Cart
-	private async Task OnItemChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
+	private void OnItemChanged(LedgerModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 		{
 			_selectedLedger = null;
 			_selectedCart = new();
 			return;
 		}
 
-		_selectedLedger = args.Value;
+		_selectedLedger = value;
 
 		_selectedCart.LedgerId = _selectedLedger.Id;
 		_selectedCart.LedgerName = _selectedLedger.Name;
@@ -339,9 +333,9 @@ public partial class FinancialAccountingPage
 		_selectedCart.ReferenceType = null;
 	}
 
-	private void OnReferenceChanged(ChangeEventArgs<FinancialAccountingLedgerOverviewModel, FinancialAccountingLedgerOverviewModel> args)
+	private void OnReferenceChanged(FinancialAccountingLedgerOverviewModel value)
 	{
-		if (args.Value is null)
+		if (value is null)
 		{
 			_selectedAccountingLedger = null;
 			_selectedCart.ReferenceNo = null;
@@ -350,10 +344,10 @@ public partial class FinancialAccountingPage
 			return;
 		}
 
-		_selectedAccountingLedger = args.Value;
-		_selectedCart.ReferenceNo = args.Value.LedgerReferenceNo;
-		_selectedCart.ReferenceId = args.Value.LedgerReferenceId;
-		_selectedCart.ReferenceType = args.Value.LedgerReferenceType;
+		_selectedAccountingLedger = value;
+		_selectedCart.ReferenceNo = value.LedgerReferenceNo;
+		_selectedCart.ReferenceId = value.LedgerReferenceId;
+		_selectedCart.ReferenceType = value.LedgerReferenceType;
 
 		if ((_selectedAccountingLedger.Debit ?? 0) > (_selectedAccountingLedger.Credit ?? 0))
 			_selectedCart.Credit = (_selectedAccountingLedger.Debit ?? 0) - (_selectedAccountingLedger.Credit ?? 0);
@@ -536,10 +530,6 @@ public partial class FinancialAccountingPage
 				item.ReferenceNo = null;
 				item.ReferenceType = null;
 			}
-
-			item.Remarks = item.Remarks?.Trim();
-			if (string.IsNullOrWhiteSpace(item.Remarks))
-				item.Remarks = null;
 		}
 
 		_accounting.TotalCreditAmount = _cart.Sum(x => x.Credit ?? 0);
@@ -556,20 +546,11 @@ public partial class FinancialAccountingPage
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_accounting.FinancialYearId = _selectedFinancialYear.Id;
 		else
-		{
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-			_accounting.TransactionDateTime = await CommonData.LoadCurrentDateTime();
-			_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_accounting.TransactionDateTime);
-			_accounting.FinancialYearId = _selectedFinancialYear.Id;
-		}
 		#endregion
 
 		if (Id is null)
 			_accounting.TransactionNo = await GenerateCodes.GenerateFinancialAccountingTransactionNo(_accounting);
-
-		_accounting.Remarks = _accounting.Remarks?.Trim();
-		if (string.IsNullOrWhiteSpace(_accounting.Remarks))
-			_accounting.Remarks = null;
 
 		var currentDateTime = await CommonData.LoadCurrentDateTime();
 		_accounting.Status = true;

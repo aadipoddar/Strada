@@ -1,42 +1,42 @@
 using Microsoft.AspNetCore.Components;
 
+using MudBlazor;
+
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Models.Accounts.Masters;
-
-using Syncfusion.Blazor.Calendars;
 
 namespace Strada.Shared.Components.Input;
 
 public partial class CustomDatePicker
 {
-	private SfDatePicker<DateTime> _sfDatePicker;
+	private MudDatePicker _datePicker;
 	private bool _isFocused;
 
-	private void OnFocus(object args) => _isFocused = true;
-	private void OnBlur(object args) => _isFocused = false;
+	private void OnFocusIn() => _isFocused = true;
+	private void OnFocusOut() => _isFocused = false;
 
 	[Parameter] public DateTime Value { get; set; }
 	[Parameter] public EventCallback<DateTime> ValueChanged { get; set; }
-	[Parameter] public EventCallback<ChangedEventArgs<DateTime>> ValueChange { get; set; }
 
-	[Parameter] public FinancialYearModel? FinancialYear { get; set; }
+	[Parameter] public FinancialYearModel FinancialYear { get; set; }
 
-	[Parameter] public string Placeholder { get; set; } = "Select Date";
-	[Parameter] public bool Disabled { get; set; } = false;
-
-	[Parameter] public string? Label { get; set; } = "Transaction Date";
+	[Parameter] public string Label { get; set; } = "Transaction Date";
 	[Parameter] public bool Required { get; set; } = true;
-	[Parameter] public string? AddNewRoute { get; set; } = PageRouteNames.FinancialYearMaster;
-	[Parameter] public string AddNewLabel { get; set; } = "New";
+	[Parameter] public bool ShowFinancialYear { get; set; } = true;
+	[Parameter] public string AddNewRoute { get; set; } = PageRouteNames.FinancialYearMaster;
 
-	public Task FocusAsync() => _sfDatePicker.FocusAsync();
+	private DateTime? DateValue => Value == default ? null : Value;
 
-	private async Task OnValueChangeInternal(ChangedEventArgs<DateTime> args)
+	public ValueTask FocusAsync() =>
+		_datePicker is null ? ValueTask.CompletedTask : _datePicker.FocusAsync();
+
+	private async Task OnDateChangedInternal(DateTime? date)
 	{
-		Value = args.Value;
-		await ValueChanged.InvokeAsync(args.Value);
-		if (ValueChange.HasDelegate)
-			await ValueChange.InvokeAsync(args);
+		if (!date.HasValue)
+			return;
+
+		Value = date.Value;
+		await ValueChanged.InvokeAsync(Value);
 	}
 
 	private async Task NavigateToAddNew()

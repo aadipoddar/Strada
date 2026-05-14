@@ -113,86 +113,84 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-													 Value="_selectedCompany"
-													 DataSource="@_companies"
-													 Placeholder="All Companies"
-													 Label="Company" Required="true"
-													 ValueChange="OnCompanyChanged"
-													 FieldValue="@nameof(CompanyModel.Name)"
-													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+								<CustomAutoComplete T="CompanyModel"
+													Value="_selectedCompany"
+													DataSource="@_companies"
+													Placeholder="All Companies"
+													Label="Company" Required="false"
+													ValueChanged="OnCompanyChanged"
+													FieldValue="@nameof(CompanyModel.Name)"
+													AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- OMC -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
-													 Value="_selectedOMC"
-													 DataSource="@_omcs"
-													 Placeholder="All OMCs"
-													 Label="OMC" Required="true"
-													 ValueChange="OnOMCChanged"
-													 FieldValue="@nameof(OMCModel.Name)"
-													 AddNewRoute="@PageRouteNames.OMCMaster" />
+								<CustomAutoComplete T="OMCModel"
+													Value="_selectedOMC"
+													DataSource="@_omcs"
+													Placeholder="All OMCs"
+													Label="OMC" Required="false"
+													ValueChanged="OnOMCChanged"
+													FieldValue="@nameof(OMCModel.Name)"
+													AddNewRoute="@PageRouteNames.OMCMaster" />
 							</div>
 
 							<!-- Vehicle -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="VehicleModel" TValue="VehicleModel"
-													 Value="_selectedVehicle"
-													 DataSource="@_vehicles"
-													 Placeholder="All Vehicles"
-													 Label="Vehicle" Required="true"
-													 ValueChange="OnVehicleChanged"
-													 FieldValue="@nameof(VehicleModel.Code)"
-													 AddNewRoute="@PageRouteNames.VehicleMaster" />
+								<CustomAutoComplete T="VehicleModel"
+													Value="_selectedVehicle"
+													DataSource="@_vehicles"
+													Placeholder="All Vehicles"
+													Label="Vehicle" Required="false"
+													ValueChanged="OnVehicleChanged"
+													FieldValue="@nameof(VehicleModel.Code)"
+													AddNewRoute="@PageRouteNames.VehicleMaster" />
 							</div>
 
 							<!-- Route -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="RouteOverviewModel" TValue="RouteOverviewModel"
-													 Value="_selectedRoute"
-													 DataSource="@_routes"
-													 Placeholder="All Routes"
-													 Label="Route" Required="true"
-													 ValueChange="OnRouteChanged"
-													 FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
-													 AddNewRoute="@PageRouteNames.RouteMaster" />
+								<CustomAutoComplete T="RouteOverviewModel"
+													Value="_selectedRoute"
+													DataSource="@_routes"
+													Placeholder="All Routes"
+													Label="Route" Required="false"
+													ValueChanged="OnRouteChanged"
+													FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
+													AddNewRoute="@PageRouteNames.RouteMaster" />
 							</div>
 
 							<!-- Driver -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="DriverOverviewModel" TValue="DriverOverviewModel"
-													 Value="_selectedDriver"
-													 DataSource="@_drivers"
-													 Placeholder="All Drivers"
-													 Label="Driver" Required="true"
-													 ValueChange="OnDriverChanged"
-													 FieldValue="@nameof(DriverOverviewModel.DisplayName)"
-													 AddNewRoute="@PageRouteNames.DriverMaster" />
+								<CustomAutoComplete T="DriverOverviewModel"
+													Value="_selectedDriver"
+													DataSource="@_drivers"
+													Placeholder="All Drivers"
+													Label="Driver" Required="false"
+													ValueChanged="OnDriverChanged"
+													FieldValue="@nameof(DriverOverviewModel.DisplayName)"
+													AddNewRoute="@PageRouteNames.DriverMaster" />
 							</div>
 
 							<!-- Vehicle Empty -->
 							<div class="form-field">
-								<label class="field-label">Vehicle Empty</label>
-								<SfDropDownList TValue="int" TItem="YesNoFilterOption"
-												DataSource="@TripFilterOptions.YesNo" Value="_vehicleEmptyFilter"
-												CssClass="custom-textbox" FloatLabelType="FloatLabelType.Never">
-									<DropDownListFieldSettings Text="Name" Value="Id" />
-									<DropDownListEvents TValue="int" TItem="YesNoFilterOption"
-														ValueChange="OnVehicleEmptyFilterChanged" />
-								</SfDropDownList>
+								<CustomAutoComplete T="YesNoFilterOption"
+													Value="_selectedVehicleEmptyFilter"
+													DataSource="@TripFilterOptions.YesNo"
+													Placeholder="All"
+													Label="Vehicle Empty" Required="false"
+													ValueChanged="OnVehicleEmptyFilterChanged"
+													FieldValue="@nameof(YesNoFilterOption.Name)" />
 							</div>
 
 							<!-- Pending Bills -->
 							<div class="form-field">
-								<label class="field-label">Pending Bills</label>
-								<SfDropDownList TValue="int" TItem="YesNoFilterOption"
-												DataSource="@TripFilterOptions.YesNo" Value="_pendingBillsFilter"
-												CssClass="custom-textbox" FloatLabelType="FloatLabelType.Never">
-									<DropDownListFieldSettings Text="Name" Value="Id" />
-									<DropDownListEvents TValue="int" TItem="YesNoFilterOption"
-														ValueChange="OnPendingBillsFilterChanged" />
-								</SfDropDownList>
+								<CustomAutoComplete T="YesNoFilterOption"
+													Value="_selectedPendingBillsFilter"
+													DataSource="@TripFilterOptions.YesNo"
+													Placeholder="All"
+													Label="Pending Bills" Required="false"
+													ValueChanged="OnPendingBillsFilterChanged"
+													FieldValue="@nameof(YesNoFilterOption.Name)" />
 							</div>
 						</div>
 					</div>
@@ -588,16 +586,16 @@ else
 							<GridColumn Field="@nameof(TripExpensesOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(TripExpensesOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="300" Visible="_showAllColumns" />
 
-						<GridColumn Field="@nameof(TripExpensesOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
-							<Template>
-								@{
-									var item = (context as TripExpensesOverviewModel);
-									<span class="@(item.Status ? string.Empty : "grid-debit")">
-										@(item.Status ? "Active" : "Deleted")
-									</span>
-								}
-							</Template>
-						</GridColumn>
+							<GridColumn Field="@nameof(TripExpensesOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
+								<Template>
+									@{
+										var item = (context as TripExpensesOverviewModel);
+										<span class="@(item.Status ? string.Empty : "grid-debit")">
+											@(item.Status ? "Active" : "Deleted")
+										</span>
+									}
+								</Template>
+							</GridColumn>
 						</GridColumns>
 					</SfGrid>
 				</div>

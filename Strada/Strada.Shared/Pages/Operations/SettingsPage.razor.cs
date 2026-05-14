@@ -2,7 +2,6 @@ using Strada.Shared.Components.Dialog;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
-using Syncfusion.Blazor.DropDowns;
 
 namespace Strada.Shared.Pages.Operations;
 
@@ -18,7 +17,7 @@ public partial class SettingsPage
 
     // Primary Configuration
     private string _primaryCompanyLinkingId = string.Empty;
-    private string _selectedCompanyName = string.Empty;
+    private CompanyModel _selectedCompany;
     private List<CompanyModel> _companies = [];
 
     // Login Settings
@@ -47,18 +46,18 @@ public partial class SettingsPage
 
     // Ledger Linking
     private string _cashLedgerId = string.Empty;
-    private string _selectedCashLedgerName = string.Empty;
+    private LedgerModel _selectedCashLedger;
     private string _gstLedgerId = string.Empty;
-    private string _selectedGSTLedgerName = string.Empty;
+    private LedgerModel _selectedGSTLedger;
     private string _billLedgerId = string.Empty;
-    private string _selectedBillLedgerName = string.Empty;
+    private LedgerModel _selectedBillLedger;
     private List<LedgerModel> _ledgers = [];
 
     // Default Values
     private string _defaultSelectedVoucherId = string.Empty;
-    private string _selectedDefaultVoucherName = string.Empty;
+    private VoucherModel _selectedDefaultVoucher;
     private string _billVoucherId = string.Empty;
-    private string _selectedBillVoucherName = string.Empty;
+    private VoucherModel _selectedBillVoucher;
     private List<VoucherModel> _vouchers = [];
 
     // Report Settings
@@ -194,62 +193,62 @@ public partial class SettingsPage
     private void MapSelections()
     {
         if (!string.IsNullOrWhiteSpace(_primaryCompanyLinkingId) && int.TryParse(_primaryCompanyLinkingId, out var companyId))
-            _selectedCompanyName = _companies.FirstOrDefault(c => c.Id == companyId)?.Name ?? string.Empty;
+            _selectedCompany = _companies.FirstOrDefault(c => c.Id == companyId);
 
         if (!string.IsNullOrWhiteSpace(_cashLedgerId) && int.TryParse(_cashLedgerId, out var cashId))
-            _selectedCashLedgerName = _ledgers.FirstOrDefault(l => l.Id == cashId)?.Name ?? string.Empty;
+            _selectedCashLedger = _ledgers.FirstOrDefault(l => l.Id == cashId);
 
         if (!string.IsNullOrWhiteSpace(_gstLedgerId) && int.TryParse(_gstLedgerId, out var gstId))
-            _selectedGSTLedgerName = _ledgers.FirstOrDefault(l => l.Id == gstId)?.Name ?? string.Empty;
+            _selectedGSTLedger = _ledgers.FirstOrDefault(l => l.Id == gstId);
 
         if (!string.IsNullOrWhiteSpace(_billLedgerId) && int.TryParse(_billLedgerId, out var billLedgerId))
-            _selectedBillLedgerName = _ledgers.FirstOrDefault(l => l.Id == billLedgerId)?.Name ?? string.Empty;
+            _selectedBillLedger = _ledgers.FirstOrDefault(l => l.Id == billLedgerId);
 
         if (!string.IsNullOrWhiteSpace(_defaultSelectedVoucherId) && int.TryParse(_defaultSelectedVoucherId, out var voucherId))
-            _selectedDefaultVoucherName = _vouchers.FirstOrDefault(v => v.Id == voucherId)?.Name ?? string.Empty;
+            _selectedDefaultVoucher = _vouchers.FirstOrDefault(v => v.Id == voucherId);
 
         if (!string.IsNullOrWhiteSpace(_billVoucherId) && int.TryParse(_billVoucherId, out var billVoucherId))
-            _selectedBillVoucherName = _vouchers.FirstOrDefault(v => v.Id == billVoucherId)?.Name ?? string.Empty;
+            _selectedBillVoucher = _vouchers.FirstOrDefault(v => v.Id == billVoucherId);
     }
 
     #endregion
 
     #region Change Handlers
 
-    private void OnCompanyChange(ChangeEventArgs<string, CompanyModel> args)
+    private void OnCompanyChange(CompanyModel value)
     {
-        if (args.ItemData is not null)
-            _primaryCompanyLinkingId = args.ItemData.Id.ToString();
+        _selectedCompany = value;
+        _primaryCompanyLinkingId = value?.Id.ToString() ?? string.Empty;
     }
 
-    private void OnCashLedgerChange(ChangeEventArgs<string, LedgerModel> args)
+    private void OnCashLedgerChange(LedgerModel value)
     {
-        if (args.ItemData is not null)
-            _cashLedgerId = args.ItemData.Id.ToString();
+        _selectedCashLedger = value;
+        _cashLedgerId = value?.Id.ToString() ?? string.Empty;
     }
 
-    private void OnGSTLedgerChange(ChangeEventArgs<string, LedgerModel> args)
+    private void OnGSTLedgerChange(LedgerModel value)
     {
-        if (args.ItemData is not null)
-            _gstLedgerId = args.ItemData.Id.ToString();
+        _selectedGSTLedger = value;
+        _gstLedgerId = value?.Id.ToString() ?? string.Empty;
     }
 
-    private void OnBillLedgerChange(ChangeEventArgs<string, LedgerModel> args)
+    private void OnBillLedgerChange(LedgerModel value)
     {
-        if (args.ItemData is not null)
-            _billLedgerId = args.ItemData.Id.ToString();
+        _selectedBillLedger = value;
+        _billLedgerId = value?.Id.ToString() ?? string.Empty;
     }
 
-    private void OnDefaultVoucherChange(ChangeEventArgs<string, VoucherModel> args)
+    private void OnDefaultVoucherChange(VoucherModel value)
     {
-        if (args.ItemData is not null)
-            _defaultSelectedVoucherId = args.ItemData.Id.ToString();
+        _selectedDefaultVoucher = value;
+        _defaultSelectedVoucherId = value?.Id.ToString() ?? string.Empty;
     }
 
-    private void OnBillVoucherChange(ChangeEventArgs<string, VoucherModel> args)
+    private void OnBillVoucherChange(VoucherModel value)
     {
-        if (args.ItemData is not null)
-            _billVoucherId = args.ItemData.Id.ToString();
+        _selectedBillVoucher = value;
+        _billVoucherId = value?.Id.ToString() ?? string.Empty;
     }
 
     #endregion

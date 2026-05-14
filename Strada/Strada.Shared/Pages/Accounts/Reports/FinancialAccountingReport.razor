@@ -110,24 +110,24 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
+								<CustomAutoComplete T="CompanyModel"
 													 Value="_selectedCompany"
 													 DataSource="@_companies"
 													 Placeholder="All Companies"
-													 Label="Company" Required="true"
-													 ValueChange="OnCompanyChanged"
+													 Label="Company" Required="false"
+													 ValueChanged="OnCompanyChanged"
 													 FieldValue="@nameof(CompanyModel.Name)"
 													 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Voucher -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="VoucherModel" TValue="VoucherModel"
+								<CustomAutoComplete T="VoucherModel"
 													 Value="_selectedVoucher"
 													 DataSource="@_vouchers"
 													 Placeholder="All Vouchers"
-													 Label="Voucher" Required="true"
-													 ValueChange="OnVoucherChanged"
+													 Label="Voucher" Required="false"
+													 ValueChanged="OnVoucherChanged"
 													 FieldValue="@nameof(VoucherModel.Name)"
 													 AddNewRoute="@PageRouteNames.VoucherMaster" />
 							</div>

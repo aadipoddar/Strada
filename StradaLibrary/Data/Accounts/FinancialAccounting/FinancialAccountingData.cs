@@ -129,6 +129,9 @@ public static class FinancialAccountingData
 
 		if (ledgers.Count != (accounting.TotalDebitLedgers + accounting.TotalCreditLedgers))
 			throw new InvalidOperationException("The number of accounting ledgers does not match the transaction summary.");
+
+		foreach (var item in ledgers)
+			item.Remarks = string.IsNullOrWhiteSpace(item.Remarks) ? null : item.Remarks.Trim();
 	}
 
 	public static async Task<int> SaveTransaction(

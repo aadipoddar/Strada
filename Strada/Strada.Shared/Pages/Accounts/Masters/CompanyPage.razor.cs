@@ -18,6 +18,7 @@ public partial class CompanyPage
 	private bool _showDeleted = false;
 
 	private CompanyModel _company = new();
+	private StateUTModel _selectedStateUT;
 
 	private List<CompanyModel> _companies = [];
 	private List<StateUTModel> _stateUTs = [];
@@ -55,6 +56,9 @@ public partial class CompanyPage
 		_companies = await CommonData.LoadTableData<CompanyModel>(AccountNames.Company);
 		_stateUTs = await CommonData.LoadTableData<StateUTModel>(AccountNames.StateUT);
 
+		_stateUTs = [.. _stateUTs.OrderBy(s => s.Name)];
+		_selectedStateUT = _stateUTs.FirstOrDefault(s => s.Id == _company.StateUTId);
+
 		if (!_showDeleted)
 			_companies = [.. _companies.Where(c => c.Status)];
 
@@ -66,6 +70,14 @@ public partial class CompanyPage
 
 		if (_sfFirstFocus is not null)
 			await _sfFirstFocus.FocusAsync();
+	}
+	#endregion
+
+	#region Change Events
+	private void OnStateUTChanged(StateUTModel value)
+	{
+		_selectedStateUT = value;
+		_company.StateUTId = value?.Id ?? 0;
 	}
 	#endregion
 
@@ -271,6 +283,7 @@ public partial class CompanyPage
 		if (_company is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
+		_selectedStateUT = _stateUTs.FirstOrDefault(s => s.Id == _company.StateUTId);
 		StateHasChanged();
 
 		await _sfFirstFocus.FocusAsync();

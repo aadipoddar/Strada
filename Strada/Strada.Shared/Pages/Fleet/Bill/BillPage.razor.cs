@@ -15,7 +15,6 @@ using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Operations;
 
-using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 
@@ -48,12 +47,12 @@ public partial class BillPage
 	private List<TripOverviewModel> _tripCart = [];
 	private List<BillLedgerPaymentsCartModel> _ledgerPaymentsCart = [];
 
-	private CustomAutoComplete<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
+	private CustomAutoComplete<LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<TripOverviewModel> _sfPendingTripGrid;
 	private SfGrid<TripOverviewModel> _sfTripCartGrid;
 	private SfGrid<BillLedgerPaymentsCartModel> _sfLedgerPaymentsCartGrid;
 	private SfTextBox _sfChallanNoTextBox;
-	private CustomAutoComplete<CompanyModel, CompanyModel> _sfFirstFocus;
+	private CustomAutoComplete<CompanyModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _pendingTripGridContextMenuItems =
@@ -322,21 +321,21 @@ public partial class BillPage
 	#endregion
 
 	#region Change Events
-	private async Task OnCompanyChanged(ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 		await SaveTransactionFile();
 	}
 
-	private async Task OnOMCChanged(ChangeEventArgs<OMCModel, OMCModel> args)
+	private async Task OnOMCChanged(OMCModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedOMC = args.Value;
+		_selectedOMC = value;
 		_bill.OMCId = _selectedOMC.Id;
 
 		await SaveTransactionFile();
@@ -344,16 +343,16 @@ public partial class BillPage
 	#endregion
 
 	#region Ledger Payments Cart
-	private async Task OnLedgerPaymentsTypeChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
+	private void OnLedgerPaymentsTypeChanged(LedgerModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 		{
 			_selectedLedger = null;
 			_selectedLedgerPaymentCart = new();
 			return;
 		}
 
-		_selectedLedger = args.Value;
+		_selectedLedger = value;
 
 		_selectedLedgerPaymentCart.LedgerId = _selectedLedger.Id;
 		_selectedLedgerPaymentCart.LedgerName = _selectedLedger.Name;

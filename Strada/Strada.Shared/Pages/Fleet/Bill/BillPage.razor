@@ -87,21 +87,21 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-													 @ref="_sfFirstFocus"
-													 Value="_selectedCompany"
-													 DataSource="@_companies"
-													 Placeholder="Select a Company"
-													 Label="Company" Required="true"
-													 ValueChange="OnCompanyChanged"
-													 FieldValue="@nameof(CompanyModel.Name)"
-													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+								<CustomAutoComplete T="CompanyModel"
+													   @ref="_sfFirstFocus"
+													   Value="_selectedCompany"
+													   DataSource="@_companies"
+													   Placeholder="Select a Company"
+													   Label="Company"
+													   ValueChanged="OnCompanyChanged"
+													   FieldValue="@nameof(CompanyModel.Name)"
+													   AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Transaction Date -->
 							<div class="form-field">
 								<CustomDatePicker @bind-Value="_bill.TransactionDateTime"
-												   FinancialYear="@_selectedFinancialYear" />
+													 FinancialYear="@_selectedFinancialYear" />
 							</div>
 
 							<!-- Bill No -->
@@ -115,14 +115,14 @@ else
 
 							<!-- OMC -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
-													 Value="_selectedOMC"
-													 DataSource="@_omcs"
-													 Placeholder="Select an OMC"
-													 Label="OMC" Required="true"
-													 ValueChange="OnOMCChanged"
-													 FieldValue="@nameof(OMCModel.Name)"
-													 AddNewRoute="@PageRouteNames.OMCMaster" />
+								<CustomAutoComplete T="OMCModel"
+													   Value="_selectedOMC"
+													   DataSource="@_omcs"
+													   Placeholder="Select an OMC"
+													   Label="OMC"
+													   ValueChanged="OnOMCChanged"
+													   FieldValue="@nameof(OMCModel.Name)"
+													   AddNewRoute="@PageRouteNames.OMCMaster" />
 							</div>
 
 							<!-- Remarks -->
@@ -209,12 +209,12 @@ else
 					<div class="section-body">
 						<div class="cart-input-row">
 							<div class="cart-field cart-field-wide">
-								<CustomAutoComplete TItem="LedgerModel" TValue="LedgerModel"
-													 @ref="_sfLedgerAutoComplete"
-													 FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
-													 DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
-													 ValueChange="OnLedgerPaymentsTypeChanged"
-													 Label="Ledger" Required="true" AddNewRoute="@PageRouteNames.LedgerMaster" />
+								<CustomAutoComplete T="LedgerModel"
+													   @ref="_sfLedgerAutoComplete"
+													   FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
+													   DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
+													   ValueChanged="OnLedgerPaymentsTypeChanged" OpenOnFocus="false"
+													   Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
 							</div>
 
 							<div class="cart-field cart-field-wide">

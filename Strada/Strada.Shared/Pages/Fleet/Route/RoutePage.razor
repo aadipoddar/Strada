@@ -25,7 +25,7 @@ else
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-									   Easing="ease" />
+										   Easing="ease" />
 					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
@@ -74,23 +74,23 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<CustomAutoComplete @ref="_sfFirstFocus" TItem="LocationModel" TValue="LocationModel"
-												 @bind-Value="_selectedFromLocation"
-												 DataSource="@_locations"
-												 Placeholder="Select From Location (Ctrl + F)"
-												 Label="From Location" Required="true"
-												 FieldValue="@nameof(LocationModel.Name)"
-												 AddNewRoute="@PageRouteNames.LocationMaster" />
+							<CustomAutoComplete @ref="_sfFirstFocus" T="LocationModel"
+												@bind-Value="_selectedFromLocation"
+												DataSource="@_locations"
+												Placeholder="Select From Location (Ctrl + F)"
+												Label="From Location"
+												FieldValue="@nameof(LocationModel.Name)"
+												AddNewRoute="@PageRouteNames.LocationMaster" />
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete TItem="LocationModel" TValue="LocationModel"
-												 @bind-Value="_selectedToLocation"
-												 DataSource="@_locations"
-												 Placeholder="Select To Location"
-												 Label="To Location" Required="true"
-												 FieldValue="@nameof(LocationModel.Name)"
-												 AddNewRoute="@PageRouteNames.LocationMaster" />
+							<CustomAutoComplete T="LocationModel"
+												@bind-Value="_selectedToLocation"
+												DataSource="@_locations"
+												Placeholder="Select To Location"
+												Label="To Location"
+												FieldValue="@nameof(LocationModel.Name)"
+												AddNewRoute="@PageRouteNames.LocationMaster" />
 						</div>
 
 						<div class="form-field">
@@ -106,9 +106,9 @@ else
 								Estimated Hours <span class="required">*</span>
 							</label>
 							<SfNumericTextBox @bind-Value="_route.EstimatedHours" TValue="int" Min="0"
-										  ShowSpinButton="false" Placeholder="Enter estimated hours"
-										  FloatLabelType="FloatLabelType.Never" Format="N0"
-										  CssClass="custom-numeric" />
+											  ShowSpinButton="false" Placeholder="Enter estimated hours"
+											  FloatLabelType="FloatLabelType.Never" Format="N0"
+											  CssClass="custom-numeric" />
 						</div>
 
 						<div class="form-field">
@@ -116,9 +116,9 @@ else
 								Estimated Distance <span class="required">*</span>
 							</label>
 							<SfNumericTextBox @bind-Value="_route.EstimatedDistance" TValue="int" Min="0"
-										  ShowSpinButton="false" Placeholder="Enter estimated distance"
-										  FloatLabelType="FloatLabelType.Never" Format="N0"
-										  CssClass="custom-numeric" />
+											  ShowSpinButton="false" Placeholder="Enter estimated distance"
+											  FloatLabelType="FloatLabelType.Never" Format="N0"
+											  CssClass="custom-numeric" />
 						</div>
 
 						<div class="form-field">
@@ -126,9 +126,9 @@ else
 								Estimated Fuel Consumption <span class="required">*</span>
 							</label>
 							<SfNumericTextBox @bind-Value="_route.EstimatedFuelConsumption" TValue="int" Min="0"
-										  ShowSpinButton="false" Placeholder="Enter estimated fuel consumption"
-										  FloatLabelType="FloatLabelType.Never" Format="N0"
-										  CssClass="custom-numeric" />
+											  ShowSpinButton="false" Placeholder="Enter estimated fuel consumption"
+											  FloatLabelType="FloatLabelType.Never" Format="N0"
+											  CssClass="custom-numeric" />
 						</div>
 
 						<div class="form-field">
@@ -136,9 +136,9 @@ else
 								Estimated Cost <span class="required">*</span>
 							</label>
 							<SfNumericTextBox @bind-Value="_route.EstimatedCost" TValue="decimal" Min="0"
-										  ShowSpinButton="false" Placeholder="Enter estimated cost"
-										  FloatLabelType="FloatLabelType.Never" Format="N2"
-										  CssClass="custom-numeric" />
+											  ShowSpinButton="false" Placeholder="Enter estimated cost"
+											  FloatLabelType="FloatLabelType.Never" Format="N2"
+											  CssClass="custom-numeric" />
 						</div>
 
 						<div class="form-field">
@@ -224,7 +224,7 @@ else
 						  OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Route"
-					   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
-					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+						   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
+						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

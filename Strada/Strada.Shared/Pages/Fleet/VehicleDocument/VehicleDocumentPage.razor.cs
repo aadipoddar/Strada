@@ -7,7 +7,6 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Fleet.VehicleDocument;
 using StradaLibrary.Models.Operations;
-using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 
@@ -86,23 +85,23 @@ public partial class VehicleDocumentPage
 	#endregion
 
 	#region Change Events
-	private void OnVehicleDocumentTypeChanged(ChangeEventArgs<VehicleDocumentTypeModel, VehicleDocumentTypeModel> args)
+	private Task OnVehicleDocumentTypeChanged()
 	{
-		if (args.Value is null || args.Value.Id <= 0)
-			return;
+		if (_selectedVehicleDocumentType is null || _selectedVehicleDocumentType.Id <= 0)
+			return Task.CompletedTask;
 
-		_selectedVehicleDocumentType = args.Value;
-		_vehicleDocument.VehicleDocumentTypeId = args.Value.Id;
-		_vehicleDocument.Rate = args.Value.Rate;
+		_vehicleDocument.VehicleDocumentTypeId = _selectedVehicleDocumentType.Id;
+		_vehicleDocument.Rate = _selectedVehicleDocumentType.Rate;
+		return Task.CompletedTask;
 	}
 
-	private void OnVehicleChanged(ChangeEventArgs<VehicleModel, VehicleModel> args)
+	private Task OnVehicleChanged()
 	{
-		if (args.Value is null || args.Value.Id <= 0)
-			return;
+		if (_selectedVehicle is null || _selectedVehicle.Id <= 0)
+			return Task.CompletedTask;
 
-		_selectedVehicle = args.Value;
-		_vehicleDocument.VehicleId = args.Value.Id;
+		_vehicleDocument.VehicleId = _selectedVehicle.Id;
+		return Task.CompletedTask;
 	}
 	#endregion
 

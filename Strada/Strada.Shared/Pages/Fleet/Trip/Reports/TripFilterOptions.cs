@@ -10,7 +10,6 @@ internal static class TripFilterOptions
 
 	public static readonly List<YesNoFilterOption> YesNo =
 	[
-		new(All, "All"),
 		new(Yes, "Yes"),
 		new(No, "No"),
 	];

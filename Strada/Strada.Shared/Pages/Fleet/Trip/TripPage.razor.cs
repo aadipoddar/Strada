@@ -16,7 +16,6 @@ using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 
-using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 
 using System.Text.Json;
@@ -58,13 +57,13 @@ public partial class TripPage
 	private List<TripCardPaymentsCartModel> _cardPaymentsCart = [];
 	private List<TripLedgerPaymentsCartModel> _ledgerPaymentsCart = [];
 
-	private CustomAutoComplete<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
-	private CustomAutoComplete<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
-	private CustomAutoComplete<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
+	private CustomAutoComplete<ExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private CustomAutoComplete<OMCCardModel> _sfOMCCardAutoComplete;
+	private CustomAutoComplete<LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<TripExpensesCartModel> _sfExpensesCartGrid;
 	private SfGrid<TripCardPaymentsCartModel> _sfCardPaymentsCartGrid;
 	private SfGrid<TripLedgerPaymentsCartModel> _sfLedgerPaymentsCartGrid;
-	private CustomAutoComplete<VehicleModel, VehicleModel> _sfFirstFocus;
+	private CustomAutoComplete<VehicleModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =
@@ -411,66 +410,66 @@ public partial class TripPage
 	#endregion
 
 	#region Change Events
-	private async Task OnVehicleChanged(ChangeEventArgs<VehicleModel, VehicleModel> args)
+	private async Task OnVehicleChanged(VehicleModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedVehicle = args.Value;
+		_selectedVehicle = value;
 		_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId);
 		_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _selectedVehicle.OMCId) ?? _omcs.FirstOrDefault();
 
 		await SaveTransactionFile();
 	}
 
-	private async Task OnCompanyChanged(ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 		await SaveTransactionFile();
 	}
 
-	private async Task OnOMCChanged(ChangeEventArgs<OMCModel, OMCModel> args)
+	private async Task OnOMCChanged(OMCModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedOMC = args.Value;
+		_selectedOMC = value;
 		await SaveTransactionFile();
 	}
 
-	private async Task OnDriverChanged(ChangeEventArgs<DriverOverviewModel, DriverOverviewModel> args)
+	private async Task OnDriverChanged(DriverOverviewModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedDriver = args.Value;
+		_selectedDriver = value;
 		await SaveTransactionFile();
 	}
 
-	private async Task OnRouteChanged(ChangeEventArgs<RouteOverviewModel, RouteOverviewModel> args)
+	private async Task OnRouteChanged(RouteOverviewModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedRoute = args.Value;
+		_selectedRoute = value;
 		await SaveTransactionFile();
 	}
 	#endregion
 
 	#region Expenses Cart
-	private async Task OnExpensesTypeChanged(ChangeEventArgs<ExpenseTypeModel?, ExpenseTypeModel?> args)
+	private void OnExpensesTypeChanged(ExpenseTypeModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 		{
 			_selectedExpenseType = null;
 			_selectedExpensesCart = new();
 			return;
 		}
 
-		_selectedExpenseType = args.Value;
+		_selectedExpenseType = value;
 
 		_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
 		_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
@@ -538,16 +537,16 @@ public partial class TripPage
 	#endregion
 
 	#region Card Payments Cart
-	private async Task OnCardPaymentsTypeChanged(ChangeEventArgs<OMCCardModel?, OMCCardModel?> args)
+	private void OnCardPaymentsTypeChanged(OMCCardModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 		{
 			_selectedOMCCard = null;
 			_selectedCardPaymentCart = new();
 			return;
 		}
 
-		_selectedOMCCard = args.Value;
+		_selectedOMCCard = value;
 
 		_selectedCardPaymentCart.OMCCardId = _selectedOMCCard.Id;
 		_selectedCardPaymentCart.OMCCardNumber = _selectedOMCCard.CardNumber;
@@ -621,16 +620,16 @@ public partial class TripPage
 	#endregion
 
 	#region Ledger Payments Cart
-	private async Task OnLedgerPaymentsTypeChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
+	private void OnLedgerPaymentsTypeChanged(LedgerModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 		{
 			_selectedLedger = null;
 			_selectedLedgerPaymentCart = new();
 			return;
 		}
 
-		_selectedLedger = args.Value;
+		_selectedLedger = value;
 
 		_selectedLedgerPaymentCart.LedgerId = _selectedLedger.Id;
 		_selectedLedgerPaymentCart.LedgerName = _selectedLedger.Name;

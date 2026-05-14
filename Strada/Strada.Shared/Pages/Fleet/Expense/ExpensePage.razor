@@ -84,33 +84,32 @@ else
 					<div class="form-grid">
 						<!-- Vehicle -->
 						<div class="form-field">
-							<CustomAutoComplete TItem="VehicleModel" TValue="VehicleModel"
-												 @ref="_sfFirstFocus"
-												 Value="_selectedVehicle"
-												 DataSource="@_vehicles"
-												 Placeholder="Select a Vehicle"
-												 Label="Vehicle" Required="true"
-												 ValueChange="OnVehicleChanged"
-												 FieldValue="@nameof(VehicleModel.Code)"
-												 AddNewRoute="@PageRouteNames.VehicleMaster" />
+							<CustomAutoComplete @ref="_sfFirstFocus" T="VehicleModel"
+												   Value="_selectedVehicle"
+												   DataSource="@_vehicles"
+												   Placeholder="Select a Vehicle"
+												   Label="Vehicle"
+												   ValueChanged="OnVehicleChanged"
+												   FieldValue="@nameof(VehicleModel.Code)"
+												   AddNewRoute="@PageRouteNames.VehicleMaster" />
 						</div>
 
 						<!-- Company -->
 						<div class="form-field">
-							<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-												 Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="Select a Company (Ctrl + F)"
-												 Label="Company" Required="true"
-												 ValueChange="OnCompanyChanged"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+							<CustomAutoComplete T="CompanyModel"
+												   Value="_selectedCompany"
+												   DataSource="@_companies"
+												   Placeholder="Select a Company (Ctrl + F)"
+												   Label="Company"
+												   ValueChanged="OnCompanyChanged"
+												   FieldValue="@nameof(CompanyModel.Name)"
+												   AddNewRoute="@PageRouteNames.CompanyMaster" />
 						</div>
 
 						<!-- Transaction Date -->
 						<div class="form-field">
 							<CustomDatePicker @bind-Value="_expense.TransactionDateTime"
-											   FinancialYear="@_selectedFinancialYear" />
+												 FinancialYear="@_selectedFinancialYear" />
 						</div>
 
 						<!-- Transaction No -->
@@ -165,21 +164,23 @@ else
 					<div class="cart-input-row">
 						<!-- Expense Type -->
 						<div class="cart-field cart-field-wide">
-							<CustomAutoComplete TItem="ExpenseTypeModel" TValue="ExpenseTypeModel"
-												 @ref="_sfExpenseTypeAutoComplete"
-												 FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
-												 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + G)"
-												 ValueChange="OnExpensesTypeChanged"
-												 Label="Expense Type" Required="true" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+							<CustomAutoComplete T="ExpenseTypeModel"
+												   @ref="_sfExpenseTypeAutoComplete"
+												   FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
+												   DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + G)"
+												   ValueChanged="OnExpensesTypeChanged"
+												   OpenOnFocus="false"
+												   Label="Expense Type" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Ledger -->
 						<div class="cart-field">
-							<CustomAutoComplete TItem="LedgerModel" TValue="LedgerModel"
-												 FieldValue="@nameof(LedgerModel.Name)" @bind-Value="_selectedLedger"
-												 DataSource="@_ledgers" Placeholder="Select Ledger"
-												 ValueChange="OnLedgerChanged"
-												 Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
+							<CustomAutoComplete T="LedgerModel"
+												   FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
+												   DataSource="@_ledgers" Placeholder="Select Ledger"
+												   ValueChanged="OnLedgerChanged"
+												   OpenOnFocus="false" Required="false"
+												   Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
 						</div>
 
 						<!-- Amount -->

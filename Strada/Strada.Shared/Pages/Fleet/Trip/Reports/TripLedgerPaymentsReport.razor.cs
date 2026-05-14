@@ -37,6 +37,8 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 	private DriverOverviewModel? _selectedDriver = null;
 	private int _vehicleEmptyFilter = TripFilterOptions.All;
 	private int _pendingBillsFilter = TripFilterOptions.All;
+	private YesNoFilterOption _selectedVehicleEmptyFilter;
+	private YesNoFilterOption _selectedPendingBillsFilter;
 
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
@@ -170,9 +172,9 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_vehicles = [.. _vehicles.OrderBy(v => v.Code)];
@@ -184,39 +186,41 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnOMCChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<OMCModel, OMCModel> args)
+	private async Task OnOMCChanged(OMCModel value)
 	{
-		_selectedOMC = args.Value;
+		_selectedOMC = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnVehicleChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VehicleModel, VehicleModel> args)
+	private async Task OnVehicleChanged(VehicleModel value)
 	{
-		_selectedVehicle = args.Value;
+		_selectedVehicle = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnRouteChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<RouteOverviewModel, RouteOverviewModel> args)
+	private async Task OnRouteChanged(RouteOverviewModel value)
 	{
-		_selectedRoute = args.Value;
+		_selectedRoute = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnDriverChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<DriverOverviewModel, DriverOverviewModel> args)
+	private async Task OnDriverChanged(DriverOverviewModel value)
 	{
-		_selectedDriver = args.Value;
+		_selectedDriver = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnVehicleEmptyFilterChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<int, YesNoFilterOption> args)
+	private async Task OnVehicleEmptyFilterChanged(YesNoFilterOption value)
 	{
-		_vehicleEmptyFilter = args.Value;
+		_selectedVehicleEmptyFilter = value;
+		_vehicleEmptyFilter = value?.Id ?? TripFilterOptions.All;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnPendingBillsFilterChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<int, YesNoFilterOption> args)
+	private async Task OnPendingBillsFilterChanged(YesNoFilterOption value)
 	{
-		_pendingBillsFilter = args.Value;
+		_selectedPendingBillsFilter = value;
+		_pendingBillsFilter = value?.Id ?? TripFilterOptions.All;
 		await LoadTransactionOverviews();
 	}
 

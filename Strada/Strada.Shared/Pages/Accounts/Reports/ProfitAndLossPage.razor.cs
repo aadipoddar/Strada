@@ -1,4 +1,5 @@
 using Strada.Shared.Components.Dialog;
+
 using StradaLibrary.Data.Accounts.FinancialAccounting;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Operations;
@@ -7,6 +8,7 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
+
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Reports;
@@ -41,36 +43,25 @@ public partial class ProfitAndLossPage : IAsyncDisposable
 			return;
 
 		await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
-		await LoadData();
+		await InitializePage();
 	}
 
-	private async Task LoadData()
+	private async Task InitializePage()
 	{
-		await LoadDates();
-		await LoadCompanies();
+		await LoadData();
 		await LoadProfitAndLoss();
 		await StartAutoRefresh();
 		_isLoading = false;
 		StateHasChanged();
 	}
 
-	private async Task LoadDates()
+	private async Task LoadData()
 	{
 		_fromDate = await CommonData.LoadCurrentDateTime();
 		_toDate = _fromDate;
-	}
 
-	private async Task LoadCompanies()
-	{
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
-		_companies.Add(new()
-		{
-			Id = 0,
-			Name = "All Companies"
-		});
-
 		_companies = [.. _companies.OrderBy(s => s.Name)];
-		_selectedCompany = _companies.FirstOrDefault(_ => _.Id == 0);
 	}
 
 	private async Task LoadProfitAndLoss()
@@ -120,9 +111,9 @@ public partial class ProfitAndLossPage : IAsyncDisposable
 		await LoadProfitAndLoss();
 	}
 
-	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 		await LoadProfitAndLoss();
 	}
 

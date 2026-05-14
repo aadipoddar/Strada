@@ -166,21 +166,21 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnLedgerChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
+	private async Task OnLedgerChanged(LedgerModel value)
 	{
-		_selectedLedger = args.Value;
+		_selectedLedger = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnVoucherChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VoucherModel, VoucherModel> args)
+	private async Task OnVoucherChanged(VoucherModel value)
 	{
-		_selectedVoucher = args.Value;
+		_selectedVoucher = value;
 		await LoadTransactionOverviews();
 	}
 

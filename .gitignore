@@ -422,3 +422,5 @@ FodyWeavers.xsd
 
 StradaLibrary/DataAccess/Secrets.local_secrets.cs
 .claude
+AGENTS.md
+CLAUDE.md

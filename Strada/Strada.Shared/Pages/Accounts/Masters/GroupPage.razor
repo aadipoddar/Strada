@@ -87,14 +87,13 @@ else
 
                         <!-- Nature -->
                         <div class="form-field">
-                            <label class="field-label">
-                                Nature <span class="required">*</span>
-                            </label>
-                            <SfDropDownList TValue="int" TItem="NatureModel" Placeholder="Select Nature"
-                                            DataSource="@_natures" @bind-Value="_group.NatureId" FloatLabelType="FloatLabelType.Never"
-                                            CssClass="custom-textbox">
-                                <DropDownListFieldSettings Text="Name" Value="Id" />
-                            </SfDropDownList>
+                            <CustomAutoComplete T="NatureModel"
+                                                   Value="_selectedNature"
+                                                   DataSource="@_natures"
+                                                   Placeholder="Select Nature"
+                                                   Label="Nature" Required="true"
+                                                   ValueChanged="OnNatureChanged"
+                                                   FieldValue="@nameof(NatureModel.Name)" />
                         </div>
 
                         <!-- Remarks -->

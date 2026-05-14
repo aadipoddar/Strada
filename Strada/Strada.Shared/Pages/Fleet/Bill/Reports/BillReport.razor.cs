@@ -131,15 +131,15 @@ public partial class BillReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnOMCChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<OMCModel, OMCModel> args)
+	private async Task OnOMCChanged(OMCModel value)
 	{
-		_selectedOMC = args.Value;
+		_selectedOMC = value;
 		await LoadTransactionOverviews();
 	}
 

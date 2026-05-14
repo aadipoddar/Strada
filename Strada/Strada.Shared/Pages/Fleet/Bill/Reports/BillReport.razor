@@ -108,24 +108,24 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
+								<CustomAutoComplete T="CompanyModel"
 													 Value="_selectedCompany"
 													 DataSource="@_companies"
 													 Placeholder="All Companies"
-													 Label="Company" Required="true"
-													 ValueChange="OnCompanyChanged"
+													 Label="Company" Required="false"
+													 ValueChanged="OnCompanyChanged"
 													 FieldValue="@nameof(CompanyModel.Name)"
 													 AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- OMC -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
+								<CustomAutoComplete T="OMCModel"
 													 Value="_selectedOMC"
 													 DataSource="@_omcs"
 													 Placeholder="All OMCs"
-													 Label="OMC" Required="true"
-													 ValueChange="OnOMCChanged"
+													 Label="OMC" Required="false"
+													 ValueChanged="OnOMCChanged"
 													 FieldValue="@nameof(OMCModel.Name)"
 													 AddNewRoute="@PageRouteNames.OMCMaster" />
 							</div>

@@ -103,41 +103,37 @@ else
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete TItem="VehicleTypeModel" TValue="VehicleTypeModel"
-												 @bind-Value="_selectedVehicleType"
-												 DataSource="@_vehicleTypes"
-												 Placeholder="Select vehicle type"
-												 FieldValue="@nameof(VehicleTypeModel.Name)"
-												 Label="Vehicle Type" Required="true"
-												 AddNewRoute="@PageRouteNames.VehicleTypeMaster" />
+							<CustomAutoComplete T="VehicleTypeModel"
+												@bind-Value="_selectedVehicleType"
+												DataSource="@_vehicleTypes"
+												Placeholder="Select vehicle type"
+												FieldValue="@nameof(VehicleTypeModel.Name)"
+												Label="Vehicle Type"
+												AddNewRoute="@PageRouteNames.VehicleTypeMaster" />
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-												 @bind-Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="Select company"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 Label="Company" Required="true"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+							<CustomAutoComplete T="CompanyModel"
+												@bind-Value="_selectedCompany"
+												DataSource="@_companies"
+												Placeholder="Select company"
+												FieldValue="@nameof(CompanyModel.Name)"
+												Label="Company"
+												AddNewRoute="@PageRouteNames.CompanyMaster" />
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
-												 @bind-Value="_selectedOMC"
-												 DataSource="@_omcs"
-												 Placeholder="Select OMC"
-												 FieldValue="@nameof(OMCModel.Name)"
-												 Label="OMC"
-												 AddNewRoute="@PageRouteNames.OMCMaster" />
+							<CustomAutoComplete T="OMCModel"
+												@bind-Value="_selectedOMC"
+												DataSource="@_omcs"
+												Placeholder="Select OMC"
+												FieldValue="@nameof(OMCModel.Name)"
+												Label="OMC" Required="false"
+												AddNewRoute="@PageRouteNames.OMCMaster" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Purchase Date <span class="required">*</span>
-							</label>
-							<SfDatePicker @bind-Value="_vehicle.PurchaseDate" Placeholder="Select purchase date"
-										  FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Format="dd-MMM-yyyy" />
+							<CustomDatePicker @bind-Value="_vehicle.PurchaseDate" Label="Purchase Date" ShowFinancialYear="false" />
 						</div>
 
 						<div class="form-field">

@@ -34,7 +34,7 @@ public partial class RoutePage
 	private SfGrid<RouteModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomAutoComplete<LocationModel, LocationModel> _sfFirstFocus;
+	private CustomAutoComplete<LocationModel> _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;

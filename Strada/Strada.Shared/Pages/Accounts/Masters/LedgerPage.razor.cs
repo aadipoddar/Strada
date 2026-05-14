@@ -18,6 +18,9 @@ public partial class LedgerPage
 	private bool _showDeleted = false;
 
 	private LedgerModel _ledger = new();
+	private GroupModel _selectedGroup;
+	private AccountTypeModel _selectedAccountType;
+	private StateUTModel _selectedStateUT;
 
 	private List<LedgerModel> _ledgers = [];
 	private List<GroupModel> _groups = [];
@@ -59,6 +62,12 @@ public partial class LedgerPage
 		_accountTypes = await CommonData.LoadTableData<AccountTypeModel>(AccountNames.AccountType);
 		_stateUTs = await CommonData.LoadTableData<StateUTModel>(AccountNames.StateUT);
 
+		_groups = [.. _groups.OrderBy(g => g.Name)];
+		_accountTypes = [.. _accountTypes.OrderBy(a => a.Name)];
+		_stateUTs = [.. _stateUTs.OrderBy(s => s.Name)];
+
+		SyncSelections();
+
 		if (!_showDeleted)
 			_ledgers = [.. _ledgers.Where(l => l.Status)];
 
@@ -70,6 +79,33 @@ public partial class LedgerPage
 
 		if (_sfFirstFocus is not null)
 			await _sfFirstFocus.FocusAsync();
+	}
+	#endregion
+
+	#region Change Events
+	private void SyncSelections()
+	{
+		_selectedGroup = _groups.FirstOrDefault(g => g.Id == _ledger.GroupId);
+		_selectedAccountType = _accountTypes.FirstOrDefault(a => a.Id == _ledger.AccountTypeId);
+		_selectedStateUT = _stateUTs.FirstOrDefault(s => s.Id == _ledger.StateUTId);
+	}
+
+	private void OnGroupChanged(GroupModel value)
+	{
+		_selectedGroup = value;
+		_ledger.GroupId = value?.Id ?? 0;
+	}
+
+	private void OnAccountTypeChanged(AccountTypeModel value)
+	{
+		_selectedAccountType = value;
+		_ledger.AccountTypeId = value?.Id ?? 0;
+	}
+
+	private void OnStateUTChanged(StateUTModel value)
+	{
+		_selectedStateUT = value;
+		_ledger.StateUTId = value?.Id ?? 0;
 	}
 	#endregion
 
@@ -275,6 +311,7 @@ public partial class LedgerPage
 		if (_ledger is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
+		SyncSelections();
 		StateHasChanged();
 
 		await _sfFirstFocus.FocusAsync();

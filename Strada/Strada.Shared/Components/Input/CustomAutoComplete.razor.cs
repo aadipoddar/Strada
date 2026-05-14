@@ -1,39 +1,78 @@
 using Microsoft.AspNetCore.Components;
 
-using Syncfusion.Blazor.DropDowns;
+using MudBlazor;
+
+using System.Reflection;
 
 namespace Strada.Shared.Components.Input;
 
-public partial class CustomAutoComplete<TValue, TItem>
+public partial class CustomAutoComplete<T>
 {
-	private SfAutoComplete<TValue, TItem> _sfAutoComplete;
+	private MudAutocomplete<T> _autocomplete;
+	private PropertyInfo _fieldProperty;
+	private Type _cachedType;
 	private bool _isFocused;
 
-	private void OnFocus(object args) => _isFocused = true;
-	private void OnBlur(object args) => _isFocused = false;
+	private void OnFocusIn() => _isFocused = true;
+	private void OnFocusOut() => _isFocused = false;
 
-	[Parameter] public TValue? Value { get; set; }
-	[Parameter] public EventCallback<TValue?> ValueChanged { get; set; }
-	[Parameter] public EventCallback<ChangeEventArgs<TValue, TItem>> ValueChange { get; set; }
+	[Parameter] public T Value { get; set; }
+	[Parameter] public EventCallback<T> ValueChanged { get; set; }
 
-	[Parameter] public IEnumerable<TItem>? DataSource { get; set; }
+	[Parameter] public IEnumerable<T> DataSource { get; set; }
 	[Parameter] public string Placeholder { get; set; } = "Select...";
 	[Parameter] public string FieldValue { get; set; }
 	[Parameter] public bool Disabled { get; set; } = false;
 
-	[Parameter] public string? Label { get; set; }
-	[Parameter] public bool Required { get; set; } = false;
-	[Parameter] public string? AddNewRoute { get; set; }
+	[Parameter] public string Label { get; set; }
+	[Parameter] public bool Required { get; set; } = true;
+	[Parameter] public string AddNewRoute { get; set; }
 	[Parameter] public string AddNewLabel { get; set; } = "New";
 
-	public Task FocusAsync() => _sfAutoComplete.FocusAsync();
+	[Parameter] public bool OpenOnFocus { get; set; } = true;
 
-	private async Task OnValueChangeInternal(ChangeEventArgs<TValue, TItem> args)
+	private bool ShowAddNew => AddNewRoute is not null && !Disabled;
+
+	public ValueTask FocusAsync() =>
+		_autocomplete is null ? ValueTask.CompletedTask : _autocomplete.FocusAsync();
+
+	private string DisplayText(T item)
 	{
-		Value = args.Value;
-		await ValueChanged.InvokeAsync(args.Value);
-		if (ValueChange.HasDelegate)
-			await ValueChange.InvokeAsync(args);
+		if (item is null)
+			return string.Empty;
+
+		if (string.IsNullOrEmpty(FieldValue))
+			return item.ToString();
+
+		if (_cachedType != typeof(T))
+		{
+			_fieldProperty = typeof(T).GetProperty(FieldValue);
+			_cachedType = typeof(T);
+		}
+
+		return _fieldProperty?.GetValue(item)?.ToString() ?? string.Empty;
+	}
+
+	private Task<IEnumerable<T>> SearchAsync(string searchText, CancellationToken token)
+	{
+		if (DataSource is null)
+			return Task.FromResult<IEnumerable<T>>([]);
+
+		if (string.IsNullOrWhiteSpace(searchText))
+			return Task.FromResult(DataSource);
+
+		return Task.FromResult(DataSource.Where(item =>
+		{
+			var display = DisplayText(item);
+			return !string.IsNullOrEmpty(display) &&
+				   display.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+		}));
+	}
+
+	private async Task OnValueChangedInternal(T value)
+	{
+		Value = value;
+		await ValueChanged.InvokeAsync(value);
 	}
 
 	private async Task NavigateToAddNew()

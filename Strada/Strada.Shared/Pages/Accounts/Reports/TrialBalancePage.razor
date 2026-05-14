@@ -5,8 +5,7 @@
 
 <PageTitle>Trial Balance - Strada</PageTitle>
 
-<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft]
-					 OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTrialBalance" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTrialBalance" />
@@ -24,19 +23,14 @@ else
 		<Header Title="Trial Balance">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
-					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-										   Easing="ease" />
-					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected"
-								OnOpen='async () => await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0)' />
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
+					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" OnOpen='async () => await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0)' />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Refresh Data (Ctrl + R / F5)" IconCss="e-icons e-refresh" Id="Refresh"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")"
-										  IconCss="e-icons e-table" Id="ToggleDetailsView" Disabled="@_isProcessing" />
+								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Refresh Data (Ctrl + R / F5)" IconCss="e-icons e-refresh" Id="Refresh" Disabled="@_isProcessing" /> 
+								<MenuItem Text="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")" IconCss="e-icons e-table" Id="ToggleDetailsView" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
 								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
 										  Disabled="@_isProcessing" />
@@ -103,38 +97,38 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-												 Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="All Companies"
-												 Label="Company" Required="true"
-												 ValueChange="OnCompanyChanged"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+								<CustomAutoComplete T="CompanyModel"
+													   Value="_selectedCompany"
+													   DataSource="@_companies"
+													   Placeholder="All Companies"
+													   Label="Company" Required="false"
+													   ValueChanged="OnCompanyChanged"
+													   FieldValue="@nameof(CompanyModel.Name)"
+													   AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Group -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="GroupModel" TValue="GroupModel"
-												 Value="_selectedGroup"
-												 DataSource="@_groups"
-												 Placeholder="All Groups"
-												 Label="Group" Required="true"
-												 ValueChange="OnGroupChanged"
-												 FieldValue="@nameof(GroupModel.Name)"
-												 AddNewRoute="@PageRouteNames.GroupMaster" />
+								<CustomAutoComplete T="GroupModel"
+													   Value="_selectedGroup"
+													   DataSource="@_groups"
+													   Placeholder="All Groups"
+													   Label="Group" Required="false"
+													   ValueChanged="OnGroupChanged"
+													   FieldValue="@nameof(GroupModel.Name)"
+													   AddNewRoute="@PageRouteNames.GroupMaster" />
 							</div>
 
 							<!-- Account Type -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="AccountTypeModel" TValue="AccountTypeModel"
-												 Value="_selectedAccountType"
-												 DataSource="@_accountTypes"
-												 Placeholder="All Account Types"
-												 Label="Account Type" Required="true"
-												 ValueChange="OnAccountTypeChanged"
-												 FieldValue="@nameof(AccountTypeModel.Name)"
-												 AddNewRoute="@PageRouteNames.AccountTypeMaster" />
+								<CustomAutoComplete T="AccountTypeModel"
+													   Value="_selectedAccountType"
+													   DataSource="@_accountTypes"
+													   Placeholder="All Account Types"
+													   Label="Account Type" Required="false"
+													   ValueChanged="OnAccountTypeChanged"
+													   FieldValue="@nameof(AccountTypeModel.Name)"
+													   AddNewRoute="@PageRouteNames.AccountTypeMaster" />
 							</div>
 						</div>
 

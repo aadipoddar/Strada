@@ -1,50 +1,39 @@
-@typeparam TValue
-@typeparam TItem
+@using MudBlazor
+@typeparam T
 
-@if (_isFocused && AddNewRoute is not null)
+@if (_isFocused && AddNewRoute is not null && !Disabled)
 {
-	<MudBlazor.MudHotkey Key="JsKey.F12" OnHotkeyPressed="NavigateToAddNew" />
+	<MudHotkey Key="JsKey.F12" OnHotkeyPressed="NavigateToAddNew" />
 }
 
-<div class="mac-field">
-	@if (Label is not null)
-	{
-		<label class="field-label">
-			@Label
-			@if (Required)
-			{
-				<span class="required">*</span>
-			}
-		</label>
-	}
-
-	<div class="mac-input">
-		<SfAutoComplete @ref="_sfAutoComplete" TValue="TValue" TItem="TItem"
-						Value="@Value"
-						DataSource="@DataSource"
-						Placeholder="@Placeholder"
-						FloatLabelType="FloatLabelType.Never"
-						AllowFiltering="true"
-						Autofill="true"
-						AllowCustom="false"
-						Enabled="@(!Disabled)"
-						FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-						CssClass="custom-autocomplete">
-			<AutoCompleteEvents TItem="TItem" TValue="TValue" ValueChange="@OnValueChangeInternal" Focus="@OnFocus" Blur="@OnBlur" />
-			<AutoCompleteFieldSettings Value="@FieldValue" />
-		</SfAutoComplete>
-	</div>
-
-	@if (Label is not null && AddNewRoute is not null && !Disabled)
-	{
-		<button class="mac-add-new" tabindex="-1" @onclick="NavigateToAddNew" title="@AddNewLabel">
-			<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-				 fill="none" stroke="currentColor" stroke-width="2.5"
-				 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-				<line x1="12" y1="5" x2="12" y2="19" />
-				<line x1="5" y1="12" x2="19" y2="12" />
-			</svg>
-			@AddNewLabel
-		</button>
-	}
+<div @onfocusin="OnFocusIn" @onfocusout="OnFocusOut">
+	<MudAutocomplete T="T"
+					 @ref="_autocomplete"
+					 Value="Value"
+					 ValueChanged="OnValueChangedInternal"
+					 SearchFunc="SearchAsync"
+					 ToStringFunc="DisplayText"
+					 Label="@Label"
+					 Placeholder="@Placeholder"
+					 Required="@Required"
+					 RequiredError=""
+					 ErrorText=""
+					 Disabled="@Disabled"
+					 Margin="MudBlazor.Margin.Dense"
+					 Dense="true"
+					 Variant="MudBlazor.Variant.Outlined"
+					 SelectValueOnTab="true"
+					 OpenOnFocus="OpenOnFocus"
+					 ResetValueOnEmptyText="Required"
+					 CoerceText="true"
+					 Clearable="!Required"
+					 MaxItems="20"
+					 ShowProgressIndicator="true"
+					 DebounceInterval="100"
+					 Adornment="@(ShowAddNew ? Adornment.End : Adornment.None)"
+					 AdornmentIcon="@(ShowAddNew ? Icons.Material.Filled.Add: null)"
+					 AdornmentColor="Color.Primary"
+					 IconSize="Size.Small"
+					 OnAdornmentClick="NavigateToAddNew"
+					 AdornmentAriaLabel="@AddNewLabel" />
 </div>

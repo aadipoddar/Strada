@@ -86,32 +86,32 @@ else
 						<div class="form-grid">
 							<!-- Company -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-													 Value="_selectedCompany"
-													 DataSource="@_companies"
-													 Placeholder="Select Company"
-													 Label="Company" Required="true"
-													 ValueChange="OnCompanyChanged"
-													 FieldValue="@nameof(CompanyModel.Name)"
-													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+								<CustomAutoComplete T="CompanyModel"
+													   Value="_selectedCompany"
+													   DataSource="@_companies"
+													   Placeholder="Select Company"
+													   Label="Company" Required="true"
+													   ValueChanged="OnCompanyChanged"
+													   FieldValue="@nameof(CompanyModel.Name)"
+													   AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Voucher -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="VoucherModel" TValue="VoucherModel"
-													 Value="_selectedVoucher"
-													 DataSource="@_vouchers"
-													 Placeholder="Select Voucher"
-													 Label="Voucher" Required="true"
-													 ValueChange="OnVoucherChanged"
-													 FieldValue="@nameof(VoucherModel.Name)"
-													 AddNewRoute="@PageRouteNames.VoucherMaster" />
+								<CustomAutoComplete T="VoucherModel"
+													   Value="_selectedVoucher"
+													   DataSource="@_vouchers"
+													   Placeholder="Select Voucher"
+													   Label="Voucher" Required="true"
+													   ValueChanged="OnVoucherChanged"
+													   FieldValue="@nameof(VoucherModel.Name)"
+													   AddNewRoute="@PageRouteNames.VoucherMaster" />
 							</div>
 
 							<!-- Transaction Date -->
 							<div class="form-field">
 								<CustomDatePicker @bind-Value="_accounting.TransactionDateTime"
-												   FinancialYear="@_selectedFinancialYear" />
+													 FinancialYear="@_selectedFinancialYear" />
 							</div>
 
 							<!-- Transaction No -->
@@ -223,14 +223,14 @@ else
 					<div class="cart-input-row">
 						<div class="cart-field cart-field-wide">
 							<div class="reference-wrapper">
-								<CustomAutoComplete @ref="_sfLedgerAutoComplete" TItem="LedgerModel" TValue="LedgerModel"
-													 Value="_selectedLedger"
-													 DataSource="@_ledgers"
-													 Placeholder="Select Ledger (Ctrl + F)"
-													 Label="Ledger" Required="true"
-													 ValueChange="OnItemChanged"
-													 FieldValue="@nameof(LedgerModel.Name)"
-													 AddNewRoute="@PageRouteNames.LedgerMaster" />
+								<CustomAutoComplete @ref="_sfLedgerAutoComplete" T="LedgerModel"
+													   Value="_selectedLedger"
+													   DataSource="@_ledgers"
+													   Placeholder="Select Ledger (Ctrl + F)"
+													   Label="Ledger" Required="true"
+													   ValueChanged="OnItemChanged" OpenOnFocus="false"
+													   FieldValue="@nameof(LedgerModel.Name)"
+													   AddNewRoute="@PageRouteNames.LedgerMaster" />
 
 								<div class="reference-actions">
 									<IconButton Icon="IconType.Get" Variant="ButtonVariant.Get" Size="ButtonSize.Small"
@@ -242,15 +242,13 @@ else
 						<div class="cart-field cart-field-wide">
 							<label class="cart-label">Ref No</label>
 							<div class="reference-wrapper">
-								<SfAutoComplete Value="@_selectedAccountingLedger"
-												TValue="FinancialAccountingLedgerOverviewModel"
-												TItem="FinancialAccountingLedgerOverviewModel" DataSource="@_accountingLedgers"
-												Placeholder="Select Reference" FloatLabelType="FloatLabelType.Never"
-												AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-												CssClass="custom-autocomplete">
-									<AutoCompleteEvents TItem="FinancialAccountingLedgerOverviewModel" TValue="FinancialAccountingLedgerOverviewModel" ValueChange="OnReferenceChanged" />
-									<AutoCompleteFieldSettings Value="LedgerReferenceNo" />
-								</SfAutoComplete>
+								<CustomAutoComplete T="FinancialAccountingLedgerOverviewModel"
+													   Value="_selectedAccountingLedger"
+													   DataSource="@_accountingLedgers"
+													   Placeholder="Select Reference"
+													   Label="Ref No" Required="false"
+													   ValueChanged="OnReferenceChanged"
+													   FieldValue="@nameof(FinancialAccountingLedgerOverviewModel.LedgerReferenceNo)" />
 								<div class="reference-actions">
 									<IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Small"
 												Title="View Transaction" OnClick="ViewCartReferenceTransaction" />

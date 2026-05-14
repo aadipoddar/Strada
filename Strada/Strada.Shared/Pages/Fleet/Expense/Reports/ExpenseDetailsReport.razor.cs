@@ -134,9 +134,9 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_vehicles = [.. _vehicles.OrderBy(v => v.Code)];
@@ -148,9 +148,9 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnVehicleChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VehicleModel, VehicleModel> args)
+	private async Task OnVehicleChanged(VehicleModel value)
 	{
-		_selectedVehicle = args.Value;
+		_selectedVehicle = value;
 		await LoadTransactionOverviews();
 	}
 

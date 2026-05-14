@@ -104,14 +104,14 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
-												 Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="All Companies"
-												 Label="Company" Required="true"
-												 ValueChange="OnCompanyChanged"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+								<CustomAutoComplete T="CompanyModel"
+													   Value="_selectedCompany"
+													   DataSource="@_companies"
+													   Placeholder="All Companies"
+													   Label="Company" Required="false"
+													   ValueChanged="OnCompanyChanged"
+													   FieldValue="@nameof(CompanyModel.Name)"
+													   AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 						</div>
 

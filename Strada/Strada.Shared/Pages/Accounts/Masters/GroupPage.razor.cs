@@ -18,6 +18,7 @@ public partial class GroupPage
 	private bool _showDeleted = false;
 
 	private GroupModel _group = new();
+	private NatureModel _selectedNature;
 
 	private List<GroupModel> _groups = [];
 	private List<NatureModel> _natures = [];
@@ -55,6 +56,9 @@ public partial class GroupPage
 		_natures = await CommonData.LoadTableDataByStatus<NatureModel>(AccountNames.Nature);
 		_groups = await CommonData.LoadTableData<GroupModel>(AccountNames.Group);
 
+		_natures = [.. _natures.OrderBy(n => n.Name)];
+		_selectedNature = _natures.FirstOrDefault(n => n.Id == _group.NatureId);
+
 		if (!_showDeleted)
 			_groups = [.. _groups.Where(g => g.Status)];
 
@@ -66,6 +70,14 @@ public partial class GroupPage
 
 		if (_sfFirstFocus is not null)
 			await _sfFirstFocus.FocusAsync();
+	}
+	#endregion
+
+	#region Change Events
+	private void OnNatureChanged(NatureModel value)
+	{
+		_selectedNature = value;
+		_group.NatureId = value?.Id ?? 0;
 	}
 	#endregion
 
@@ -271,6 +283,7 @@ public partial class GroupPage
 		if (_group is null)
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 
+		_selectedNature = _natures.FirstOrDefault(n => n.Id == _group.NatureId);
 		StateHasChanged();
 
 		await _sfFirstFocus.FocusAsync();

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
+
 using Strada.Shared.Components.Dialog;
+
 using StradaLibrary.Data.Accounts.FinancialAccounting;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Operations;
@@ -8,6 +10,7 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
+
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Reports;
@@ -24,9 +27,9 @@ public partial class TrialBalancePage : IAsyncDisposable
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
 
-	private CompanyModel _selectedCompany = new();
-	private GroupModel _selectedGroup = new();
-	private AccountTypeModel _selectedAccountType = new();
+	private CompanyModel? _selectedCompany = null;
+	private GroupModel? _selectedGroup = null;
+	private AccountTypeModel? _selectedAccountType = null;
 
 	private List<CompanyModel> _companies = [];
 	private List<GroupModel> _groups = [];
@@ -43,63 +46,30 @@ public partial class TrialBalancePage : IAsyncDisposable
 			return;
 
 		await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
-		await LoadData();
+		await InitializePage();
 	}
 
-	private async Task LoadData()
+	private async Task InitializePage()
 	{
-		await LoadDates();
-		await LoadCompanies();
-		await LoadGroups();
-		await LoadAccountTypes();
+		await LoadData();
 		await LoadTrialBalance();
 		await StartAutoRefresh();
 		_isLoading = false;
 		StateHasChanged();
 	}
 
-	private async Task LoadDates()
+	private async Task LoadData()
 	{
 		_fromDate = await CommonData.LoadCurrentDateTime();
 		_toDate = _fromDate;
-	}
 
-	private async Task LoadCompanies()
-	{
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
-		_companies.Add(new()
-		{
-			Id = 0,
-			Name = "All Companies"
-		});
+		_groups = await CommonData.LoadTableDataByStatus<GroupModel>(AccountNames.Group);
+		_accountTypes = await CommonData.LoadTableDataByStatus<AccountTypeModel>(AccountNames.AccountType);
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
-		_selectedCompany = _companies.FirstOrDefault(_ => _.Id == 0);
-	}
-
-	private async Task LoadGroups()
-	{
-		_groups = await CommonData.LoadTableDataByStatus<GroupModel>(AccountNames.Group);
-		_groups.Add(new()
-		{
-			Id = 0,
-			Name = "All Groups"
-		});
-
 		_groups = [.. _groups.OrderBy(s => s.Name)];
-		_selectedGroup = _groups.FirstOrDefault(_ => _.Id == 0);
-	}
-
-	private async Task LoadAccountTypes()
-	{
-		_accountTypes = await CommonData.LoadTableDataByStatus<AccountTypeModel>(AccountNames.AccountType);
-		_accountTypes.Add(new()
-		{
-			Id = 0,
-			Name = "All Account Types"
-		});
 		_accountTypes = [.. _accountTypes.OrderBy(s => s.Name)];
-		_selectedAccountType = _accountTypes.FirstOrDefault(_ => _.Id == 0);
 	}
 
 	private async Task LoadTrialBalance()
@@ -148,21 +118,21 @@ public partial class TrialBalancePage : IAsyncDisposable
 		await LoadTrialBalance();
 	}
 
-	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 		await LoadTrialBalance();
 	}
 
-	private async Task OnAccountTypeChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<AccountTypeModel, AccountTypeModel> args)
+	private async Task OnAccountTypeChanged(AccountTypeModel value)
 	{
-		_selectedAccountType = args.Value;
+		_selectedAccountType = value;
 		await LoadTrialBalance();
 	}
 
-	private async Task OnGroupChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<GroupModel, GroupModel> args)
+	private async Task OnGroupChanged(GroupModel value)
 	{
-		_selectedGroup = args.Value;
+		_selectedGroup = value;
 		await LoadTrialBalance();
 	}
 

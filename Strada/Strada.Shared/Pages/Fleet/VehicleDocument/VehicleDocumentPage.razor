@@ -65,7 +65,7 @@ else
 		</Header>
 
 		<div class="page-container">
-			
+
 			<div class="section-card">
 				<div class="section-header">
 					<div class="section-title-wrapper">
@@ -91,34 +91,29 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Transaction Date <span class="required">*</span>
-							</label>
-							<SfDatePicker @bind-Value="_vehicleDocument.TransactionDateTime" TValue="DateTime"
-										  Format="dd/MM/yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
-										  CssClass="custom-textbox" />
+							<CustomDatePicker @bind-Value="_vehicleDocument.TransactionDateTime" Label="Transaction Date" ShowFinancialYear="false" />
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete TItem="VehicleDocumentTypeModel" TValue="VehicleDocumentTypeModel"
-												 Value="_selectedVehicleDocumentType"
-												 DataSource="@_vehicleDocumentTypes"
-												 Placeholder="Select Document Type"
-												 Label="Document Type" Required="true"
-												 ValueChange="OnVehicleDocumentTypeChanged"
-												 FieldValue="@nameof(VehicleDocumentTypeModel.Name)"
-												 AddNewRoute="@PageRouteNames.VehicleDocumentTypeMaster" />
+							<CustomAutoComplete T="VehicleDocumentTypeModel"
+												@bind-Value="_selectedVehicleDocumentType"
+												@bind-Value:after="OnVehicleDocumentTypeChanged"
+												DataSource="@_vehicleDocumentTypes"
+												Placeholder="Select Document Type"
+												Label="Document Type"
+												FieldValue="@nameof(VehicleDocumentTypeModel.Name)"
+												AddNewRoute="@PageRouteNames.VehicleDocumentTypeMaster" />
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete TItem="VehicleModel" TValue="VehicleModel"
-												 Value="_selectedVehicle"
-												 DataSource="@_vehicles"
-												 Placeholder="Select Vehicle"
-												 Label="Vehicle" Required="true"
-												 ValueChange="OnVehicleChanged"
-												 FieldValue="@nameof(VehicleModel.Code)"
-												 AddNewRoute="@PageRouteNames.VehicleMaster" />
+							<CustomAutoComplete T="VehicleModel"
+												@bind-Value="_selectedVehicle"
+												@bind-Value:after="OnVehicleChanged"
+												DataSource="@_vehicles"
+												Placeholder="Select Vehicle"
+												Label="Vehicle"
+												FieldValue="@nameof(VehicleModel.Code)"
+												AddNewRoute="@PageRouteNames.VehicleMaster" />
 						</div>
 
 						<div class="form-field">
@@ -142,12 +137,7 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Renewal Date <span class="required">*</span>
-							</label>
-							<SfDatePicker @bind-Value="_vehicleDocument.RenewalDate" Placeholder="Select renewal date"
-										  FloatLabelType="FloatLabelType.Never" CssClass="custom-datepicker"
-										  Format="dd/MM/yy" />
+							<CustomDatePicker @bind-Value="_vehicleDocument.RenewalDate" Label="Renewal Date" ShowFinancialYear="false" />
 						</div>
 
 						<div class="form-field">

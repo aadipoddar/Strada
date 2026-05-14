@@ -13,7 +13,6 @@ using StradaLibrary.Models.Fleet.Expense;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
 
-using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 
 using System.Text.Json;
@@ -31,9 +30,9 @@ public partial class ExpensePage
 
 	private CompanyModel _selectedCompany = new();
 	private FinancialYearModel _selectedFinancialYear = new();
-	private VehicleModel? _selectedVehicle = null;
-	private ExpenseTypeModel? _selectedExpenseType = null;
-	private LedgerModel? _selectedLedger = null;
+	private VehicleModel _selectedVehicle = null;
+	private ExpenseTypeModel _selectedExpenseType = null;
+	private LedgerModel _selectedLedger = null;
 	private ExpenseDetailsCartModel _selectedExpensesCart = new();
 	private ExpenseModel _expense = new();
 
@@ -43,9 +42,9 @@ public partial class ExpensePage
 	private List<LedgerModel> _ledgers = [];
 	private List<ExpenseDetailsCartModel> _expensesCart = [];
 
-	private CustomAutoComplete<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private CustomAutoComplete<ExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private SfGrid<ExpenseDetailsCartModel> _sfExpensesCartGrid;
-	private CustomAutoComplete<VehicleModel, VehicleModel> _sfFirstFocus;
+	private CustomAutoComplete<VehicleModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =
@@ -256,38 +255,38 @@ public partial class ExpensePage
 	#endregion
 
 	#region Change Events
-	private async Task OnVehicleChanged(ChangeEventArgs<VehicleModel, VehicleModel> args)
+	private async Task OnVehicleChanged(VehicleModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedVehicle = args.Value;
+		_selectedVehicle = value;
 		_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId);
 
 		await SaveTransactionFile();
 	}
 
-	private async Task OnCompanyChanged(ChangeEventArgs<CompanyModel, CompanyModel> args)
+	private async Task OnCompanyChanged(CompanyModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 			return;
 
-		_selectedCompany = args.Value;
+		_selectedCompany = value;
 		await SaveTransactionFile();
 	}
 	#endregion
 
 	#region Expenses Cart
-	private async Task OnExpensesTypeChanged(ChangeEventArgs<ExpenseTypeModel?, ExpenseTypeModel?> args)
+	private void OnExpensesTypeChanged(ExpenseTypeModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 		{
 			_selectedExpenseType = null;
 			_selectedExpensesCart = new();
 			return;
 		}
 
-		_selectedExpenseType = args.Value;
+		_selectedExpenseType = value;
 
 		_selectedExpensesCart.ExpenseTypeId = _selectedExpenseType.Id;
 		_selectedExpensesCart.ExpenseTypeName = _selectedExpenseType.Name;
@@ -295,9 +294,9 @@ public partial class ExpensePage
 		_selectedExpensesCart.LedgerName = _selectedLedger?.Name;
 	}
 
-	private async Task OnLedgerChanged(ChangeEventArgs<LedgerModel?, LedgerModel?> args)
+	private async Task OnLedgerChanged(LedgerModel value)
 	{
-		if (args.Value is null || args.Value.Id == 0)
+		if (value is null || value.Id == 0)
 		{
 			_selectedLedger = null;
 			_selectedExpensesCart.LedgerId = null;
@@ -306,7 +305,7 @@ public partial class ExpensePage
 
 		else
 		{
-			_selectedLedger = args.Value;
+			_selectedLedger = value;
 			_selectedExpensesCart.LedgerId = _selectedLedger.Id;
 			_selectedExpensesCart.LedgerName = _selectedLedger.Name;
 		}
@@ -579,7 +578,7 @@ public partial class ExpensePage
 			case "ExportExcelInvoice":
 				await ExportExcelInvoice();
 				break;
-			case "TripReport":
+			case "ExpenseReport":
 				await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager);
 				break;
 			case "ExpenseDetailsReport":

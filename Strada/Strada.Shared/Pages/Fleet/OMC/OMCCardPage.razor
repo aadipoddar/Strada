@@ -91,13 +91,13 @@ else
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
-												 @bind-Value="_selectedOMC"
-												 DataSource="@_omcs"
-												 Placeholder="Select OMC"
-												 Label="OMC" Required="true"
-												 FieldValue="@nameof(OMCModel.Name)"
-												 AddNewRoute="@PageRouteNames.OMCMaster" />
+							<CustomAutoComplete T="OMCModel"
+												   @bind-Value="_selectedOMC"
+												   DataSource="@_omcs"
+												   Placeholder="Select OMC"
+												   Label="OMC"
+												   FieldValue="@nameof(OMCModel.Name)"
+												   AddNewRoute="@PageRouteNames.OMCMaster" />
 						</div>
 
 						<div class="form-field">

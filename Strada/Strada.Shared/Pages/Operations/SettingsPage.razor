@@ -51,14 +51,14 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Primary Company <span class="required">*</span></label>
-							<SfAutoComplete @bind-Value="_selectedCompanyName" TValue="string" TItem="CompanyModel"
-											DataSource="@_companies" Placeholder="Select primary company"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-								<AutoCompleteEvents TValue="string" TItem="CompanyModel" ValueChange="OnCompanyChange" />
-							</SfAutoComplete>
+							<CustomAutoComplete T="CompanyModel"
+												Value="_selectedCompany"
+												DataSource="@_companies"
+												Placeholder="Select primary company"
+												Label="Primary Company"
+												ValueChanged="OnCompanyChange"
+												FieldValue="@nameof(CompanyModel.Name)"
+												AddNewRoute="@PageRouteNames.CompanyMaster" />
 						</div>
 					</div>
 				</div>
@@ -239,36 +239,36 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Cash Ledger</label>
-							<SfAutoComplete @bind-Value="_selectedCashLedgerName" TValue="string" TItem="LedgerModel"
-											DataSource="@_ledgers" Placeholder="Select cash ledger"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-								<AutoCompleteEvents TValue="string" TItem="LedgerModel" ValueChange="OnCashLedgerChange" />
-							</SfAutoComplete>
+							<CustomAutoComplete T="LedgerModel"
+												Value="_selectedCashLedger"
+												DataSource="@_ledgers"
+												Placeholder="Select cash ledger"
+												Label="Cash Ledger"
+												ValueChanged="OnCashLedgerChange"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">GST Ledger</label>
-							<SfAutoComplete @bind-Value="_selectedGSTLedgerName" TValue="string" TItem="LedgerModel"
-											DataSource="@_ledgers" Placeholder="Select GST ledger"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-								<AutoCompleteEvents TValue="string" TItem="LedgerModel" ValueChange="OnGSTLedgerChange" />
-							</SfAutoComplete>
+							<CustomAutoComplete T="LedgerModel"
+												Value="_selectedGSTLedger"
+												DataSource="@_ledgers"
+												Placeholder="Select GST ledger"
+												Label="GST Ledger"
+												ValueChanged="OnGSTLedgerChange"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Bill Ledger</label>
-							<SfAutoComplete @bind-Value="_selectedBillLedgerName" TValue="string" TItem="LedgerModel"
-											DataSource="@_ledgers" Placeholder="Select bill ledger"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-								<AutoCompleteEvents TValue="string" TItem="LedgerModel" ValueChange="OnBillLedgerChange" />
-							</SfAutoComplete>
+							<CustomAutoComplete T="LedgerModel"
+												Value="_selectedBillLedger"
+												DataSource="@_ledgers"
+												Placeholder="Select bill ledger"
+												Label="Bill Ledger"
+												ValueChanged="OnBillLedgerChange"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
 						</div>
 					</div>
 				</div>
@@ -290,25 +290,25 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Default Voucher for Accounting Transactions</label>
-							<SfAutoComplete @bind-Value="_selectedDefaultVoucherName" TValue="string" TItem="VoucherModel"
-											DataSource="@_vouchers" Placeholder="Select default voucher"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-								<AutoCompleteEvents TValue="string" TItem="VoucherModel" ValueChange="OnDefaultVoucherChange" />
-							</SfAutoComplete>
+							<CustomAutoComplete T="VoucherModel"
+												Value="_selectedDefaultVoucher"
+												DataSource="@_vouchers"
+												Placeholder="Select default voucher"
+												Label="Default Voucher for Accounting Transactions"
+												ValueChanged="OnDefaultVoucherChange"
+												FieldValue="@nameof(VoucherModel.Name)"
+												AddNewRoute="@PageRouteNames.VoucherMaster" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Bill Voucher</label>
-							<SfAutoComplete @bind-Value="_selectedBillVoucherName" TValue="string" TItem="VoucherModel"
-											DataSource="@_vouchers" Placeholder="Select bill voucher"
-											FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-								<AutoCompleteFieldSettings Value="Name" />
-								<AutoCompleteEvents TValue="string" TItem="VoucherModel" ValueChange="OnBillVoucherChange" />
-							</SfAutoComplete>
+							<CustomAutoComplete T="VoucherModel"
+												Value="_selectedBillVoucher"
+												DataSource="@_vouchers"
+												Placeholder="Select bill voucher"
+												Label="Bill Voucher"
+												ValueChanged="OnBillVoucherChange"
+												FieldValue="@nameof(VoucherModel.Name)"
+												AddNewRoute="@PageRouteNames.VoucherMaster" />
 						</div>
 					</div>
 				</div>
