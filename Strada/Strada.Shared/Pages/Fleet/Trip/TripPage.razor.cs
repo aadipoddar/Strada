@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.Data.Fleet.Trip;
@@ -13,8 +15,10 @@ using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
+
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
+
 using System.Text.Json;
 
 namespace Strada.Shared.Pages.Fleet.Trip;
@@ -54,13 +58,13 @@ public partial class TripPage
 	private List<TripCardPaymentsCartModel> _cardPaymentsCart = [];
 	private List<TripLedgerPaymentsCartModel> _ledgerPaymentsCart = [];
 
-	private AutoCompleteWithAdd<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
-	private AutoCompleteWithAdd<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
-	private AutoCompleteWithAdd<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
+	private CustomAutoComplete<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private CustomAutoComplete<OMCCardModel?, OMCCardModel> _sfOMCCardAutoComplete;
+	private CustomAutoComplete<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<TripExpensesCartModel> _sfExpensesCartGrid;
 	private SfGrid<TripCardPaymentsCartModel> _sfCardPaymentsCartGrid;
 	private SfGrid<TripLedgerPaymentsCartModel> _sfLedgerPaymentsCartGrid;
-	private AutoCompleteWithAdd<VehicleModel, VehicleModel> _sfFirstFocus;
+	private CustomAutoComplete<VehicleModel, VehicleModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =

@@ -74,7 +74,7 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<AutoCompleteWithAdd @ref="_sfFirstFocus" TItem="LocationModel" TValue="LocationModel"
+							<CustomAutoComplete @ref="_sfFirstFocus" TItem="LocationModel" TValue="LocationModel"
 												 @bind-Value="_selectedFromLocation"
 												 DataSource="@_locations"
 												 Placeholder="Select From Location (Ctrl + F)"
@@ -84,7 +84,7 @@ else
 						</div>
 
 						<div class="form-field">
-							<AutoCompleteWithAdd TItem="LocationModel" TValue="LocationModel"
+							<CustomAutoComplete TItem="LocationModel" TValue="LocationModel"
 												 @bind-Value="_selectedToLocation"
 												 DataSource="@_locations"
 												 Placeholder="Select To Location"

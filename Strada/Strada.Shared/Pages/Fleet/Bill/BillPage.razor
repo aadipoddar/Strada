@@ -87,7 +87,7 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
 													 @ref="_sfFirstFocus"
 													 Value="_selectedCompany"
 													 DataSource="@_companies"
@@ -100,7 +100,7 @@ else
 
 							<!-- Transaction Date -->
 							<div class="form-field">
-								<DatePickerWithAdd @bind-Value="_bill.TransactionDateTime"
+								<CustomDatePicker @bind-Value="_bill.TransactionDateTime"
 												   FinancialYear="@_selectedFinancialYear" />
 							</div>
 
@@ -115,7 +115,7 @@ else
 
 							<!-- OMC -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+								<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
 													 Value="_selectedOMC"
 													 DataSource="@_omcs"
 													 Placeholder="Select an OMC"
@@ -209,7 +209,7 @@ else
 					<div class="section-body">
 						<div class="cart-input-row">
 							<div class="cart-field cart-field-wide">
-								<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
+								<CustomAutoComplete TItem="LedgerModel" TValue="LedgerModel"
 													 @ref="_sfLedgerAutoComplete"
 													 FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
 													 DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"

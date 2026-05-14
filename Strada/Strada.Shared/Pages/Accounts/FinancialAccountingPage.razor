@@ -86,7 +86,7 @@ else
 						<div class="form-grid">
 							<!-- Company -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
 													 Value="_selectedCompany"
 													 DataSource="@_companies"
 													 Placeholder="Select Company"
@@ -98,7 +98,7 @@ else
 
 							<!-- Voucher -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="VoucherModel" TValue="VoucherModel"
+								<CustomAutoComplete TItem="VoucherModel" TValue="VoucherModel"
 													 Value="_selectedVoucher"
 													 DataSource="@_vouchers"
 													 Placeholder="Select Voucher"
@@ -110,7 +110,7 @@ else
 
 							<!-- Transaction Date -->
 							<div class="form-field">
-								<DatePickerWithAdd @bind-Value="_accounting.TransactionDateTime"
+								<CustomDatePicker @bind-Value="_accounting.TransactionDateTime"
 												   FinancialYear="@_selectedFinancialYear" />
 							</div>
 
@@ -223,7 +223,7 @@ else
 					<div class="cart-input-row">
 						<div class="cart-field cart-field-wide">
 							<div class="reference-wrapper">
-								<AutoCompleteWithAdd @ref="_sfLedgerAutoComplete" TItem="LedgerModel" TValue="LedgerModel"
+								<CustomAutoComplete @ref="_sfLedgerAutoComplete" TItem="LedgerModel" TValue="LedgerModel"
 													 Value="_selectedLedger"
 													 DataSource="@_ledgers"
 													 Placeholder="Select Ledger (Ctrl + F)"

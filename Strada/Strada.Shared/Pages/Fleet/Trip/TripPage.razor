@@ -94,7 +94,7 @@ else
 
 							<!-- Vehicle -->
 							<div class="form-field">
-								<AutoCompleteWithAdd @ref="_sfFirstFocus" TItem="VehicleModel" TValue="VehicleModel"
+								<CustomAutoComplete @ref="_sfFirstFocus" TItem="VehicleModel" TValue="VehicleModel"
 													 Value="_selectedVehicle"
 													 DataSource="@_vehicles"
 													 Placeholder="Select a Vehicle (Ctrl + F)"
@@ -115,13 +115,13 @@ else
 
 							<!-- Transaction Date -->
 							<div class="form-field">
-								<DatePickerWithAdd @bind-Value="_trip.TransactionDateTime" 
+								<CustomDatePicker @bind-Value="_trip.TransactionDateTime" 
 													FinancialYear="@_selectedFinancialYear" />
 							</div>
 
 							<!-- Route -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="RouteOverviewModel" TValue="RouteOverviewModel"
+								<CustomAutoComplete TItem="RouteOverviewModel" TValue="RouteOverviewModel"
 													 Value="_selectedRoute"
 													 DataSource="@_routes"
 													 Placeholder="Select a Route"
@@ -133,7 +133,7 @@ else
 
 							<!-- Driver -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="DriverOverviewModel" TValue="DriverOverviewModel"
+								<CustomAutoComplete TItem="DriverOverviewModel" TValue="DriverOverviewModel"
 													 Value="_selectedDriver"
 													 DataSource="@_drivers"
 													 Placeholder="Select a Driver"
@@ -145,7 +145,7 @@ else
 
 							<!-- Company -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+								<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
 													 Value="_selectedCompany"
 													 DataSource="@_companies"
 													 Placeholder="Select a Company"
@@ -157,7 +157,7 @@ else
 
 							<!-- OMC -->
 							<div class="form-field">
-								<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+								<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
 													 Value="_selectedOMC"
 													 DataSource="@_omcs"
 													 Placeholder="Select an OMC"
@@ -296,7 +296,7 @@ else
 						<div class="cart-input-row">
 							<!-- OMC Card -->
 							<div class="cart-field cart-field-wide">
-								<AutoCompleteWithAdd TItem="OMCCardModel" TValue="OMCCardModel"
+								<CustomAutoComplete TItem="OMCCardModel" TValue="OMCCardModel"
 													 @ref="_sfOMCCardAutoComplete"
 													 FieldValue="@nameof(OMCCardModel.CardNumber)" @bind-Value="_selectedOMCCard"
 													 DataSource="@_omcCards" Placeholder="Card (Ctrl + Shift + F)"
@@ -397,7 +397,7 @@ else
 					<div class="section-body">
 						<div class="cart-input-row">
 							<div class="cart-field cart-field-wide">
-								<AutoCompleteWithAdd TItem="LedgerModel" TValue="LedgerModel"
+								<CustomAutoComplete TItem="LedgerModel" TValue="LedgerModel"
 													 @ref="_sfLedgerAutoComplete"
 													 FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
 													 DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
@@ -499,7 +499,7 @@ else
 					<div class="cart-input-row">
 						<!-- Expense Type -->
 						<div class="cart-field cart-field-wide">
-							<AutoCompleteWithAdd TItem="ExpenseTypeModel" TValue="ExpenseTypeModel"
+							<CustomAutoComplete TItem="ExpenseTypeModel" TValue="ExpenseTypeModel"
 												 @ref="_sfExpenseTypeAutoComplete"
 												 FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
 												 DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + G)"

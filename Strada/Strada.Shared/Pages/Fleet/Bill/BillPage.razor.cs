@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
+
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.Bill;
 using StradaLibrary.Data.Fleet.Trip;
@@ -12,9 +14,11 @@ using StradaLibrary.Models.Fleet.Bill;
 using StradaLibrary.Models.Fleet.OMC;
 using StradaLibrary.Models.Fleet.Trip;
 using StradaLibrary.Models.Operations;
+
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
+
 using System.Text.Json;
 
 namespace Strada.Shared.Pages.Fleet.Bill;
@@ -44,12 +48,12 @@ public partial class BillPage
 	private List<TripOverviewModel> _tripCart = [];
 	private List<BillLedgerPaymentsCartModel> _ledgerPaymentsCart = [];
 
-	private AutoCompleteWithAdd<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
+	private CustomAutoComplete<LedgerModel?, LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<TripOverviewModel> _sfPendingTripGrid;
 	private SfGrid<TripOverviewModel> _sfTripCartGrid;
 	private SfGrid<BillLedgerPaymentsCartModel> _sfLedgerPaymentsCartGrid;
 	private SfTextBox _sfChallanNoTextBox;
-	private AutoCompleteWithAdd<CompanyModel, CompanyModel> _sfFirstFocus;
+	private CustomAutoComplete<CompanyModel, CompanyModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _pendingTripGridContextMenuItems =
@@ -456,7 +460,7 @@ public partial class BillPage
 
 		_selectedTrip.GrossAmount ??= 0;
 		_selectedTrip.PenaltyAmount ??= 0;
-		_selectedTrip.NetAmount = _selectedTrip.GrossAmount -  _selectedTrip.PenaltyAmount;
+		_selectedTrip.NetAmount = _selectedTrip.GrossAmount - _selectedTrip.PenaltyAmount;
 
 		if (string.IsNullOrWhiteSpace(_selectedTrip.ChallanNo) ||
 			_selectedTrip.Quantity < 0 ||

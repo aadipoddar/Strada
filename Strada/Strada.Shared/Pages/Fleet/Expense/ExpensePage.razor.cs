@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Fleet.Expense;
 using StradaLibrary.Data.Operations;
@@ -10,8 +12,10 @@ using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Fleet.Expense;
 using StradaLibrary.Models.Fleet.Vehicle;
 using StradaLibrary.Models.Operations;
+
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
+
 using System.Text.Json;
 
 namespace Strada.Shared.Pages.Fleet.Expense;
@@ -39,9 +43,9 @@ public partial class ExpensePage
 	private List<LedgerModel> _ledgers = [];
 	private List<ExpenseDetailsCartModel> _expensesCart = [];
 
-	private AutoCompleteWithAdd<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
+	private CustomAutoComplete<ExpenseTypeModel?, ExpenseTypeModel> _sfExpenseTypeAutoComplete;
 	private SfGrid<ExpenseDetailsCartModel> _sfExpensesCartGrid;
-	private AutoCompleteWithAdd<VehicleModel, VehicleModel> _sfFirstFocus;
+	private CustomAutoComplete<VehicleModel, VehicleModel> _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =

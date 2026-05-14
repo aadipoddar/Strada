@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
+
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
 using StradaLibrary.Data.Accounts.FinancialAccounting;
 using StradaLibrary.Data.Accounts.Masters;
 using StradaLibrary.Data.Operations;
@@ -9,6 +11,7 @@ using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Accounts.FinancialAccounting;
 using StradaLibrary.Models.Accounts.Masters;
 using StradaLibrary.Models.Operations;
+
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 
@@ -41,7 +44,7 @@ public partial class FinancialAccountingPage
 		new() { Text = "Delete (Del)", Id = "DeleteCart", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private AutoCompleteWithAdd<LedgerModel, LedgerModel> _sfLedgerAutoComplete;
+	private CustomAutoComplete<LedgerModel, LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<FinancialAccountingLedgerCartModel> _sfCartGrid;
 
 	private ToastNotification _toastNotification;

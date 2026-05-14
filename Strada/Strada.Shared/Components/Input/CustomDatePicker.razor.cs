@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Components;
+
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Models.Accounts.Masters;
+
 using Syncfusion.Blazor.Calendars;
 
 namespace Strada.Shared.Components.Input;
 
-public partial class DatePickerWithAdd
+public partial class CustomDatePicker
 {
 	private SfDatePicker<DateTime> _sfDatePicker;
 	private bool _isFocused;

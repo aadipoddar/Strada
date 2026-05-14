@@ -103,7 +103,7 @@ else
 						</div>
 
 						<div class="form-field">
-							<AutoCompleteWithAdd TItem="VehicleTypeModel" TValue="VehicleTypeModel"
+							<CustomAutoComplete TItem="VehicleTypeModel" TValue="VehicleTypeModel"
 												 @bind-Value="_selectedVehicleType"
 												 DataSource="@_vehicleTypes"
 												 Placeholder="Select vehicle type"
@@ -113,7 +113,7 @@ else
 						</div>
 
 						<div class="form-field">
-							<AutoCompleteWithAdd TItem="CompanyModel" TValue="CompanyModel"
+							<CustomAutoComplete TItem="CompanyModel" TValue="CompanyModel"
 												 @bind-Value="_selectedCompany"
 												 DataSource="@_companies"
 												 Placeholder="Select company"
@@ -123,7 +123,7 @@ else
 						</div>
 
 						<div class="form-field">
-							<AutoCompleteWithAdd TItem="OMCModel" TValue="OMCModel"
+							<CustomAutoComplete TItem="OMCModel" TValue="OMCModel"
 												 @bind-Value="_selectedOMC"
 												 DataSource="@_omcs"
 												 Placeholder="Select OMC"

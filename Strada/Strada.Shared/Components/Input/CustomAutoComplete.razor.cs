@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Components;
+
 using Syncfusion.Blazor.DropDowns;
 
 namespace Strada.Shared.Components.Input;
 
-public partial class AutoCompleteWithAdd<TValue, TItem>
+public partial class CustomAutoComplete<TValue, TItem>
 {
 	private SfAutoComplete<TValue, TItem> _sfAutoComplete;
 	private bool _isFocused;

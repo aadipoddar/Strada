@@ -1,11 +1,13 @@
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
 using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.Data.Operations;
 using StradaLibrary.Exports.Fleet.Route;
 using StradaLibrary.Exports.Utils;
 using StradaLibrary.Models.Fleet.Route;
 using StradaLibrary.Models.Operations;
+
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Fleet.Route;
@@ -32,7 +34,7 @@ public partial class RoutePage
 	private SfGrid<RouteModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private AutoCompleteWithAdd<LocationModel, LocationModel> _sfFirstFocus;
+	private CustomAutoComplete<LocationModel, LocationModel> _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
