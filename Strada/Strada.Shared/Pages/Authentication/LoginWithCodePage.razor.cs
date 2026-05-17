@@ -1,7 +1,7 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Mailing;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Utils.MailUtils;
+using StradaLibrary.Operations.Models;
 using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Authentication;

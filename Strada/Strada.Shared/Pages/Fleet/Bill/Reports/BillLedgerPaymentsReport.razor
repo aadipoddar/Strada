@@ -1,8 +1,8 @@
 @attribute [Route(PageRouteNames.BillLedgerPaymentsReport)]
 
-@using StradaLibrary.Models.Accounts.Masters
-@using StradaLibrary.Models.Fleet.OMC
-@using StradaLibrary.Models.Fleet.Bill
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.OMC.Models
+@using StradaLibrary.Fleet.Bill.Models
 
 <PageTitle>Bill Ledger Payments Report - Strada</PageTitle>
 
@@ -100,35 +100,34 @@ else
 						<div class="filters-grid">
 							<!-- Date Range -->
 							<div class="form-field">
-								<label class="field-label">Date Range</label>
-								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
-												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
-									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-								</SfDateRangePicker>
+								<CustomDateRangePicker Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+													   ValueChanged="OnDateRangeChanged"
+													   Label="Date Range"
+													   Required="false" />
 							</div>
 
 							<!-- Company -->
 							<div class="form-field">
 								<CustomAutoComplete T="CompanyModel"
-													 Value="_selectedCompany"
-													 DataSource="@_companies"
-													 Placeholder="All Companies"
-													 Label="Company" Required="false"
-													 ValueChanged="OnCompanyChanged"
-													 FieldValue="@nameof(CompanyModel.Name)"
-													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+													Value="_selectedCompany"
+													DataSource="@_companies"
+													Placeholder="All Companies"
+													Label="Company" Required="false"
+													ValueChanged="OnCompanyChanged"
+													FieldValue="@nameof(CompanyModel.Name)"
+													AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- OMC -->
 							<div class="form-field">
 								<CustomAutoComplete T="OMCModel"
-													 Value="_selectedOMC"
-													 DataSource="@_omcs"
-													 Placeholder="All OMCs"
-													 Label="OMC" Required="false"
-													 ValueChanged="OnOMCChanged"
-													 FieldValue="@nameof(OMCModel.Name)"
-													 AddNewRoute="@PageRouteNames.OMCMaster" />
+													Value="_selectedOMC"
+													DataSource="@_omcs"
+													Placeholder="All OMCs"
+													Label="OMC" Required="false"
+													ValueChanged="OnOMCChanged"
+													FieldValue="@nameof(OMCModel.Name)"
+													AddNewRoute="@PageRouteNames.OMCMaster" />
 							</div>
 						</div>
 					</div>
@@ -316,7 +315,7 @@ else
 							</GridColumn>
 
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.PaymentRemarks)" HeaderText="Payment Remarks" Width="170" Visible="_showAllColumns" />
-							
+
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns && (_selectedCompany is null || _selectedCompany.Id <= 0))" />
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
@@ -336,7 +335,7 @@ else
 								</Template>
 							</GridColumn>
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.TotalLedgerPaymentAmount)" HeaderText="Ledger Payment" Width="140" TextAlign="TextAlign.Right" Format="N2" />
-							
+
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
@@ -365,8 +364,7 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Bill"
-						  IdentifierLabel="Transaction No" IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing"
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionNo"
 						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
 <ToastNotification @ref="_toastNotification" />

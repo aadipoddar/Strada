@@ -1,8 +1,8 @@
+@using StradaLibrary.Accounts.Masters.Models
+
 @attribute [Route(PageRouteNames.LedgerMaster)]
 
-@using StradaLibrary.Models.Accounts.Masters
-
-<PageTitle>Ledger Management - Strada</PageTitle>
+<PageTitle>Ledger Management - Vectus</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -24,31 +24,23 @@ else
 		<Header Title="Ledger Management">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
-					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-										   Easing="ease" />
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
 					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
-										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash" Id="ToggleDeleted" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel" Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem" Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 					</MenuItems>
@@ -78,112 +70,122 @@ else
 					<div class="form-grid">
 						<!-- Ledger Name -->
 						<div class="form-field">
-							<label class="field-label">
-								Ledger Name <span class="required">*</span>
-							</label>
-							<SfTextBox @ref="_sfFirstFocus" @bind-Value="_ledger.Name" Placeholder="Enter ledger name (Ctrl + F)"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @ref="_sfFirstFocus"
+											 @bind-Value="_ledger.Name"
+											 Label="Name"
+											 Placeholder="Enter Ledger Name (Ctrl + F)" />
 						</div>
 
 						<!-- Code (Auto-generated) -->
 						<div class="form-field">
-							<label class="field-label">
-								Code <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_ledger.Code" Placeholder="Auto-generated"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+							<CustomTextField @bind-Value="_ledger.Code"
+											 Label="Code"
+											 Placeholder="Auto-generated"
+											 ReadOnly="true"
+											 TabIndex="-1" />
 						</div>
 
 						<!-- Group -->
 						<div class="form-field">
 							<CustomAutoComplete T="GroupModel"
-												   Value="_selectedGroup"
-												   DataSource="@_groups"
-												   Placeholder="Select Group"
-												   Label="Group" Required="true"
-												   ValueChanged="OnGroupChanged"
-												   FieldValue="@nameof(GroupModel.Name)"
-												   AddNewRoute="@PageRouteNames.GroupMaster" />
+												Value="_selectedGroup"
+												DataSource="@_groups"
+												Placeholder="Select Group"
+												Label="Group"
+												ValueChanged="OnGroupChanged"
+												FieldValue="@nameof(GroupModel.Name)"
+												AddNewRoute="@PageRouteNames.GroupMaster" />
 						</div>
 
 						<!-- Account Type -->
 						<div class="form-field">
 							<CustomAutoComplete T="AccountTypeModel"
-												   Value="_selectedAccountType"
-												   DataSource="@_accountTypes"
-												   Placeholder="Select Account Type"
-												   Label="Account Type" Required="true"
-												   ValueChanged="OnAccountTypeChanged"
-												   FieldValue="@nameof(AccountTypeModel.Name)"
-												   AddNewRoute="@PageRouteNames.AccountTypeMaster" />
+												Value="_selectedAccountType"
+												DataSource="@_accountTypes"
+												Placeholder="Select Account Type"
+												Label="Account Type"
+												ValueChanged="OnAccountTypeChanged"
+												FieldValue="@nameof(AccountTypeModel.Name)"
+												AddNewRoute="@PageRouteNames.AccountTypeMaster" />
 						</div>
 
 						<!-- State/UT -->
 						<div class="form-field">
 							<CustomAutoComplete T="StateUTModel"
-												   Value="_selectedStateUT"
-												   DataSource="@_stateUTs"
-												   Placeholder="Select State/UT"
-												   Label="State/UT" Required="true"
-												   ValueChanged="OnStateUTChanged"
-												   FieldValue="@nameof(StateUTModel.Name)"
-												   AddNewRoute="@PageRouteNames.StateUTMaster" />
+												Value="_selectedStateUT"
+												DataSource="@_stateUTs"
+												Placeholder="Select State/UT"
+												Label="State/UT"
+												ValueChanged="OnStateUTChanged"
+												FieldValue="@nameof(StateUTModel.Name)"
+												AddNewRoute="@PageRouteNames.StateUTMaster" />
 						</div>
 
 						<!-- GST No -->
 						<div class="form-field">
-							<label class="field-label">GST No</label>
-							<SfTextBox @bind-Value="_ledger.GSTNo" Placeholder="Enter GST No"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.GSTNo"
+											 Label="GST No"
+											 Placeholder="Enter GST No"
+											 Required="false" />
 						</div>
 
 						<!-- PAN No -->
 						<div class="form-field">
-							<label class="field-label">PAN No</label>
-							<SfTextBox @bind-Value="_ledger.PANNo" Placeholder="Enter PAN No"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.PANNo"
+											 Label="PAN No"
+											 Placeholder="Enter PAN No"
+											 Required="false" />
 						</div>
 
 						<!-- CIN No -->
 						<div class="form-field">
-							<label class="field-label">CIN No</label>
-							<SfTextBox @bind-Value="_ledger.CINNo" Placeholder="Enter CIN No"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.CINNo"
+											 Label="CIN No"
+											 Placeholder="Enter CIN No"
+											 Required="false" />
 						</div>
 
 						<!-- Alias -->
 						<div class="form-field">
-							<label class="field-label">Alias</label>
-							<SfTextBox @bind-Value="_ledger.Alias" Placeholder="Enter Alias"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.Alias"
+											 Label="Alias"
+											 Placeholder="Enter Alias"
+											 Required="false" />
 						</div>
 
 						<!-- Phone -->
 						<div class="form-field">
-							<label class="field-label">Phone</label>
-							<SfTextBox @bind-Value="_ledger.Phone" Placeholder="Enter Phone"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.Phone"
+											 Label="Phone"
+											 Placeholder="Enter Phone"
+											 Required="false"
+											 MaxLength="10" />
 						</div>
 
 						<!-- Email -->
 						<div class="form-field">
-							<label class="field-label">Email</label>
-							<SfTextBox @bind-Value="_ledger.Email" Placeholder="Enter Email"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.Email"
+											 Label="Email"
+											 Placeholder="Enter Email"
+											 Required="false" />
 						</div>
 
 						<!-- Address -->
 						<div class="form-field">
-							<label class="field-label">Address</label>
-							<SfTextBox @bind-Value="_ledger.Address" Placeholder="Enter Address" Multiline="true"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.Address"
+											 Label="Address"
+											 Placeholder="Enter Address"
+											 Required="false"
+											 Lines="2" />
 						</div>
 
 						<!-- Remarks -->
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_ledger.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledger.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -260,11 +262,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Ledger" IdentifierLabel="Name"
-						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Ledger" IdentifierLabel="Name"
-						   IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover"
-						   OnCancel="CancelRecover" />
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
+						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

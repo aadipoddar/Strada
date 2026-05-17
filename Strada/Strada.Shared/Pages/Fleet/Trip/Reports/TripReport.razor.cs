@@ -1,17 +1,17 @@
 using Strada.Shared.Components.Dialog;
 
-using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Fleet.Route;
-using StradaLibrary.Data.Fleet.Trip;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.Trip;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.OMC;
-using StradaLibrary.Models.Fleet.Route;
-using StradaLibrary.Models.Fleet.Trip;
-using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Fleet.Route.Data;
+using StradaLibrary.Fleet.Trip;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Fleet.Trip.Exports;
+using StradaLibrary.Utils.ExportUtils;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Fleet.Route.Models;
+using StradaLibrary.Fleet.Trip.Models;
+using StradaLibrary.Fleet.Vehicle.Models;
+using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -167,10 +167,10 @@ public partial class TripReport : IAsyncDisposable
 	#endregion
 
 	#region Changed Events
-	private async Task OnDateRangeChanged(Syncfusion.Blazor.Calendars.RangePickerEventArgs<DateTime> args)
+	private async Task OnDateRangeChanged(MudBlazor.DateRange range)
 	{
-		_fromDate = args.StartDate;
-		_toDate = args.EndDate;
+		_fromDate = range?.Start ?? _fromDate;
+		_toDate = range?.End ?? _toDate;
 		await LoadTransactionOverviews();
 	}
 

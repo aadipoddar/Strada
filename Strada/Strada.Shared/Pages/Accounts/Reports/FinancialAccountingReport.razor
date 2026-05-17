@@ -1,9 +1,10 @@
+@using Strada.Shared.Components.Card
+@using StradaLibrary.Accounts.FinancialAccounting.Models
+@using StradaLibrary.Accounts.Masters.Models
+
 @attribute [Route(PageRouteNames.FinancialAccountingReport)]
 
-@using StradaLibrary.Models.Accounts.FinancialAccounting
-@using StradaLibrary.Models.Accounts.Masters
-
-<PageTitle>Financial Accounting Report - Strada</PageTitle>
+<PageTitle>Financial Accounting Report - Vectus</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -101,35 +102,34 @@ else
 						<div class="filters-grid">
 							<!-- Date Range -->
 							<div class="form-field">
-								<label class="field-label">Date Range</label>
-								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
-												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
-									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-								</SfDateRangePicker>
+								<CustomDateRangePicker Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+													   ValueChanged="OnDateRangeChanged"
+													   Label="Date Range"
+													   Required="false" />
 							</div>
 
 							<!-- Company -->
 							<div class="form-field">
 								<CustomAutoComplete T="CompanyModel"
-													 Value="_selectedCompany"
-													 DataSource="@_companies"
-													 Placeholder="All Companies"
-													 Label="Company" Required="false"
-													 ValueChanged="OnCompanyChanged"
-													 FieldValue="@nameof(CompanyModel.Name)"
-													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+													Value="_selectedCompany"
+													DataSource="@_companies"
+													Placeholder="All Companies"
+													Label="Company" Required="false"
+													ValueChanged="OnCompanyChanged"
+													FieldValue="@nameof(CompanyModel.Name)"
+													AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Voucher -->
 							<div class="form-field">
 								<CustomAutoComplete T="VoucherModel"
-													 Value="_selectedVoucher"
-													 DataSource="@_vouchers"
-													 Placeholder="All Vouchers"
-													 Label="Voucher" Required="false"
-													 ValueChanged="OnVoucherChanged"
-													 FieldValue="@nameof(VoucherModel.Name)"
-													 AddNewRoute="@PageRouteNames.VoucherMaster" />
+													Value="_selectedVoucher"
+													DataSource="@_vouchers"
+													Placeholder="All Vouchers"
+													Label="Voucher" Required="false"
+													ValueChanged="OnVoucherChanged"
+													FieldValue="@nameof(VoucherModel.Name)"
+													AddNewRoute="@PageRouteNames.VoucherMaster" />
 							</div>
 						</div>
 					</div>
@@ -400,12 +400,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Accounting Transaction"
-						  IdentifierLabel="Transaction No" IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing"
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionNo"
 						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Accounting Transaction"
-						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverTransactionNo" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionNo"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

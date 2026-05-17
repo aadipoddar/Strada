@@ -1,4 +1,4 @@
-﻿@using StradaLibrary.Models.Operations
+﻿@using StradaLibrary.Operations.Models
 @attribute [Route(PageRouteNames.User)]
 
 <PageTitle>User Management - Strada</PageTitle>
@@ -62,56 +62,70 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Name <span class="required">*</span></label>
-							<SfTextBox @bind-Value="_transactionUser.Name" Placeholder="Enter user name" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_transactionUser.Name"
+											 Label="Name"
+											 Placeholder="Enter user name" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Phone <span class="required">*</span></label>
-							<SfTextBox @bind-Value="_transactionUser.Phone" Placeholder="Enter 10-digit phone number" MaxLength="10" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_transactionUser.Phone"
+											 Label="Phone"
+											 Placeholder="Enter 10-digit phone number"
+											 MaxLength="10" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Email</label>
-							<SfTextBox @bind-Value="_transactionUser.Email" Placeholder="Enter email (optional)" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_transactionUser.Email"
+											 Label="Email"
+											 Placeholder="Enter email (optional)"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Password <span class="required">*</span></label>
-							<SfTextBox @bind-Value="_transactionUser.Password" Placeholder="Enter password" Type="InputType.Password" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_transactionUser.Password"
+											 Label="Password"
+											 Placeholder="Enter password"
+											 InputType="MudBlazor.InputType.Password" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Accounts Permission</label>
 							<div class="checkbox-wrapper">
-								<SfCheckBox @bind-Checked="_transactionUser.Accounts" Label="Accounts" CssClass="custom-checkbox" />
+								<CustomCheckBox @bind-Value="_transactionUser.Accounts"
+												Label="Accounts"
+												AriaLabel="Accounts permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Fleet Permission</label>
 							<div class="checkbox-wrapper">
-								<SfCheckBox @bind-Checked="_transactionUser.Fleet" Label="Fleet" CssClass="custom-checkbox" />
+								<CustomCheckBox @bind-Value="_transactionUser.Fleet"
+												Label="Fleet"
+												AriaLabel="Fleet permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Reports Permission</label>
 							<div class="checkbox-wrapper">
-								<SfCheckBox @bind-Checked="_transactionUser.Reports" Label="Reports" CssClass="custom-checkbox" />
+								<CustomCheckBox @bind-Value="_transactionUser.Reports"
+												Label="Reports"
+												AriaLabel="Reports permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Admin Permission</label>
 							<div class="checkbox-wrapper">
-								<SfCheckBox @bind-Checked="_transactionUser.Admin" Label="Admin" CssClass="custom-checkbox" />
+								<CustomCheckBox @bind-Value="_transactionUser.Admin"
+												Label="Admin"
+												AriaLabel="Admin permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_transactionUser.Remarks" Placeholder="Enter remarks (optional)" Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_transactionUser.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -189,10 +203,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="User" IdentifierLabel="Name" IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="User" IdentifierLabel="Name" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

@@ -1,13 +1,13 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Fleet.Bill;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.Bill;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.Bill;
-using StradaLibrary.Models.Fleet.OMC;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Fleet.Bill;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Fleet.Bill.Exports;
+using StradaLibrary.Utils.ExportUtils;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.Bill.Models;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Operations.Models;
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Fleet.Bill.Reports;
@@ -124,10 +124,10 @@ public partial class BillReport : IAsyncDisposable
 	#endregion
 
 	#region Changed Events
-	private async Task OnDateRangeChanged(Syncfusion.Blazor.Calendars.RangePickerEventArgs<DateTime> args)
+	private async Task OnDateRangeChanged(MudBlazor.DateRange range)
 	{
-		_fromDate = args.StartDate;
-		_toDate = args.EndDate;
+		_fromDate = range?.Start ?? _fromDate;
+		_toDate = range?.End ?? _toDate;
 		await LoadTransactionOverviews();
 	}
 

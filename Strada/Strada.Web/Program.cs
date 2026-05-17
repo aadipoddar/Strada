@@ -1,13 +1,16 @@
 using MudBlazor.Services;
+
 using Strada.Shared.Services;
 using Strada.Web.Components;
 using Strada.Web.Services;
+
 using StradaLibrary.DataAccess;
+
 using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Secrets.SetupConfiguration();
+SqlDataAccess.SetupConfiguration();
 
 // Add services to the container.
 builder.Services

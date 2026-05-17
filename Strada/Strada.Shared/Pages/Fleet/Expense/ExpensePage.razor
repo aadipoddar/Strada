@@ -1,9 +1,9 @@
 ﻿@attribute [Route(PageRouteNames.Expense)]
 @attribute [Route(PageRouteNames.Expense + "/{Id:int}")]
 
-@using StradaLibrary.Models.Accounts.Masters
-@using StradaLibrary.Models.Fleet.Vehicle
-@using StradaLibrary.Models.Fleet.Expense
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.Vehicle.Models
+@using StradaLibrary.Fleet.Expense.Models
 
 <PageTitle>Expense - Strada</PageTitle>
 
@@ -114,32 +114,30 @@ else
 
 						<!-- Transaction No -->
 						<div class="form-field">
-							<label class="field-label">
-								Transaction No <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_expense.TransactionNo" Placeholder="Transaction No"
-									   FloatLabelType="FloatLabelType.Never" Readonly="true" TabIndex="-1"
-									   CssClass="custom-textbox readonly-field" />
+							<CustomTextField @bind-Value="_expense.TransactionNo"
+								Label="Transaction No"
+								Placeholder="Transaction No"
+								ReadOnly="true"
+								TabIndex="-1" />
 						</div>
 
 						<!-- Total Expense -->
 						<div class="form-field">
-							<label class="field-label">
-								Total Expense
-							</label>
-							<SfTextBox Value="@_expense.TotalExpense.ToString("N2")" Placeholder="Total Expense"
-									   FloatLabelType="FloatLabelType.Never" Readonly="true" TabIndex="-1"
-									   CssClass="custom-textbox readonly-field" />
+							<CustomTextField Value="@_expense.TotalExpense.ToString("N2")"
+								Label="Total Expense"
+								Placeholder="Total Expense"
+								ReadOnly="true"
+								Required="false"
+								TabIndex="-1" />
 						</div>
 
 						<!-- Remarks -->
 						<div class="form-field">
-							<label class="field-label">
-								Remarks / Narration
-							</label>
-							<SfTextBox @bind-Value="_expense.Remarks" Multiline="true"
-									   Placeholder="Enter remarks..." FloatLabelType="FloatLabelType.Never"
-									   CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_expense.Remarks"
+								Label="Remarks / Narration"
+								Placeholder="Enter remarks..."
+								Required="false"
+								Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -185,24 +183,27 @@ else
 
 						<!-- Amount -->
 						<div class="cart-field">
-							<label class="cart-label">Amount <span class="required">*</span></label>
-							<SfNumericTextBox @bind-Value=@_selectedExpensesCart.Amount TValue="decimal" Min="0"
-											  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-											  CssClass="custom-numeric editable-field" />
+							<CustomNumericField T="decimal"
+								@bind-Value="_selectedExpensesCart.Amount"
+								Min="0"
+								Label="Amount"
+								Placeholder="0.00" />
 						</div>
 
 						<!-- Identification -->
 						<div class="cart-field cart-field-wide">
-							<label class="cart-label">Identification</label>
-							<SfTextBox @bind-Value="_selectedExpensesCart.IdentificationNo" Placeholder="Enter identification..."
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_selectedExpensesCart.IdentificationNo"
+								Label="Identification"
+								Placeholder="Enter identification..."
+								Required="false" />
 						</div>
 
 						<!-- Remarks -->
 						<div class="cart-field cart-field-wide">
-							<label class="cart-label">Remarks</label>
-							<SfTextBox @bind-Value="_selectedExpensesCart.Remarks" Placeholder="Item Narration..."
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_selectedExpensesCart.Remarks"
+								Label="Remarks"
+								Placeholder="Item Narration..."
+								Required="false" />
 						</div>
 
 						<!-- Add Button -->

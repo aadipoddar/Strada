@@ -1,7 +1,7 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Pages.Operations;
 

@@ -1,10 +1,10 @@
 ﻿@attribute [Route(PageRouteNames.TripLedgerPaymentsReport)]
 
-@using StradaLibrary.Models.Accounts.Masters
-@using StradaLibrary.Models.Fleet.OMC
-@using StradaLibrary.Models.Fleet.Vehicle
-@using StradaLibrary.Models.Fleet.Route
-@using StradaLibrary.Models.Fleet.Trip
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.OMC.Models
+@using StradaLibrary.Fleet.Vehicle.Models
+@using StradaLibrary.Fleet.Route.Models
+@using StradaLibrary.Fleet.Trip.Models
 
 <PageTitle>Trip Ledger Payments Report - Strada</PageTitle>
 
@@ -104,11 +104,10 @@ else
 						<div class="filters-grid">
 							<!-- Date Range -->
 							<div class="form-field">
-								<label class="field-label">Date Range</label>
-								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
-												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
-									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-								</SfDateRangePicker>
+								<CustomDateRangePicker Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+													   ValueChanged="OnDateRangeChanged"
+													   Label="Date Range"
+													   Required="false" />
 							</div>
 
 							<!-- Company -->
@@ -619,12 +618,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Trip Transaction"
-						  IdentifierLabel="Transaction No" IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing"
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionNo"
 						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Trip Transaction"
-						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverTransactionNo" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionNo"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

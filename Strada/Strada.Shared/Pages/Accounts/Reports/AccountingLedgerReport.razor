@@ -1,10 +1,10 @@
+@using Strada.Shared.Components.Card
+@using StradaLibrary.Accounts.FinancialAccounting.Models
+@using StradaLibrary.Accounts.Masters.Models
+
 @attribute [Route(PageRouteNames.AccountingLedgerReport)]
 
-@using Strada.Shared.Components.Card
-@using StradaLibrary.Models.Accounts.FinancialAccounting
-@using StradaLibrary.Models.Accounts.Masters
-
-<PageTitle>Financial Ledger Report - Strada</PageTitle>
+<PageTitle>Financial Ledger Report - Vectus</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -102,47 +102,46 @@ else
 						<div class="filters-grid">
 							<!-- Date Range -->
 							<div class="form-field">
-								<label class="field-label">Date Range</label>
-								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
-												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
-									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-								</SfDateRangePicker>
+								<CustomDateRangePicker Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+													   ValueChanged="OnDateRangeChanged"
+													   Label="Date Range"
+													   Required="false" />
 							</div>
 
 							<!-- Company -->
 							<div class="form-field">
 								<CustomAutoComplete T="CompanyModel"
-													 Value="_selectedCompany"
-													 DataSource="@_companies"
-													 Placeholder="All Companies"
-													 Label="Company" Required="false"
-													 FieldValue="@nameof(CompanyModel.Name)"
-													 ValueChanged="OnCompanyChanged"
-													 AddNewRoute="@PageRouteNames.CompanyMaster" />
+													Value="_selectedCompany"
+													DataSource="@_companies"
+													Placeholder="All Companies"
+													Label="Company" Required="false"
+													FieldValue="@nameof(CompanyModel.Name)"
+													ValueChanged="OnCompanyChanged"
+													AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Voucher -->
 							<div class="form-field">
 								<CustomAutoComplete T="VoucherModel"
-													 Value="_selectedVoucher"
-													 DataSource="@_vouchers"
-													 Placeholder="All Vouchers"
-													 Label="Voucher" Required="false"
-													 ValueChanged="OnVoucherChanged"
-													 FieldValue="@nameof(VoucherModel.Name)"
-													 AddNewRoute="@PageRouteNames.VoucherMaster" />
+													Value="_selectedVoucher"
+													DataSource="@_vouchers"
+													Placeholder="All Vouchers"
+													Label="Voucher" Required="false"
+													ValueChanged="OnVoucherChanged"
+													FieldValue="@nameof(VoucherModel.Name)"
+													AddNewRoute="@PageRouteNames.VoucherMaster" />
 							</div>
 
 							<!-- Ledger -->
 							<div class="form-field">
 								<CustomAutoComplete T="LedgerModel"
-													 Value="_selectedLedger"
-													 DataSource="@_ledgers"
-													 Placeholder="All Ledgers"
-													 Label="Ledger" Required="false"
-													 FieldValue="@nameof(LedgerModel.Name)"
-													 ValueChanged="OnLedgerChanged"
-													 AddNewRoute="@PageRouteNames.LedgerMaster" />
+													Value="_selectedLedger"
+													DataSource="@_ledgers"
+													Placeholder="All Ledgers"
+													Label="Ledger" Required="false"
+													FieldValue="@nameof(LedgerModel.Name)"
+													ValueChanged="OnLedgerChanged"
+													AddNewRoute="@PageRouteNames.LedgerMaster" />
 							</div>
 						</div>
 
@@ -289,7 +288,7 @@ else
 							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.LedgerCode)" HeaderText="Code" Width="120" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.AccountTypeName)" HeaderText="Account Type" Width="150" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.GroupName)" HeaderText="Group" Width="150" Visible="_showAllColumns" />
-							
+
 							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.LedgerReferenceType)" HeaderText="Ref Type" Width="130" />
 							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.LedgerReferenceNo)" HeaderText="Ref No" Width="150" />
 							<GridColumn Field="@nameof(FinancialAccountingLedgerOverviewModel.LedgerReferenceDateTime)" HeaderText="Ref Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
@@ -457,12 +456,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Financial Accounting"
-						  IdentifierLabel="Transaction No" IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing"
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionNo"
 						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Financial Accounting"
-						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverTransactionNo" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionNo"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

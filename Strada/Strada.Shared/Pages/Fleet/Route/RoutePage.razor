@@ -1,6 +1,6 @@
-@attribute [Route(PageRouteNames.RouteMaster)]
+﻿@attribute [Route(PageRouteNames.RouteMaster)]
 
-@using StradaLibrary.Models.Fleet.Route
+@using StradaLibrary.Fleet.Route.Models
 
 <PageTitle>Route - Strada</PageTitle>
 
@@ -94,57 +94,54 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Code <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_route.Code" Placeholder="Auto-generated"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+							<CustomTextField @bind-Value="_route.Code"
+											 Label="Code"
+											 Placeholder="Auto-generated"
+											 ReadOnly="true"
+											 TabIndex="-1" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Estimated Hours <span class="required">*</span>
-							</label>
-							<SfNumericTextBox @bind-Value="_route.EstimatedHours" TValue="int" Min="0"
-											  ShowSpinButton="false" Placeholder="Enter estimated hours"
-											  FloatLabelType="FloatLabelType.Never" Format="N0"
-											  CssClass="custom-numeric" />
+							<CustomNumericField T="int"
+												@bind-Value="_route.EstimatedHours"
+												Label="Estimated Hours"
+												Placeholder="Enter estimated hours"
+												Format="N0"
+												Min="0" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Estimated Distance <span class="required">*</span>
-							</label>
-							<SfNumericTextBox @bind-Value="_route.EstimatedDistance" TValue="int" Min="0"
-											  ShowSpinButton="false" Placeholder="Enter estimated distance"
-											  FloatLabelType="FloatLabelType.Never" Format="N0"
-											  CssClass="custom-numeric" />
+							<CustomNumericField T="int"
+												@bind-Value="_route.EstimatedDistance"
+												Label="Estimated Distance"
+												Placeholder="Enter estimated distance"
+												Format="N0"
+												Min="0" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Estimated Fuel Consumption <span class="required">*</span>
-							</label>
-							<SfNumericTextBox @bind-Value="_route.EstimatedFuelConsumption" TValue="int" Min="0"
-											  ShowSpinButton="false" Placeholder="Enter estimated fuel consumption"
-											  FloatLabelType="FloatLabelType.Never" Format="N0"
-											  CssClass="custom-numeric" />
+							<CustomNumericField T="int"
+												@bind-Value="_route.EstimatedFuelConsumption"
+												Label="Estimated Fuel Consumption"
+												Placeholder="Enter estimated fuel consumption"
+												Format="N0"
+												Min="0" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Estimated Cost <span class="required">*</span>
-							</label>
-							<SfNumericTextBox @bind-Value="_route.EstimatedCost" TValue="decimal" Min="0"
-											  ShowSpinButton="false" Placeholder="Enter estimated cost"
-											  FloatLabelType="FloatLabelType.Never" Format="N2"
-											  CssClass="custom-numeric" />
+							<CustomNumericField T="decimal"
+												@bind-Value="_route.EstimatedCost"
+												Label="Estimated Cost"
+												Placeholder="Enter estimated cost"
+												Min="0" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_route.Remarks" Placeholder="Enter remarks (optional)"
-									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_route.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -219,12 +216,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Route" IdentifierLabel="Code"
-						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Route"
-						   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

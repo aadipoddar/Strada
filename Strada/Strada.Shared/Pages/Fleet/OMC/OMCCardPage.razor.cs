@@ -1,14 +1,13 @@
-using Strada.Shared.Components.Dialog;
+﻿using Strada.Shared.Components.Dialog;
 
-using StradaLibrary.Data.Fleet.OMC;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.OMC;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Fleet.OMC;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Fleet.OMC.Data;
+using StradaLibrary.Fleet.OMC.Exports;
+using StradaLibrary.Utils.ExportUtils;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Inputs;
+using Strada.Shared.Components.Input;
 
 namespace Strada.Shared.Pages.Fleet.OMC;
 
@@ -33,7 +32,7 @@ public partial class OMCCardPage
 	private SfGrid<OMCCardModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private SfTextBox _sfFirstFocus;
+	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;

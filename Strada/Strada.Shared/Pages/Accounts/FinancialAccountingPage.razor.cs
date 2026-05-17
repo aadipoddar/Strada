@@ -3,16 +3,15 @@ using Microsoft.AspNetCore.Components;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
-using StradaLibrary.Data.Accounts.FinancialAccounting;
-using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Accounts.FinancialAccounting;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.FinancialAccounting;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Accounts.FinancialAccounting.Data;
+using StradaLibrary.Accounts.FinancialAccounting.Exports;
+using StradaLibrary.Accounts.FinancialAccounting.Models;
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
-using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts;
@@ -44,6 +43,7 @@ public partial class FinancialAccountingPage
 		new() { Text = "Delete (Del)", Id = "DeleteCart", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
+	private CustomAutoComplete<CompanyModel> _sfFirstFocus;
 	private CustomAutoComplete<LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<FinancialAccountingLedgerCartModel> _sfCartGrid;
 
@@ -55,46 +55,51 @@ public partial class FinancialAccountingPage
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
-		await InitializePage();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
+			await InitializePage();
+		}
+		catch
+		{
+			await ResetPage();
+		}
 	}
 
 	private async Task InitializePage()
 	{
 		await LoadCompanies();
 		await LoadVouchers();
-
-		if (!await ResolveTransaction())
-			return;
-
+		await ResolveTransaction();
 		await LoadSelections();
 		await LoadLedgers();
 		await LoadCart();
-		await SaveTransactionFile();
 
 		_isLoading = false;
 		StateHasChanged();
+
+		await SaveTransactionFile();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
-	private async Task<bool> ResolveTransaction()
+	private async Task ResolveTransaction()
 	{
 		try
 		{
 			if (await LoadExistingTransaction())
-				return true;
+				return;
 
 			if (await TryRestoreFromLocalStorage())
-				return true;
+				return;
 
 			await CreateNewTransaction();
-			return true;
 		}
 		catch (Exception ex)
 		{
 			await _toastNotification.ShowAsync("An Error Occurred While Loading Transaction Data", ex.Message, ToastType.Error);
-			await DeleteLocalFiles();
-			await CreateNewTransaction();
-			return true;
+			await ResetPage();
 		}
 	}
 

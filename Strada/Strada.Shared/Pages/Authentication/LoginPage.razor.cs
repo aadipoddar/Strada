@@ -1,7 +1,7 @@
 using Microsoft.JSInterop;
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
 using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Authentication;

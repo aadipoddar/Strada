@@ -1,17 +1,15 @@
-using Microsoft.AspNetCore.Components;
+using Syncfusion.Blazor.Grids;
 
 using Strada.Shared.Components.Dialog;
 
-using StradaLibrary.Data.Accounts.FinancialAccounting;
-using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Accounts.FinancialAccounting;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.FinancialAccounting;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Operations;
-
-using Syncfusion.Blazor.Grids;
+using StradaLibrary.Accounts.FinancialAccounting.Data;
+using StradaLibrary.Accounts.FinancialAccounting.Exports;
+using StradaLibrary.Accounts.FinancialAccounting.Models;
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 namespace Strada.Shared.Pages.Accounts.Reports;
 
@@ -62,8 +60,15 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
-		await InitializePage();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
+			await InitializePage();
+		}
+		catch
+		{
+			NavigationManager.NavigateTo(NavigationManager.Uri, true);
+		}
 	}
 
 	private async Task InitializePage()
@@ -130,10 +135,10 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	#endregion
 
 	#region Changed Events
-	private async Task OnDateRangeChanged(Syncfusion.Blazor.Calendars.RangePickerEventArgs<DateTime> args)
+	private async Task OnDateRangeChanged(MudBlazor.DateRange range)
 	{
-		_fromDate = args.StartDate;
-		_toDate = args.EndDate;
+		_fromDate = range?.Start ?? _fromDate;
+		_toDate = range?.End ?? _toDate;
 		await LoadTransactionOverviews();
 	}
 

@@ -1,5 +1,4 @@
 @using MudBlazor
-@using StradaLibrary.Models.Accounts.Masters
 
 @if (_isFocused && AddNewRoute is not null)
 {
@@ -26,20 +25,15 @@
 					   IconSize="Size.Small" />
 		@if (ShowFinancialYear)
 		{
-			<MudTextField T="string"
-						  Value="@(FinancialYear is null ? "Select Financial Year" : $"{FinancialYear.StartDate:yyyy} to {FinancialYear.EndDate:yyyy}")"
-						  Placeholder="Financial Year"
-						  Label="Financial Year"
-						  ReadOnly="true"
-						  tabindex="-1"
-						  Margin="MudBlazor.Margin.Dense"
-						  Variant="MudBlazor.Variant.Filled"
-						  Adornment="@(AddNewRoute is not null ? Adornment.End : Adornment.None)"
-						  AdornmentIcon="@(AddNewRoute is not null ? Icons.Material.Filled.Add : null)"
-						  AdornmentColor="Color.Primary"
-						  IconSize="Size.Small"
-						  OnAdornmentClick="NavigateToAddNew"
-						  AdornmentAriaLabel="New" />
+			<CustomTextField Value="@(FinancialYear is null ? "Select Financial Year" : $"{FinancialYear.StartDate:yyyy} to {FinancialYear.EndDate:yyyy}")"
+							 Placeholder="Financial Year"
+							 Label="Financial Year"
+							 ReadOnly="true"
+							 Required="false"
+							 TabIndex="-1"
+							 AdornmentIcon="@(AddNewRoute is not null ? Icons.Material.Filled.Add : null)"
+							 OnAdornmentClick="NavigateToAddNew"
+							 AdornmentAriaLabel="New" />
 		}
 	</div>
 </div>

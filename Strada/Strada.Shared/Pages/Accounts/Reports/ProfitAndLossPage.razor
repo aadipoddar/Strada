@@ -1,13 +1,12 @@
+@using Strada.Shared.Components.Card
+@using StradaLibrary.Accounts.FinancialAccounting.Models
+@using StradaLibrary.Accounts.Masters.Models
+
 @attribute [Route(PageRouteNames.ProfitAndLossReport)]
 
-@using Strada.Shared.Components.Card
-@using StradaLibrary.Models.Accounts.FinancialAccounting
-@using StradaLibrary.Models.Accounts.Masters
+<PageTitle>Profit & Loss - Vectus</PageTitle>
 
-<PageTitle>Profit & Loss - Strada</PageTitle>
-
-<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft]
-					 OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadProfitAndLoss" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadProfitAndLoss" />
@@ -32,17 +31,12 @@ else
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Refresh Data (Ctrl + R / F5)" IconCss="e-icons e-refresh" Id="Refresh"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")"
-										  IconCss="e-icons e-table" Id="ToggleDetailsView" Disabled="@_isProcessing" />
+								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Refresh Data (Ctrl + R / F5)" IconCss="e-icons e-refresh" Id="Refresh" Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")" IconCss="e-icons e-table" Id="ToggleDetailsView" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf" Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Open" IconCss="e-icons e-folder-open">
@@ -95,23 +89,22 @@ else
 						<div class="filters-grid">
 							<!-- Date Range -->
 							<div class="form-field">
-								<label class="field-label">Date Range</label>
-								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
-												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
-									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-								</SfDateRangePicker>
+								<CustomDateRangePicker Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+													   ValueChanged="OnDateRangeChanged"
+													   Label="Date Range"
+													   Required="false" />
 							</div>
 
 							<!-- Company -->
 							<div class="form-field">
 								<CustomAutoComplete T="CompanyModel"
-													   Value="_selectedCompany"
-													   DataSource="@_companies"
-													   Placeholder="All Companies"
-													   Label="Company" Required="false"
-													   ValueChanged="OnCompanyChanged"
-													   FieldValue="@nameof(CompanyModel.Name)"
-													   AddNewRoute="@PageRouteNames.CompanyMaster" />
+													Value="_selectedCompany"
+													DataSource="@_companies"
+													Placeholder="All Companies"
+													Label="Company" Required="false"
+													ValueChanged="OnCompanyChanged"
+													FieldValue="@nameof(CompanyModel.Name)"
+													AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 						</div>
 

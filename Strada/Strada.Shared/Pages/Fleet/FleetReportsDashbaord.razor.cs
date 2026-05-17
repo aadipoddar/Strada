@@ -1,4 +1,4 @@
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Pages.Fleet;
 

@@ -1,10 +1,10 @@
 @attribute [Route(PageRouteNames.Bill)]
 @attribute [Route(PageRouteNames.Bill + "/{Id:int}")]
 
-@using StradaLibrary.Models.Accounts.Masters
-@using StradaLibrary.Models.Fleet.OMC
-@using StradaLibrary.Models.Fleet.Trip
-@using StradaLibrary.Models.Fleet.Bill
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.OMC.Models
+@using StradaLibrary.Fleet.Trip.Models
+@using StradaLibrary.Fleet.Bill.Models
 
 <PageTitle>Bill - Strada</PageTitle>
 
@@ -88,49 +88,48 @@ else
 							<!-- Company -->
 							<div class="form-field">
 								<CustomAutoComplete T="CompanyModel"
-													   @ref="_sfFirstFocus"
-													   Value="_selectedCompany"
-													   DataSource="@_companies"
-													   Placeholder="Select a Company"
-													   Label="Company"
-													   ValueChanged="OnCompanyChanged"
-													   FieldValue="@nameof(CompanyModel.Name)"
-													   AddNewRoute="@PageRouteNames.CompanyMaster" />
+													@ref="_sfFirstFocus"
+													Value="_selectedCompany"
+													DataSource="@_companies"
+													Placeholder="Select a Company"
+													Label="Company"
+													ValueChanged="OnCompanyChanged"
+													FieldValue="@nameof(CompanyModel.Name)"
+													AddNewRoute="@PageRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Transaction Date -->
 							<div class="form-field">
 								<CustomDatePicker @bind-Value="_bill.TransactionDateTime"
-													 FinancialYear="@_selectedFinancialYear" />
+												  FinancialYear="@_selectedFinancialYear" />
 							</div>
 
 							<!-- Bill No -->
 							<div class="form-field">
-								<label class="field-label">
-									Bill No <span class="required">*</span>
-								</label>
-								<SfTextBox @bind-Value="_bill.BillNo" Placeholder="Enter Bill No..."
-										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+								<CustomTextField @bind-Value="_bill.BillNo"
+												 Label="Bill No"
+												 Placeholder="Enter Bill No..." />
 							</div>
 
 							<!-- OMC -->
 							<div class="form-field">
 								<CustomAutoComplete T="OMCModel"
-													   Value="_selectedOMC"
-													   DataSource="@_omcs"
-													   Placeholder="Select an OMC"
-													   Label="OMC"
-													   ValueChanged="OnOMCChanged"
-													   FieldValue="@nameof(OMCModel.Name)"
-													   AddNewRoute="@PageRouteNames.OMCMaster" />
+													Value="_selectedOMC"
+													DataSource="@_omcs"
+													Placeholder="Select an OMC"
+													Label="OMC"
+													ValueChanged="OnOMCChanged"
+													FieldValue="@nameof(OMCModel.Name)"
+													AddNewRoute="@PageRouteNames.OMCMaster" />
 							</div>
 
 							<!-- Remarks -->
 							<div class="form-field">
-								<label class="field-label">Remarks / Narration</label>
-								<SfTextBox @bind-Value="_bill.Remarks" Multiline="true"
-										   Placeholder="Enter remarks..." FloatLabelType="FloatLabelType.Never"
-										   CssClass="custom-textbox" />
+								<CustomTextField @bind-Value="_bill.Remarks"
+												 Label="Remarks / Narration"
+												 Placeholder="Enter remarks..."
+												 Required="false"
+												 Lines="2" />
 							</div>
 
 						</div>
@@ -156,36 +155,44 @@ else
 
 							<!-- Transaction No -->
 							<div class="form-field">
-								<label class="field-label">
-									Transaction No <span class="required">*</span>
-								</label>
-								<SfTextBox @bind-Value="_bill.TransactionNo" Placeholder="Transaction No"
-										   FloatLabelType="FloatLabelType.Never" Readonly="true" TabIndex="-1"
-										   CssClass="custom-textbox readonly-field" />
+								<CustomTextField @bind-Value="_bill.TransactionNo"
+												 Label="Transaction No"
+												 Placeholder="Transaction No"
+												 ReadOnly="true"
+												 TabIndex="-1" />
 							</div>
 
 							<!-- Total Gross Amount -->
 							<div class="form-field">
-								<label class="field-label">Total Gross Amount</label>
-								<SfNumericTextBox Value="@_bill.TotalGrossAmount" Readonly="true" TValue="decimal" TabIndex="-1"
-												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-												  CssClass="custom-numeric readonly-field" />
+								<CustomNumericField T="decimal"
+													Value="_bill.TotalGrossAmount"
+													Label="Total Gross Amount"
+													Placeholder="0.00"
+													ReadOnly="true"
+													Required="false"
+													TabIndex="-1" />
 							</div>
 
 							<!-- Total Penalty Amount -->
 							<div class="form-field">
-								<label class="field-label">Total Penalty Amount</label>
-								<SfNumericTextBox Value="@_bill.TotalPenaltyAmount" Readonly="true" TValue="decimal" TabIndex="-1"
-												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-												  CssClass="custom-numeric readonly-field" />
+								<CustomNumericField T="decimal"
+													Value="_bill.TotalPenaltyAmount"
+													Label="Total Penalty Amount"
+													Placeholder="0.00"
+													ReadOnly="true"
+													Required="false"
+													TabIndex="-1" />
 							</div>
 
 							<!-- Total Net Amount -->
 							<div class="form-field">
-								<label class="field-label">Total Net Amount</label>
-								<SfNumericTextBox Value="@_bill.TotalNetAmount" Readonly="true" TValue="decimal" TabIndex="-1"
-												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-												  CssClass="custom-numeric total-field" />
+								<CustomNumericField T="decimal"
+													Value="_bill.TotalNetAmount"
+													Label="Total Net Amount"
+													Placeholder="0.00"
+													ReadOnly="true"
+													Required="false"
+													TabIndex="-1" />
 							</div>
 
 						</div>
@@ -210,24 +217,26 @@ else
 						<div class="cart-input-row">
 							<div class="cart-field cart-field-wide">
 								<CustomAutoComplete T="LedgerModel"
-													   @ref="_sfLedgerAutoComplete"
-													   FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
-													   DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
-													   ValueChanged="OnLedgerPaymentsTypeChanged" OpenOnFocus="false"
-													   Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
+													@ref="_sfLedgerAutoComplete"
+													FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
+													DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
+													ValueChanged="OnLedgerPaymentsTypeChanged" OpenOnFocus="false"
+													Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
 							</div>
 
 							<div class="cart-field cart-field-wide">
-								<label class="cart-label">Amount <span class="required">*</span></label>
-								<SfNumericTextBox @bind-Value="_selectedLedgerPaymentCart.Amount" TValue="decimal" Min="0"
-												  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-												  CssClass="custom-numeric editable-field" />
+								<CustomNumericField T="decimal"
+													@bind-Value="_selectedLedgerPaymentCart.Amount"
+													Min="0"
+													Label="Amount"
+													Placeholder="0.00" />
 							</div>
 
 							<div class="cart-field cart-field-wide">
-								<label class="cart-label">Remarks</label>
-								<SfTextBox @bind-Value="_selectedLedgerPaymentCart.Remarks" Placeholder="Item Narration..."
-										   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+								<CustomTextField @bind-Value="_selectedLedgerPaymentCart.Remarks"
+												 Label="Remarks"
+												 Placeholder="Item Narration..."
+												 Required="false" />
 							</div>
 
 							<div class="cart-field cart-field-wide">
@@ -379,62 +388,73 @@ else
 						<div class="section-body">
 							<div class="cart-input-row">
 								<div class="cart-field">
-									<label class="cart-label">Vehicle</label>
-									<SfTextBox Value="@_selectedTrip?.VehicleCode" Readonly="true"
-											   Placeholder="Select trip from pending list"
-											   FloatLabelType="FloatLabelType.Never"
-											   CssClass="custom-textbox readonly-field" />
+									<CustomTextField Value="@_selectedTrip?.VehicleCode"
+													 Label="Vehicle"
+													 Placeholder="Select trip from pending list"
+													 ReadOnly="true"
+													 Required="false" />
 								</div>
 
 								<div class="cart-field cart-field-wide">
-									<label class="cart-label">Route</label>
-									<SfTextBox Value="@_selectedTrip?.RouteDisplay" Readonly="true"
-											   Placeholder="Select trip from pending list"
-											   FloatLabelType="FloatLabelType.Never"
-											   CssClass="custom-textbox readonly-field" />
+									<CustomTextField Value="@_selectedTrip?.RouteDisplay"
+													 Label="Route"
+													 Placeholder="Select trip from pending list"
+													 ReadOnly="true"
+													 Required="false" />
 								</div>
 
 								<div class="cart-field">
-									<label class="cart-label">Expense</label>
-									<SfNumericTextBox @bind-Value="_selectedTrip.TotalExpense" TValue="decimal" Min="0" Readonly="true"
-													  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-													  CssClass="custom-numeric readonly-field" />
+									<CustomNumericField T="decimal"
+														@bind-Value="_selectedTrip.TotalExpense"
+														Min="0"
+														Label="Expense"
+														Placeholder="0.00"
+														ReadOnly="true"
+														Required="false" />
 								</div>
 
 								<div class="cart-field cart-field-wide">
-									<label class="cart-label">Challan No <span class="required">*</span></label>
-									<SfTextBox @ref="_sfChallanNoTextBox" @bind-Value="_selectedTrip.ChallanNo" Placeholder="Enter Challan No..."
-											   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+									<CustomTextField @ref="_sfChallanNoTextBox"
+													 @bind-Value="_selectedTrip.ChallanNo"
+													 Label="Challan No"
+													 Placeholder="Enter Challan No..." />
 								</div>
 							</div>
 
 							<div class="cart-input-row">
 								<div class="cart-field">
-									<label class="cart-label">Quantity</label>
-									<SfNumericTextBox @bind-Value="_selectedTrip.Quantity" TValue="decimal" Min="0"
-													  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-													  CssClass="custom-numeric editable-field" />
+									<CustomNumericField T="decimal"
+														@bind-Value="_selectedTrip.Quantity"
+														Min="0"
+														Label="Quantity"
+														Placeholder="0.00"
+														Required="false" />
 								</div>
 
 								<div class="cart-field">
-									<label class="cart-label">Gross Amount <span class="required">*</span></label>
-									<SfNumericTextBox @bind-Value="_selectedTrip.GrossAmount" TValue="decimal?" Min="0"
-													  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-													  CssClass="custom-numeric editable-field" />
+									<CustomNumericField T="decimal?"
+														@bind-Value="_selectedTrip.GrossAmount"
+														Min="0"
+														Label="Gross Amount"
+														Placeholder="0.00" />
 								</div>
 
 								<div class="cart-field">
-									<label class="cart-label">Penalty Amount</label>
-									<SfNumericTextBox @bind-Value="_selectedTrip.PenaltyAmount" TValue="decimal?" Min="0"
-													  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-													  CssClass="custom-numeric editable-field" />
+									<CustomNumericField T="decimal?"
+														@bind-Value="_selectedTrip.PenaltyAmount"
+														Min="0"
+														Label="Penalty Amount"
+														Placeholder="0.00"
+														Required="false" />
 								</div>
 
 								<div class="cart-field">
-									<label class="cart-label">Net Amount</label>
-									<SfNumericTextBox Value="@((_selectedTrip?.GrossAmount ?? 0) - (_selectedTrip?.PenaltyAmount ?? 0))"
-													  Readonly="true" TValue="decimal" ShowSpinButton="false" Placeholder="0.00"
-													  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric total-field" />
+									<CustomNumericField T="decimal"
+														Value="@((_selectedTrip?.GrossAmount ?? 0) - (_selectedTrip?.PenaltyAmount ?? 0))"
+														Label="Net Amount"
+														Placeholder="0.00"
+														ReadOnly="true"
+														Required="false" />
 								</div>
 
 								<div class="cart-field">

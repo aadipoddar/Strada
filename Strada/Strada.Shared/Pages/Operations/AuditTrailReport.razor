@@ -1,6 +1,6 @@
-@attribute [Route(PageRouteNames.AuditTrailReport)]
+﻿@attribute [Route(PageRouteNames.AuditTrailReport)]
 
-@using StradaLibrary.Models.Operations
+@using StradaLibrary.Operations.Models
 
 <PageTitle>Audit Trail - Strada</PageTitle>
 
@@ -79,11 +79,10 @@ else
 					<div class="filters-container">
 						<div class="filters-grid">
 							<div class="form-field">
-								<label class="field-label">Date Range</label>
-								<SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
-												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
-									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-								</SfDateRangePicker>
+								<CustomDateRangePicker Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+													   ValueChanged="OnDateRangeChanged"
+													   Label="Date Range"
+													   Required="false" />
 							</div>
 						</div>
 					</div>

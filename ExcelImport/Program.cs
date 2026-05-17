@@ -1,13 +1,12 @@
 ﻿using OfficeOpenXml;
-using StradaLibrary.Data.Common;
-using StradaLibrary.Data.Fleet.OMC;
-using StradaLibrary.Data.Fleet.Vehicle;
-using StradaLibrary.Data.Fleet.Route;
 using StradaLibrary.DataAccess;
-using StradaLibrary.Models.Fleet.OMC;
-using StradaLibrary.Models.Fleet.Vehicle;
+using StradaLibrary.Fleet.OMC.Data;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Fleet.Route.Data;
+using StradaLibrary.Fleet.Vehicle.Data;
+using StradaLibrary.Fleet.Vehicle.Models;
 
-Secrets.SetupConfiguration();
+SqlDataAccess.SetupConfiguration();
 
 FileInfo fileInfo = new(@"C:\Others\vehicle.xlsx");
 

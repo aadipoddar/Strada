@@ -1,6 +1,6 @@
 ﻿@attribute [Route(PageRouteNames.VehicleTypeMaster)]
 
-@using StradaLibrary.Models.Fleet.Vehicle
+@using StradaLibrary.Fleet.Vehicle.Models
 
 <PageTitle>Vehicle Type - Strada</PageTitle>
 
@@ -74,25 +74,26 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">
-								Vehicle Type Name <span class="required">*</span>
-							</label>
-							<SfTextBox @ref="_sfFirstFocus" @bind-Value="_vehicleType.Name" Placeholder="Enter vehicle type name (Ctrl + F)"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @ref="_sfFirstFocus"
+											 @bind-Value="_vehicleType.Name"
+											 Label="Name"
+											 Placeholder="Enter vehicle type name (Ctrl + F)" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Code <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_vehicleType.Code" Placeholder="Auto-generated"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+							<CustomTextField @bind-Value="_vehicleType.Code"
+											 Label="Code"
+											 Placeholder="Auto-generated"
+											 ReadOnly="true"
+											 TabIndex="-1" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_vehicleType.Remarks" Placeholder="Enter remarks (optional)"
-									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicleType.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -142,12 +143,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Type" IdentifierLabel="Vehicle Type Name"
-						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Type"
-						   IdentifierLabel="Vehicle Type Name" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

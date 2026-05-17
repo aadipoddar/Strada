@@ -1,8 +1,8 @@
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Operations;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Exports;
+using StradaLibrary.Utils.ExportUtils;
+using StradaLibrary.Operations.Models;
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Operations;

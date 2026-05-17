@@ -1,6 +1,6 @@
-@attribute [Route(PageRouteNames.DriverMaster)]
+﻿@attribute [Route(PageRouteNames.DriverMaster)]
 
-@using StradaLibrary.Models.Fleet.Route
+@using StradaLibrary.Fleet.Route.Models
 
 <PageTitle>Driver - Strada</PageTitle>
 
@@ -74,33 +74,32 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">
-								Name <span class="required">*</span>
-							</label>
-							<SfTextBox @ref="_sfFirstFocus" @bind-Value="_driver.Name" Placeholder="Enter Driver Name (Ctrl + F)"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @ref="_sfFirstFocus"
+											 @bind-Value="_driver.Name"
+											 Label="Name"
+											 Placeholder="Enter Driver Name (Ctrl + F)" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Mobile <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_driver.Mobile" Placeholder="Enter mobile number"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_driver.Mobile"
+											 Label="Mobile"
+											 Placeholder="Enter mobile number" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Code <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_driver.Code" Placeholder="Auto-generated"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+							<CustomTextField @bind-Value="_driver.Code"
+											 Label="Code"
+											 Placeholder="Auto-generated"
+											 ReadOnly="true"
+											 TabIndex="-1" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_driver.Remarks" Placeholder="Enter remarks (optional)" 
-									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_driver.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -150,12 +149,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Driver" IdentifierLabel="Driver Name"
-						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Driver"
-						   IdentifierLabel="Driver Name" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

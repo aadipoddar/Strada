@@ -1,5 +1,5 @@
-﻿using StradaLibrary.Data.Operations;
-using StradaLibrary.Models.Operations;
+﻿using StradaLibrary.Operations.Models;
+
 using System.Reflection;
 
 namespace Strada.Shared.Pages;

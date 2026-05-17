@@ -1,6 +1,6 @@
-@attribute [Route(PageRouteNames.VehicleDocumentTypeMaster)]
+﻿@attribute [Route(PageRouteNames.VehicleDocumentTypeMaster)]
 
-@using StradaLibrary.Models.Fleet.VehicleDocument
+@using StradaLibrary.Fleet.VehicleDocument.Models
 
 <PageTitle>Vehicle Document Type - Strada</PageTitle>
 
@@ -25,7 +25,7 @@ else
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
 					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-									   Easing="ease" />
+										   Easing="ease" />
 					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
@@ -74,33 +74,34 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">
-								Document Type Name <span class="required">*</span>
-							</label>
-							<SfTextBox @ref="_sfFirstFocus" @bind-Value="_vehicleDocumentType.Name" Placeholder="Enter document type name (Ctrl + F)"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @ref="_sfFirstFocus"
+											 @bind-Value="_vehicleDocumentType.Name"
+											 Label="Name"
+											 Placeholder="Enter document type name (Ctrl + F)" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Code <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_vehicleDocumentType.Code" Placeholder="Auto-generated"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Readonly="true" />
+							<CustomTextField @bind-Value="_vehicleDocumentType.Code"
+											 Label="Code"
+											 Placeholder="Auto-generated"
+											 ReadOnly="true"
+											 TabIndex="-1" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Rate <span class="required">*</span>
-							</label>
-							<SfNumericTextBox @bind-Value="_vehicleDocumentType.Rate" Placeholder="Enter rate"
-											  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" Min="0" Format="N2" />
+							<CustomNumericField T="decimal"
+												@bind-Value="_vehicleDocumentType.Rate"
+												Label="Rate"
+												Placeholder="Enter rate"
+												Min="0" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_vehicleDocumentType.Remarks" Placeholder="Enter remarks (optional)"
-									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicleDocumentType.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -152,12 +153,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Document Type" IdentifierLabel="Document Type Name"
-						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Document Type"
-					   IdentifierLabel="Document Type Name" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
-					   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
+						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

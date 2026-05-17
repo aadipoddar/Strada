@@ -1,8 +1,8 @@
-@attribute [Route(PageRouteNames.VehicleDocument)]
+﻿@attribute [Route(PageRouteNames.VehicleDocument)]
 
-@using StradaLibrary.Models.Accounts.Masters
-@using StradaLibrary.Models.Fleet.Vehicle
-@using StradaLibrary.Models.Fleet.VehicleDocument
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.Vehicle.Models
+@using StradaLibrary.Fleet.VehicleDocument.Models
 
 <PageTitle>Vehicle Document - Strada</PageTitle>
 
@@ -83,11 +83,10 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">
-								Transaction No <span class="required">*</span>
-							</label>
-							<SfTextBox @ref="_sfFirstFocus" @bind-Value="_vehicleDocument.TransactionNo" Placeholder="Enter transaction number (Ctrl + F)"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @ref="_sfFirstFocus"
+											 @bind-Value="_vehicleDocument.TransactionNo"
+											 Label="Transaction No"
+											 Placeholder="Enter transaction number (Ctrl + F)" />
 						</div>
 
 						<div class="form-field">
@@ -117,23 +116,20 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Current KM
-							</label>
-							<SfNumericTextBox @bind-Value="_vehicleDocument.CurrentKM" TValue="decimal" Min="0"
-											  ShowSpinButton="false" Placeholder="0.00"
-											  FloatLabelType="FloatLabelType.Never" Format="N2"
-											  CssClass="custom-numeric editable-field" />
+							<CustomNumericField T="decimal"
+												@bind-Value="_vehicleDocument.CurrentKM"
+												Label="Current KM"
+												Placeholder="0.00"
+												Min="0"
+												Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Rate <span class="required">*</span>
-							</label>
-							<SfNumericTextBox @bind-Value="_vehicleDocument.Rate" TValue="decimal" Min="0"
-											  ShowSpinButton="false" Placeholder="0.00"
-											  FloatLabelType="FloatLabelType.Never" Format="N2"
-											  CssClass="custom-numeric editable-field" />
+							<CustomNumericField T="decimal"
+												@bind-Value="_vehicleDocument.Rate"
+												Label="Rate"
+												Placeholder="0.00"
+												Min="0" />
 						</div>
 
 						<div class="form-field">
@@ -141,9 +137,11 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_vehicleDocument.Remarks" Placeholder="Enter remarks (optional)"
-									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicleDocument.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -227,12 +225,10 @@ else
 					  OnDownloadClick="DownloadExistingDocument" OnRemoveClick="MarkDocumentForRemoval"
 					  OnClose="CloseUploadDialog" />
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle Document" IdentifierLabel="Transaction No"
-						  IdentifierValue="@_deleteTransactionNo" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionNo"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle Document"
-						   IdentifierLabel="Transaction No" IdentifierValue="@_recoverTransactionNo" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionNo"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

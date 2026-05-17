@@ -4,8 +4,11 @@ using Microsoft.Extensions.Logging;
 
 using Strada.Services;
 using Strada.Shared.Services;
+
 using StradaLibrary.DataAccess;
+
 using Syncfusion.Blazor;
+
 using MudBlazor.Services;
 
 namespace Strada;
@@ -14,7 +17,7 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
-		Secrets.SetupConfiguration();
+		SqlDataAccess.SetupConfiguration();
 
 		var builder = MauiApp.CreateBuilder();
 		builder

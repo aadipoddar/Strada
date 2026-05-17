@@ -1,14 +1,15 @@
-using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Fleet.Vehicle;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Fleet.Vehicle;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Fleet.OMC;
-using StradaLibrary.Models.Fleet.Vehicle;
-using StradaLibrary.Models.Operations;
+﻿using Strada.Shared.Components.Dialog;
+
+using StradaLibrary.Fleet.Vehicle.Data;
+using StradaLibrary.Fleet.Vehicle.Exports;
+using StradaLibrary.Utils.ExportUtils;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Fleet.Vehicle.Models;
+using StradaLibrary.Operations.Models;
+
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Inputs;
+using Strada.Shared.Components.Input;
 
 namespace Strada.Shared.Pages.Fleet.Vehicle;
 
@@ -37,7 +38,7 @@ public partial class VehiclePage
 	private SfGrid<VehicleModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private SfTextBox _sfFirstFocus;
+	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;

@@ -1,5 +1,5 @@
-@using StradaLibrary.Models.Accounts.Masters
-@using StradaLibrary.Models.Operations
+﻿@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Operations.Models
 @attribute [Route(PageRouteNames.Settings)]
 
 <PageTitle>Settings - Strada</PageTitle>
@@ -78,35 +78,52 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Enable Login with Code</label>
 							<div class="checkbox-wrapper">
-								<SfCheckBox @bind-Checked="_enableLoginWithCode" Label="Allow OTP-based login" CssClass="custom-checkbox" />
+								<CustomCheckBox @bind-Value="_enableLoginWithCode"
+												Label="Allow OTP-based login"
+												AriaLabel="Allow OTP-based login" />
 							</div>
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Enable Users to Reset Password</label>
 							<div class="checkbox-wrapper">
-								<SfCheckBox @bind-Checked="_enableUsersToResetPassword" Label="Allow self-service password reset" CssClass="custom-checkbox" />
+								<CustomCheckBox @bind-Value="_enableUsersToResetPassword"
+												Label="Allow self-service password reset"
+												AriaLabel="Allow self-service password reset" />
 							</div>
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Max Login Attempts</label>
-							<SfNumericTextBox @bind-Value="_maxLoginAttempts" TValue="int" Min="1" Max="20"
-											  Placeholder="e.g., 5" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+							<CustomNumericField T="int"
+												@bind-Value="_maxLoginAttempts"
+												Label="Max Login Attempts"
+												Placeholder="e.g., 5"
+												Format="N0"
+												Min="1"
+												Max="20"
+												Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Code Resend Limit</label>
-							<SfNumericTextBox @bind-Value="_codeResendLimit" TValue="int" Min="1" Max="10"
-											  Placeholder="e.g., 3" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+							<CustomNumericField T="int"
+												@bind-Value="_codeResendLimit"
+												Label="Code Resend Limit"
+												Placeholder="e.g., 3"
+												Format="N0"
+												Min="1"
+												Max="10"
+												Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Code Expiry (Minutes)</label>
-							<SfNumericTextBox @bind-Value="_codeExpiryMinutes" TValue="int" Min="1" Max="60"
-											  Placeholder="e.g., 10" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+							<CustomNumericField T="int"
+												@bind-Value="_codeExpiryMinutes"
+												Label="Code Expiry (Minutes)"
+												Placeholder="e.g., 10"
+												Format="N0"
+												Min="1"
+												Max="60"
+												Required="false" />
 						</div>
 					</div>
 				</div>
@@ -126,57 +143,66 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Ledger Code Prefix</label>
-							<SfTextBox @bind-Value="_ledgerCodePrefix" Placeholder="e.g., LD"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_ledgerCodePrefix"
+											 Label="Ledger Code Prefix"
+											 Placeholder="e.g., LD"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Vehicle Type Code Prefix</label>
-							<SfTextBox @bind-Value="_vehicleTypeCodePrefix" Placeholder="e.g., VHTY"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicleTypeCodePrefix"
+											 Label="Vehicle Type Code Prefix"
+											 Placeholder="e.g., VHTY"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Document Type Code Prefix</label>
-							<SfTextBox @bind-Value="_documentTypeCodePrefix" Placeholder="e.g., DCTY"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_documentTypeCodePrefix"
+											 Label="Document Type Code Prefix"
+											 Placeholder="e.g., DCTY"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">OMC Code Prefix</label>
-							<SfTextBox @bind-Value="_omcCodePrefix" Placeholder="e.g., OMC"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_omcCodePrefix"
+											 Label="OMC Code Prefix"
+											 Placeholder="e.g., OMC"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">OMC Card Code Prefix</label>
-							<SfTextBox @bind-Value="_omcCardCodePrefix" Placeholder="e.g., OMCC"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_omcCardCodePrefix"
+											 Label="OMC Card Code Prefix"
+											 Placeholder="e.g., OMCC"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Location Code Prefix</label>
-							<SfTextBox @bind-Value="_locationCodePrefix" Placeholder="e.g., LC"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_locationCodePrefix"
+											 Label="Location Code Prefix"
+											 Placeholder="e.g., LC"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Route Code Prefix</label>
-							<SfTextBox @bind-Value="_routeCodePrefix" Placeholder="e.g., RT"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_routeCodePrefix"
+											 Label="Route Code Prefix"
+											 Placeholder="e.g., RT"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Driver Code Prefix</label>
-							<SfTextBox @bind-Value="_driverCodePrefix" Placeholder="e.g., DR"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_driverCodePrefix"
+											 Label="Driver Code Prefix"
+											 Placeholder="e.g., DR"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Expense Type Code Prefix</label>
-							<SfTextBox @bind-Value="_expenseTypeCodePrefix" Placeholder="e.g., EX"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_expenseTypeCodePrefix"
+											 Label="Expense Type Code Prefix"
+											 Placeholder="e.g., EX"
+											 Required="false" />
 						</div>
 					</div>
 				</div>
@@ -196,27 +222,31 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Financial Accounting Prefix</label>
-							<SfTextBox @bind-Value="_financialAccountingTransactionPrefix" Placeholder="e.g., AC"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_financialAccountingTransactionPrefix"
+											 Label="Financial Accounting Prefix"
+											 Placeholder="e.g., AC"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Trip Prefix</label>
-							<SfTextBox @bind-Value="_tripTransactionPrefix" Placeholder="e.g., TR"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_tripTransactionPrefix"
+											 Label="Trip Prefix"
+											 Placeholder="e.g., TR"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Bill Prefix</label>
-							<SfTextBox @bind-Value="_billTransactionPrefix" Placeholder="e.g., BL"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_billTransactionPrefix"
+											 Label="Bill Prefix"
+											 Placeholder="e.g., BL"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Expense Prefix</label>
-							<SfTextBox @bind-Value="_expenseTransactionPrefix" Placeholder="e.g., EX"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_expenseTransactionPrefix"
+											 Label="Expense Prefix"
+											 Placeholder="e.g., EX"
+											 Required="false" />
 						</div>
 					</div>
 				</div>
@@ -328,9 +358,14 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">Auto Refresh Timer (Minutes)</label>
-							<SfNumericTextBox @bind-Value="_autoRefreshReportTimer" TValue="int" Min="1" Max="60"
-											  Placeholder="e.g., 5" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+							<CustomNumericField T="int"
+												@bind-Value="_autoRefreshReportTimer"
+												Label="Auto Refresh Timer (Minutes)"
+												Placeholder="e.g., 5"
+												Format="N0"
+												Min="1"
+												Max="60"
+												Required="false" />
 						</div>
 					</div>
 				</div>
@@ -342,11 +377,6 @@ else
 	</div>
 }
 
-<ResetConfirmationDialog @ref="_resetConfirmationDialog"
-						 Message="Are you sure you want to reset all settings to their default values?"
-						 WarningMessage="This will reset all system configuration including company linking, code prefixes, transaction prefixes, ledger associations, and login settings."
-						 NoteMessage="This action cannot be undone. You will need to reconfigure all settings manually."
-						 ConfirmButtonText="Reset Settings" Disabled="@_isProcessing" OnConfirm="ConfirmReset"
-						 OnCancel="CancelReset" />
+<ResetConfirmationDialog @ref="_resetConfirmationDialog" OnConfirm="ConfirmReset" OnCancel="CancelReset" />
 
 <ToastNotification @ref="_toastNotification" />

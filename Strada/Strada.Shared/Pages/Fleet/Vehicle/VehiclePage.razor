@@ -1,8 +1,8 @@
-@attribute [Route(PageRouteNames.VehicleMaster)]
+﻿@attribute [Route(PageRouteNames.VehicleMaster)]
 
-@using StradaLibrary.Models.Accounts.Masters
-@using StradaLibrary.Models.Fleet.OMC
-@using StradaLibrary.Models.Fleet.Vehicle
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.OMC.Models
+@using StradaLibrary.Fleet.Vehicle.Models
 
 <PageTitle>Vehicle - Strada</PageTitle>
 
@@ -75,31 +75,30 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<label class="field-label">
-								Code <span class="required">*</span>
-							</label>
-							<SfTextBox @ref="_sfFirstFocus" @bind-Value="_vehicle.Code" Placeholder="Enter vehicle code (Ctrl + F)"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @ref="_sfFirstFocus"
+											 @bind-Value="_vehicle.Code"
+											 Label="Code"
+											 Placeholder="Enter vehicle code (Ctrl + F)" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Short Code <span class="required">*</span>
-							</label>
-							<SfTextBox @bind-Value="_vehicle.ShortCode" Placeholder="Enter short code"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicle.ShortCode"
+											 Label="Short Code"
+											 Placeholder="Enter short code" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Chasis Code</label>
-							<SfTextBox @bind-Value="_vehicle.ChasisCode" Placeholder="Enter chasis code"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicle.ChasisCode"
+											 Label="Chasis Code"
+											 Placeholder="Enter chasis code"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Engine Code</label>
-							<SfTextBox @bind-Value="_vehicle.EngineCode" Placeholder="Enter engine code"
-									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicle.EngineCode"
+											 Label="Engine Code"
+											 Placeholder="Enter engine code"
+											 Required="false" />
 						</div>
 
 						<div class="form-field">
@@ -137,17 +136,19 @@ else
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">
-								Opening KM <span class="required">*</span>
-							</label>
-							<SfNumericTextBox @bind-Value="_vehicle.OpeningKM" Placeholder="Enter opening KM"
-											  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" Min="0" Format="N2" />
+							<CustomNumericField T="decimal"
+												@bind-Value="_vehicle.OpeningKM"
+												Label="Opening KM"
+												Placeholder="Enter opening KM"
+												Min="0" />
 						</div>
 
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_vehicle.Remarks" Placeholder="Enter remarks (optional)"
-									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_vehicle.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -229,12 +230,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Vehicle" IdentifierLabel="Code"
-						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Vehicle"
-						   IdentifierLabel="Code" IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
 						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

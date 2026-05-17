@@ -1,8 +1,8 @@
+@using StradaLibrary.Accounts.Masters.Models
+
 @attribute [Route(PageRouteNames.FinancialYearMaster)]
 
-@using StradaLibrary.Models.Accounts.Masters
-
-<PageTitle>Financial Year Management - Strada</PageTitle>
+<PageTitle>Financial Year Management - Vectus</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -72,42 +72,46 @@ else
 						<!-- Start Date -->
 						<div class="form-field">
 							<CustomDatePicker @ref="_sfFirstFocus"
-												 Value="StartDateTime"
-												 ValueChanged="OnStartDateChanged"
-												 Label="Start Date"
-												 ShowFinancialYear="false" />
+											  Value="StartDateTime"
+											  ValueChanged="OnStartDateChanged"
+											  Label="Start Date"
+											  ShowFinancialYear="false" />
 						</div>
 
 						<!-- End Date -->
 						<div class="form-field">
 							<CustomDatePicker Value="EndDateTime"
-												 ValueChanged="OnEndDateChanged"
-												 Label="End Date"
-												 ShowFinancialYear="false" />
+											  ValueChanged="OnEndDateChanged"
+											  Label="End Date"
+											  ShowFinancialYear="false" />
 						</div>
 
 						<!-- Year No -->
 						<div class="form-field">
-							<label class="field-label">Year No <span class="required">*</span></label>
-							<SfNumericTextBox @bind-Value="_financialYear.YearNo" Placeholder="Enter year number"
-											  FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Format="N0" Decimals="0"
-											  Min="1" />
+							<CustomNumericField T="int"
+												@bind-Value="_financialYear.YearNo"
+												Label="Year No"
+												Placeholder="Enter year number"
+												Format="N0"
+												Min="1" />
 						</div>
 
 						<!-- Locked Checkbox -->
 						<div class="form-field">
-							<label class="field-label">Locked</label>
 							<div class="checkbox-wrapper">
-								<SfCheckBox @bind-Checked="_financialYear.Locked" Label="Is Locked"
-											CssClass="custom-checkbox" />
+								<CustomCheckBox @bind-Value="_financialYear.Locked"
+												Label="Is Locked"
+												AriaLabel="Lock this financial year" />
 							</div>
 						</div>
 
 						<!-- Remarks -->
 						<div class="form-field">
-							<label class="field-label">Remarks</label>
-							<SfTextBox @bind-Value="_financialYear.Remarks" Placeholder="Enter remarks (optional)"
-									   Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+							<CustomTextField @bind-Value="_financialYear.Remarks"
+											 Label="Remarks"
+											 Placeholder="Enter remarks (optional)"
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -169,12 +173,10 @@ else
 	</div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Financial Year" IdentifierLabel="Period"
-						  IdentifierValue="@_deleteTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
-						  OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
+						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Financial Year" IdentifierLabel="Period"
-						   IdentifierValue="@_recoverTransactionName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover"
-						   OnCancel="CancelRecover" />
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" IdentifierValue="@_recoverTransactionName"
+						   OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
 <ToastNotification @ref="_toastNotification" />

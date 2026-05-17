@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Models.Operations;
+
+using StradaLibrary.Operations.Models;
+
 using Syncfusion.Blazor.DropDowns;
 
 using System.Reflection;

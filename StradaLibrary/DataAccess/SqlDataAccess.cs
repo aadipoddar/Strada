@@ -43,6 +43,14 @@ public static class SqlDataAccess
 		using IDbConnection connection = new SqlConnection(_databaseConnection);
 		await connection.ExecuteAsync(storedProcedure, commandType: CommandType.StoredProcedure);
 	}
+
+	public static void SetupConfiguration()
+	{
+		SqlMapper.Settings.CommandTimeout = 600;
+		SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+		SqlMapper.AddTypeHandler(new TimeOnlyTypeHandler());
+		Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Secrets.SyncfusionLicense);
+	}
 }
 
 public class SqlDataAccessTransaction : IDisposable

@@ -1,12 +1,13 @@
-using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Accounts.Masters;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Operations;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Inputs;
+
+using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
+
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Exports;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 namespace Strada.Shared.Pages.Accounts.Masters;
 
@@ -29,7 +30,7 @@ public partial class StateUTPage
 	private SfGrid<StateUTModel> _sfGrid;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private SfTextBox _sfFirstFocus;
+	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
@@ -45,8 +46,15 @@ public partial class StateUTPage
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
-		await LoadData();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
+			await LoadData();
+		}
+		catch
+		{
+			ResetPage();
+		}
 	}
 
 	private async Task LoadData()

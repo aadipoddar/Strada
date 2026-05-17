@@ -1,11 +1,11 @@
-using System.Text;
+﻿using System.Text;
 using Strada.Shared.Components.Dialog;
-using StradaLibrary.Data.Accounts.Masters;
-using StradaLibrary.Data.Operations;
-using StradaLibrary.Exports.Operations;
-using StradaLibrary.Exports.Utils;
-using StradaLibrary.Models.Accounts.Masters;
-using StradaLibrary.Models.Operations;
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Exports;
+using StradaLibrary.Utils.ExportUtils;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Operations.Models;
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Operations;
@@ -89,10 +89,10 @@ public partial class AuditTrailReport : IAsyncDisposable
 	#endregion
 
 	#region Changed Events
-	private async Task OnDateRangeChanged(Syncfusion.Blazor.Calendars.RangePickerEventArgs<DateTime> args)
+	private async Task OnDateRangeChanged(MudBlazor.DateRange range)
 	{
-		_fromDate = args.StartDate;
-		_toDate = args.EndDate;
+		_fromDate = range?.Start ?? _fromDate;
+		_toDate = range?.End ?? _toDate;
 		await LoadAuditTrails();
 	}
 
