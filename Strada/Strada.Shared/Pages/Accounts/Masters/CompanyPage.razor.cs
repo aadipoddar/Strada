@@ -1,5 +1,3 @@
-using Syncfusion.Blazor.Grids;
-
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
@@ -8,6 +6,8 @@ using StradaLibrary.Accounts.Masters.Exports;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
+
+using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Masters;
 
@@ -30,17 +30,15 @@ public partial class CompanyPage
 	];
 
 	private SfGrid<CompanyModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -53,10 +51,7 @@ public partial class CompanyPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
 			await LoadData();
 		}
-		catch
-		{
-			ResetPage();
-		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -81,14 +76,6 @@ public partial class CompanyPage
 	}
 	#endregion
 
-	#region Change Events
-	private void OnStateUTChanged(StateUTModel value)
-	{
-		_selectedStateUT = value;
-		_company.StateUTId = value?.Id ?? 0;
-	}
-	#endregion
-
 	#region Saving
 	private async Task SaveTransaction()
 	{
@@ -105,6 +92,7 @@ public partial class CompanyPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
+			_company.StateUTId = _selectedStateUT?.Id ?? 0;
 			await CompanyData.SaveTransaction(_company, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
@@ -244,27 +232,13 @@ public partial class CompanyPage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -272,12 +246,8 @@ public partial class CompanyPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -289,11 +259,13 @@ public partial class CompanyPage
 
 		_company = await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, selectedRecords[0].Id);
 		if (_company is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
 		_selectedStateUT = _stateUTs.FirstOrDefault(s => s.Id == _company.StateUTId);
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -343,10 +315,7 @@ public partial class CompanyPage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.CompanyMaster, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 	#endregion
 }

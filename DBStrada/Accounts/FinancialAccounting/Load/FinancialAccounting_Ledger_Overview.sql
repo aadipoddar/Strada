@@ -15,15 +15,18 @@ SELECT
 	[ad].[ReferenceType] AS LedgerReferenceType,
 	[ad].[ReferenceNo] AS LedgerReferenceNo,
 
-	(CASE
-		WHEN [ad].[ReferenceType] = 'Bill' THEN
-			(SELECT TransactionDateTime FROM [dbo].[Bill_Overview] WHERE Id = [ad].[ReferenceId])
-	END) AS LedgerReferenceDateTime,
+	NULL AS LedgerReferenceDateTime,
+	NULL AS LedgerReferenceAmount,
 
-	(CASE
-		WHEN [ad].[ReferenceType] = 'Bill' THEN
-			(SELECT TotalLedgerPaymentAmount FROM [dbo].[Bill_Overview] WHERE Id = [ad].[ReferenceId])
-	END) AS LedgerReferenceAmount,
+	--(CASE
+	--	WHEN [ad].[ReferenceType] = 'Bill' THEN
+	--		(SELECT TransactionDateTime FROM [dbo].[Bill_Overview] WHERE Id = [ad].[ReferenceId])
+	--END) AS LedgerReferenceDateTime,
+
+	--(CASE
+	--	WHEN [ad].[ReferenceType] = 'Bill' THEN
+	--		(SELECT TotalLedgerPaymentAmount FROM [dbo].[Bill_Overview] WHERE Id = [ad].[ReferenceId])
+	--END) AS LedgerReferenceAmount,
 
 	[ad].[Debit] AS Debit,
 	[ad].[Credit] AS Credit,

@@ -2,7 +2,7 @@
 
 @attribute [Route(PageRouteNames.AccountTypeMaster)]
 
-<PageTitle>Account Type Management - Vectus</PageTitle>
+<PageTitle>Account Type Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -72,8 +72,8 @@ else
 						<div class="form-field">
 							<CustomTextField @ref="_sfFirstFocus"
 											 @bind-Value="_accountType.Name"
-											 Label="Name"
-											 Placeholder="Enter Account Type Name (Ctrl + F)" />
+											 Label="Name (Ctrl + F)"
+											 Placeholder="Enter Account Type Name" />
 						</div>
 
 						<!-- Remarks -->

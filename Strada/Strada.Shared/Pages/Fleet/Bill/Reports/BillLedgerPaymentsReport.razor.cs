@@ -1,13 +1,16 @@
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
+
 using StradaLibrary.Accounts.Masters.Data;
-using StradaLibrary.Fleet.Bill;
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Fleet.Bill.Exports;
-using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.Bill;
+using StradaLibrary.Fleet.Bill.Exports;
 using StradaLibrary.Fleet.Bill.Models;
 using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
+
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Fleet.Bill.Reports;
@@ -34,13 +37,6 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	private List<OMCModel> _omcs = [];
 	private List<BillLedgerPaymentsOverviewModel> _transactionOverviews = [];
 
-	private string _deleteTransactionNo = string.Empty;
-	private int _deleteTransactionId = 0;
-
-	private DeleteConfirmationDialog _deleteConfirmationDialog;
-
-	private SfGrid<BillLedgerPaymentsOverviewModel> _sfGrid;
-	private ToastNotification _toastNotification;
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
@@ -49,14 +45,26 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
+	private SfGrid<BillLedgerPaymentsOverviewModel> _sfGrid;
+	private CustomDateRangePicker _sfFirstFocus;
+	private ToastNotification _toastNotification;
+	private DeleteConfirmationDialog _deleteConfirmationDialog;
+
+	private string _deleteTransactionNo = string.Empty;
+	private int _deleteTransactionId = 0;
+
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet, UserRoles.Reports]);
-		await InitializePage();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet, UserRoles.Reports]);
+			await InitializePage();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task InitializePage()
@@ -67,6 +75,9 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -363,69 +374,27 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.Bill, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "Refresh":
-				await LoadTransactionOverviews();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ToggleDetailsView":
-				await ToggleDetailsView();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ViewSelected":
-				await ViewSelectedTransaction();
-				break;
-			case "DownloadSelectedPdf":
-				await ExportSelectedTransactionPdf();
-				break;
-			case "DownloadSelectedExcel":
-				await ExportSelectedTransactionExcel();
-				break;
-			case "DeleteRecoverSelected":
-				await DeleteRecoverSelectedTransaction();
-				break;
-			case "TransactionHistory":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "PeriodToday":
-				await HandleDatesChanged(DateRangeType.Today);
-				break;
-			case "PeriodPreviousDay":
-				await HandleDatesChanged(DateRangeType.Yesterday);
-				break;
-			case "PeriodNextDay":
-				await HandleDatesChanged(DateRangeType.NextDay);
-				break;
-			case "PeriodCurrentMonth":
-				await HandleDatesChanged(DateRangeType.CurrentMonth);
-				break;
-			case "PeriodPreviousMonth":
-				await HandleDatesChanged(DateRangeType.PreviousMonth);
-				break;
-			case "PeriodNextMonth":
-				await HandleDatesChanged(DateRangeType.NextMonth);
-				break;
-			case "PeriodCurrentFinancialYear":
-				await HandleDatesChanged(DateRangeType.CurrentFinancialYear);
-				break;
-			case "PeriodPreviousFinancialYear":
-				await HandleDatesChanged(DateRangeType.PreviousFinancialYear);
-				break;
-			case "PeriodNextFinancialYear":
-				await HandleDatesChanged(DateRangeType.NextFinancialYear);
-				break;
-			case "PeriodAllTime":
-				await HandleDatesChanged(DateRangeType.AllTime);
-				break;
+			case "NewTransaction": await AuthenticationService.NavigateToRoute(PageRouteNames.Bill, FormFactor, JSRuntime, NavigationManager); break;
+			case "Refresh": await LoadTransactionOverviews(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ToggleDetailsView": await ToggleDetailsView(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ViewSelected": await ViewSelectedTransaction(); break;
+			case "DownloadSelectedPdf": await ExportSelectedTransactionPdf(); break;
+			case "DownloadSelectedExcel": await ExportSelectedTransactionExcel(); break;
+			case "DeleteRecoverSelected": await DeleteRecoverSelectedTransaction(); break;
+			case "TransactionHistory": await AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
+			case "PeriodPreviousDay": await HandleDatesChanged(DateRangeType.Yesterday); break;
+			case "PeriodNextDay": await HandleDatesChanged(DateRangeType.NextDay); break;
+			case "PeriodCurrentMonth": await HandleDatesChanged(DateRangeType.CurrentMonth); break;
+			case "PeriodPreviousMonth": await HandleDatesChanged(DateRangeType.PreviousMonth); break;
+			case "PeriodNextMonth": await HandleDatesChanged(DateRangeType.NextMonth); break;
+			case "PeriodCurrentFinancialYear": await HandleDatesChanged(DateRangeType.CurrentFinancialYear); break;
+			case "PeriodPreviousFinancialYear": await HandleDatesChanged(DateRangeType.PreviousFinancialYear); break;
+			case "PeriodNextFinancialYear": await HandleDatesChanged(DateRangeType.NextFinancialYear); break;
+			case "PeriodAllTime": await HandleDatesChanged(DateRangeType.AllTime); break;
 		}
 	}
 
@@ -433,18 +402,10 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "View":
-				await ViewSelectedTransaction();
-				break;
-			case "ExportPDF":
-				await ExportSelectedTransactionPdf();
-				break;
-			case "ExportExcel":
-				await ExportSelectedTransactionExcel();
-				break;
-			case "DeleteRecover":
-				await DeleteRecoverSelectedTransaction();
-				break;
+			case "View": await ViewSelectedTransaction(); break;
+			case "ExportPDF": await ExportSelectedTransactionPdf(); break;
+			case "ExportExcel": await ExportSelectedTransactionExcel(); break;
+			case "DeleteRecover": await DeleteRecoverSelectedTransaction(); break;
 		}
 	}
 
@@ -465,7 +426,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	}
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard, true);
+		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard);
 
 	private async Task StartAutoRefresh()
 	{

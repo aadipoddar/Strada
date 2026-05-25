@@ -2,7 +2,7 @@
 
 @attribute [Route(PageRouteNames.StateUTMaster)]
 
-<PageTitle>State/UT Management - Vectus</PageTitle>
+<PageTitle>State/UT Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -71,8 +71,8 @@ else
 						<div class="form-field">
 							<CustomTextField @ref="_sfFirstFocus"
 											 @bind-Value="_stateUT.Name"
-											 Label="Name"
-											 Placeholder="Enter state/UT name (Ctrl + F)" />
+											 Label="Name (Ctrl + F)"
+											 Placeholder="Enter State/UT Name" />
 						</div>
 
 						<!-- Union Territory Checkbox -->

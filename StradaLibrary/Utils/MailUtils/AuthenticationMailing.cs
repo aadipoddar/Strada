@@ -11,7 +11,7 @@ public static class AuthenticationMailing
 {
 	public static async Task SendLoginCodeEmail(UserModel user, string code, string redirectLink, int codeExpiryMinutes)
 	{
-		var subject = "Your Login Code for Strada";
+		var subject = $"Your Login Code for {Secrets.DatabaseName}";
 		var htmlBody = GenerateLoginCodeEmailHtml(user, code, codeExpiryMinutes, redirectLink);
 		await SendEmailToUser(user.Name, user.Email, subject, htmlBody);
 	}
@@ -57,8 +57,8 @@ public static class AuthenticationMailing
         }}
     </style>
 </head>
-<body style=""margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f7f8fa;"">
-    <table role=""presentation"" style=""width: 100%; border-collapse: collapse; background-color: #f7f8fa;"">
+<body style=""margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: {MailTheme.PageBackground};"">
+    <table role=""presentation"" style=""width: 100%; border-collapse: collapse; background-color: {MailTheme.PageBackground};"">
         <tr>
             <td align=""center"" class=""outer-padding"" style=""padding: 40px 20px;"">
                 <table role=""presentation"" class=""email-container"" style=""width: 600px; max-width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);"">
@@ -75,13 +75,13 @@ public static class AuthenticationMailing
                         <td class=""content-padding"" style=""padding: 40px;"">
                             <h2 style=""margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;"">Hello {user.Name},</h2>
                             <p style=""margin: 0 0 30px 0; color: #666666; font-size: 16px; line-height: 1.6;"">
-                                You've requested a login code for your Strada account. Use the code below to complete your sign-in:
+                                You've requested a login code for your {Secrets.DatabaseName} account. Use the code below to complete your sign-in:
                             </p>
                             
                             <!-- Code Box -->
                             <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 30px 0;"">
                                 <tr>
-                                    <td align=""center"" style=""padding: 30px; background-color: #eef2f5; border-radius: 8px; border: 2px dashed #cbd5e1;"">
+                                    <td align=""center"" style=""padding: 30px; background-color: {MailTheme.SurfaceTint}; border-radius: 8px; border: 2px dashed {MailTheme.SurfaceBorder};"">
                                         <div style=""font-size: 36px; font-weight: 700; color: #2563eb; letter-spacing: 8px; font-family: 'Courier New', monospace;"">{code}</div>
                                     </td>
                                 </tr>
@@ -95,7 +95,7 @@ public static class AuthenticationMailing
                             <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 20px 0;"">
                                 <tr>
                                     <td align=""center"">
-                                        <a href=""{redirectLink}"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);"">Go to Strada Login</a>
+                                        <a href=""{redirectLink}"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);"">Go to {Secrets.DatabaseName} Login</a>
                                     </td>
                                 </tr>
                             </table>

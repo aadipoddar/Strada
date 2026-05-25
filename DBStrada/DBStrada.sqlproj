@@ -96,6 +96,7 @@
     <Folder Include="Fleet\Route\Table" />
     <Folder Include="Fleet\Route\Insert" />
     <Folder Include="Operations\AuditTrail" />
+    <Folder Include="Fleet\Route\Delete" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -186,6 +187,9 @@
     <Build Include="Fleet\Trip\Load\TripLedgerPayments_Overview.sql" />
     <Build Include="Operations\AuditTrail\AuditTrail.sql" />
     <Build Include="Operations\AuditTrail\Insert_AuditTrail.sql" />
+    <Build Include="Fleet\Route\Delete\Delete_VehicleDriver.sql" />
+    <Build Include="Fleet\Route\Table\VehicleDriver.sql" />
+    <Build Include="Fleet\Route\Insert\Insert_VehicleDriver.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

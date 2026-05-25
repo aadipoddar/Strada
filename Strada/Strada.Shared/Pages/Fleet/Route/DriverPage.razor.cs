@@ -1,13 +1,14 @@
 ﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 
 using StradaLibrary.Fleet.Route.Data;
 using StradaLibrary.Fleet.Route.Exports;
-using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Fleet.Route.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
-using Strada.Shared.Components.Input;
+using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Fleet.Route;
 
@@ -17,6 +18,7 @@ public partial class DriverPage
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showDeleted = false;
+	private bool _isUploadDialogVisible = false;
 
 	private DriverModel _driver = new();
 
@@ -24,21 +26,20 @@ public partial class DriverPage
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Download License (Alt + D)", Id = "DownloadSelectedLicense", IconCss = "e-icons e-download", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<DriverModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -46,8 +47,12 @@ public partial class DriverPage
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
-		await LoadData();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+			await LoadData();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -218,32 +223,129 @@ public partial class DriverPage
 	}
 	#endregion
 
+	#region Uploading License
+	private void UploadLicense()
+	{
+		if (_isProcessing)
+			return;
+
+		_isUploadDialogVisible = true;
+		StateHasChanged();
+	}
+
+	private void CloseUploadDialog()
+	{
+		_isUploadDialogVisible = false;
+		StateHasChanged();
+	}
+
+	private async Task OnUploaderFileChange(UploadChangeEventArgs args)
+	{
+		try
+		{
+			if (args.Files is null || args.Files.Count != 1)
+				return;
+
+			if (!string.IsNullOrEmpty(_driver.LicenseUrl))
+				await RemoveExistingLicense();
+
+			await using var file = args.Files[0].File.OpenReadStream(maxAllowedSize: 52428800);
+			var fileName = $"{Guid.NewGuid()}_{args.Files[0].File.Name}";
+			_driver.LicenseUrl = await BlobStorageAccess.UploadFileToBlobStorage(file, fileName, BlobStorageContainers.driverlicense);
+
+			await _toastNotification.ShowAsync("Uploaded", "The license has been uploaded successfully.", ToastType.Success);
+			StateHasChanged();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Uploading", ex.Message, ToastType.Error);
+		}
+	}
+
+	private async Task OnRemoveFile(RemovingEventArgs args) =>
+		await RemoveExistingLicense();
+
+	private async Task RemoveExistingLicense()
+	{
+		try
+		{
+			if (string.IsNullOrEmpty(_driver.LicenseUrl))
+				return;
+
+			var fileName = _driver.LicenseUrl.Split('/').Last();
+			await BlobStorageAccess.DeleteFileFromBlobStorage(fileName, BlobStorageContainers.driverlicense);
+			_driver.LicenseUrl = null;
+
+			await _toastNotification.ShowAsync("Removed", "The license has been removed successfully.", ToastType.Success);
+			StateHasChanged();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Removing", ex.Message, ToastType.Error);
+		}
+	}
+
+	private async Task DownloadExistingLicense()
+	{
+		try
+		{
+			if (string.IsNullOrWhiteSpace(_driver.LicenseUrl))
+				return;
+
+			var (stream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(_driver.LicenseUrl);
+			var fileName = _driver.LicenseUrl.Split('/').Last();
+			await SaveAndViewService.SaveAndView(fileName, stream);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Downloading", ex.Message, ToastType.Error);
+		}
+	}
+
+	private async Task DownloadSelectedLicense()
+	{
+		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
+		if (selectedRecords.Count == 0)
+			return;
+
+		var licenseUrl = selectedRecords[0].LicenseUrl;
+		if (string.IsNullOrWhiteSpace(licenseUrl))
+		{
+			await _toastNotification.ShowAsync("No License", "No license document is available for the selected driver.", ToastType.Warning);
+			return;
+		}
+
+		try
+		{
+			await _toastNotification.ShowAsync("Processing", "Downloading the license...", ToastType.Info);
+
+			var (stream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(licenseUrl);
+			var fileName = licenseUrl.Split('/').Last();
+			await SaveAndViewService.SaveAndView(fileName, stream);
+
+			await _toastNotification.ShowAsync("Downloaded", "The license has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Downloading", ex.Message, ToastType.Error);
+		}
+	}
+
+	#endregion
+
 	#region Utilities
 	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "UploadLicense": UploadLicense(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -251,12 +353,9 @@ public partial class DriverPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DownloadSelectedLicense": await DownloadSelectedLicense(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -268,10 +367,13 @@ public partial class DriverPage
 
 		_driver = await CommonData.LoadTableDataById<DriverModel>(FleetNames.Driver, selectedRecords[0].Id);
 		if (_driver is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
+		_isUploadDialogVisible = false;
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -321,10 +423,7 @@ public partial class DriverPage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.DriverMaster, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard);
 	#endregion
 }

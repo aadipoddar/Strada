@@ -34,17 +34,15 @@ public partial class LedgerPage
 	];
 
 	private SfGrid<LedgerModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -57,10 +55,7 @@ public partial class LedgerPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
 			await LoadData();
 		}
-		catch
-		{
-			ResetPage();
-		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -74,7 +69,9 @@ public partial class LedgerPage
 		_accountTypes = [.. _accountTypes.OrderBy(a => a.Name)];
 		_stateUTs = [.. _stateUTs.OrderBy(s => s.Name)];
 
-		SyncSelections();
+		_selectedGroup = _groups.FirstOrDefault(g => g.Id == _ledger.GroupId);
+		_selectedAccountType = _accountTypes.FirstOrDefault(a => a.Id == _ledger.AccountTypeId);
+		_selectedStateUT = _stateUTs.FirstOrDefault(s => s.Id == _ledger.StateUTId);
 
 		if (!_showDeleted)
 			_ledgers = [.. _ledgers.Where(l => l.Status)];
@@ -87,33 +84,6 @@ public partial class LedgerPage
 
 		if (_sfFirstFocus is not null)
 			await _sfFirstFocus.FocusAsync();
-	}
-	#endregion
-
-	#region Change Events
-	private void SyncSelections()
-	{
-		_selectedGroup = _groups.FirstOrDefault(g => g.Id == _ledger.GroupId);
-		_selectedAccountType = _accountTypes.FirstOrDefault(a => a.Id == _ledger.AccountTypeId);
-		_selectedStateUT = _stateUTs.FirstOrDefault(s => s.Id == _ledger.StateUTId);
-	}
-
-	private void OnGroupChanged(GroupModel value)
-	{
-		_selectedGroup = value;
-		_ledger.GroupId = value?.Id ?? 0;
-	}
-
-	private void OnAccountTypeChanged(AccountTypeModel value)
-	{
-		_selectedAccountType = value;
-		_ledger.AccountTypeId = value?.Id ?? 0;
-	}
-
-	private void OnStateUTChanged(StateUTModel value)
-	{
-		_selectedStateUT = value;
-		_ledger.StateUTId = value?.Id ?? 0;
 	}
 	#endregion
 
@@ -133,6 +103,9 @@ public partial class LedgerPage
 
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
+			_ledger.GroupId = _selectedGroup?.Id ?? 0;
+			_ledger.AccountTypeId = _selectedAccountType?.Id ?? 0;
+			_ledger.StateUTId = _selectedStateUT?.Id ?? 0;
 			await LedgerData.SaveTransaction(_ledger, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
 			await _toastNotification.ShowAsync("Saved", "Transaction has been saved successfully.", ToastType.Success);
@@ -272,27 +245,13 @@ public partial class LedgerPage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -300,12 +259,8 @@ public partial class LedgerPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -317,11 +272,15 @@ public partial class LedgerPage
 
 		_ledger = await CommonData.LoadTableDataById<LedgerModel>(AccountNames.Ledger, selectedRecords[0].Id);
 		if (_ledger is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
-		SyncSelections();
+		_selectedGroup = _groups.FirstOrDefault(g => g.Id == _ledger.GroupId);
+		_selectedAccountType = _accountTypes.FirstOrDefault(a => a.Id == _ledger.AccountTypeId);
+		_selectedStateUT = _stateUTs.FirstOrDefault(s => s.Id == _ledger.StateUTId);
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -371,10 +330,7 @@ public partial class LedgerPage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.LedgerMaster, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 	#endregion
 }

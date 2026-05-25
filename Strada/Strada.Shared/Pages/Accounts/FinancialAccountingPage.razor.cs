@@ -60,10 +60,7 @@ public partial class FinancialAccountingPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
 			await InitializePage();
 		}
-		catch
-		{
-			await ResetPage();
-		}
+		catch { await ResetPage(); }
 	}
 
 	private async Task InitializePage()
@@ -244,6 +241,7 @@ public partial class FinancialAccountingPage
 		{
 			await _toastNotification.ShowAsync("An Error Occurred While Loading Existing Cart", ex.Message, ToastType.Error);
 			await DeleteLocalFiles();
+			await ResetPage();
 		}
 	}
 
@@ -293,7 +291,7 @@ public partial class FinancialAccountingPage
 	}
 	#endregion
 
-	#region Change Events
+	#region Changed Events
 	private async Task OnCompanyChanged(CompanyModel value)
 	{
 		if (value is null || value.Id == 0)
@@ -611,6 +609,7 @@ public partial class FinancialAccountingPage
 		{
 			await SaveTransactionFile();
 			_isProcessing = true;
+			StateHasChanged();
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
@@ -798,39 +797,17 @@ public partial class FinancialAccountingPage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				await ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "SavePdfInvoice":
-				await SaveTransaction(savePDF: true);
-				break;
-			case "SaveExcelInvoice":
-				await SaveTransaction(saveExcel: true);
-				break;
-			case "ExportPdfInvoice":
-				await ExportPdfInvoice();
-				break;
-			case "ExportExcelInvoice":
-				await ExportExcelInvoice();
-				break;
-			case "TransactionHistory":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "ItemReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "TrialBalance":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "ProfitLoss":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "BalanceSheet":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager);
-				break;
+			case "NewTransaction": await ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "SavePdfInvoice": await SaveTransaction(savePDF: true); break;
+			case "SaveExcelInvoice": await SaveTransaction(saveExcel: true); break;
+			case "ExportPdfInvoice": await ExportPdfInvoice(); break;
+			case "ExportExcelInvoice": await ExportExcelInvoice(); break;
+			case "TransactionHistory": await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "ItemReport": await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "TrialBalance": await AuthenticationService.NavigateToRoute(PageRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "ProfitLoss": await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "BalanceSheet": await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager); break;
 		}
 	}
 
@@ -838,12 +815,8 @@ public partial class FinancialAccountingPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCart":
-				await EditSelectedCartItem();
-				break;
-			case "DeleteCart":
-				await RemoveSelectedCartItem();
-				break;
+			case "EditCart": await EditSelectedCartItem(); break;
+			case "DeleteCart": await RemoveSelectedCartItem(); break;
 		}
 	}
 
@@ -856,7 +829,7 @@ public partial class FinancialAccountingPage
 	private async Task ResetPage()
 	{
 		await DeleteLocalFiles();
-		NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting, true);
+		PageRefresh.Request();
 	}
 
 	private void NavigateBack() =>

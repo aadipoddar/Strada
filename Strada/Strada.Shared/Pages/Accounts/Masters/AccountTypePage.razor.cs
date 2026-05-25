@@ -1,5 +1,3 @@
-using Syncfusion.Blazor.Grids;
-
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
@@ -8,6 +6,8 @@ using StradaLibrary.Accounts.Masters.Exports;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
+
+using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Masters;
 
@@ -28,17 +28,15 @@ public partial class AccountTypePage
 	];
 
 	private SfGrid<AccountTypeModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -51,10 +49,7 @@ public partial class AccountTypePage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
 			await LoadData();
 		}
-		catch
-		{
-			ResetPage();
-		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -89,7 +84,7 @@ public partial class AccountTypePage
 			if (!_user.Admin)
 				throw new Exception("You do not have permission to perform this action.");
 
-			await _toastNotification.ShowAsync("Processing", "Please wait...", ToastType.Info);
+			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
 			await AccountTypeData.SaveTransaction(_accountType, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
@@ -230,27 +225,13 @@ public partial class AccountTypePage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -258,12 +239,8 @@ public partial class AccountTypePage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -275,10 +252,12 @@ public partial class AccountTypePage
 
 		_accountType = await CommonData.LoadTableDataById<AccountTypeModel>(AccountNames.AccountType, selectedRecords[0].Id);
 		if (_accountType is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -328,10 +307,7 @@ public partial class AccountTypePage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountTypeMaster, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 	#endregion
 }

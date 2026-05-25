@@ -171,7 +171,7 @@ internal static class TransactionMailing
                                     <td style=""padding: 15px 20px; background-color: #e8f4fd; border-left: 4px solid #2196F3; border-radius: 4px; text-align: center;"">
                                         <p style=""margin: 0; color: #1565c0; font-size: 14px;"">
                                             {attachmentNotice}
-                                            <a href=""{Secrets.AppWebsite}"" style=""color: #2563eb; text-decoration: none; font-weight: 600; margin-top: 8px; display: inline-block;"">Visit Strada</a>
+                                            <a href=""{Secrets.AppWebsite}"" style=""color: #2563eb; text-decoration: none; font-weight: 600; margin-top: 8px; display: inline-block;"">Visit {Secrets.DatabaseName}</a>
                                         </p>
                                     </td>
                                 </tr>
@@ -228,8 +228,8 @@ internal static class TransactionMailing
         }}
     </style>
 </head>
-<body style=""margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f7f8fa;"">
-    <table role=""presentation"" style=""width: 100%; border-collapse: collapse; background-color: #f7f8fa;"">
+<body style=""margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: {MailTheme.PageBackground};"">
+    <table role=""presentation"" style=""width: 100%; border-collapse: collapse; background-color: {MailTheme.PageBackground};"">
         <tr>
             <td align=""center"" class=""outer-padding"" style=""padding: 40px 20px;"">
                 <table role=""presentation"" class=""email-container"" style=""width: 600px; max-width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);"">
@@ -237,7 +237,7 @@ internal static class TransactionMailing
                     <!-- Header -->
                     <tr>
                         <td class=""header-padding"" style=""padding: 30px; text-align: center; background-color: #eff6ff; border-radius: 12px 12px 0 0;"">
-                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""Strada"" style=""max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
+                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""{Secrets.DatabaseName}"" style=""max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
                         </td>
                     </tr>
                     

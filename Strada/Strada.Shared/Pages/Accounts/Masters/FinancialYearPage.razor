@@ -2,7 +2,7 @@
 
 @attribute [Route(PageRouteNames.FinancialYearMaster)]
 
-<PageTitle>Financial Year Management - Vectus</PageTitle>
+<PageTitle>Financial Year Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -74,7 +74,7 @@ else
 							<CustomDatePicker @ref="_sfFirstFocus"
 											  Value="StartDateTime"
 											  ValueChanged="OnStartDateChanged"
-											  Label="Start Date"
+											  Label="Start Date (Ctrl + F)"
 											  ShowFinancialYear="false" />
 						</div>
 

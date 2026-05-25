@@ -72,10 +72,14 @@ public partial class SettingsPage
         if (!firstRender)
             return;
 
-        await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Admin]);
-        await LoadData();
-        _isLoading = false;
-        StateHasChanged();
+        try
+        {
+            await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Admin]);
+            await LoadData();
+            _isLoading = false;
+            StateHasChanged();
+        }
+        catch { NavigateBack(); }
     }
 
     private async Task LoadData()
@@ -262,6 +266,7 @@ public partial class SettingsPage
         try
         {
             _isProcessing = true;
+            StateHasChanged();
 
             if (string.IsNullOrWhiteSpace(_primaryCompanyLinkingId))
             {

@@ -24,31 +24,23 @@ else
 		<Header Title="Route Management">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
-					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-										   Easing="ease" />
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
 					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
-										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash" Id="ToggleDeleted" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel" Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem" Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 					</MenuItems>
@@ -77,8 +69,8 @@ else
 							<CustomAutoComplete @ref="_sfFirstFocus" T="LocationModel"
 												@bind-Value="_selectedFromLocation"
 												DataSource="@_locations"
-												Placeholder="Select From Location (Ctrl + F)"
-												Label="From Location"
+												Placeholder="Select From Location"
+												Label="From Location (Ctrl + F)"
 												FieldValue="@nameof(LocationModel.Name)"
 												AddNewRoute="@PageRouteNames.LocationMaster" />
 						</div>
@@ -167,8 +159,7 @@ else
 						<GridEvents TValue="RouteModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
-							<GridColumn Field="@nameof(RouteModel.Id)" HeaderText="ID" Width="80"
-										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(RouteModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(RouteModel.FromLocationId)" HeaderText="From Location" Width="250">
 								<Template>
 									@{
@@ -188,17 +179,12 @@ else
 								</Template>
 							</GridColumn>
 							<GridColumn Field="@nameof(RouteModel.Code)" HeaderText="Code" Width="150" />
-							<GridColumn Field="@nameof(RouteModel.EstimatedHours)" HeaderText="Estimated Hours" Width="160"
-										Format="N0" TextAlign="TextAlign.Right" />
-							<GridColumn Field="@nameof(RouteModel.EstimatedDistance)" HeaderText="Estimated Distance" Width="170"
-										Format="N0" TextAlign="TextAlign.Right" />
-							<GridColumn Field="@nameof(RouteModel.EstimatedFuelConsumption)" HeaderText="Estimated Fuel" Width="160"
-										Format="N0" TextAlign="TextAlign.Right" />
-							<GridColumn Field="@nameof(RouteModel.EstimatedCost)" HeaderText="Estimated Cost" Width="160"
-										Format="N2" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(RouteModel.EstimatedHours)" HeaderText="Estimated Hours" Width="160" Format="N0" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(RouteModel.EstimatedDistance)" HeaderText="Estimated Distance" Width="170" Format="N0" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(RouteModel.EstimatedFuelConsumption)" HeaderText="Estimated Fuel" Width="160" Format="N0" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(RouteModel.EstimatedCost)" HeaderText="Estimated Cost" Width="160" Format="N2" TextAlign="TextAlign.Right" />
 							<GridColumn Field="@nameof(RouteModel.Remarks)" HeaderText="Remarks" Width="300" />
-							<GridColumn Field="@nameof(RouteModel.Status)" HeaderText="Status" Width="110"
-										TextAlign="TextAlign.Center" Visible="_showDeleted">
+							<GridColumn Field="@nameof(RouteModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
 										var item = (context as RouteModel);

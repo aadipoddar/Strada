@@ -1,6 +1,5 @@
-using Syncfusion.Blazor.Grids;
-
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.FinancialAccounting.Data;
 using StradaLibrary.Accounts.FinancialAccounting.Exports;
@@ -10,6 +9,8 @@ using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
+
+using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Reports;
 
@@ -35,6 +36,7 @@ public partial class TrialBalancePage : IAsyncDisposable
 	private List<TrialBalanceModel> _trialBalance = [];
 
 	private SfGrid<TrialBalanceModel> _sfGrid;
+	private CustomDateRangePicker _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	#region Load Data
@@ -48,10 +50,7 @@ public partial class TrialBalancePage : IAsyncDisposable
 			await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
 			await InitializePage();
 		}
-		catch
-		{
-			NavigationManager.NavigateTo(NavigationManager.Uri, true);
-		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task InitializePage()
@@ -59,8 +58,12 @@ public partial class TrialBalancePage : IAsyncDisposable
 		await LoadData();
 		await LoadTrialBalance();
 		await StartAutoRefresh();
+
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -115,7 +118,7 @@ public partial class TrialBalancePage : IAsyncDisposable
 	}
 	#endregion
 
-	#region Change Events
+	#region Changed Events
 	private async Task OnDateRangeChanged(MudBlazor.DateRange range)
 	{
 		_fromDate = range?.Start ?? _fromDate;
@@ -227,63 +230,25 @@ public partial class TrialBalancePage : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "Refresh":
-				await LoadTrialBalance();
-				break;
-			case "ToggleDetailsView":
-				await ToggleDetailsView();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "TransactionHistory":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "LedgerReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "ProfitLoss":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "BalanceSheet":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "PeriodToday":
-				await HandleDatesChanged(DateRangeType.Today);
-				break;
-			case "PeriodPreviousDay":
-				await HandleDatesChanged(DateRangeType.Yesterday);
-				break;
-			case "PeriodNextDay":
-				await HandleDatesChanged(DateRangeType.NextDay);
-				break;
-			case "PeriodCurrentMonth":
-				await HandleDatesChanged(DateRangeType.CurrentMonth);
-				break;
-			case "PeriodPreviousMonth":
-				await HandleDatesChanged(DateRangeType.PreviousMonth);
-				break;
-			case "PeriodNextMonth":
-				await HandleDatesChanged(DateRangeType.NextMonth);
-				break;
-			case "PeriodCurrentFinancialYear":
-				await HandleDatesChanged(DateRangeType.CurrentFinancialYear);
-				break;
-			case "PeriodPreviousFinancialYear":
-				await HandleDatesChanged(DateRangeType.PreviousFinancialYear);
-				break;
-			case "PeriodNextFinancialYear":
-				await HandleDatesChanged(DateRangeType.NextFinancialYear);
-				break;
-			case "PeriodAllTime":
-				await HandleDatesChanged(DateRangeType.AllTime);
-				break;
+			case "NewTransaction": await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager); break;
+			case "Refresh": await LoadTrialBalance(); break;
+			case "ToggleDetailsView": await ToggleDetailsView(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "TransactionHistory": await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "LedgerReport": await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "ProfitLoss": await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "BalanceSheet": await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
+			case "PeriodPreviousDay": await HandleDatesChanged(DateRangeType.Yesterday); break;
+			case "PeriodNextDay": await HandleDatesChanged(DateRangeType.NextDay); break;
+			case "PeriodCurrentMonth": await HandleDatesChanged(DateRangeType.CurrentMonth); break;
+			case "PeriodPreviousMonth": await HandleDatesChanged(DateRangeType.PreviousMonth); break;
+			case "PeriodNextMonth": await HandleDatesChanged(DateRangeType.NextMonth); break;
+			case "PeriodCurrentFinancialYear": await HandleDatesChanged(DateRangeType.CurrentFinancialYear); break;
+			case "PeriodPreviousFinancialYear": await HandleDatesChanged(DateRangeType.PreviousFinancialYear); break;
+			case "PeriodNextFinancialYear": await HandleDatesChanged(DateRangeType.NextFinancialYear); break;
+			case "PeriodAllTime": await HandleDatesChanged(DateRangeType.AllTime); break;
 		}
 	}
 

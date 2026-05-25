@@ -2,7 +2,9 @@
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 using Microsoft.UI.Windowing;
+
 using WinRT.Interop;
+
 using WinUIWindow = Microsoft.UI.Xaml.Window;
 
 namespace Strada.WinUI;
@@ -17,6 +19,8 @@ public partial class App : MauiWinUIApplication
 	/// executed, and as such is the logical equivalent of main() or WinMain().
 	/// </summary>
 	public App() => this.InitializeComponent();
+
+	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 
 	protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
 	{
@@ -36,6 +40,4 @@ public partial class App : MauiWinUIApplication
 				presenter.Maximize();
 		}
 	}
-
-	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 }

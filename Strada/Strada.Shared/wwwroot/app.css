@@ -1,5 +1,5 @@
 /* ================================================================
-   STRADA APPLICATION STYLESHEET
+   APPLICATION STYLESHEET
    ================================================================ */
 
 :root {
@@ -27,6 +27,9 @@
 	--bg-light: #fafbfc;
 	--bg-blue-light: #eff6ff;
 	--bg-summary: #deecf9;
+	/* Shared application background — used by .page-container and the
+	   authentication pages. Change here to restyle the whole app. */
+	--app-bg: linear-gradient(135deg, #fdf6ee 0%, #f6e7d8 100%);
 	/* Spacing */
 	--border-radius: 6px;
 	--border-radius-lg: 12px;
@@ -89,7 +92,7 @@ h1:focus {
 	padding: 16px 32px;
 	width: 100%;
 	margin: 0 auto;
-	background: linear-gradient(135deg, #f7f8fa 0%, #eef2f5 100%);
+	background: var(--app-bg);
 	flex: 1;
 }
 
@@ -97,22 +100,6 @@ h1:focus {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
-}
-
-/* Grid Action Buttons Container - used in all grids */
-.grid-actions {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-}
-
-/* Header Actions Container */
-.header-actions {
-	display: flex;
-	gap: 12px;
-	align-items: center;
 }
 
 /* ================================================================
@@ -197,12 +184,6 @@ h1:focus {
 .cart-label {
 	text-transform: uppercase;
 	letter-spacing: 0.3px;
-}
-
-.required {
-	color: var(--bright-red);
-	font-weight: 700;
-	margin-left: 2px;
 }
 
 /* ================================================================
@@ -466,6 +447,21 @@ h1:focus {
 
 	.two-column-layout > :last-child {
 		flex: 0 0 calc(25% - 16px);
+	}
+
+/* Two Column Layout (25-75 split) */
+.two-column-layout-reverse {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+	.two-column-layout-reverse > :first-child {
+		flex: 0 0 calc(25% - 16px);
+	}
+
+	.two-column-layout-reverse > :last-child {
+		flex: 0 0 75%;
 	}
 
 /* Two Column Layout (equal 50-50 split) */

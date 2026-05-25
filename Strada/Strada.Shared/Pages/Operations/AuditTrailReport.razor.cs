@@ -1,12 +1,16 @@
-﻿using System.Text;
-using Strada.Shared.Components.Dialog;
+﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
+
 using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Exports;
-using StradaLibrary.Utils.ExportUtils;
-using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
+
 using Syncfusion.Blazor.Grids;
+
+using System.Text;
 
 namespace Strada.Shared.Pages.Operations;
 
@@ -32,6 +36,7 @@ public partial class AuditTrailReport : IAsyncDisposable
 	private List<AuditTrailModel> _auditTrails = [];
 
 	private SfGrid<AuditTrailModel> _sfGrid;
+	private CustomDateRangePicker _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	#region Load Data
@@ -40,8 +45,12 @@ public partial class AuditTrailReport : IAsyncDisposable
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Admin]);
-		await InitializePage();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Admin]);
+			await InitializePage();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task InitializePage()
@@ -54,6 +63,9 @@ public partial class AuditTrailReport : IAsyncDisposable
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task LoadAuditTrails()

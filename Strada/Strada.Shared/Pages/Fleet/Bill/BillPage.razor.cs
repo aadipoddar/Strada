@@ -82,10 +82,7 @@ public partial class BillPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 			await InitializePage();
 		}
-		catch
-		{
-			await ResetPage();
-		}
+		catch { await ResetPage(); }
 	}
 
 	private async Task InitializePage()
@@ -212,11 +209,6 @@ public partial class BillPage
 	{
 		if (_bill.CompanyId > 0)
 			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _bill.CompanyId) ?? _companies.FirstOrDefault();
-		else
-		{
-			var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
-			_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault();
-		}
 
 		if (_bill.OMCId > 0)
 			_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _bill.OMCId) ?? _omcs.FirstOrDefault();
@@ -319,7 +311,7 @@ public partial class BillPage
 	}
 	#endregion
 
-	#region Change Events
+	#region Changed Events
 	private async Task OnCompanyChanged(CompanyModel value)
 	{
 		if (value is null || value.Id == 0)
@@ -429,7 +421,7 @@ public partial class BillPage
 		await _sfChallanNoTextBox.FocusAsync();
 	}
 
-	private async void OnPendingTripDoubleClick(RecordDoubleClickEventArgs<TripOverviewModel> args)
+	private async Task OnPendingTripDoubleClick(RecordDoubleClickEventArgs<TripOverviewModel> args)
 	{
 		if (args.RowData is null || args.RowData.Id <= 0)
 			return;
@@ -697,30 +689,14 @@ public partial class BillPage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				await ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "SavePdfInvoice":
-				await SaveTransaction(savePDF: true);
-				break;
-			case "SaveExcelInvoice":
-				await SaveTransaction(saveExcel: true);
-				break;
-			case "ExportPdfInvoice":
-				await ExportPdfInvoice();
-				break;
-			case "ExportExcelInvoice":
-				await ExportExcelInvoice();
-				break;
-			case "TransactionHistory":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "LedgerPaymentsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager);
-				break;
+			case "NewTransaction": await ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "SavePdfInvoice": await SaveTransaction(savePDF: true); break;
+			case "SaveExcelInvoice": await SaveTransaction(saveExcel: true); break;
+			case "ExportPdfInvoice": await ExportPdfInvoice(); break;
+			case "ExportExcelInvoice": await ExportExcelInvoice(); break;
+			case "TransactionHistory": await AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "LedgerPaymentsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager); break;
 		}
 	}
 
@@ -728,9 +704,7 @@ public partial class BillPage
 	{
 		switch (args.Item.Id)
 		{
-			case "InsertCart":
-				await EditSelectedPendingTripItem();
-				break;
+			case "InsertCart": await EditSelectedPendingTripItem(); break;
 		}
 	}
 
@@ -738,12 +712,8 @@ public partial class BillPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCart":
-				await EditSelectedTripCartItem();
-				break;
-			case "DeleteCart":
-				await RemoveSelectedTripFromCart();
-				break;
+			case "EditCart": await EditSelectedTripCartItem(); break;
+			case "DeleteCart": await RemoveSelectedTripFromCart(); break;
 		}
 	}
 
@@ -751,12 +721,8 @@ public partial class BillPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCart":
-				await EditSelectedLedgerPaymentsCartItem();
-				break;
-			case "DeleteCart":
-				await RemoveSelectedLedgerPaymentsCartItem();
-				break;
+			case "EditCart": await EditSelectedLedgerPaymentsCartItem(); break;
+			case "DeleteCart": await RemoveSelectedLedgerPaymentsCartItem(); break;
 		}
 	}
 
@@ -770,10 +736,10 @@ public partial class BillPage
 	private async Task ResetPage()
 	{
 		await DeleteLocalFiles();
-		NavigationManager.NavigateTo(PageRouteNames.Bill, true);
+		PageRefresh.Request();
 	}
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard, true);
+		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard);
 	#endregion
 }

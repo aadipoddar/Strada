@@ -2,12 +2,14 @@
 
 @using StradaLibrary.Fleet.Route.Models
 
-<PageTitle>Driver - Strada</PageTitle>
+<PageTitle>Driver Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
 <MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" />
+<MudBlazor.MudHotkey Key=JsKey.KeyU KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="UploadLicense" />
+<MudBlazor.MudHotkey Key=JsKey.KeyD KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="DownloadSelectedLicense" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
 <MudBlazor.MudHotkey Key=JsKey.Delete KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDeleted" />
@@ -24,31 +26,24 @@ else
 		<Header Title="Driver Management">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
-					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-										   Easing="ease" />
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
 					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
-										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Text="New (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Upload License (Ctrl + U)" IconCss="e-icons e-upload" Id="UploadLicense" Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash" Id="ToggleDeleted" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel" Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem" Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 					</MenuItems>
@@ -76,14 +71,15 @@ else
 						<div class="form-field">
 							<CustomTextField @ref="_sfFirstFocus"
 											 @bind-Value="_driver.Name"
-											 Label="Name"
-											 Placeholder="Enter Driver Name (Ctrl + F)" />
+											 Label="Name (Ctrl + F)"
+											 Placeholder="Enter Driver Name" />
 						</div>
 
 						<div class="form-field">
 							<CustomTextField @bind-Value="_driver.Mobile"
 											 Label="Mobile"
-											 Placeholder="Enter mobile number" />
+											 Placeholder="Enter mobile number"
+											 MaxLength="10" />
 						</div>
 
 						<div class="form-field">
@@ -92,6 +88,21 @@ else
 											 Placeholder="Auto-generated"
 											 ReadOnly="true"
 											 TabIndex="-1" />
+						</div>
+
+						<div class="form-field">
+							<CustomTextField @bind-Value="_driver.LicenseNo"
+											 Label="License No"
+											 Placeholder="Enter license number"
+											 Required="false" />
+						</div>
+
+						<div class="form-field">
+							<CustomDatePicker @bind-NullableValue="_driver.LicenseExpiryDateTime"
+											  Label="License Expiry Date"
+											  Required="false"
+											  ShowFinancialYear="false"
+											  AddNewRoute="@(null)" />
 						</div>
 
 						<div class="form-field">
@@ -129,9 +140,10 @@ else
 							<GridColumn Field="@nameof(DriverModel.Name)" HeaderText="Driver Name" Width="300" />
 							<GridColumn Field="@nameof(DriverModel.Mobile)" HeaderText="Mobile" Width="150" />
 							<GridColumn Field="@nameof(DriverModel.Code)" HeaderText="Code" Width="150" />
+							<GridColumn Field="@nameof(DriverModel.LicenseNo)" HeaderText="License No" Width="180" />
+							<GridColumn Field="@nameof(DriverModel.LicenseExpiryDateTime)" HeaderText="License Expiry" Width="150" Format="dd/MM/yyyy" Type="ColumnType.Date" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(DriverModel.Remarks)" HeaderText="Remarks" Width="400" />
-							<GridColumn Field="@nameof(DriverModel.Status)" HeaderText="Status" Width="110"
-										TextAlign="TextAlign.Center" Visible="_showDeleted">
+							<GridColumn Field="@nameof(DriverModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
 										var item = (context as DriverModel);
@@ -148,6 +160,13 @@ else
 		<Footer />
 	</div>
 }
+
+<DocumentUploadDialog Title="Upload Driver License"
+					  ExistingDocumentUrl="@_driver.LicenseUrl"
+					  @bind-IsVisible="_isUploadDialogVisible"
+					  OnFileChange="OnUploaderFileChange" OnFileRemove="OnRemoveFile"
+					  OnDownloadClick="DownloadExistingLicense" OnRemoveClick="RemoveExistingLicense"
+					  OnClose="CloseUploadDialog" />
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionName"
 						  OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />

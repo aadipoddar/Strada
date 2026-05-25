@@ -97,8 +97,8 @@ else
 								<CustomAutoComplete @ref="_sfFirstFocus" T="VehicleModel"
 													Value="_selectedVehicle"
 													DataSource="@_vehicles"
-													Placeholder="Select a Vehicle (Ctrl + F)"
-													Label="Vehicle"
+													Placeholder="Select a Vehicle"
+													Label="Vehicle (Ctrl + F)"
 													ValueChanged="OnVehicleChanged"
 													FieldValue="@nameof(VehicleModel.Code)"
 													AddNewRoute="@PageRouteNames.VehicleMaster" />
@@ -114,7 +114,8 @@ else
 
 							<!-- Transaction Date -->
 							<div class="form-field">
-								<CustomDatePicker @bind-Value="_trip.TransactionDateTime"
+								<CustomDatePicker Value="_trip.TransactionDateTime"
+												  ValueChanged="OnTransactionDateChanged"
 												  FinancialYear="@_selectedFinancialYear" />
 							</div>
 
@@ -300,7 +301,7 @@ else
 								<rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
 								<line x1="1" y1="10" x2="23" y2="10" />
 							</svg>
-							<h2 class="section-title">Card Payments</h2>
+							<h2 class="section-title">OMC Card Payments</h2>
 						</div>
 					</div>
 
@@ -311,9 +312,9 @@ else
 								<CustomAutoComplete T="OMCCardModel"
 													@ref="_sfOMCCardAutoComplete"
 													FieldValue="@nameof(OMCCardModel.CardNumber)" Value="_selectedOMCCard"
-													DataSource="@_omcCards" Placeholder="Card (Ctrl + Shift + F)"
+													DataSource="@_omcCards" Placeholder="Select OMC Card"
 													ValueChanged="OnCardPaymentsTypeChanged" OpenOnFocus="false"
-													Label="OMC Card" AddNewRoute="@PageRouteNames.OMCCardMaster" />
+													Label="Card (Ctrl + Shift + F)" AddNewRoute="@PageRouteNames.OMCCardMaster" />
 							</div>
 
 							<!-- Amount -->
@@ -414,9 +415,9 @@ else
 								<CustomAutoComplete T="LedgerModel"
 													@ref="_sfLedgerAutoComplete"
 													FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
-													DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
+													DataSource="@_ledgers" Placeholder="Select a Ledger"
 													ValueChanged="OnLedgerPaymentsTypeChanged" OpenOnFocus="false"
-													Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
+													Label="Ledger (Ctrl + Shift + G)" AddNewRoute="@PageRouteNames.LedgerMaster" />
 							</div>
 
 							<div class="cart-field cart-field-wide">
@@ -518,9 +519,9 @@ else
 							<CustomAutoComplete T="ExpenseTypeModel"
 												@ref="_sfExpenseTypeAutoComplete"
 												FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
-												DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + G)"
+												DataSource="@_expenseTypes" Placeholder="Select Expense Type"
 												ValueChanged="OnExpensesTypeChanged" OpenOnFocus="false"
-												Label="Expense Type" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+												Label="Expense Type (Ctrl + G)" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Amount -->
@@ -571,8 +572,7 @@ else
 							GridLines="GridLine.Horizontal" CssClass="professional-grid"
 							ContextMenuItems="@_expensesCartGridContextMenuItems" Toolbar="@(new List<string>() { "Search" })">
 
-						<GridEvents TValue="TripExpensesCartModel"
-									ContextMenuItemClicked="OnExpensesCartGridContextMenuItemClicked" />
+						<GridEvents TValue="TripExpensesCartModel" ContextMenuItemClicked="OnExpensesCartGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 
 						<GridAggregates>
@@ -606,10 +606,8 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(TripExpensesCartModel.ExpenseTypeName)"
-										HeaderText="Name" Width="200" />
-							<GridColumn Field="@nameof(TripExpensesCartModel.Amount)" HeaderText="Amount" Width="130"
-										TextAlign="TextAlign.Right" Format="N2">
+							<GridColumn Field="@nameof(TripExpensesCartModel.ExpenseTypeName)" HeaderText="Name" Width="200" />
+							<GridColumn Field="@nameof(TripExpensesCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
 								<Template>
 									@{
 										var item = (context as dynamic);
@@ -617,8 +615,7 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(TripExpensesCartModel.Remarks)" HeaderText="Remarks"
-										Width="150" />
+							<GridColumn Field="@nameof(TripExpensesCartModel.Remarks)" HeaderText="Remarks" Width="150" />
 						</GridColumns>
 
 					</SfGrid>

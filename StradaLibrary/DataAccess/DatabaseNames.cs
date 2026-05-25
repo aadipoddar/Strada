@@ -106,7 +106,7 @@ public static class FleetNames
 	public static string InsertTripCardPayments => "Insert_TripCardPayments";
 	public static string InsertTripLedgerPayments => "Insert_TripLedgerPayments";
 	#endregion
-	
+
 	#region Expense
 	public static string Expense => "Expense";
 	public static string ExpenseDetails => "ExpenseDetails";
@@ -122,12 +122,16 @@ public static class FleetNames
 	public static string Location => "Location";
 	public static string Route => "Route";
 	public static string Driver => "Driver";
-	
+	public static string VehicleDriver => "VehicleDriver";
+
 	public static string InsertLocation => "Insert_Location";
 	public static string InsertRoute => "Insert_Route";
 	public static string InsertDriver => "Insert_Driver";
+	public static string InsertVehicleDriver => "Insert_VehicleDriver";
+
+	public static string DeleteVehicleDriver => "Delete_VehicleDriver";
 	#endregion
-	
+
 	#region OMC
 	public static string OMC => "OMC";
 	public static string OMCCard => "OMCCard";

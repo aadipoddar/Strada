@@ -1,16 +1,14 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 
-using Strada.Shared.Components.Dialog;
-
+using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Fleet.VehicleDocument.Data;
 using StradaLibrary.Fleet.VehicleDocument.Exports;
-using StradaLibrary.Utils.ExportUtils;
-using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Fleet.VehicleDocument.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
-using Strada.Shared.Components.Input;
 using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Fleet.VehicleDocument;
@@ -24,9 +22,6 @@ public partial class VehicleDocumentPage
 	private bool _isUploadDialogVisible = false;
 
 	private VehicleDocumentModel _vehicleDocument = new() { TransactionDateTime = DateTime.Now, RenewalDate = DateTime.Now.AddYears(1) };
-	private Stream _pendingDocumentStream;
-	private string _pendingDocumentFileName;
-	private string _documentUrlToDelete = string.Empty;
 	private VehicleDocumentTypeModel _selectedVehicleDocumentType;
 	private VehicleModel _selectedVehicle;
 
@@ -36,20 +31,20 @@ public partial class VehicleDocumentPage
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
+		new() { Text = "Download Document (Alt + D)", Id = "DownloadSelectedDocument", IconCss = "e-icons e-download", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecoverSelectedItem", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<VehicleDocumentModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionNo = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionNo = string.Empty;
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -57,8 +52,12 @@ public partial class VehicleDocumentPage
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
-		await LoadData();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+			await LoadData();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -87,24 +86,15 @@ public partial class VehicleDocumentPage
 	}
 	#endregion
 
-	#region Change Events
-	private Task OnVehicleDocumentTypeChanged()
+	#region Changed Events
+	private async Task OnVehicleDocumentTypeChanged(VehicleDocumentTypeModel value)
 	{
-		if (_selectedVehicleDocumentType is null || _selectedVehicleDocumentType.Id <= 0)
-			return Task.CompletedTask;
+		if (value is null || value.Id == 0)
+			return;
 
+		_selectedVehicleDocumentType = value;
 		_vehicleDocument.VehicleDocumentTypeId = _selectedVehicleDocumentType.Id;
 		_vehicleDocument.Rate = _selectedVehicleDocumentType.Rate;
-		return Task.CompletedTask;
-	}
-
-	private Task OnVehicleChanged()
-	{
-		if (_selectedVehicle is null || _selectedVehicle.Id <= 0)
-			return Task.CompletedTask;
-
-		_vehicleDocument.VehicleId = _selectedVehicle.Id;
-		return Task.CompletedTask;
 	}
 	#endregion
 
@@ -120,24 +110,22 @@ public partial class VehicleDocumentPage
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
+			_vehicleDocument.VehicleDocumentTypeId = _selectedVehicleDocumentType?.Id ?? 0;
+			_vehicleDocument.VehicleId = _selectedVehicle?.Id ?? 0;
 			var currentDateTime = await CommonData.LoadCurrentDateTime();
 			_vehicleDocument.Status = true;
 			_vehicleDocument.TransactionDateTime = DateOnly.FromDateTime(_vehicleDocument.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
 			_vehicleDocument.CreatedBy = _user.Id;
+			_vehicleDocument.LastModifiedBy = _user.Id;
 			_vehicleDocument.CreatedAt = currentDateTime;
+			_vehicleDocument.LastModifiedAt = currentDateTime;
 			_vehicleDocument.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			_vehicleDocument.LastModifiedBy = null;
-			_vehicleDocument.LastModifiedAt = null;
-			_vehicleDocument.LastModifiedFromPlatform = null;
+			_vehicleDocument.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 
-			await VehicleDocumentData.SaveTransaction(
-				_vehicleDocument,
-				_pendingDocumentStream,
-				_pendingDocumentFileName,
-				_documentUrlToDelete);
+			await VehicleDocumentData.SaveTransaction(_vehicleDocument);
 
 			await _toastNotification.ShowAsync("Success", $"Vehicle Document transaction '{_vehicleDocument.TransactionNo}' has been saved successfully.", ToastType.Success);
-			NavigationManager.NavigateTo(PageRouteNames.VehicleDocument, true);
+			ResetPage();
 		}
 		catch (Exception ex)
 		{
@@ -151,18 +139,6 @@ public partial class VehicleDocumentPage
 	#endregion
 
 	#region Actions
-	private async Task OnEditVehicleDocument(VehicleDocumentModel vehicleDocument)
-	{
-		_vehicleDocument = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, vehicleDocument.Id)
-			?? throw new Exception("Vehicle Document transaction not found for editing.");
-		_pendingDocumentStream?.Dispose();
-		_pendingDocumentStream = null;
-		_pendingDocumentFileName = null;
-		_documentUrlToDelete = string.Empty;
-		_isUploadDialogVisible = false;
-		StateHasChanged();
-	}
-
 	private async Task ConfirmDelete()
 	{
 		try
@@ -312,27 +288,48 @@ public partial class VehicleDocumentPage
 
 	private async Task OnUploaderFileChange(UploadChangeEventArgs args)
 	{
-		if (args.Files is null || args.Files.Count == 0 || args.Files[0].File is null)
-			return;
+		try
+		{
+			if (args.Files is null || args.Files.Count != 1)
+				return;
 
-		var file = args.Files[0].File;
-		var ms = new MemoryStream();
-		await file.OpenReadStream(maxAllowedSize: 52428800).CopyToAsync(ms);
-		ms.Position = 0;
+			if (!string.IsNullOrEmpty(_vehicleDocument.DocumentUrl))
+				await RemoveExistingDocument();
 
-		_pendingDocumentStream?.Dispose();
-		_pendingDocumentStream = ms;
-		_pendingDocumentFileName = file.Name;
+			await using var file = args.Files[0].File.OpenReadStream(maxAllowedSize: 52428800);
+			var fileName = $"{Guid.NewGuid()}_{args.Files[0].File.Name}";
+			_vehicleDocument.DocumentUrl = await BlobStorageAccess.UploadFileToBlobStorage(file, fileName, BlobStorageContainers.vehicledocument);
 
-		await _toastNotification.ShowAsync("Document Selected", $"'{_pendingDocumentFileName}' will be uploaded when you save the transaction.", ToastType.Info);
+			await _toastNotification.ShowAsync("Uploaded", "The document has been uploaded successfully.", ToastType.Success);
+			StateHasChanged();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Uploading", ex.Message, ToastType.Error);
+		}
 	}
 
-	private Task OnRemoveFile(RemovingEventArgs args)
+	private async Task OnRemoveFile(RemovingEventArgs args) =>
+		await RemoveExistingDocument();
+
+	private async Task RemoveExistingDocument()
 	{
-		_pendingDocumentStream?.Dispose();
-		_pendingDocumentStream = null;
-		_pendingDocumentFileName = null;
-		return Task.CompletedTask;
+		try
+		{
+			if (string.IsNullOrEmpty(_vehicleDocument.DocumentUrl))
+				return;
+
+			var fileName = _vehicleDocument.DocumentUrl.Split('/').Last();
+			await BlobStorageAccess.DeleteFileFromBlobStorage(fileName, BlobStorageContainers.vehicledocument);
+			_vehicleDocument.DocumentUrl = null;
+
+			await _toastNotification.ShowAsync("Removed", "The document has been removed successfully.", ToastType.Success);
+			StateHasChanged();
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Removing", ex.Message, ToastType.Error);
+		}
 	}
 
 	private async Task DownloadExistingDocument()
@@ -342,38 +339,45 @@ public partial class VehicleDocumentPage
 			if (string.IsNullOrWhiteSpace(_vehicleDocument.DocumentUrl))
 				return;
 
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
 			var (stream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(_vehicleDocument.DocumentUrl);
 			var fileName = _vehicleDocument.DocumentUrl.Split('/').Last();
 			await SaveAndViewService.SaveAndView(fileName, stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+			await _toastNotification.ShowAsync("Error While Downloading", ex.Message, ToastType.Error);
 		}
 	}
 
-	private async Task MarkDocumentForRemoval()
+	private async Task DownloadSelectedDocument()
 	{
-		if (string.IsNullOrWhiteSpace(_vehicleDocument.DocumentUrl))
+		var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
+		if (selectedRecords.Count == 0)
+			return;
+
+		var documentUrl = selectedRecords[0].DocumentUrl;
+		if (string.IsNullOrWhiteSpace(documentUrl))
 		{
-			_pendingDocumentStream?.Dispose();
-			_pendingDocumentStream = null;
-			_pendingDocumentFileName = null;
+			await _toastNotification.ShowAsync("No Document", "No document is available for the selected transaction.", ToastType.Warning);
 			return;
 		}
 
-		_documentUrlToDelete = _vehicleDocument.DocumentUrl;
-		_vehicleDocument.DocumentUrl = null;
-		_pendingDocumentStream?.Dispose();
-		_pendingDocumentStream = null;
-		_pendingDocumentFileName = null;
+		try
+		{
+			await _toastNotification.ShowAsync("Processing", "Downloading the document...", ToastType.Info);
 
-		await _toastNotification.ShowAsync("Document Removed", "Document will be removed when you save the transaction.", ToastType.Info);
+			var (stream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(documentUrl);
+			var fileName = documentUrl.Split('/').Last();
+			await SaveAndViewService.SaveAndView(fileName, stream);
+
+			await _toastNotification.ShowAsync("Downloaded", "The document has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Downloading", ex.Message, ToastType.Error);
+		}
 	}
+
 	#endregion
 
 	#region Utilities
@@ -381,30 +385,14 @@ public partial class VehicleDocumentPage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "UploadDocument":
-				UploadDocument();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelected":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelected":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "UploadDocument": UploadDocument(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -412,12 +400,9 @@ public partial class VehicleDocumentPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DownloadSelectedDocument": await DownloadSelectedDocument(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -429,13 +414,14 @@ public partial class VehicleDocumentPage
 
 		_vehicleDocument = await CommonData.LoadTableDataById<VehicleDocumentModel>(FleetNames.VehicleDocument, selectedRecords[0].Id);
 		if (_vehicleDocument is null)
+		{
 			await _toastNotification.ShowAsync("Error", "Selected Vehicle Document transaction not found for editing.", ToastType.Error);
+			return;
+		}
 
 		_selectedVehicleDocumentType = _vehicleDocumentTypes.FirstOrDefault(vdt => vdt.Id == _vehicleDocument.VehicleDocumentTypeId);
 		_selectedVehicle = _vehicles.FirstOrDefault(v => v.Id == _vehicleDocument.VehicleId);
-
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -485,10 +471,7 @@ public partial class VehicleDocumentPage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.VehicleDocument, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard);
 	#endregion
 }

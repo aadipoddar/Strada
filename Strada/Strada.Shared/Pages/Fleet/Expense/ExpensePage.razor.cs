@@ -4,13 +4,13 @@ using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Fleet.Expense;
 using StradaLibrary.Fleet.Expense.Exports;
-using StradaLibrary.Utils.ExportUtils;
-using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -253,7 +253,7 @@ public partial class ExpensePage
 	}
 	#endregion
 
-	#region Change Events
+	#region Changed Events
 	private async Task OnVehicleChanged(VehicleModel value)
 	{
 		if (value is null || value.Id == 0)
@@ -559,30 +559,14 @@ public partial class ExpensePage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				await ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "SavePdfInvoice":
-				await SaveTransaction(savePDF: true);
-				break;
-			case "SaveExcelInvoice":
-				await SaveTransaction(saveExcel: true);
-				break;
-			case "ExportPdfInvoice":
-				await ExportPdfInvoice();
-				break;
-			case "ExportExcelInvoice":
-				await ExportExcelInvoice();
-				break;
-			case "ExpenseReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "ExpenseDetailsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseDetailsReport, FormFactor, JSRuntime, NavigationManager);
-				break;
+			case "NewTransaction": await ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "SavePdfInvoice": await SaveTransaction(savePDF: true); break;
+			case "SaveExcelInvoice": await SaveTransaction(saveExcel: true); break;
+			case "ExportPdfInvoice": await ExportPdfInvoice(); break;
+			case "ExportExcelInvoice": await ExportExcelInvoice(); break;
+			case "ExpenseReport": await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "ExpenseDetailsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseDetailsReport, FormFactor, JSRuntime, NavigationManager); break;
 		}
 	}
 
@@ -590,12 +574,8 @@ public partial class ExpensePage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCart":
-				await EditSelectedExpensesCartItem();
-				break;
-			case "DeleteCart":
-				await RemoveSelectedExpensesCartItem();
-				break;
+			case "EditCart": await EditSelectedExpensesCartItem(); break;
+			case "DeleteCart": await RemoveSelectedExpensesCartItem(); break;
 		}
 	}
 
@@ -608,10 +588,10 @@ public partial class ExpensePage
 	private async Task ResetPage()
 	{
 		await DeleteLocalFiles();
-		NavigationManager.NavigateTo(PageRouteNames.Expense, true);
+		PageRefresh.Request();
 	}
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard, true);
+		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard);
 	#endregion
 }

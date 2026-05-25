@@ -1,13 +1,13 @@
 ﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 
 using StradaLibrary.Fleet.Vehicle.Data;
 using StradaLibrary.Fleet.Vehicle.Exports;
-using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
-using Strada.Shared.Components.Input;
 
 namespace Strada.Shared.Pages.Fleet.Vehicle;
 
@@ -28,17 +28,15 @@ public partial class ExpenseTypePage
 	];
 
 	private SfGrid<ExpenseTypeModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -46,8 +44,12 @@ public partial class ExpenseTypePage
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
-		await LoadData();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+			await LoadData();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -223,27 +225,13 @@ public partial class ExpenseTypePage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -251,12 +239,8 @@ public partial class ExpenseTypePage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -268,10 +252,12 @@ public partial class ExpenseTypePage
 
 		_expenseType = await CommonData.LoadTableDataById<ExpenseTypeModel>(FleetNames.ExpenseType, selectedRecords[0].Id);
 		if (_expenseType is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -321,10 +307,7 @@ public partial class ExpenseTypePage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.ExpenseTypeMaster, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard);
 	#endregion
 }

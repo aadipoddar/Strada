@@ -1,8 +1,11 @@
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
+
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Exports;
-using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
+
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Operations;
@@ -24,16 +27,15 @@ public partial class UserPage
 	];
 
 	private SfGrid<UserModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -41,8 +43,12 @@ public partial class UserPage
 		if (!firstRender)
 			return;
 
-		_loggedInUser = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Admin]);
-		await LoadData();
+		try
+		{
+			_loggedInUser = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Admin]);
+			await LoadData();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -57,6 +63,9 @@ public partial class UserPage
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -154,6 +163,7 @@ public partial class UserPage
 		try
 		{
 			_isProcessing = true;
+			StateHasChanged();
 			await _deleteConfirmationDialog.HideAsync();
 
 			if (!_loggedInUser.Admin)
@@ -184,6 +194,7 @@ public partial class UserPage
 		try
 		{
 			_isProcessing = true;
+			StateHasChanged();
 			await _recoverConfirmationDialog.HideAsync();
 
 			if (!_loggedInUser.Admin)
@@ -215,27 +226,13 @@ public partial class UserPage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -243,12 +240,8 @@ public partial class UserPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -260,9 +253,13 @@ public partial class UserPage
 
 		_transactionUser = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, selectedRecords[0].Id);
 		if (_transactionUser is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
 		StateHasChanged();
+		await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverSelectedItem()
@@ -311,10 +308,7 @@ public partial class UserPage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.User, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.OperationsDashboard);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.OperationsDashboard);
 	#endregion
 }

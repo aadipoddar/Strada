@@ -2,7 +2,7 @@
 
 @attribute [Route(PageRouteNames.GroupMaster)]
 
-<PageTitle>Group Management - Vectus</PageTitle>
+<PageTitle>Group Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -72,8 +72,8 @@ else
 						<div class="form-field">
 							<CustomTextField @ref="_sfFirstFocus"
 											 @bind-Value="_group.Name"
-											 Label="Name"
-											 Placeholder="Enter group name (Ctrl + F)" />
+											 Label="Name (Ctrl + F)"
+											 Placeholder="Enter Group Name" />
 						</div>
 
 						<!-- Nature -->

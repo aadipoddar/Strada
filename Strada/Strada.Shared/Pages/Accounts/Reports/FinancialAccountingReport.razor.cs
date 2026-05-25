@@ -1,6 +1,5 @@
-using Syncfusion.Blazor.Grids;
-
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.FinancialAccounting.Data;
 using StradaLibrary.Accounts.FinancialAccounting.Exports;
@@ -10,6 +9,8 @@ using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
+
+using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Accounts.Reports;
 
@@ -38,21 +39,21 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
-		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
-		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
+		new() { Text = "Export PDF (Alt + P)", Id = "ExportSelectedPdf", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
+		new() { Text = "Export Excel (Alt + E)", Id = "ExportSelectedExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
 	private SfGrid<FinancialAccountingOverviewModel> _sfGrid;
+	private CustomDateRangePicker _sfFirstFocus;
 	private ToastNotification _toastNotification;
+	private DeleteConfirmationDialog _deleteConfirmationDialog;
+	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
 	private string _deleteTransactionNo = string.Empty;
 	private int _deleteTransactionId = 0;
 	private string _recoverTransactionNo = string.Empty;
 	private int _recoverTransactionId = 0;
-
-	private DeleteConfirmationDialog _deleteConfirmationDialog;
-	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -65,10 +66,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
 			await InitializePage();
 		}
-		catch
-		{
-			NavigationManager.NavigateTo(NavigationManager.Uri, true);
-		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task InitializePage()
@@ -79,6 +77,9 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -292,8 +293,14 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	#region Actions
 	private async Task ViewSelectedTransaction()
 	{
-		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0 || !_sfGrid.SelectedRecords.First().Status)
+		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
+
+		if (!_sfGrid.SelectedRecords.First().Status)
+		{
+			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it first.", ToastType.Warning);
+			return;
+		}
 
 		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
@@ -317,16 +324,12 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
 			var accounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, _deleteTransactionId)
 				?? throw new Exception("Transaction not found.");
-			accounting.Status = false;
 			accounting.LastModifiedBy = _user.Id;
 			accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
 			accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 			await FinancialAccountingData.DeleteTransaction(accounting);
 
 			await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
-
-			_deleteTransactionId = 0;
-			_deleteTransactionNo = string.Empty;
 		}
 		catch (Exception ex)
 		{
@@ -334,6 +337,8 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 		}
 		finally
 		{
+			_deleteTransactionId = 0;
+			_deleteTransactionNo = string.Empty;
 			_isProcessing = false;
 			StateHasChanged();
 			await LoadTransactionOverviews();
@@ -358,16 +363,12 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
 			var accounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, _recoverTransactionId)
 				?? throw new Exception("Transaction not found.");
-			accounting.Status = true;
 			accounting.LastModifiedBy = _user.Id;
 			accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
 			accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 			await FinancialAccountingData.RecoverTransaction(accounting);
 
 			await _toastNotification.ShowAsync("Success", $"Transaction {_recoverTransactionNo} has been recovered successfully.", ToastType.Success);
-
-			_recoverTransactionId = 0;
-			_recoverTransactionNo = string.Empty;
 		}
 		catch (Exception ex)
 		{
@@ -375,6 +376,8 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 		}
 		finally
 		{
+			_recoverTransactionId = 0;
+			_recoverTransactionNo = string.Empty;
 			_isProcessing = false;
 			StateHasChanged();
 			await LoadTransactionOverviews();
@@ -428,78 +431,30 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "Refresh":
-				await LoadTransactionOverviews();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ToggleDetailsView":
-				await ToggleDetailsView();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ViewSelected":
-				await ViewSelectedTransaction();
-				break;
-			case "DownloadSelectedPdf":
-				await ExportSelectedTransactionPdf();
-				break;
-			case "DownloadSelectedExcel":
-				await ExportSelectedTransactionExcel();
-				break;
-			case "DeleteRecoverSelected":
-				await DeleteRecoverSelectedTransaction();
-				break;
-			case "LedgerReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "TrialBalance":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "ProfitLoss":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "BalanceSheet":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "PeriodToday":
-				await HandleDatesChanged(DateRangeType.Today);
-				break;
-			case "PeriodPreviousDay":
-				await HandleDatesChanged(DateRangeType.Yesterday);
-				break;
-			case "PeriodNextDay":
-				await HandleDatesChanged(DateRangeType.NextDay);
-				break;
-			case "PeriodCurrentMonth":
-				await HandleDatesChanged(DateRangeType.CurrentMonth);
-				break;
-			case "PeriodPreviousMonth":
-				await HandleDatesChanged(DateRangeType.PreviousMonth);
-				break;
-			case "PeriodNextMonth":
-				await HandleDatesChanged(DateRangeType.NextMonth);
-				break;
-			case "PeriodCurrentFinancialYear":
-				await HandleDatesChanged(DateRangeType.CurrentFinancialYear);
-				break;
-			case "PeriodPreviousFinancialYear":
-				await HandleDatesChanged(DateRangeType.PreviousFinancialYear);
-				break;
-			case "PeriodNextFinancialYear":
-				await HandleDatesChanged(DateRangeType.NextFinancialYear);
-				break;
-			case "PeriodAllTime":
-				await HandleDatesChanged(DateRangeType.AllTime);
-				break;
+			case "NewTransaction": await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager); break;
+			case "Refresh": await LoadTransactionOverviews(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ToggleDetailsView": await ToggleDetailsView(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ViewSelected": await ViewSelectedTransaction(); break;
+			case "DownloadSelectedPdf": await ExportSelectedTransactionPdf(); break;
+			case "DownloadSelectedExcel": await ExportSelectedTransactionExcel(); break;
+			case "DeleteRecoverSelected": await DeleteRecoverSelectedTransaction(); break;
+			case "LedgerReport": await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "TrialBalance": await AuthenticationService.NavigateToRoute(PageRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "ProfitLoss": await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "BalanceSheet": await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
+			case "PeriodPreviousDay": await HandleDatesChanged(DateRangeType.Yesterday); break;
+			case "PeriodNextDay": await HandleDatesChanged(DateRangeType.NextDay); break;
+			case "PeriodCurrentMonth": await HandleDatesChanged(DateRangeType.CurrentMonth); break;
+			case "PeriodPreviousMonth": await HandleDatesChanged(DateRangeType.PreviousMonth); break;
+			case "PeriodNextMonth": await HandleDatesChanged(DateRangeType.NextMonth); break;
+			case "PeriodCurrentFinancialYear": await HandleDatesChanged(DateRangeType.CurrentFinancialYear); break;
+			case "PeriodPreviousFinancialYear": await HandleDatesChanged(DateRangeType.PreviousFinancialYear); break;
+			case "PeriodNextFinancialYear": await HandleDatesChanged(DateRangeType.NextFinancialYear); break;
+			case "PeriodAllTime": await HandleDatesChanged(DateRangeType.AllTime); break;
 		}
 	}
 
@@ -507,18 +462,10 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "View":
-				await ViewSelectedTransaction();
-				break;
-			case "ExportPDF":
-				await ExportSelectedTransactionPdf();
-				break;
-			case "ExportExcel":
-				await ExportSelectedTransactionExcel();
-				break;
-			case "DeleteRecover":
-				await DeleteRecoverSelectedTransaction();
-				break;
+			case "View": await ViewSelectedTransaction(); break;
+			case "ExportSelectedPdf": await ExportSelectedTransactionPdf(); break;
+			case "ExportSelectedExcel": await ExportSelectedTransactionExcel(); break;
+			case "DeleteRecover": await DeleteRecoverSelectedTransaction(); break;
 		}
 	}
 

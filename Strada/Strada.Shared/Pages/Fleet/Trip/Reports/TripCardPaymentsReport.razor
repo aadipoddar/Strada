@@ -1,16 +1,17 @@
-﻿@attribute [Route(PageRouteNames.TripCardPaymentsReport)]
-
-@using StradaLibrary.Accounts.Masters.Models
+﻿@using StradaLibrary.Accounts.Masters.Models
 @using StradaLibrary.Fleet.OMC.Models
 @using StradaLibrary.Fleet.Vehicle.Models
 @using StradaLibrary.Fleet.Route.Models
 @using StradaLibrary.Fleet.Trip.Models
+
+@attribute [Route(PageRouteNames.TripCardPaymentsReport)]
 
 <PageTitle>Trip Card Payments Report - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.Trip, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" />
 <MudBlazor.MudHotkey Key=JsKey.KeyQ KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDetailsView" />
@@ -104,9 +105,9 @@ else
 						<div class="filters-grid">
 							<!-- Date Range -->
 							<div class="form-field">
-								<CustomDateRangePicker Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+								<CustomDateRangePicker @ref="_sfFirstFocus" Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
 													   ValueChanged="OnDateRangeChanged"
-													   Label="Date Range"
+													   Label="Date Range (Ctrl + F)"
 													   Required="false" />
 							</div>
 

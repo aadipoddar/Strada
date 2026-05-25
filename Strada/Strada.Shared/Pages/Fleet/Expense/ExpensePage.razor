@@ -85,59 +85,59 @@ else
 						<!-- Vehicle -->
 						<div class="form-field">
 							<CustomAutoComplete @ref="_sfFirstFocus" T="VehicleModel"
-												   Value="_selectedVehicle"
-												   DataSource="@_vehicles"
-												   Placeholder="Select a Vehicle"
-												   Label="Vehicle"
-												   ValueChanged="OnVehicleChanged"
-												   FieldValue="@nameof(VehicleModel.Code)"
-												   AddNewRoute="@PageRouteNames.VehicleMaster" />
+												Value="_selectedVehicle"
+												DataSource="@_vehicles"
+												Placeholder="Select a Vehicle"
+												Label="Vehicle (Ctrl + F)"
+												ValueChanged="OnVehicleChanged"
+												FieldValue="@nameof(VehicleModel.Code)"
+												AddNewRoute="@PageRouteNames.VehicleMaster" />
 						</div>
 
 						<!-- Company -->
 						<div class="form-field">
 							<CustomAutoComplete T="CompanyModel"
-												   Value="_selectedCompany"
-												   DataSource="@_companies"
-												   Placeholder="Select a Company (Ctrl + F)"
-												   Label="Company"
-												   ValueChanged="OnCompanyChanged"
-												   FieldValue="@nameof(CompanyModel.Name)"
-												   AddNewRoute="@PageRouteNames.CompanyMaster" />
+												Value="_selectedCompany"
+												DataSource="@_companies"
+												Placeholder="Select a Company (Ctrl + F)"
+												Label="Company"
+												ValueChanged="OnCompanyChanged"
+												FieldValue="@nameof(CompanyModel.Name)"
+												AddNewRoute="@PageRouteNames.CompanyMaster" />
 						</div>
 
 						<!-- Transaction Date -->
 						<div class="form-field">
 							<CustomDatePicker @bind-Value="_expense.TransactionDateTime"
-												 FinancialYear="@_selectedFinancialYear" />
+											  FinancialYear="@_selectedFinancialYear" />
 						</div>
 
 						<!-- Transaction No -->
 						<div class="form-field">
 							<CustomTextField @bind-Value="_expense.TransactionNo"
-								Label="Transaction No"
-								Placeholder="Transaction No"
-								ReadOnly="true"
-								TabIndex="-1" />
+											 Label="Transaction No"
+											 Placeholder="Transaction No"
+											 ReadOnly="true"
+											 TabIndex="-1" />
 						</div>
 
 						<!-- Total Expense -->
 						<div class="form-field">
 							<CustomTextField Value="@_expense.TotalExpense.ToString("N2")"
-								Label="Total Expense"
-								Placeholder="Total Expense"
-								ReadOnly="true"
-								Required="false"
-								TabIndex="-1" />
+											 Label="Total Expense"
+											 Placeholder="Total Expense"
+											 ReadOnly="true"
+											 Required="false"
+											 TabIndex="-1" />
 						</div>
 
 						<!-- Remarks -->
 						<div class="form-field">
 							<CustomTextField @bind-Value="_expense.Remarks"
-								Label="Remarks / Narration"
-								Placeholder="Enter remarks..."
-								Required="false"
-								Lines="2" />
+											 Label="Remarks / Narration"
+											 Placeholder="Enter remarks..."
+											 Required="false"
+											 Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -163,47 +163,48 @@ else
 						<!-- Expense Type -->
 						<div class="cart-field cart-field-wide">
 							<CustomAutoComplete T="ExpenseTypeModel"
-												   @ref="_sfExpenseTypeAutoComplete"
-												   FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
-												   DataSource="@_expenseTypes" Placeholder="Select Expense Type (Ctrl + G)"
-												   ValueChanged="OnExpensesTypeChanged"
-												   OpenOnFocus="false"
-												   Label="Expense Type" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+												@ref="_sfExpenseTypeAutoComplete"
+												FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
+												DataSource="@_expenseTypes" Placeholder="Select Expense Type"
+												ValueChanged="OnExpensesTypeChanged"
+												OpenOnFocus="false"
+												Label="Expense Type (Ctrl + G)"
+												AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Ledger -->
 						<div class="cart-field">
 							<CustomAutoComplete T="LedgerModel"
-												   FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
-												   DataSource="@_ledgers" Placeholder="Select Ledger"
-												   ValueChanged="OnLedgerChanged"
-												   OpenOnFocus="false" Required="false"
-												   Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
+												FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
+												DataSource="@_ledgers" Placeholder="Select Ledger"
+												ValueChanged="OnLedgerChanged"
+												OpenOnFocus="false" Required="false"
+												Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
 						</div>
 
 						<!-- Amount -->
 						<div class="cart-field">
 							<CustomNumericField T="decimal"
-								@bind-Value="_selectedExpensesCart.Amount"
-								Min="0"
-								Label="Amount"
-								Placeholder="0.00" />
+												@bind-Value="_selectedExpensesCart.Amount"
+												Min="0"
+												Label="Amount"
+												Placeholder="0.00" />
 						</div>
 
 						<!-- Identification -->
 						<div class="cart-field cart-field-wide">
 							<CustomTextField @bind-Value="_selectedExpensesCart.IdentificationNo"
-								Label="Identification"
-								Placeholder="Enter identification..."
-								Required="false" />
+											 Label="Identification"
+											 Placeholder="Enter identification..."
+											 Required="false" />
 						</div>
 
 						<!-- Remarks -->
 						<div class="cart-field cart-field-wide">
 							<CustomTextField @bind-Value="_selectedExpensesCart.Remarks"
-								Label="Remarks"
-								Placeholder="Item Narration..."
-								Required="false" />
+											 Label="Remarks"
+											 Placeholder="Item Narration..."
+											 Required="false" />
 						</div>
 
 						<!-- Add Button -->

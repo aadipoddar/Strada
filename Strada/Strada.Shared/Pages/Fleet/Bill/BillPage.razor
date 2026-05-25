@@ -92,7 +92,7 @@ else
 													Value="_selectedCompany"
 													DataSource="@_companies"
 													Placeholder="Select a Company"
-													Label="Company"
+													Label="Company (Ctrl + F)"
 													ValueChanged="OnCompanyChanged"
 													FieldValue="@nameof(CompanyModel.Name)"
 													AddNewRoute="@PageRouteNames.CompanyMaster" />
@@ -219,9 +219,9 @@ else
 								<CustomAutoComplete T="LedgerModel"
 													@ref="_sfLedgerAutoComplete"
 													FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
-													DataSource="@_ledgers" Placeholder="Ledger (Ctrl + Shift + G)"
+													DataSource="@_ledgers" Placeholder="Select a Ledger"
 													ValueChanged="OnLedgerPaymentsTypeChanged" OpenOnFocus="false"
-													Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
+													Label="Ledger (Ctrl + Shift + G)" AddNewRoute="@PageRouteNames.LedgerMaster" />
 							</div>
 
 							<div class="cart-field cart-field-wide">
@@ -292,8 +292,7 @@ else
 										}
 									</Template>
 								</GridColumn>
-								<GridColumn Field="@nameof(BillLedgerPaymentsCartModel.Remarks)"
-											HeaderText="Remarks" Width="150" />
+								<GridColumn Field="@nameof(BillLedgerPaymentsCartModel.Remarks)" HeaderText="Remarks" Width="150" />
 							</GridColumns>
 
 						</SfGrid>

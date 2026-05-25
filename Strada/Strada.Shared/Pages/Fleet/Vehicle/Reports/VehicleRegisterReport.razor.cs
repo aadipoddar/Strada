@@ -1,12 +1,15 @@
 ﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
+
 using StradaLibrary.Accounts.Masters.Data;
-using StradaLibrary.Operations.Data;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.OMC.Models;
 using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
+using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
+
 using Syncfusion.Blazor.Grids;
 
 namespace Strada.Shared.Pages.Fleet.Vehicle.Reports;
@@ -35,6 +38,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	private List<VehicleRegisterExpensesModel> _activeExpenseTypes = [];
 
 	private SfGrid<VehicleRegisterModel> _sfGrid;
+	private CustomDateRangePicker _sfFirstFocus;
 	private ToastNotification _toastNotification;
 
 	#region Load Data
@@ -43,8 +47,12 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet, UserRoles.Reports]);
-		await InitializePage();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet, UserRoles.Reports]);
+			await InitializePage();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task InitializePage()
@@ -55,6 +63,9 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 
 		_isLoading = false;
 		StateHasChanged();
+
+		if (_sfFirstFocus is not null)
+			await _sfFirstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -78,7 +89,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			// await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
+			await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
 
 			_transactionOverviews = [];
 
@@ -378,57 +389,23 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "TripReport":
-				NavigationManager.NavigateTo(PageRouteNames.TripReport);
-				break;
-			case "ExpenseReport":
-				NavigationManager.NavigateTo(PageRouteNames.ExpenseReport);
-				break;
-			case "BillReport":
-				NavigationManager.NavigateTo(PageRouteNames.BillReport);
-				break;
-			case "Refresh":
-				await LoadTransactionOverviews();
-				break;
-			case "ToggleDetailsView":
-				await ToggleDetailsView();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "PeriodToday":
-				await HandleDatesChanged(DateRangeType.Today);
-				break;
-			case "PeriodPreviousDay":
-				await HandleDatesChanged(DateRangeType.Yesterday);
-				break;
-			case "PeriodNextDay":
-				await HandleDatesChanged(DateRangeType.NextDay);
-				break;
-			case "PeriodCurrentMonth":
-				await HandleDatesChanged(DateRangeType.CurrentMonth);
-				break;
-			case "PeriodPreviousMonth":
-				await HandleDatesChanged(DateRangeType.PreviousMonth);
-				break;
-			case "PeriodNextMonth":
-				await HandleDatesChanged(DateRangeType.NextMonth);
-				break;
-			case "PeriodCurrentFinancialYear":
-				await HandleDatesChanged(DateRangeType.CurrentFinancialYear);
-				break;
-			case "PeriodPreviousFinancialYear":
-				await HandleDatesChanged(DateRangeType.PreviousFinancialYear);
-				break;
-			case "PeriodNextFinancialYear":
-				await HandleDatesChanged(DateRangeType.NextFinancialYear);
-				break;
-			case "PeriodAllTime":
-				await HandleDatesChanged(DateRangeType.AllTime);
-				break;
+			case "TripReport": NavigationManager.NavigateTo(PageRouteNames.TripReport); break;
+			case "ExpenseReport": NavigationManager.NavigateTo(PageRouteNames.ExpenseReport); break;
+			case "BillReport": NavigationManager.NavigateTo(PageRouteNames.BillReport); break;
+			case "Refresh": await LoadTransactionOverviews(); break;
+			case "ToggleDetailsView": await ToggleDetailsView(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
+			case "PeriodPreviousDay": await HandleDatesChanged(DateRangeType.Yesterday); break;
+			case "PeriodNextDay": await HandleDatesChanged(DateRangeType.NextDay); break;
+			case "PeriodCurrentMonth": await HandleDatesChanged(DateRangeType.CurrentMonth); break;
+			case "PeriodPreviousMonth": await HandleDatesChanged(DateRangeType.PreviousMonth); break;
+			case "PeriodNextMonth": await HandleDatesChanged(DateRangeType.NextMonth); break;
+			case "PeriodCurrentFinancialYear": await HandleDatesChanged(DateRangeType.CurrentFinancialYear); break;
+			case "PeriodPreviousFinancialYear": await HandleDatesChanged(DateRangeType.PreviousFinancialYear); break;
+			case "PeriodNextFinancialYear": await HandleDatesChanged(DateRangeType.NextFinancialYear); break;
+			case "PeriodAllTime": await HandleDatesChanged(DateRangeType.AllTime); break;
 		}
 	}
 
@@ -442,7 +419,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	}
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard, true);
+		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard);
 
 	private async Task StartAutoRefresh()
 	{

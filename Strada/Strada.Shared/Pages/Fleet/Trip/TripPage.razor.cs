@@ -4,16 +4,16 @@ using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.Masters.Data;
-using StradaLibrary.Fleet.Route.Data;
-using StradaLibrary.Fleet.Trip;
-using StradaLibrary.Fleet.Trip.Exports;
-using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Fleet.Route.Data;
 using StradaLibrary.Fleet.Route.Models;
+using StradaLibrary.Fleet.Trip;
+using StradaLibrary.Fleet.Trip.Exports;
 using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -48,6 +48,7 @@ public partial class TripPage
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
 	private List<DriverOverviewModel> _drivers = [];
+	private List<VehicleDriverOverviewModel> _vehicleDrivers = [];
 	private List<RouteOverviewModel> _routes = [];
 	private List<ExpenseTypeModel> _expenseTypes = [];
 	private List<OMCCardModel> _omcCards = [];
@@ -94,10 +95,7 @@ public partial class TripPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 			await InitializePage();
 		}
-		catch
-		{
-			await ResetPage();
-		}
+		catch { await ResetPage(); }
 	}
 
 	private async Task InitializePage()
@@ -124,6 +122,7 @@ public partial class TripPage
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_drivers = await DriverData.LoadDriverOverview();
+		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
 		_routes = await StradaLibrary.Fleet.Route.Data.RouteData.LoadRouteOverview();
 		_expenseTypes = await CommonData.LoadTableDataByStatus<ExpenseTypeModel>(FleetNames.ExpenseType);
 		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
@@ -133,6 +132,7 @@ public partial class TripPage
 		_companies = [.. _companies.OrderBy(x => x.Name)];
 		_omcs = [.. _omcs.OrderBy(x => x.Name)];
 		_drivers = [.. _drivers.OrderBy(s => s.Name)];
+		_vehicleDrivers = [.. _vehicleDrivers.Where(vd => vd.StartDateTime <= DateTime.Now && (vd.EndDateTime is null || vd.EndDateTime > DateTime.Now))];
 		_routes = [.. _routes.OrderBy(s => s.Code)];
 		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
 		_omcCards = [.. _omcCards.OrderBy(s => s.CardNumber)];
@@ -141,7 +141,7 @@ public partial class TripPage
 		_selectedVehicle = _vehicles.FirstOrDefault();
 		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _selectedVehicle.CompanyId);
 		_selectedOMC = _omcs.FirstOrDefault(c => c.Id == _selectedVehicle.OMCId) ?? _omcs.FirstOrDefault();
-		_selectedDriver = _drivers.FirstOrDefault();
+		_selectedDriver = _vehicleDrivers.FirstOrDefault(vd => vd.VehicleId == _selectedVehicle.Id) is var vehicleDriver && vehicleDriver is not null ? _drivers.FirstOrDefault(d => d.Id == vehicleDriver.DriverId) : _drivers.FirstOrDefault();
 		_selectedRoute = _routes.FirstOrDefault();
 	}
 
@@ -408,7 +408,16 @@ public partial class TripPage
 	}
 	#endregion
 
-	#region Change Events
+	#region Changed Events
+	private async Task OnTransactionDateChanged(DateTime value)
+	{
+		_trip.TransactionDateTime = value;
+
+		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
+		_vehicleDrivers = [.. _vehicleDrivers.Where(vd => vd.StartDateTime <= DateTime.Now && (vd.EndDateTime is null || vd.EndDateTime > DateTime.Now))];
+		_selectedDriver = _vehicleDrivers.FirstOrDefault(vd => vd.VehicleId == _selectedVehicle.Id) is var vehicleDriver && vehicleDriver is not null ? _drivers.FirstOrDefault(d => d.Id == vehicleDriver.DriverId) : _drivers.FirstOrDefault();
+	}
+
 	private async Task OnVehicleChanged(VehicleModel value)
 	{
 		if (value is null || value.Id == 0)
@@ -417,6 +426,7 @@ public partial class TripPage
 		_selectedVehicle = value;
 		_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId);
 		_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _selectedVehicle.OMCId) ?? _omcs.FirstOrDefault();
+		_selectedDriver = _vehicleDrivers.FirstOrDefault(vd => vd.VehicleId == _selectedVehicle.Id) is var vehicleDriver && vehicleDriver is not null ? _drivers.FirstOrDefault(d => d.Id == vehicleDriver.DriverId) : _drivers.FirstOrDefault();
 
 		await SaveTransactionFile();
 	}
@@ -804,6 +814,7 @@ public partial class TripPage
 		{
 			await SaveTransactionFile();
 			_isProcessing = true;
+			StateHasChanged();
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
@@ -907,36 +918,16 @@ public partial class TripPage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				await ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "SavePdfInvoice":
-				await SaveTransaction(savePDF: true);
-				break;
-			case "SaveExcelInvoice":
-				await SaveTransaction(saveExcel: true);
-				break;
-			case "ExportPdfInvoice":
-				await ExportPdfInvoice();
-				break;
-			case "ExportExcelInvoice":
-				await ExportExcelInvoice();
-				break;
-			case "TripReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "ExpensesReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.TripExpensesReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "CardPaymentsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager);
-				break;
-			case "LedgerPaymentsReport":
-				await AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager);
-				break;
+			case "NewTransaction": await ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "SavePdfInvoice": await SaveTransaction(savePDF: true); break;
+			case "SaveExcelInvoice": await SaveTransaction(saveExcel: true); break;
+			case "ExportPdfInvoice": await ExportPdfInvoice(); break;
+			case "ExportExcelInvoice": await ExportExcelInvoice(); break;
+			case "TripReport": await AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "ExpensesReport": await AuthenticationService.NavigateToRoute(PageRouteNames.TripExpensesReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "CardPaymentsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "LedgerPaymentsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager); break;
 		}
 	}
 
@@ -944,12 +935,8 @@ public partial class TripPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCart":
-				await EditSelectedExpensesCartItem();
-				break;
-			case "DeleteCart":
-				await RemoveSelectedExpensesCartItem();
-				break;
+			case "EditCart": await EditSelectedExpensesCartItem(); break;
+			case "DeleteCart": await RemoveSelectedExpensesCartItem(); break;
 		}
 	}
 
@@ -957,12 +944,8 @@ public partial class TripPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCart":
-				await EditSelectedCardPaymentsCartItem();
-				break;
-			case "DeleteCart":
-				await RemoveSelectedCardPaymentsCartItem();
-				break;
+			case "EditCart": await EditSelectedCardPaymentsCartItem(); break;
+			case "DeleteCart": await RemoveSelectedCardPaymentsCartItem(); break;
 		}
 	}
 
@@ -970,12 +953,8 @@ public partial class TripPage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditCart":
-				await EditSelectedLedgerPaymentsCartItem();
-				break;
-			case "DeleteCart":
-				await RemoveSelectedLedgerPaymentsCartItem();
-				break;
+			case "EditCart": await EditSelectedLedgerPaymentsCartItem(); break;
+			case "DeleteCart": await RemoveSelectedLedgerPaymentsCartItem(); break;
 		}
 	}
 
@@ -990,10 +969,10 @@ public partial class TripPage
 	private async Task ResetPage()
 	{
 		await DeleteLocalFiles();
-		NavigationManager.NavigateTo(PageRouteNames.Trip, true);
+		PageRefresh.Request();
 	}
 
 	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard, true);
+		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard);
 	#endregion
 }

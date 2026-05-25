@@ -1,10 +1,9 @@
-﻿@attribute [Route(PageRouteNames.VehicleDocument)]
-
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.Vehicle.Models
+﻿@using StradaLibrary.Fleet.Vehicle.Models
 @using StradaLibrary.Fleet.VehicleDocument.Models
 
-<PageTitle>Vehicle Document - Strada</PageTitle>
+@attribute [Route(PageRouteNames.VehicleDocument)]
+
+<PageTitle>Vehicle Document Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" />
 <MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" />
@@ -13,6 +12,7 @@
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportExcel" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ExportPdf" />
 <MudBlazor.MudHotkey Key=JsKey.KeyU KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="UploadDocument" />
+<MudBlazor.MudHotkey Key=JsKey.KeyD KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="DownloadSelectedDocument" />
 <MudBlazor.MudHotkey Key=JsKey.Delete KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDeleted" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedItem" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="DeleteRecoverSelectedItem" />
@@ -27,33 +27,24 @@ else
 		<Header Title="Vehicle Document Entry">
 			<LeftContent>
 				<SfMenu TValue="Syncfusion.Blazor.Navigations.MenuItem">
-					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300"
-										   Easing="ease" />
+					<MenuAnimationSettings Effect="Syncfusion.Blazor.Navigations.MenuEffect.SlideDown" Duration="300" Easing="ease" />
 					<MenuEvents TValue="Syncfusion.Blazor.Navigations.MenuItem" ItemSelected="OnMenuSelected" />
 					<MenuItems>
 						<MenuItem Text="File" IconCss="e-icons e-folder">
 							<MenuItems>
-								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Upload Document (Ctrl + U)" IconCss="e-icons e-upload" Id="UploadDocument"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash"
-										  Id="ToggleDeleted" Disabled="@_isProcessing" />
+								<MenuItem Text="New Transaction (Ctrl + N)" IconCss="e-icons e-plus" Id="NewTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Save (Ctrl + S)" IconCss="e-icons e-save" Id="SaveTransaction" Disabled="@_isProcessing" />
+								<MenuItem Text="Upload Document (Ctrl + U)" IconCss="e-icons e-upload" Id="UploadDocument" Disabled="@_isProcessing" />
+								<MenuItem Text="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" IconCss="e-icons e-trash" Id="ToggleDeleted" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
-								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Export Excel (Ctrl + E)" IconCss="e-icons e-export-excel" Id="ExportExcel" Disabled="@_isProcessing" />
+								<MenuItem Text="Export PDF (Ctrl + P)" IconCss="e-icons e-export-pdf" Id="ExportPdf" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
-								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem"
-										  Disabled="@_isProcessing" />
-								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem"
-										  Disabled="@_isProcessing" />
+								<MenuItem Text="Edit (Insert)" IconCss="e-icons e-edit" Id="EditSelectedItem" Disabled="@_isProcessing" />
+								<MenuItem Text="Delete / Recover (Del)" IconCss="e-icons e-trash" Id="DeleteRecoverSelectedItem" Disabled="@_isProcessing" />
 							</MenuItems>
 						</MenuItem>
 					</MenuItems>
@@ -85,8 +76,8 @@ else
 						<div class="form-field">
 							<CustomTextField @ref="_sfFirstFocus"
 											 @bind-Value="_vehicleDocument.TransactionNo"
-											 Label="Transaction No"
-											 Placeholder="Enter transaction number (Ctrl + F)" />
+											 Label="Transaction No (Ctrl + F)"
+											 Placeholder="Enter Transaction Number" />
 						</div>
 
 						<div class="form-field">
@@ -95,8 +86,8 @@ else
 
 						<div class="form-field">
 							<CustomAutoComplete T="VehicleDocumentTypeModel"
-												@bind-Value="_selectedVehicleDocumentType"
-												@bind-Value:after="OnVehicleDocumentTypeChanged"
+												Value="_selectedVehicleDocumentType"
+												ValueChanged="OnVehicleDocumentTypeChanged"
 												DataSource="@_vehicleDocumentTypes"
 												Placeholder="Select Document Type"
 												Label="Document Type"
@@ -107,7 +98,6 @@ else
 						<div class="form-field">
 							<CustomAutoComplete T="VehicleModel"
 												@bind-Value="_selectedVehicle"
-												@bind-Value:after="OnVehicleChanged"
 												DataSource="@_vehicles"
 												Placeholder="Select Vehicle"
 												Label="Vehicle"
@@ -133,7 +123,9 @@ else
 						</div>
 
 						<div class="form-field">
-							<CustomDatePicker @bind-Value="_vehicleDocument.RenewalDate" Label="Renewal Date" ShowFinancialYear="false" />
+							<CustomDatePicker @bind-Value="_vehicleDocument.RenewalDate"
+											  Label="Renewal Date"
+											  ShowFinancialYear="false" />
 						</div>
 
 						<div class="form-field">
@@ -167,11 +159,9 @@ else
 						<GridEvents TValue="VehicleDocumentModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 						<GridColumns>
-							<GridColumn Field="@nameof(VehicleDocumentModel.Id)" HeaderText="ID" Width="80"
-										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleDocumentModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(VehicleDocumentModel.TransactionNo)" HeaderText="Transaction No" Width="180" />
-							<GridColumn Field="@nameof(VehicleDocumentModel.TransactionDateTime)" HeaderText="Transaction Date" Width="150"
-										Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleDocumentModel.TransactionDateTime)" HeaderText="Transaction Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(VehicleDocumentModel.VehicleDocumentTypeId)" HeaderText="Document Type" Width="200">
 								<Template>
 									@{
@@ -190,15 +180,11 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(VehicleDocumentModel.CurrentKM)" HeaderText="Current KM" Width="140"
-										Format="N2" TextAlign="TextAlign.Right" />
-							<GridColumn Field="@nameof(VehicleDocumentModel.Rate)" HeaderText="Rate" Width="140"
-										Format="N2" TextAlign="TextAlign.Right" />
-							<GridColumn Field="@nameof(VehicleDocumentModel.RenewalDate)" HeaderText="Next Renewal Date" Width="150"
-										Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(VehicleDocumentModel.CurrentKM)" HeaderText="Current KM" Width="140" Format="N2" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleDocumentModel.Rate)" HeaderText="Rate" Width="140" Format="N2" TextAlign="TextAlign.Right" />
+							<GridColumn Field="@nameof(VehicleDocumentModel.RenewalDate)" HeaderText="Next Renewal Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(VehicleDocumentModel.Remarks)" HeaderText="Remarks" Width="250" />
-							<GridColumn Field="@nameof(VehicleDocumentModel.Status)" HeaderText="Status" Width="110"
-										TextAlign="TextAlign.Center" Visible="_showDeleted">
+							<GridColumn Field="@nameof(VehicleDocumentModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
 										var item = (context as VehicleDocumentModel);
@@ -216,13 +202,10 @@ else
 	</div>
 }
 
-<DocumentUploadDialog Title="Upload Original Document"
-					  InfoMessage="Document will be uploaded only when you save the transaction."
-					  ExistingDocumentUrl="@_vehicleDocument.DocumentUrl"
-					  PendingDocumentFileName="@_pendingDocumentFileName"
-					  ShowInterpretButton="false" @bind-IsVisible="_isUploadDialogVisible"
+<DocumentUploadDialog ExistingDocumentUrl="@_vehicleDocument.DocumentUrl"
+					  @bind-IsVisible="_isUploadDialogVisible"
 					  OnFileChange="OnUploaderFileChange" OnFileRemove="OnRemoveFile"
-					  OnDownloadClick="DownloadExistingDocument" OnRemoveClick="MarkDocumentForRemoval"
+					  OnDownloadClick="DownloadExistingDocument" OnRemoveClick="RemoveExistingDocument"
 					  OnClose="CloseUploadDialog" />
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog" IdentifierValue="@_deleteTransactionNo"

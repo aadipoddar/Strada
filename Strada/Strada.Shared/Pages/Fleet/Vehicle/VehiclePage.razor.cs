@@ -1,15 +1,15 @@
 ﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 
-using StradaLibrary.Fleet.Vehicle.Data;
-using StradaLibrary.Fleet.Vehicle.Exports;
-using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Fleet.Vehicle.Data;
+using StradaLibrary.Fleet.Vehicle.Exports;
 using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
-using Strada.Shared.Components.Input;
 
 namespace Strada.Shared.Pages.Fleet.Vehicle;
 
@@ -36,17 +36,15 @@ public partial class VehiclePage
 	];
 
 	private SfGrid<VehicleModel> _sfGrid;
+	private CustomTextField _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomTextField _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -54,8 +52,12 @@ public partial class VehiclePage
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
-		await LoadData();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+			await LoadData();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -246,27 +248,13 @@ public partial class VehiclePage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -274,12 +262,8 @@ public partial class VehiclePage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -291,18 +275,15 @@ public partial class VehiclePage
 
 		_vehicle = await CommonData.LoadTableDataById<VehicleModel>(FleetNames.Vehicle, selectedRecords[0].Id);
 		if (_vehicle is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
 		_selectedVehicleType = _vehicleTypes.FirstOrDefault(vt => vt.Id == _vehicle.VehicleTypeId);
 		_selectedCompany = _companies.FirstOrDefault(c => c.Id == _vehicle.CompanyId);
-
-		if (_vehicle.OMCId.HasValue)
-			_selectedOMC = _omcs.FirstOrDefault(o => o.Id == _vehicle.OMCId);
-		else
-			_selectedOMC = null;
-
+		_selectedOMC = _vehicle.OMCId.HasValue ? _omcs.FirstOrDefault(o => o.Id == _vehicle.OMCId) : null;
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -352,10 +333,7 @@ public partial class VehiclePage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.VehicleMaster, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard);
 	#endregion
 }

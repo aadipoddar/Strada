@@ -3,9 +3,9 @@ using Strada.Shared.Components.Input;
 
 using StradaLibrary.Fleet.Route.Data;
 using StradaLibrary.Fleet.Route.Exports;
-using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Fleet.Route.Models;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -31,17 +31,15 @@ public partial class RoutePage
 	];
 
 	private SfGrid<RouteModel> _sfGrid;
+	private CustomAutoComplete<LocationModel> _sfFirstFocus;
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
-	private CustomAutoComplete<LocationModel> _sfFirstFocus;
 
 	private int _deleteTransactionId = 0;
 	private string _deleteTransactionName = string.Empty;
-
 	private int _recoverTransactionId = 0;
 	private string _recoverTransactionName = string.Empty;
-
-	private ToastNotification _toastNotification;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -49,8 +47,12 @@ public partial class RoutePage
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
-		await LoadData();
+		try
+		{
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
+			await LoadData();
+		}
+		catch { NavigateBack(); }
 	}
 
 	private async Task LoadData()
@@ -232,27 +234,13 @@ public partial class RoutePage
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction":
-				ResetPage();
-				break;
-			case "SaveTransaction":
-				await SaveTransaction();
-				break;
-			case "ToggleDeleted":
-				await ToggleDeleted();
-				break;
-			case "ExportExcel":
-				await ExportExcel();
-				break;
-			case "ExportPdf":
-				await ExportPdf();
-				break;
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "NewTransaction": ResetPage(); break;
+			case "SaveTransaction": await SaveTransaction(); break;
+			case "ToggleDeleted": await ToggleDeleted(); break;
+			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportPdf(); break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -260,12 +248,8 @@ public partial class RoutePage
 	{
 		switch (args.Item.Id)
 		{
-			case "EditSelectedItem":
-				await EditSelectedItem();
-				break;
-			case "DeleteRecoverSelectedItem":
-				await DeleteRecoverSelectedItem();
-				break;
+			case "EditSelectedItem": await EditSelectedItem(); break;
+			case "DeleteRecoverSelectedItem": await DeleteRecoverSelectedItem(); break;
 		}
 	}
 
@@ -277,13 +261,14 @@ public partial class RoutePage
 
 		_route = await CommonData.LoadTableDataById<RouteModel>(FleetNames.Route, selectedRecords[0].Id);
 		if (_route is null)
+		{
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
+			return;
+		}
 
 		_selectedFromLocation = _locations.FirstOrDefault(rl => rl.Id == _route.FromLocationId);
 		_selectedToLocation = _locations.FirstOrDefault(rl => rl.Id == _route.ToLocationId);
-
 		StateHasChanged();
-
 		await _sfFirstFocus.FocusAsync();
 	}
 
@@ -293,12 +278,11 @@ public partial class RoutePage
 		if (selectedRecords.Count > 0)
 		{
 			var route = selectedRecords[0];
-			var locations = await CommonData.LoadTableData<LocationModel>(FleetNames.Location);
 
 			if (route.Status)
-				await ShowDeleteConfirmation(route.Id, $"{locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name} to {locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name}");
+				await ShowDeleteConfirmation(route.Id, $"{_locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name} to {_locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name}");
 			else
-				await ShowRecoverConfirmation(route.Id, $"{locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name} to {locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name}");
+				await ShowRecoverConfirmation(route.Id, $"{_locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name} to {_locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name}");
 		}
 	}
 
@@ -336,10 +320,7 @@ public partial class RoutePage
 		await LoadData();
 	}
 
-	private void ResetPage() =>
-		NavigationManager.NavigateTo(PageRouteNames.RouteMaster, true);
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard, true);
+	private void ResetPage() => PageRefresh.Request();
+	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard);
 	#endregion
 }

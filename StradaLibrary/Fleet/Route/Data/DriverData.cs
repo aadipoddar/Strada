@@ -8,9 +8,25 @@ namespace StradaLibrary.Fleet.Route.Data;
 
 public static class DriverData
 {
-	public static async Task<int> InsertDriver(DriverModel driver, SqlDataAccessTransaction transaction = null) =>
+	private static async Task<int> InsertDriver(DriverModel driver, SqlDataAccessTransaction transaction = null) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertDriver, driver, transaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Driver.");
+
+	public static async Task<List<DriverOverviewModel>> LoadDriverOverview()
+	{
+		var drivers = await CommonData.LoadTableDataByStatus<DriverModel>(FleetNames.Driver);
+		return [.. drivers.Select(d => new DriverOverviewModel
+		{
+			Id = d.Id,
+			Name = d.Name,
+			Mobile = d.Mobile,
+			Code = d.Code,
+			Remarks = d.Remarks,
+			LicenseNo = d.LicenseNo,
+			LicenseExpiryDateTime = d.LicenseExpiryDateTime,
+			Status = d.Status
+		})];
+	}
 
 	public static async Task DeleteTransaction(DriverModel driver, int userId, string platform) =>
 		await SqlDataAccessTransaction.Run(async transaction =>
@@ -42,55 +58,40 @@ public static class DriverData
 			}, transaction);
 		});
 
-	public static async Task<List<DriverOverviewModel>> LoadDriverOverview()
+	private static async Task ValidateTransaction(DriverModel item)
 	{
-		var drivers = await CommonData.LoadTableDataByStatus<DriverModel>(FleetNames.Driver);
-		return [.. drivers.Select(d => new DriverOverviewModel
-		{
-			Id = d.Id,
-			Name = d.Name,
-			Mobile = d.Mobile,
-			Code = d.Code,
-			Remarks = d.Remarks,
-			Status = d.Status
-		})];
-	}
+		item.Name = item.Name?.Trim().ToUpper() ?? string.Empty;
+		item.Mobile = item.Mobile?.Trim() ?? string.Empty;
+		item.Code = item.Code?.Trim().ToUpper() ?? string.Empty;
+		item.LicenseNo = string.IsNullOrWhiteSpace(item.LicenseNo) ? null : item.LicenseNo.Trim();
+		item.Remarks = string.IsNullOrWhiteSpace(item.Remarks) ? null : item.Remarks.Trim();
+		item.LicenseExpiryDateTime = item.LicenseExpiryDateTime == default ? null : item.LicenseExpiryDateTime;
+		item.Status = true;
 
-	private static async Task ValidateTransaction(DriverModel driver)
-	{
-		driver.Name = driver.Name?.Trim().ToUpper() ?? string.Empty;
-		driver.Mobile = driver.Mobile?.Trim() ?? string.Empty;
-		driver.Code = driver.Code?.Trim().ToUpper() ?? string.Empty;
-		driver.Remarks = driver.Remarks?.Trim() ?? string.Empty;
-		driver.Status = true;
-
-		if (string.IsNullOrWhiteSpace(driver.Name))
+		if (string.IsNullOrWhiteSpace(item.Name))
 			throw new Exception("Driver name is required. Please enter a valid driver name.");
 
-		if (string.IsNullOrWhiteSpace(driver.Mobile))
+		if (string.IsNullOrWhiteSpace(item.Mobile))
 			throw new Exception("Mobile is required. Please enter a valid mobile number.");
 
-		if (!driver.Mobile.ValidatePhoneNumber())
+		if (!item.Mobile.ValidatePhoneNumber())
 			throw new Exception("Mobile must be exactly 10 numeric digits.");
 
-		if (driver.Id == 0)
-			driver.Code = await GenerateCodes.GenerateDriverCode();
+		if (item.Id == 0)
+			item.Code = await GenerateCodes.GenerateDriverCode();
 
-		if (string.IsNullOrWhiteSpace(driver.Code))
+		if (string.IsNullOrWhiteSpace(item.Code))
 			throw new Exception("Driver code is required. Please try again.");
-
-		if (string.IsNullOrWhiteSpace(driver.Remarks))
-			driver.Remarks = null;
 
 		var allDrivers = await CommonData.LoadTableData<DriverModel>(FleetNames.Driver);
 
-		var existingByMobile = allDrivers.FirstOrDefault(vd => vd.Id != driver.Id && vd.Mobile.Equals(driver.Mobile, StringComparison.OrdinalIgnoreCase));
+		var existingByMobile = allDrivers.FirstOrDefault(vd => vd.Id != item.Id && vd.Mobile.Equals(item.Mobile, StringComparison.OrdinalIgnoreCase));
 		if (existingByMobile is not null)
-			throw new Exception($"Mobile '{driver.Mobile}' already exists. Please choose a different mobile number.");
+			throw new Exception($"Mobile '{item.Mobile}' already exists. Please choose a different mobile number.");
 
-		var existingByCode = allDrivers.FirstOrDefault(vd => vd.Id != driver.Id && vd.Code.Equals(driver.Code, StringComparison.OrdinalIgnoreCase));
+		var existingByCode = allDrivers.FirstOrDefault(vd => vd.Id != item.Id && vd.Code.Equals(item.Code, StringComparison.OrdinalIgnoreCase));
 		if (existingByCode is not null)
-			throw new Exception($"Driver code '{driver.Code}' already exists. Please choose a different code.");
+			throw new Exception($"Driver code '{item.Code}' already exists. Please choose a different code.");
 	}
 
 	public static async Task<int> SaveTransaction(DriverModel driver, int userId, string platform)
