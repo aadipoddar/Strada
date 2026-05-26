@@ -1,4 +1,5 @@
 using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Input;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Utils.MailUtils;
 using StradaLibrary.Operations.Models;
@@ -33,8 +34,8 @@ public partial class LoginWithCodePage
 
 	private List<UserModel> _users = [];
 
-	private SfTextBox _phoneEmailTextBox;
-	private SfTextBox _newPasswordTextBox;
+	private CustomTextField _phoneEmailTextBox;
+	private CustomTextField _newPasswordTextBox;
 	private SfOtpInput _otpInput;
 
 	private ToastNotification _toastNotification;
