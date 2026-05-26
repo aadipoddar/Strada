@@ -1,0 +1,22 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="fiori-tile-host">
+	<SfButton CssClass="fiori-tile" OnClick="OnClick">
+		<div class="ft-inner">
+			<div class="ft-head">
+				<p class="ft-title">@Title</p>
+				@if (!string.IsNullOrWhiteSpace(Subtitle))
+				{
+					<p class="ft-subtitle">@Subtitle</p>
+				}
+			</div>
+
+			<div class="ft-body"></div>
+
+			@if (IconContent is not null)
+			{
+				<span class="ft-icon">@IconContent</span>
+			}
+		</div>
+	</SfButton>
+</div>

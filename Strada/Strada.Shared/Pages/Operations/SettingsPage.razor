@@ -1,4 +1,4 @@
-﻿@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Accounts.Masters.Models
 @using StradaLibrary.Operations.Models
 @attribute [Route(PageRouteNames.Settings)]
 
@@ -6,7 +6,6 @@
 
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveSettings" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ShowResetConfirmation" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" Disabled="@_isProcessing" />
 
 @if (_isLoading)
 {
@@ -30,9 +29,6 @@ else
 					</MenuItems>
 				</SfMenu>
 			</LeftContent>
-			<RightContent>
-				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
-			</RightContent>
 		</Header>
 
 		<div class="page-container">

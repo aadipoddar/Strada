@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
@@ -971,8 +971,5 @@ public partial class TripPage
 		await DeleteLocalFiles();
 		PageRefresh.Request();
 	}
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard);
 	#endregion
 }

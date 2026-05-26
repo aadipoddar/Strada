@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRouteNames.VehicleRegisterReport)]
+@attribute [Route(PageRouteNames.VehicleRegisterReport)]
 
 @using StradaLibrary.Accounts.Masters.Models
 @using StradaLibrary.Fleet.OMC.Models
@@ -8,7 +8,6 @@
 
 <PageTitle>Vehicle Register - Strada</PageTitle>
 
-<MudBlazor.MudHotkey Key=JsKey.KeyB KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="NavigateBack" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
@@ -62,9 +61,6 @@ else
 					</MenuItems>
 				</SfMenu>
 			</LeftContent>
-			<RightContent>
-				<IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="NavigateBack" />
-			</RightContent>
 		</Header>
 
 		<div class="page-container">

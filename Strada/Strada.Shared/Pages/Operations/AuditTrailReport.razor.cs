@@ -1,4 +1,4 @@
-﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.Masters.Data;
@@ -50,7 +50,7 @@ public partial class AuditTrailReport : IAsyncDisposable
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Admin]);
 			await InitializePage();
 		}
-		catch { NavigateBack(); }
+		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
 	}
 
 	private async Task InitializePage()
@@ -289,9 +289,6 @@ public partial class AuditTrailReport : IAsyncDisposable
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
 	}
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.OperationsDashboard);
 
 	private async Task StartAutoRefresh()
 	{

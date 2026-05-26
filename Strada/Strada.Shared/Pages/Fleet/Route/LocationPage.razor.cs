@@ -1,4 +1,4 @@
-﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
 using StradaLibrary.Fleet.Route.Data;
@@ -47,7 +47,7 @@ public partial class LocationPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 			await LoadData();
 		}
-		catch { NavigateBack(); }
+		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
 	}
 
 	private async Task LoadData()
@@ -297,6 +297,5 @@ public partial class LocationPage
 	}
 
 	private void ResetPage() => PageRefresh.Request();
-	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard);
 	#endregion
 }

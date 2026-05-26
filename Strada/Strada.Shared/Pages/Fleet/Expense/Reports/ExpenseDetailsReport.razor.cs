@@ -1,4 +1,4 @@
-﻿using Strada.Shared.Components.Dialog;
+using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.Masters.Data;
@@ -65,7 +65,7 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet, UserRoles.Reports]);
 			await InitializePage();
 		}
-		catch { NavigateBack(); }
+		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
 	}
 
 	private async Task InitializePage()
@@ -480,9 +480,6 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 		StateHasChanged();
 	}
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetReportsDashboard);
-
 	private async Task StartAutoRefresh()
 	{
 		var timerSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.AutoRefreshReportTimer);

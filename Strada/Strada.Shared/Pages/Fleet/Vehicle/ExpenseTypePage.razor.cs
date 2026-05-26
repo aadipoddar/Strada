@@ -47,7 +47,7 @@ public partial class ExpenseTypePage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 			await LoadData();
 		}
-		catch { NavigateBack(); }
+		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
 	}
 
 	private async Task LoadData()
@@ -297,6 +297,5 @@ public partial class ExpenseTypePage
 	}
 
 	private void ResetPage() => PageRefresh.Request();
-	private void NavigateBack() => NavigationManager.NavigateTo(PageRouteNames.FleetMastersDashboard);
 	#endregion
 }

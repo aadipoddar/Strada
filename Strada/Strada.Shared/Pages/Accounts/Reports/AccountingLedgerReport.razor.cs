@@ -67,7 +67,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
 			await InitializePage();
 		}
-		catch { NavigateBack(); }
+		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
 	}
 
 	private async Task InitializePage()
@@ -514,9 +514,6 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 		StateHasChanged();
 	}
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
 	private async Task StartAutoRefresh()
 	{

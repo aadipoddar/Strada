@@ -177,9 +177,9 @@ h1:focus {
 	letter-spacing: 0.3px;
 }
 
-/* Full-width separator — drop inside a form-grid or financial-grid
-   (e.g. above a total field). Spans all columns in a grid layout
-   and stretches the full width in a flex column. */
+/* Full-width separator — drop inside a form-grid (e.g. above a total
+   field). Spans all columns in a grid layout and stretches the full
+   width in a flex column. */
 .form-divider {
 	grid-column: 1 / -1;
 	width: 100%;

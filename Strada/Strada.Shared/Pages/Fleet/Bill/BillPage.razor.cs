@@ -738,8 +738,5 @@ public partial class BillPage
 		await DeleteLocalFiles();
 		PageRefresh.Request();
 	}
-
-	private void NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.FleetTransactionsDashboard);
 	#endregion
 }
