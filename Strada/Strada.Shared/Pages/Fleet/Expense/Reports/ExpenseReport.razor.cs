@@ -48,13 +48,11 @@ public partial class ExpenseReport : IAsyncDisposable
 	private SfGrid<ExpenseOverviewModel> _sfGrid;
 	private CustomDateRangePicker _sfFirstFocus;
 	private ToastNotification _toastNotification;
-	private DeleteConfirmationDialog _deleteConfirmationDialog;
-	private RecoverConfirmationDialog _recoverConfirmationDialog;
+	private ConfirmationDialog _confirmationDialog;
 
-	private string _deleteTransactionNo = string.Empty;
-	private int _deleteTransactionId = 0;
-	private string _recoverTransactionNo = string.Empty;
-	private int _recoverTransactionId = 0;
+	private string _confirmTitle = string.Empty;
+	private string _confirmMessage = string.Empty;
+	private Func<Task> _confirmAction;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -316,9 +314,9 @@ public partial class ExpenseReport : IAsyncDisposable
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
 	}
 
-	private async Task ConfirmDelete()
+	private async Task DeleteTransaction(int id, string transactionNo)
 	{
-		if (_isProcessing || _deleteTransactionId == 0)
+		if (_isProcessing || id == 0)
 			return;
 
 		try
@@ -326,13 +324,12 @@ public partial class ExpenseReport : IAsyncDisposable
 			if (!_user.Admin)
 				throw new UnauthorizedAccessException("You do not have permission to delete this transaction.");
 
-			await _deleteConfirmationDialog.HideAsync();
 			_isProcessing = true;
 			StateHasChanged();
 
 			await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
 
-			var expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, _deleteTransactionId)
+			var expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, id)
 				?? throw new Exception("Transaction not found.");
 			expense.Status = false;
 			expense.LastModifiedBy = _user.Id;
@@ -340,7 +337,7 @@ public partial class ExpenseReport : IAsyncDisposable
 			expense.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 			await ExpenseData.DeleteTransaction(expense);
 
-			await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
+			await _toastNotification.ShowAsync("Success", $"Transaction {transactionNo} has been deleted successfully.", ToastType.Success);
 		}
 		catch (Exception ex)
 		{
@@ -348,17 +345,15 @@ public partial class ExpenseReport : IAsyncDisposable
 		}
 		finally
 		{
-			_deleteTransactionId = 0;
-			_deleteTransactionNo = string.Empty;
 			_isProcessing = false;
 			StateHasChanged();
 			await LoadTransactionOverviews();
 		}
 	}
 
-	private async Task ConfirmRecover()
+	private async Task RecoverTransaction(int id, string transactionNo)
 	{
-		if (_isProcessing || _recoverTransactionId == 0)
+		if (_isProcessing || id == 0)
 			return;
 
 		try
@@ -366,13 +361,12 @@ public partial class ExpenseReport : IAsyncDisposable
 			if (!_user.Admin)
 				throw new UnauthorizedAccessException("You do not have permission to recover this transaction.");
 
-			await _recoverConfirmationDialog.HideAsync();
 			_isProcessing = true;
 			StateHasChanged();
 
 			await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
 
-			var expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, _recoverTransactionId)
+			var expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, id)
 				?? throw new Exception("Transaction not found.");
 			expense.Status = true;
 			expense.LastModifiedBy = _user.Id;
@@ -380,7 +374,7 @@ public partial class ExpenseReport : IAsyncDisposable
 			expense.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 			await ExpenseData.RecoverTransaction(expense);
 
-			await _toastNotification.ShowAsync("Success", $"Transaction {_recoverTransactionNo} has been recovered successfully.", ToastType.Success);
+			await _toastNotification.ShowAsync("Success", $"Transaction {transactionNo} has been recovered successfully.", ToastType.Success);
 		}
 		catch (Exception ex)
 		{
@@ -388,8 +382,6 @@ public partial class ExpenseReport : IAsyncDisposable
 		}
 		finally
 		{
-			_recoverTransactionId = 0;
-			_recoverTransactionNo = string.Empty;
 			_isProcessing = false;
 			StateHasChanged();
 			await LoadTransactionOverviews();
@@ -401,40 +393,35 @@ public partial class ExpenseReport : IAsyncDisposable
 		if (_sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
 
-		if (_sfGrid.SelectedRecords.First().Status)
-			await ShowDeleteConfirmation();
+		var record = _sfGrid.SelectedRecords.First();
+
+		if (record.Status)
+			await ShowConfirmation("Delete", $"Are you sure you want to delete transaction {record.TransactionNo}", () => DeleteTransaction(record.Id, record.TransactionNo));
 		else
-			await ShowRecoverConfirmation();
+			await ShowConfirmation("Recover", $"Are you sure you want to recover transaction {record.TransactionNo}", () => RecoverTransaction(record.Id, record.TransactionNo));
 	}
 
-	private async Task ShowDeleteConfirmation()
+	private async Task ShowConfirmation(string title, string message, Func<Task> action)
 	{
-		_deleteTransactionId = _sfGrid.SelectedRecords.First().Id;
-		_deleteTransactionNo = _sfGrid.SelectedRecords.First().TransactionNo;
+		_confirmTitle = title;
+		_confirmMessage = message;
+		_confirmAction = action;
 		StateHasChanged();
-		await _deleteConfirmationDialog.ShowAsync();
+		await _confirmationDialog.ShowAsync();
 	}
 
-	private async Task CancelDelete()
+	private async Task OnConfirmed()
 	{
-		_deleteTransactionId = 0;
-		_deleteTransactionNo = string.Empty;
-		await _deleteConfirmationDialog.HideAsync();
+		await _confirmationDialog.HideAsync();
+		if (_confirmAction is not null)
+			await _confirmAction();
+		_confirmAction = null;
 	}
 
-	private async Task ShowRecoverConfirmation()
+	private async Task OnCancelled()
 	{
-		_recoverTransactionId = _sfGrid.SelectedRecords.First().Id;
-		_recoverTransactionNo = _sfGrid.SelectedRecords.First().TransactionNo;
-		StateHasChanged();
-		await _recoverConfirmationDialog.ShowAsync();
-	}
-
-	private async Task CancelRecover()
-	{
-		_recoverTransactionId = 0;
-		_recoverTransactionNo = string.Empty;
-		await _recoverConfirmationDialog.HideAsync();
+		_confirmAction = null;
+		await _confirmationDialog.HideAsync();
 	}
 	#endregion
 
