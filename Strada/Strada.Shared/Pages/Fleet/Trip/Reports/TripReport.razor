@@ -100,97 +100,95 @@ else
 					</div>
 				</div>
 				<div class="section-body">
-					<div class="filters-container">
-						<div class="filters-grid">
-							<!-- Date Range -->
-							<div class="form-field">
-								<CustomDateRangePicker @ref="_sfFirstFocus" Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
-													   ValueChanged="OnDateRangeChanged"
-													   Label="Date Range (Ctrl + F)"
-													   Required="false" />
-							</div>
+					<div class="filters-grid">
+						<!-- Date Range -->
+						<div class="form-field">
+							<CustomDateRangePicker @ref="_sfFirstFocus" Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+												   ValueChanged="OnDateRangeChanged"
+												   Label="Date Range (Ctrl + F)"
+												   Required="false" />
+						</div>
 
-							<!-- Company -->
-							<div class="form-field">
-								<CustomAutoComplete T="CompanyModel"
-													Value="_selectedCompany"
-													DataSource="@_companies"
-													Placeholder="All Companies"
-													Label="Company" Required="false"
-													ValueChanged="OnCompanyChanged"
-													FieldValue="@nameof(CompanyModel.Name)"
-													AddNewRoute="@PageRouteNames.CompanyMaster" />
-							</div>
+						<!-- Company -->
+						<div class="form-field">
+							<CustomAutoComplete T="CompanyModel"
+												Value="_selectedCompany"
+												DataSource="@_companies"
+												Placeholder="All Companies"
+												Label="Company" Required="false"
+												ValueChanged="OnCompanyChanged"
+												FieldValue="@nameof(CompanyModel.Name)"
+												AddNewRoute="@PageRouteNames.CompanyMaster" />
+						</div>
 
-							<!-- OMC -->
-							<div class="form-field">
-								<CustomAutoComplete T="OMCModel"
-													Value="_selectedOMC"
-													DataSource="@_omcs"
-													Placeholder="All OMCs"
-													Label="OMC" Required="false"
-													ValueChanged="OnOMCChanged"
-													FieldValue="@nameof(OMCModel.Name)"
-													AddNewRoute="@PageRouteNames.OMCMaster" />
-							</div>
+						<!-- OMC -->
+						<div class="form-field">
+							<CustomAutoComplete T="OMCModel"
+												Value="_selectedOMC"
+												DataSource="@_omcs"
+												Placeholder="All OMCs"
+												Label="OMC" Required="false"
+												ValueChanged="OnOMCChanged"
+												FieldValue="@nameof(OMCModel.Name)"
+												AddNewRoute="@PageRouteNames.OMCMaster" />
+						</div>
 
-							<!-- Vehicle -->
-							<div class="form-field">
-								<CustomAutoComplete T="VehicleModel"
-													Value="_selectedVehicle"
-													DataSource="@_vehicles"
-													Placeholder="All Vehicles"
-													Label="Vehicle" Required="false"
-													ValueChanged="OnVehicleChanged"
-													FieldValue="@nameof(VehicleModel.Code)"
-													AddNewRoute="@PageRouteNames.VehicleMaster" />
-							</div>
+						<!-- Vehicle -->
+						<div class="form-field">
+							<CustomAutoComplete T="VehicleModel"
+												Value="_selectedVehicle"
+												DataSource="@_vehicles"
+												Placeholder="All Vehicles"
+												Label="Vehicle" Required="false"
+												ValueChanged="OnVehicleChanged"
+												FieldValue="@nameof(VehicleModel.Code)"
+												AddNewRoute="@PageRouteNames.VehicleMaster" />
+						</div>
 
-							<!-- Route -->
-							<div class="form-field">
-								<CustomAutoComplete T="RouteOverviewModel"
-													Value="_selectedRoute"
-													DataSource="@_routes"
-													Placeholder="All Routes"
-													Label="Route" Required="false"
-													ValueChanged="OnRouteChanged"
-													FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
-													AddNewRoute="@PageRouteNames.RouteMaster" />
-							</div>
+						<!-- Route -->
+						<div class="form-field">
+							<CustomAutoComplete T="RouteOverviewModel"
+												Value="_selectedRoute"
+												DataSource="@_routes"
+												Placeholder="All Routes"
+												Label="Route" Required="false"
+												ValueChanged="OnRouteChanged"
+												FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
+												AddNewRoute="@PageRouteNames.RouteMaster" />
+						</div>
 
-							<!-- Driver -->
-							<div class="form-field">
-								<CustomAutoComplete T="DriverOverviewModel"
-													Value="_selectedDriver"
-													DataSource="@_drivers"
-													Placeholder="All Drivers"
-													Label="Driver" Required="false"
-													ValueChanged="OnDriverChanged"
-													FieldValue="@nameof(DriverOverviewModel.DisplayName)"
-													AddNewRoute="@PageRouteNames.DriverMaster" />
-							</div>
+						<!-- Driver -->
+						<div class="form-field">
+							<CustomAutoComplete T="DriverOverviewModel"
+												Value="_selectedDriver"
+												DataSource="@_drivers"
+												Placeholder="All Drivers"
+												Label="Driver" Required="false"
+												ValueChanged="OnDriverChanged"
+												FieldValue="@nameof(DriverOverviewModel.DisplayName)"
+												AddNewRoute="@PageRouteNames.DriverMaster" />
+						</div>
 
-							<!-- Vehicle Empty -->
-							<div class="form-field">
-								<CustomAutoComplete T="YesNoFilterOption"
-													Value="_selectedVehicleEmptyFilter"
-													DataSource="@TripFilterOptions.YesNo"
-													Placeholder="All"
-													Label="Vehicle Empty" Required="false"
-													ValueChanged="OnVehicleEmptyFilterChanged"
-													FieldValue="@nameof(YesNoFilterOption.Name)" />
-							</div>
+						<!-- Vehicle Empty -->
+						<div class="form-field">
+							<CustomAutoComplete T="YesNoFilterOption"
+												Value="_selectedVehicleEmptyFilter"
+												DataSource="@TripFilterOptions.YesNo"
+												Placeholder="All"
+												Label="Vehicle Empty" Required="false"
+												ValueChanged="OnVehicleEmptyFilterChanged"
+												FieldValue="@nameof(YesNoFilterOption.Name)" />
+						</div>
 
-							<!-- Pending Bills -->
-							<div class="form-field">
-								<CustomAutoComplete T="YesNoFilterOption"
-													Value="_selectedPendingBillsFilter"
-													DataSource="@TripFilterOptions.YesNo"
-													Placeholder="All"
-													Label="Pending Bills" Required="false"
-													ValueChanged="OnPendingBillsFilterChanged"
-													FieldValue="@nameof(YesNoFilterOption.Name)" />
-							</div>
+						<!-- Pending Bills -->
+						<div class="form-field">
+							<CustomAutoComplete T="YesNoFilterOption"
+												Value="_selectedPendingBillsFilter"
+												DataSource="@TripFilterOptions.YesNo"
+												Placeholder="All"
+												Label="Pending Bills" Required="false"
+												ValueChanged="OnPendingBillsFilterChanged"
+												FieldValue="@nameof(YesNoFilterOption.Name)" />
 						</div>
 					</div>
 				</div>
