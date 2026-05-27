@@ -36,10 +36,10 @@ public partial class DashboardAnalysis
 		if (!firstRender)
 			return;
 
-		await LoadAnalysis();
+		await LoadData();
 	}
 
-	private async Task LoadAnalysis()
+	private async Task LoadData()
 	{
 		LoadCachedAnalysis();
 		await LoadNewAnalysis();
@@ -75,7 +75,7 @@ public partial class DashboardAnalysis
 			_expenses = await CommonData.LoadTableDataByDate<ExpenseOverviewModel>(FleetNames.ExpenseOverview, lastMonthStart, thisMonthEnd);
 			_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 
-			_unBilledTrips = [.. _unBilledTrips.Where(_ => _.Status).OrderByDescending(_ => _.TransactionDateTime)];
+			_unBilledTrips = [.. _unBilledTrips.Where(_ => _.Status).OrderByDescending(_ => _.PendingDays)];
 			_trips = [.. _trips.Where(_ => _.Status).OrderByDescending(_ => _.TransactionDateTime)];
 			_expenses = [.. _expenses.Where(_ => _.Status).OrderByDescending(_ => _.TransactionDateTime)];
 

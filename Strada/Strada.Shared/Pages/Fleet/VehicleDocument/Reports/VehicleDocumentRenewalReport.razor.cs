@@ -76,7 +76,7 @@ public partial class VehicleDocumentRenewalReport : IAsyncDisposable
 		_vehicles = [.. _vehicles.OrderBy(s => s.Code)];
 		_documentTypes = [.. _documentTypes.OrderBy(s => s.Name)];
 
-		var warningSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.DocumentRenewalWarningDays);
+		var warningSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.ReportWarningDays);
 		_warningDays = int.TryParse(warningSetting?.Value, out var days) ? days : 30;
 	}
 

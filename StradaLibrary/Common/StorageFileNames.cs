@@ -26,5 +26,8 @@ public static class StorageFileNames
 	public static string UnBilledTripsDataFileName => "unbilled_trips_data.json";
 	public static string ExpensesOverviewDataFileName => "expenses_overview_data.json";
 	public static string VehiclesDataFileName => "vehicles_data.json";
+	public static string DueDocumentsDataFileName => "due_documents_data.json";
+	public static string LossTripsDataFileName => "loss_trips_data.json";
+	public static string IdleVehiclesDataFileName => "idle_vehicles_data.json";
 	#endregion
 }

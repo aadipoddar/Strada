@@ -67,7 +67,7 @@ public partial class SettingsPage
 
 	// Report Settings
 	private int _autoRefreshReportTimer = 5;
-	private int _documentRenewalWarningDays = 30;
+	private int _reportWarningDays = 30;
 
 	#endregion
 
@@ -181,8 +181,8 @@ public partial class SettingsPage
 		s = await SettingsData.LoadSettingsByKey(SettingsKeys.AutoRefreshReportTimer);
 		_autoRefreshReportTimer = int.TryParse(s?.Value, out var v6) ? v6 : 5;
 
-		s = await SettingsData.LoadSettingsByKey(SettingsKeys.DocumentRenewalWarningDays);
-		_documentRenewalWarningDays = int.TryParse(s?.Value, out var v7) ? v7 : 30;
+		s = await SettingsData.LoadSettingsByKey(SettingsKeys.ReportWarningDays);
+		_reportWarningDays = int.TryParse(s?.Value, out var v7) ? v7 : 30;
 	}
 
 	private async Task LoadCompanies()
@@ -316,7 +316,7 @@ public partial class SettingsPage
 			await UpdateSetting(SettingsKeys.DefaultSelectedVoucherId, _defaultSelectedVoucherId, Desc(SettingsKeys.DefaultSelectedVoucherId));
 			await UpdateSetting(SettingsKeys.BillVoucherId, _billVoucherId, Desc(SettingsKeys.BillVoucherId));
 			await UpdateSetting(SettingsKeys.AutoRefreshReportTimer, _autoRefreshReportTimer.ToString(), Desc(SettingsKeys.AutoRefreshReportTimer));
-			await UpdateSetting(SettingsKeys.DocumentRenewalWarningDays, _documentRenewalWarningDays.ToString(), Desc(SettingsKeys.DocumentRenewalWarningDays));
+			await UpdateSetting(SettingsKeys.ReportWarningDays, _reportWarningDays.ToString(), Desc(SettingsKeys.ReportWarningDays));
 
 			await _toastNotification.ShowAsync("Saved", "Settings saved successfully.", ToastType.Success);
 		}
