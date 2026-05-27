@@ -1,0 +1,67 @@
+<div class="launchpad-section">
+	<h2 class="launchpad-section-title">Key Figures</h2>
+	<div class="dashboard-grid">
+
+		<FioriTile Title="Unbilled Trips" Subtitle="Trips not yet added to a bill" KPI="@_unbilledTripsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Bill)">
+			<IconContent>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="1" y="3" width="15" height="13" />
+					<polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+					<circle cx="5.5" cy="18.5" r="2.5" />
+					<circle cx="18.5" cy="18.5" r="2.5" />
+				</svg>
+			</IconContent>
+		</FioriTile>
+
+		<FioriTile Title="Trips This Month" Subtitle="@_thisMonthTripsTrend" KPI="@_thisMonthTripsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripReport)">
+			<IconContent>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="1" y="3" width="15" height="13" />
+					<polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+					<circle cx="5.5" cy="18.5" r="2.5" />
+					<circle cx="18.5" cy="18.5" r="2.5" />
+				</svg>
+			</IconContent>
+		</FioriTile>
+
+		<FioriTile Title="Revenue This Month" Subtitle="@_thisMonthRevenueTrend" KPI="@_thisMonthRevenue" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripReport)">
+			<IconContent>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+					<polyline points="17 6 23 6 23 12" />
+				</svg>
+			</IconContent>
+		</FioriTile>
+
+		<FioriTile Title="Expense This Month" Subtitle="@_thisMonthExpenseTrend" KPI="@_thisMonthExpense" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripExpensesReport)">
+			<IconContent>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+					<polyline points="17 18 23 18 23 12" />
+				</svg>
+			</IconContent>
+		</FioriTile>
+
+		<FioriTile Title="Profit / Loss This Month" Subtitle="@_thisMonthProfitTrend" KPI="@_thisMonthProfit" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleRegisterReport)">
+			<IconContent>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="12" y1="20" x2="12" y2="10" />
+					<line x1="18" y1="20" x2="18" y2="4" />
+					<line x1="6" y1="20" x2="6" y2="16" />
+				</svg>
+			</IconContent>
+		</FioriTile>
+
+		<FioriTile Title="Active Vehicles" Subtitle="@_activeVehiclesNote" KPI="@_activeVehiclesCount.ToString()" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleMaster)">
+			<IconContent>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M10 17h4V5H2v12h3" />
+					<path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h1" />
+					<circle cx="7.5" cy="17.5" r="2.5" />
+					<circle cx="17.5" cy="17.5" r="2.5" />
+				</svg>
+			</IconContent>
+		</FioriTile>
+
+	</div>
+</div>

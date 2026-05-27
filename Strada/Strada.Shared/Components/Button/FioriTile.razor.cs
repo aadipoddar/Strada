@@ -5,23 +5,19 @@ namespace Strada.Shared.Components.Button;
 
 public partial class FioriTile
 {
-	/// <summary>
-	/// The tile title shown at the top.
-	/// </summary>
 	[Parameter] public string Title { get; set; } = string.Empty;
-
-	/// <summary>
-	/// Optional secondary line shown in muted text under the title.
-	/// </summary>
 	[Parameter] public string Subtitle { get; set; } = string.Empty;
-
-	/// <summary>
-	/// The SVG icon content shown at the bottom-left of the tile.
-	/// </summary>
 	[Parameter] public RenderFragment? IconContent { get; set; }
-
-	/// <summary>
-	/// The click event callback.
-	/// </summary>
+	[Parameter] public string KPI { get; set; } = string.Empty;
 	[Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+	// Shrink the KPI font as the number gets longer so lakh/crore values
+	// (e.g. "₹1,23,45,678.00") still fit inside the tile instead of overflowing.
+	private string ValueSizeClass => (KPI?.Length ?? 0) switch
+	{
+		> 15 => "ft-value--xs",
+		> 12 => "ft-value--sm",
+		> 9 => "ft-value--md",
+		_ => string.Empty
+	};
 }

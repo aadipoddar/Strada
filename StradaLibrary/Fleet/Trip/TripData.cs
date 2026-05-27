@@ -214,7 +214,7 @@ public static class TripData
 		{
 			(MemoryStream, string)? previousInvoice = update && !recover ? await TripInvoiceExport.ExportInvoice(trip.Id, InvoiceExportType.PDF) : null;
 
-			trip.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, recover,transaction));
+			trip.Id = await SqlDataAccessTransaction.Run(transaction => SaveTransaction(trip, expensesDetails, cardPaymentDetails, ledgerPaymentDetails, recover, transaction));
 
 			if (!recover)
 				await TripNotify.Notify(trip.Id, update ? NotifyType.Updated : NotifyType.Created, previousInvoice);

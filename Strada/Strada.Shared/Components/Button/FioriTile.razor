@@ -13,10 +13,16 @@
 
 			<div class="ft-body"></div>
 
-			@if (IconContent is not null)
-			{
-				<span class="ft-icon">@IconContent</span>
-			}
+			<div class="ft-footer">
+				@if (IconContent is not null)
+				{
+					<span class="ft-icon">@IconContent</span>
+				}
+				@if (!string.IsNullOrWhiteSpace(KPI))
+				{
+					<p class="ft-value @ValueSizeClass">@KPI</p>
+				}
+			</div>
 		</div>
 	</SfButton>
 </div>

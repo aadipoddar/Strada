@@ -13,6 +13,7 @@
 
 @using Strada.Shared.Components.Input
 @using Strada.Shared.Components.Page
+@using Strada.Shared.Components.Dashboard
 @using Strada.Shared.Components.Button
 @using Strada.Shared.Components.Dialog
 
@@ -30,7 +31,10 @@
 
 @using MudBlazor.Utilities
 
+@using Microsoft.Extensions.Caching.Memory
+
 @inject NavigationManager NavigationManager
+@inject IMemoryCache MemoryCache
 @inject IJSRuntime JSRuntime
 
 @inject IFormFactor FormFactor

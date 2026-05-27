@@ -1,21 +1,18 @@
 ﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.JSInterop;
 
 using Strada.Shared.Services;
 
-using StradaLibrary.Common;
-
 namespace Strada.Web.Services;
 
-public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : IDataStorageService
+public class DataStorageService(ProtectedLocalStorage protectedLocalStorage, IJSRuntime jsRuntime) : IDataStorageService
 {
 	private readonly ProtectedLocalStorage _protectedLocalStorage = protectedLocalStorage;
+	private readonly IJSRuntime _jsRuntime = jsRuntime;
 
 	public async Task SecureSaveAsync(string key, string value)
 	{
-		try
-		{
-			await _protectedLocalStorage.SetAsync(key, value);
-		}
+		try { await _protectedLocalStorage.SetAsync(key, value); }
 		catch { }
 	}
 
@@ -24,32 +21,14 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 
 	public async Task SecureRemove(string key)
 	{
-		try
-		{
-			await _protectedLocalStorage.DeleteAsync(key);
-		}
+		try { await _protectedLocalStorage.DeleteAsync(key); }
 		catch { }
 	}
 
 	public async Task SecureRemoveAll()
 	{
-		await LocalRemove(StorageFileNames.UserDataFileName);
-		await LocalRemove(StorageFileNames.UserDeviceIdDataFileName);
-
-		await LocalRemove(StorageFileNames.FinancialAccountingDataFileName);
-		await LocalRemove(StorageFileNames.FinancialAccountingCartDataFileName);
-
-		await LocalRemove(StorageFileNames.ExpenseDataFileName);
-		await LocalRemove(StorageFileNames.ExpenseDetailsCartDataFileName);
-
-		await LocalRemove(StorageFileNames.TripDataFileName);
-		await LocalRemove(StorageFileNames.TripExpensesCartDataFileName);
-		await LocalRemove(StorageFileNames.TripCardPaymentsCartDataFileName);
-		await LocalRemove(StorageFileNames.TripLedgerPaymentsCartDataFileName);
-
-		await LocalRemove(StorageFileNames.BillDataFileName);
-		await LocalRemove(StorageFileNames.BillPendingTripsCartDataFileName);
-		await LocalRemove(StorageFileNames.BillLedgerPaymentsCartDataFileName);
+		try { await _jsRuntime.InvokeVoidAsync("localStorage.clear"); }
+		catch { }
 	}
 
 

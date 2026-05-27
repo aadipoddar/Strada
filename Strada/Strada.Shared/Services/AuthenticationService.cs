@@ -50,7 +50,7 @@ public static class AuthenticationService
 	{
 		await dataStorageService.SecureRemoveAll();
 		vibrationService.VibrateWithTime(500);
-		navigationManager.NavigateTo(PageRouteNames.Login, true);
+		navigationManager.NavigateTo(PageRouteNames.Login);
 	}
 
 	public static Func<string, bool> OpenRouteInNewWindow { get; set; }

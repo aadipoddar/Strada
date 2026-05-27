@@ -1,7 +1,5 @@
 ﻿using Strada.Shared.Services;
 
-using StradaLibrary.Common;
-
 namespace Strada.Services;
 
 public class DataStorageService : IDataStorageService
@@ -15,27 +13,17 @@ public class DataStorageService : IDataStorageService
 	public async Task SecureRemove(string key) =>
 		SecureStorage.Default.Remove(key);
 
-	public async Task SecureRemoveAll()
+	public Task SecureRemoveAll()
 	{
 		SecureStorage.Default.RemoveAll();
 
-		await LocalRemove(StorageFileNames.UserDataFileName);
-		await LocalRemove(StorageFileNames.UserDeviceIdDataFileName);
+		foreach (var file in Directory.GetFiles(FileSystem.Current.AppDataDirectory, "*.json"))
+		{
+			try { File.Delete(file); }
+			catch { }
+		}
 
-		await LocalRemove(StorageFileNames.FinancialAccountingDataFileName);
-		await LocalRemove(StorageFileNames.FinancialAccountingCartDataFileName);
-
-		await LocalRemove(StorageFileNames.ExpenseDataFileName);
-		await LocalRemove(StorageFileNames.ExpenseDetailsCartDataFileName);
-
-		await LocalRemove(StorageFileNames.TripDataFileName);
-		await LocalRemove(StorageFileNames.TripExpensesCartDataFileName);
-		await LocalRemove(StorageFileNames.TripCardPaymentsCartDataFileName);
-		await LocalRemove(StorageFileNames.TripLedgerPaymentsCartDataFileName);
-
-		await LocalRemove(StorageFileNames.BillDataFileName);
-		await LocalRemove(StorageFileNames.BillPendingTripsCartDataFileName);
-		await LocalRemove(StorageFileNames.BillLedgerPaymentsCartDataFileName);
+		return Task.CompletedTask;
 	}
 
 

@@ -86,10 +86,45 @@
     color: var(--gray-500, #64748b);
 }
 
+/* Footer row — icon on the left, KPI number pushed to the right */
+.ft-footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
 /* svg comes from the consumer's IconContent fragment — reach it via ::deep */
 .ft-icon ::deep svg {
     width: 30px;
     height: 30px;
+}
+
+/* SAP Fiori numeric tile — large KPI number anchored bottom-right */
+.ft-value {
+    margin: 0 0 0 auto;
+    min-width: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-blue, #3b82f6);
+    line-height: 1;
+    letter-spacing: -0.5px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Smaller font for longer numbers (lakhs/crores) so they stay inside the tile */
+.ft-value--md {
+    font-size: 22px;
+}
+
+.ft-value--sm {
+    font-size: 18px;
+}
+
+.ft-value--xs {
+    font-size: 15px;
 }
 
 @media (max-width: 600px) {
