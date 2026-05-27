@@ -144,6 +144,8 @@ public static class FleetNames
 	public static string VehicleDocumentType => "VehicleDocumentType";
 	public static string VehicleDocument => "VehicleDocument";
 
+	public static string VehicleDocumentRenewalOverview => "VehicleDocument_Renewal_Overview";
+
 	public static string InsertDocumentType => "Insert_VehicleDocumentType";
 	public static string InsertDocument => "Insert_VehicleDocument";
 	#endregion

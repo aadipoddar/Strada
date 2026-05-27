@@ -77,6 +77,7 @@
     <Folder Include="Fleet\VehicleDocument" />
     <Folder Include="Fleet\VehicleDocument\Table" />
     <Folder Include="Fleet\VehicleDocument\Insert" />
+    <Folder Include="Fleet\VehicleDocument\Load" />
     <Folder Include="Fleet\Trip" />
     <Folder Include="Fleet\Trip\Table" />
     <Folder Include="Fleet\Trip\Insert" />
@@ -147,6 +148,7 @@
     <Build Include="Fleet\VehicleDocument\Table\VehicleDocumentType.sql" />
     <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocument.sql" />
     <Build Include="Fleet\VehicleDocument\Insert\Insert_VehicleDocumentType.sql" />
+    <Build Include="Fleet\VehicleDocument\Load\VehicleDocument_Renewal_Overview.sql" />
     <Build Include="Fleet\Trip\Table\Trip.sql" />
     <Build Include="Fleet\Trip\Insert\Insert_Trip.sql" />
     <Build Include="Fleet\Trip\Table\TripExpenses.sql" />

@@ -42,4 +42,6 @@ public static class SettingsKeys
 	public static string DefaultSelectedVoucherId => "DefaultSelectedVoucherId";
 
 	public static string AutoRefreshReportTimer => "AutoRefreshReportTimer";
+
+	public static string DocumentRenewalWarningDays => "DocumentRenewalWarningDays";
 }
