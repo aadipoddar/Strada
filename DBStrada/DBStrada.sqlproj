@@ -192,6 +192,7 @@
     <Build Include="Fleet\Route\Delete\Delete_VehicleDriver.sql" />
     <Build Include="Fleet\Route\Table\VehicleDriver.sql" />
     <Build Include="Fleet\Route\Insert\Insert_VehicleDriver.sql" />
+    <Build Include="Operations\User\Load_User_By_Phone_Email.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

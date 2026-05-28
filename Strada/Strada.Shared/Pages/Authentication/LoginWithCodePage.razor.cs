@@ -1,16 +1,16 @@
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
 using StradaLibrary.Operations.Data;
-using StradaLibrary.Utils.MailUtils;
 using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.MailUtils;
+
 using Syncfusion.Blazor.Inputs;
 
 namespace Strada.Shared.Pages.Authentication;
 
 public partial class LoginWithCodePage
 {
-	private UserModel _user = new();
-
 	private bool _isVerifying = false;
 
 	private bool _isCodeSent = false;
@@ -32,8 +32,6 @@ public partial class LoginWithCodePage
 	private int _codeResendLimit;
 	private int _codeExpiryMinutes;
 
-	private List<UserModel> _users = [];
-
 	private CustomTextField _phoneEmailTextBox;
 	private CustomTextField _newPasswordTextBox;
 	private SfOtpInput _otpInput;
@@ -49,8 +47,6 @@ public partial class LoginWithCodePage
 		{
 			await DataStorageService.SecureRemoveAll();
 			await _phoneEmailTextBox.FocusAsync();
-
-			_users = await CommonData.LoadTableData<UserModel>(OperationNames.User);
 
 			_isLoginWithCodeEnabled = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableLoginWithCode)).Value);
 
@@ -80,45 +76,47 @@ public partial class LoginWithCodePage
 		}
 
 		_isEmail = _phoneEmail.Contains('@') && _phoneEmail.Contains('.');
-
-		var user = _users.FirstOrDefault(u => u.Phone == _phoneEmail || u.Email == _phoneEmail);
-		if (user is null || user.Status == false)
-		{
-			await _toastNotification.ShowAsync("No User Found", "No user found with the provided phone number or email.", ToastType.Error);
-			_codePlaceholder = "Enter Code";
-			return;
-		}
+		_codePlaceholder = "Enter Code";
 
 		try
 		{
 			_isVerifying = true;
-			_user = user;
+
+			var user = await UserData.LoadUserByPhoneEmail(_phoneEmail);
+			if (user is null)
+			{
+				await _phoneEmailTextBox.FocusAsync();
+				throw new Exception("No user found with the provided phone number or email.");
+			}
+
+			if (!user.Status)
+				throw new Exception("This account is inactive. Please contact support.");
 
 			if (_isEmail)
 			{
 				_verificationCode = new Random().Next(100000, 999999);
-				if (_user.CodeResends >= _codeResendLimit)
+				if (user.CodeResends >= _codeResendLimit)
 				{
-					_user.Status = false;
-					await UserData.InsertUser(_user);
+					user.Status = false;
+					await UserData.InsertUser(user);
 					throw new Exception("You have exceeded the maximum number of code resends. Your account has been locked. Please contact support.");
 				}
 
 				var guid = Guid.NewGuid().ToString();
 				await DataStorageService.SecureSaveAsync(StorageFileNames.UserDeviceIdDataFileName, guid);
 
-				_user.LastCode = _verificationCode;
-				_user.LastCodeDateTime = await CommonData.LoadCurrentDateTime();
-				_user.LastCodeDeviceId = guid;
-				await UserData.InsertUser(_user);
+				user.LastCode = _verificationCode;
+				user.LastCodeDateTime = await CommonData.LoadCurrentDateTime();
+				user.LastCodeDeviceId = guid;
+				await UserData.InsertUser(user);
 
-				var redirectLink = NavigationManager.BaseUri + PageRouteNames.LoginWithCodeRedirect + $"/{_user.Id}/{_verificationCode}";
+				var redirectLink = NavigationManager.BaseUri + PageRouteNames.LoginWithCodeRedirect + $"/{user.Id}/{_verificationCode}";
 
-				await AuthenticationMailing.SendLoginCodeEmail(_user, _verificationCode.ToString(), redirectLink, _codeExpiryMinutes);
+				await AuthenticationMailing.SendLoginCodeEmail(user, _verificationCode.ToString(), redirectLink, _codeExpiryMinutes);
 				_codeSentTime = await CommonData.LoadCurrentDateTime();
-				_codePlaceholder = $"Enter Code sent to {_user.Email} for {_user.Name}. The code is valid till {_codeSentTime.AddMinutes(_codeExpiryMinutes):hh:mm tt}";
+				_codePlaceholder = $"Enter Code sent to {user.Email} for {user.Name}. The code is valid till {_codeSentTime.AddMinutes(_codeExpiryMinutes):hh:mm tt}";
 
-				_user.CodeResends++;
+				user.CodeResends++;
 			}
 
 			else
@@ -127,7 +125,7 @@ public partial class LoginWithCodePage
 				// _codePlaceholder = $"Enter Code sent to {_user.Phone} for {_user.Name}";
 			}
 
-			await _toastNotification.ShowAsync("Code Sent Successfully", _isEmail ? $"A code has been sent to {_user.Email}" : $"A code has been sent to {_user.Phone}", ToastType.Success);
+			await _toastNotification.ShowAsync("Code Sent Successfully", _isEmail ? $"A code has been sent to {user.Email}" : $"A code has been sent to {user.Phone}", ToastType.Success);
 
 			_otpInput?.FocusAsync();
 			_isCodeSent = true;
@@ -162,13 +160,14 @@ public partial class LoginWithCodePage
 				throw new Exception("Please enter the complete code sent to you.");
 			}
 
-			if (_user.Id == 0)
+			var user = await UserData.LoadUserByPhoneEmail(_phoneEmail);
+			if (user is null)
 			{
 				await _phoneEmailTextBox.FocusAsync();
-				throw new Exception("No user selected. Please enter a valid phone number or email address to send the code.");
+				throw new Exception("No user found with the provided phone number or email.");
 			}
 
-			if (!_user.Status)
+			if (!user.Status)
 			{
 				await _phoneEmailTextBox.FocusAsync();
 				throw new Exception("This account is inactive. Please contact support.");
@@ -176,16 +175,16 @@ public partial class LoginWithCodePage
 
 			if (_otpCode != _verificationCode.ToString())
 			{
-				_user.FailedAttempts++;
+				user.FailedAttempts++;
 
-				if (_user.FailedAttempts >= _maxLoginAttempts)
+				if (user.FailedAttempts >= _maxLoginAttempts)
 				{
-					_user.Status = false;
-					await UserData.InsertUser(_user);
+					user.Status = false;
+					await UserData.InsertUser(user);
 					throw new Exception("You have exceeded the maximum number of login attempts. Your account has been locked. Please contact support.");
 				}
 
-				await UserData.InsertUser(_user);
+				await UserData.InsertUser(user);
 
 				_otpInput.FocusAsync();
 				throw new Exception("Incorrect code. Please try again.");
@@ -208,11 +207,11 @@ public partial class LoginWithCodePage
 					throw new Exception("Weak Password. The new password must be at least 6 characters long.");
 				}
 
-				_user.Password = _newPassword;
+				user.Password = _newPassword;
 			}
 
-			await UserData.ResetInsertUser(_user);
-			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
+			await UserData.ResetInsertUser(user);
+			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
 			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 		}
 		catch (Exception ex)
