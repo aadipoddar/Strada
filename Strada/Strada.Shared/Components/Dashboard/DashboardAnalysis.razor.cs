@@ -4,6 +4,9 @@ using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.Trip;
 using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
+using StradaLibrary.Fleet.VehicleDocument.Models;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Components.Dashboard;
 
@@ -13,6 +16,9 @@ public partial class DashboardAnalysis
 	private List<TripOverviewModel> _unBilledTrips = [];
 	private List<ExpenseOverviewModel> _expenses = [];
 	private List<VehicleModel> _vehicles = [];
+	private List<VehicleDocumentRenewalOverviewModel> _dueDocuments = [];
+
+	private int _warningDays = 30;
 
 	private int _unbilledTripsCount = 0;
 
@@ -30,6 +36,9 @@ public partial class DashboardAnalysis
 
 	private int _activeVehiclesCount = 0;
 	private string _activeVehiclesNote = "ran a trip this month";
+
+	private int _dueDocumentsCount = 0;
+	private string _dueDocumentsNote = "within window or expired";
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -49,6 +58,7 @@ public partial class DashboardAnalysis
 		MemoryCache.Set(StorageFileNames.TripsOverviewDataFileName, _trips, expiry);
 		MemoryCache.Set(StorageFileNames.ExpensesOverviewDataFileName, _expenses, expiry);
 		MemoryCache.Set(StorageFileNames.VehiclesDataFileName, _vehicles, expiry);
+		MemoryCache.Set(StorageFileNames.DueDocumentsDataFileName, _dueDocuments, expiry);
 	}
 
 	private void LoadCachedAnalysis()
@@ -57,6 +67,7 @@ public partial class DashboardAnalysis
 		_trips = MemoryCache.Get<List<TripOverviewModel>>(StorageFileNames.TripsOverviewDataFileName) ?? [];
 		_expenses = MemoryCache.Get<List<ExpenseOverviewModel>>(StorageFileNames.ExpensesOverviewDataFileName) ?? [];
 		_vehicles = MemoryCache.Get<List<VehicleModel>>(StorageFileNames.VehiclesDataFileName) ?? [];
+		_dueDocuments = MemoryCache.Get<List<VehicleDocumentRenewalOverviewModel>>(StorageFileNames.DueDocumentsDataFileName) ?? [];
 
 		ComputeKpis();
 		StateHasChanged();
@@ -70,14 +81,19 @@ public partial class DashboardAnalysis
 			var thisMonthEnd = thisMonthStart.AddMonths(1).AddSeconds(-1);
 			var lastMonthStart = thisMonthStart.AddMonths(-1);
 
+			var warningSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.ReportWarningDays);
+			_warningDays = int.TryParse(warningSetting?.Value, out var days) ? days : 30;
+
 			_unBilledTrips = await TripData.LoadTripOverviewByBillIdDate();
 			_trips = await CommonData.LoadTableDataByDate<TripOverviewModel>(FleetNames.TripOverview, lastMonthStart, thisMonthEnd);
 			_expenses = await CommonData.LoadTableDataByDate<ExpenseOverviewModel>(FleetNames.ExpenseOverview, lastMonthStart, thisMonthEnd);
 			_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
+			_dueDocuments = await CommonData.LoadTableData<VehicleDocumentRenewalOverviewModel>(FleetNames.VehicleDocumentRenewalOverview);
 
 			_unBilledTrips = [.. _unBilledTrips.Where(_ => _.Status).OrderByDescending(_ => _.PendingDays)];
 			_trips = [.. _trips.Where(_ => _.Status).OrderByDescending(_ => _.TransactionDateTime)];
 			_expenses = [.. _expenses.Where(_ => _.Status).OrderByDescending(_ => _.TransactionDateTime)];
+			_dueDocuments = [.. _dueDocuments.Where(_ => _.DaysRemaining < _warningDays).OrderBy(_ => _.DaysRemaining)];
 
 			ComputeKpis();
 		}
@@ -122,5 +138,9 @@ public partial class DashboardAnalysis
 		_activeVehiclesCount = _vehicles.Count;
 		var ranThisMonth = _trips.Where(_ => _.TransactionDateTime >= thisMonthStart).Select(_ => _.VehicleId).Distinct().Count();
 		_activeVehiclesNote = $"{ranThisMonth} ran a trip this month";
+
+		// Documents due within the warning window (already filtered).
+		_dueDocumentsCount = _dueDocuments.Count;
+		_dueDocumentsNote = $"within {_warningDays} days or expired";
 	}
 }
