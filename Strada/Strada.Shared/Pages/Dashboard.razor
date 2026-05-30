@@ -236,165 +236,6 @@ else
 
 				</MudBlazor.MudTabPanel>
 
-				<!-- FLEET MASTERS -->
-				<MudBlazor.MudTabPanel Text="Fleet Masters" Visible="_user.Fleet">
-
-					<!-- Routes & Drivers -->
-					<div class="launchpad-section">
-						<h2 class="launchpad-section-title">Routes &amp; Drivers</h2>
-						<div class="dashboard-grid">
-							<FioriTile Title="Route" Subtitle="Manage routes between source and destination locations" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.RouteMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<circle cx="6" cy="19" r="3" />
-										<path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
-										<circle cx="18" cy="5" r="3" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<FioriTile Title="Location" Subtitle="Pickup and drop locations used across routes" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.LocationMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M12 21s-6-4.35-6-10a6 6 0 0 1 12 0c0 5.65-6 10-6 10z" />
-										<circle cx="12" cy="11" r="2" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<FioriTile Title="Driver" Subtitle="Manage drivers assigned to your fleet" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.DriverMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-										<circle cx="12" cy="7" r="4" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<FioriTile Title="Vehicle Driver" Subtitle="Assign drivers to vehicles for a period of time" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M10 17h4V5H2v12h3" />
-										<path d="M14 9h4l4 4v4h-3" />
-										<circle cx="7.5" cy="17.5" r="2.5" />
-										<circle cx="17.5" cy="17.5" r="2.5" />
-										<circle cx="12" cy="7" r="2" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-						</div>
-					</div>
-
-					<!-- OMC -->
-					<div class="launchpad-section">
-						<h2 class="launchpad-section-title">OMC</h2>
-						<div class="dashboard-grid">
-							<FioriTile Title="OMC" Subtitle="Manage oil marketing company list" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M3 21h18" />
-										<path d="M5 21V7l8-4v18" />
-										<path d="M19 21V11l-6-4" />
-										<line x1="9" y1="9" x2="9" y2="9.01" />
-										<line x1="9" y1="13" x2="9" y2="13.01" />
-										<line x1="9" y1="17" x2="9" y2="17.01" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<FioriTile Title="OMC Card" Subtitle="Manage fuel cards issued by oil marketing companies" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
-										<line x1="2" y1="10" x2="22" y2="10" />
-										<line x1="6" y1="15" x2="10" y2="15" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-						</div>
-					</div>
-
-					<!-- Documents -->
-					<div class="launchpad-section">
-						<h2 class="launchpad-section-title">Documents</h2>
-						<div class="dashboard-grid">
-							<FioriTile Title="Vehicle Document" Subtitle="Upload and track compliance documents per vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocument)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-										<polyline points="14 2 14 8 20 8" />
-										<line x1="9" y1="15" x2="15" y2="15" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<!-- Document Reports -->
-							<FioriTile Title="Document Renewal Report" Subtitle="Latest document status per vehicle with expiry tracking" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentRenewalReport)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-										<line x1="16" y1="2" x2="16" y2="6" />
-										<line x1="8" y1="2" x2="8" y2="6" />
-										<line x1="3" y1="10" x2="21" y2="10" />
-										<path d="M8 14l3 3 5-5" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<FioriTile Title="Document Type" Subtitle="Manage document categories like RC, insurance and PUC" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentTypeMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-										<polyline points="14 2 14 8 20 8" />
-										<line x1="8" y1="13" x2="16" y2="13" />
-										<line x1="8" y1="17" x2="13" y2="17" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-						</div>
-					</div>
-
-					<!-- Vehicle Masters -->
-					<div class="launchpad-section">
-						<h2 class="launchpad-section-title">Vehicle Masters</h2>
-						<div class="dashboard-grid">
-							<FioriTile Title="Vehicle" Subtitle="Manage your fleet of vehicles" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M10 17h4V5H2v12h3" />
-										<path d="M14 9h4l4 4v4h-3" />
-										<circle cx="7.5" cy="17.5" r="2.5" />
-										<circle cx="17.5" cy="17.5" r="2.5" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<FioriTile Title="Vehicle Type" Subtitle="Categorise vehicles by class &mdash; truck, tanker, trailer" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M3 7h18" />
-										<path d="M6 3h12v4H6z" />
-										<path d="M8 11v10" />
-										<path d="M12 11v10" />
-										<path d="M16 11v10" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-
-							<FioriTile Title="Expense Type" Subtitle="Define expense categories used during data entry" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ExpenseTypeMaster)">
-								<IconContent>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-										<line x1="7" y1="7" x2="7.01" y2="7" />
-									</svg>
-								</IconContent>
-							</FioriTile>
-						</div>
-					</div>
-
-				</MudBlazor.MudTabPanel>
-
 				<!-- FLEET TRANSACTIONS -->
 				<MudBlazor.MudTabPanel Text="Fleet Transactions" Visible="_user.Fleet">
 
@@ -579,6 +420,165 @@ else
 										<line x1="8" y1="2" x2="8" y2="6" />
 										<line x1="3" y1="10" x2="21" y2="10" />
 										<path d="M8 14l3 3 5-5" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+						</div>
+					</div>
+
+				</MudBlazor.MudTabPanel>
+
+				<!-- FLEET MASTERS -->
+				<MudBlazor.MudTabPanel Text="Fleet Masters" Visible="_user.Fleet">
+
+					<!-- Routes & Drivers -->
+					<div class="launchpad-section">
+						<h2 class="launchpad-section-title">Routes &amp; Drivers</h2>
+						<div class="dashboard-grid">
+							<FioriTile Title="Route" Subtitle="Manage routes between source and destination locations" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.RouteMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<circle cx="6" cy="19" r="3" />
+										<path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+										<circle cx="18" cy="5" r="3" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="Location" Subtitle="Pickup and drop locations used across routes" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.LocationMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M12 21s-6-4.35-6-10a6 6 0 0 1 12 0c0 5.65-6 10-6 10z" />
+										<circle cx="12" cy="11" r="2" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="Driver" Subtitle="Manage drivers assigned to your fleet" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.DriverMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="Vehicle Driver" Subtitle="Assign drivers to vehicles for a period of time" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M10 17h4V5H2v12h3" />
+										<path d="M14 9h4l4 4v4h-3" />
+										<circle cx="7.5" cy="17.5" r="2.5" />
+										<circle cx="17.5" cy="17.5" r="2.5" />
+										<circle cx="12" cy="7" r="2" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+						</div>
+					</div>
+
+					<!-- OMC -->
+					<div class="launchpad-section">
+						<h2 class="launchpad-section-title">OMC</h2>
+						<div class="dashboard-grid">
+							<FioriTile Title="OMC" Subtitle="Manage oil marketing company list" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M3 21h18" />
+										<path d="M5 21V7l8-4v18" />
+										<path d="M19 21V11l-6-4" />
+										<line x1="9" y1="9" x2="9" y2="9.01" />
+										<line x1="9" y1="13" x2="9" y2="13.01" />
+										<line x1="9" y1="17" x2="9" y2="17.01" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="OMC Card" Subtitle="Manage fuel cards issued by oil marketing companies" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+										<line x1="2" y1="10" x2="22" y2="10" />
+										<line x1="6" y1="15" x2="10" y2="15" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+						</div>
+					</div>
+
+					<!-- Documents -->
+					<div class="launchpad-section">
+						<h2 class="launchpad-section-title">Documents</h2>
+						<div class="dashboard-grid">
+							<FioriTile Title="Vehicle Document" Subtitle="Upload and track compliance documents per vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocument)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+										<polyline points="14 2 14 8 20 8" />
+										<line x1="9" y1="15" x2="15" y2="15" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<!-- Document Reports -->
+							<FioriTile Title="Document Renewal Report" Subtitle="Latest document status per vehicle with expiry tracking" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentRenewalReport)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+										<line x1="16" y1="2" x2="16" y2="6" />
+										<line x1="8" y1="2" x2="8" y2="6" />
+										<line x1="3" y1="10" x2="21" y2="10" />
+										<path d="M8 14l3 3 5-5" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="Document Type" Subtitle="Manage document categories like RC, insurance and PUC" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentTypeMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+										<polyline points="14 2 14 8 20 8" />
+										<line x1="8" y1="13" x2="16" y2="13" />
+										<line x1="8" y1="17" x2="13" y2="17" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+						</div>
+					</div>
+
+					<!-- Vehicle Masters -->
+					<div class="launchpad-section">
+						<h2 class="launchpad-section-title">Vehicle Masters</h2>
+						<div class="dashboard-grid">
+							<FioriTile Title="Vehicle" Subtitle="Manage your fleet of vehicles" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M10 17h4V5H2v12h3" />
+										<path d="M14 9h4l4 4v4h-3" />
+										<circle cx="7.5" cy="17.5" r="2.5" />
+										<circle cx="17.5" cy="17.5" r="2.5" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="Vehicle Type" Subtitle="Categorise vehicles by class &mdash; truck, tanker, trailer" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M3 7h18" />
+										<path d="M6 3h12v4H6z" />
+										<path d="M8 11v10" />
+										<path d="M12 11v10" />
+										<path d="M16 11v10" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="Expense Type" Subtitle="Define expense categories used during data entry" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ExpenseTypeMaster)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+										<line x1="7" y1="7" x2="7.01" y2="7" />
 									</svg>
 								</IconContent>
 							</FioriTile>

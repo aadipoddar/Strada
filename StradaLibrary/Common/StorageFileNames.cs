@@ -29,6 +29,8 @@ public static class StorageFileNames
 	public static string DueDocumentsDataFileName => "due_documents_data.json";
 	public static string LossTripsDataFileName => "loss_trips_data.json";
 	public static string IdleVehiclesDataFileName => "idle_vehicles_data.json";
+	public static string CompaniesDataFileName => "companies_data.json";
+	public static string OMCsDataFileName => "omcs_data.json";
 	public static string TripsYearOverviewDataFileName => "trips_year_overview_data.json";
 	public static string ExpensesYearOverviewDataFileName => "expenses_year_overview_data.json";
 	public static string TripExpensesYearOverviewDataFileName => "trip_expenses_year_overview_data.json";

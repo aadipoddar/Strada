@@ -59,23 +59,33 @@ public partial class DashboardAttention
 
 	private async Task LoadData()
 	{
-		LoadCachedAttentions();
+		if (LoadCachedAttentions())
+			return;
+
 		await LoadNewAttentions();
 
-		var expiry = TimeSpan.FromMinutes(30);
+		var expiry = TimeSpan.FromHours(1);
 		MemoryCache.Set(StorageFileNames.DueDocumentsDataFileName, _dueDocuments, expiry);
 		MemoryCache.Set(StorageFileNames.UnBilledTripsDataFileName, _pendingTrips, expiry);
 		MemoryCache.Set(StorageFileNames.LossTripsDataFileName, _lossTrips, expiry);
 		MemoryCache.Set(StorageFileNames.IdleVehiclesDataFileName, _idleVehicles, expiry);
+		MemoryCache.Set(StorageFileNames.CompaniesDataFileName, _companies, expiry);
+		MemoryCache.Set(StorageFileNames.OMCsDataFileName, _omcs, expiry);
 	}
 
-	private void LoadCachedAttentions()
+	private bool LoadCachedAttentions()
 	{
+		if (!MemoryCache.TryGetValue(StorageFileNames.IdleVehiclesDataFileName, out List<VehicleModel> idleVehicles))
+			return false;
+
+		_idleVehicles = idleVehicles ?? [];
 		_dueDocuments = MemoryCache.Get<List<VehicleDocumentRenewalOverviewModel>>(StorageFileNames.DueDocumentsDataFileName) ?? [];
 		_pendingTrips = MemoryCache.Get<List<TripOverviewModel>>(StorageFileNames.UnBilledTripsDataFileName) ?? [];
 		_lossTrips = MemoryCache.Get<List<TripOverviewModel>>(StorageFileNames.LossTripsDataFileName) ?? [];
-		_idleVehicles = MemoryCache.Get<List<VehicleModel>>(StorageFileNames.IdleVehiclesDataFileName) ?? [];
+		_companies = MemoryCache.Get<List<CompanyModel>>(StorageFileNames.CompaniesDataFileName) ?? [];
+		_omcs = MemoryCache.Get<List<OMCModel>>(StorageFileNames.OMCsDataFileName) ?? [];
 		StateHasChanged();
+		return true;
 	}
 
 	private async Task LoadNewAttentions()

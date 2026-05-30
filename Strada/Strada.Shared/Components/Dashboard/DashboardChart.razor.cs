@@ -70,28 +70,31 @@ public partial class DashboardChart
 
 	private async Task LoadData()
 	{
-		LoadCached();
+		if (LoadCached())
+			return;
+
 		await LoadFresh();
 
-		var expiry = TimeSpan.FromMinutes(30);
+		var expiry = TimeSpan.FromHours(1);
 		MemoryCache.Set(StorageFileNames.TripsYearOverviewDataFileName, _trips, expiry);
 		MemoryCache.Set(StorageFileNames.ExpensesYearOverviewDataFileName, _expenses, expiry);
 		MemoryCache.Set(StorageFileNames.TripExpensesYearOverviewDataFileName, _tripExpenses, expiry);
 		MemoryCache.Set(StorageFileNames.ExpenseDetailsYearOverviewDataFileName, _expenseDetails, expiry);
 	}
 
-	private void LoadCached()
+	private bool LoadCached()
 	{
-		_trips = MemoryCache.Get<List<TripOverviewModel>>(StorageFileNames.TripsYearOverviewDataFileName) ?? [];
+		if (!MemoryCache.TryGetValue(StorageFileNames.TripsYearOverviewDataFileName, out List<TripOverviewModel> trips))
+			return false;
+
+		_trips = trips ?? [];
 		_expenses = MemoryCache.Get<List<ExpenseOverviewModel>>(StorageFileNames.ExpensesYearOverviewDataFileName) ?? [];
 		_tripExpenses = MemoryCache.Get<List<TripExpensesOverviewModel>>(StorageFileNames.TripExpensesYearOverviewDataFileName) ?? [];
 		_expenseDetails = MemoryCache.Get<List<ExpenseDetailsOverviewModel>>(StorageFileNames.ExpenseDetailsYearOverviewDataFileName) ?? [];
 
-		if (_trips.Count > 0 || _expenses.Count > 0)
-		{
-			BuildAll();
-			StateHasChanged();
-		}
+		BuildAll();
+		StateHasChanged();
+		return true;
 	}
 
 	private async Task LoadFresh()

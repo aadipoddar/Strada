@@ -50,10 +50,12 @@ public partial class DashboardAnalysis
 
 	private async Task LoadData()
 	{
-		LoadCachedAnalysis();
-		await LoadNewAnalysis();
+		if (LoadCached())
+			return;
 
-		var expiry = TimeSpan.FromMinutes(30);
+		await LoadFresh();
+
+		var expiry = TimeSpan.FromHours(1);
 		MemoryCache.Set(StorageFileNames.UnBilledTripsDataFileName, _unBilledTrips, expiry);
 		MemoryCache.Set(StorageFileNames.TripsOverviewDataFileName, _trips, expiry);
 		MemoryCache.Set(StorageFileNames.ExpensesOverviewDataFileName, _expenses, expiry);
@@ -61,19 +63,23 @@ public partial class DashboardAnalysis
 		MemoryCache.Set(StorageFileNames.DueDocumentsDataFileName, _dueDocuments, expiry);
 	}
 
-	private void LoadCachedAnalysis()
+	private bool LoadCached()
 	{
+		if (!MemoryCache.TryGetValue(StorageFileNames.TripsOverviewDataFileName, out List<TripOverviewModel> trips))
+			return false;
+
+		_trips = trips ?? [];
 		_unBilledTrips = MemoryCache.Get<List<TripOverviewModel>>(StorageFileNames.UnBilledTripsDataFileName) ?? [];
-		_trips = MemoryCache.Get<List<TripOverviewModel>>(StorageFileNames.TripsOverviewDataFileName) ?? [];
 		_expenses = MemoryCache.Get<List<ExpenseOverviewModel>>(StorageFileNames.ExpensesOverviewDataFileName) ?? [];
 		_vehicles = MemoryCache.Get<List<VehicleModel>>(StorageFileNames.VehiclesDataFileName) ?? [];
 		_dueDocuments = MemoryCache.Get<List<VehicleDocumentRenewalOverviewModel>>(StorageFileNames.DueDocumentsDataFileName) ?? [];
 
 		ComputeKpis();
 		StateHasChanged();
+		return true;
 	}
 
-	private async Task LoadNewAnalysis()
+	private async Task LoadFresh()
 	{
 		try
 		{
