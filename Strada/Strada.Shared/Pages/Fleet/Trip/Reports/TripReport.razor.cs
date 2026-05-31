@@ -38,8 +38,8 @@ public partial class TripReport : IAsyncDisposable
 	private VehicleModel? _selectedVehicle = null;
 	private RouteOverviewModel? _selectedRoute = null;
 	private DriverOverviewModel? _selectedDriver = null;
-	private int _vehicleEmptyFilter = TripFilterOptions.All;
-	private int _pendingBillsFilter = TripFilterOptions.All;
+	private int _vehicleEmptyFilter = YesNoFilterOptions.All;
+	private int _pendingBillsFilter = YesNoFilterOptions.All;
 	private YesNoFilterOption _selectedVehicleEmptyFilter;
 	private YesNoFilterOption _selectedPendingBillsFilter;
 
@@ -146,14 +146,14 @@ public partial class TripReport : IAsyncDisposable
 			if (_selectedDriver?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.DriverId == _selectedDriver.Id)];
 
-			if (_vehicleEmptyFilter == TripFilterOptions.Yes)
+			if (_vehicleEmptyFilter == YesNoFilterOptions.Yes)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.VehicleEmpty)];
-			else if (_vehicleEmptyFilter == TripFilterOptions.No)
+			else if (_vehicleEmptyFilter == YesNoFilterOptions.No)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => !_.VehicleEmpty)];
 
-			if (_pendingBillsFilter == TripFilterOptions.Yes)
+			if (_pendingBillsFilter == YesNoFilterOptions.Yes)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.BillId is null)];
-			else if (_pendingBillsFilter == TripFilterOptions.No)
+			else if (_pendingBillsFilter == YesNoFilterOptions.No)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.BillId is not null)];
 
 			_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
@@ -222,14 +222,14 @@ public partial class TripReport : IAsyncDisposable
 	private async Task OnVehicleEmptyFilterChanged(YesNoFilterOption value)
 	{
 		_selectedVehicleEmptyFilter = value;
-		_vehicleEmptyFilter = value?.Id ?? TripFilterOptions.All;
+		_vehicleEmptyFilter = value?.Id ?? YesNoFilterOptions.All;
 		await LoadTransactionOverviews();
 	}
 
 	private async Task OnPendingBillsFilterChanged(YesNoFilterOption value)
 	{
 		_selectedPendingBillsFilter = value;
-		_pendingBillsFilter = value?.Id ?? TripFilterOptions.All;
+		_pendingBillsFilter = value?.Id ?? YesNoFilterOptions.All;
 		await LoadTransactionOverviews();
 	}
 

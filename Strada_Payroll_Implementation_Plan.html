@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<title>Strada Payroll Module &mdash; End-to-End Implementation Plan</title>
+<style>
+@page { size: A4; margin: 14mm 12mm; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: "Segoe UI","Helvetica Neue",Arial,sans-serif; font-size:10.5pt; line-height:1.5;
+       color:#1f2328; max-width:1100px; margin:24px auto; padding:0 22px 60px; background:#fafbfc; }
+h1 { font-size:22pt; color:#0b5394; border-bottom:3px solid #0b5394; padding-bottom:6px; margin-bottom:0; }
+h2 { font-size:15pt; margin-top:34px; padding:6px 10px; background:#0b5394; color:#fff; border-radius:4px; page-break-after:avoid; }
+h3 { font-size:12pt; color:#0b5394; margin-top:20px; border-bottom:1px solid #d0d7de; padding-bottom:3px; page-break-after:avoid; }
+h4 { font-size:11pt; margin:14px 0 4px; color:#24292f; }
+.subtitle { color:#57606a; font-size:10.5pt; margin-top:0; }
+.meta { background:#eef4fb; border-left:4px solid #0b5394; padding:10px 14px; margin:14px 0 22px; font-size:10pt; border-radius:3px; }
+.meta b { color:#0b5394; }
+table { width:100%; border-collapse:collapse; margin:8px 0 14px; font-size:9.8pt; background:#fff; }
+th,td { border:1px solid #d0d7de; padding:5px 8px; text-align:left; vertical-align:top; }
+th { background:#0b5394; color:#fff; font-weight:600; }
+tr:nth-child(even) td { background:#f6f8fa; }
+td.right { text-align:right; font-variant-numeric:tabular-nums; }
+td.mono,.mono { font-family:Consolas,"Courier New",monospace; font-size:9.5pt; }
+pre { background:#f6f8fa; border:1px solid #d0d7de; border-radius:4px; padding:9px 12px;
+      font-family:Consolas,"Courier New",monospace; font-size:9pt; line-height:1.42; overflow-x:auto;
+      white-space:pre-wrap; word-wrap:break-word; page-break-inside:avoid; }
+code { font-family:Consolas,"Courier New",monospace; background:#eef1f4; padding:1px 4px; border-radius:3px; font-size:0.92em; }
+ul,ol { margin:5px 0 10px 22px; }
+li { margin:2px 0; }
+ul.tight li { margin:1px 0; }
+.box { border:1px solid #d0d7de; border-left:4px solid #0b5394; background:#fff; padding:10px 14px;
+       margin:12px 0; border-radius:3px; page-break-inside:avoid; }
+.box.ok   { border-left-color:#1a7f37; background:#f0f9f3; }
+.box.warn { border-left-color:#bf8700; background:#fff8e6; }
+.box.info { border-left-color:#0969da; background:#ddf4ff; }
+.tag { display:inline-block; background:#0b5394; color:#fff; font-size:8.5pt; padding:1px 7px;
+       border-radius:10px; margin-right:3px; font-weight:600; }
+.tag.alt  { background:#1a7f37; }
+.tag.warn { background:#bf8700; }
+.tag.info { background:#0969da; }
+.toc { background:#fff; border:1px solid #d0d7de; border-radius:4px; padding:12px 18px; margin:12px 0 20px; }
+.toc h3 { margin-top:0; border:none; }
+.toc a { color:#0b5394; text-decoration:none; }
+.toc a:hover { text-decoration:underline; }
+.cols { display:grid; grid-template-columns:1fr 1fr; gap:12px; page-break-inside:avoid; }
+.cols .box { margin:0; }
+.footer { margin-top:50px; padding-top:14px; border-top:1px solid #d0d7de; font-size:9.5pt; color:#57606a; text-align:center; }
+@media print { body { background:#fff; margin:0; padding:0; } .no-print { display:none; }
+                .box,table,pre { page-break-inside:avoid; } }
+.print-btn { position:fixed; top:14px; right:14px; background:#0b5394; color:#fff; border:none;
+             padding:9px 16px; font-size:10.5pt; border-radius:4px; cursor:pointer;
+             box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+.print-btn:hover { background:#074178; }
+.phase-badge { display:inline-block; background:#0b5394; color:#fff; font-size:9pt; padding:2px 10px; border-radius:12px; margin-right:6px; }
+.phase-badge.p1 { background:#1a7f37; } .phase-badge.p2 { background:#0969da; }
+.phase-badge.p3 { background:#8250df; } .phase-badge.p4 { background:#bf8700; }
+.new { background:#1a7f37; color:#fff; font-size:8pt; padding:1px 6px; border-radius:8px; font-weight:600; }
+</style></head><body>
+
+<button class="print-btn no-print" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<h1>Strada Payroll Module</h1>
+<p class="subtitle">End-to-End Implementation Plan &mdash; normalized statutory model, standards-compliant calculations</p>
+
+<div class="meta">
+<b>Target:</b> Strada &mdash; Fleet Management software for Ashok Roadlines (.NET 10, Blazor Server + MAUI Hybrid, SQL Server/SSDT, Dapper, Syncfusion)<br>
+<b>Requirement source:</b> FAS Payroll (PowerBuilder 5.0 legacy system, <code>C:\Dev\payroll</code>) &mdash; full Indian payroll cycle<br>
+<b>This revision:</b> single coherent plan built around a <b>normalized statutory-scheme model</b> &mdash; statutory rates/ceilings live in data, not columns, so new schemes are added as rows, never schema changes.<br>
+<b>Scope:</b> built as a reusable <b>pan-India</b> payroll product (multi-company, multi-state) &mdash; statutory config is data keyed by state, so one build runs anywhere in India, like the Accounts module.<br>
+<b>Statutory basis:</b> EPF/EPS/EDLI, ESI, West Bengal Profession Tax &amp; LWF verified against current (2025&ndash;26) rates.<br>
+<b>Date:</b> 29 May 2026
+</div>
+
+<div class="box ok">
+<b>What changed from the earlier draft and why.</b> The first plan stored every statutory rate as a fixed column on <code>PayrollDepartment</code> (≈30 columns) and the per-employee applicability as boolean columns on <code>Employee</code> (<code>IsEPFApplicable</code>&hellip;). That works but every <b>new</b> scheme (NPS, a new cess, gratuity) needs a schema change &mdash; the same rigidity that trapped the legacy system with its 9 hardcoded salary components. This revision normalizes all statutory configuration into four small tables (<code>StatutoryScheme</code>, <code>StatutoryRate</code>, <code>StatutorySlab</code>, <code>EmployeeStatutoryApplicability</code>) plus a registration table. The payslip likewise stores statutory results as <b>rows</b> (<code>PayslipStatutory</code>), not columns. Result: adding a scheme = inserting data; the schema and the calculations stay stable. Everything downstream (engine, calculators, FA posting, reports) is rewritten here to match, so the plan is internally consistent end-to-end.
+</div>
+
+<div class="toc"><h3>Contents</h3>
+<ol>
+<li><a href="#overview">Overview &amp; scope</a></li>
+<li><a href="#architecture">Strada architecture &amp; conventions</a></li>
+<li><a href="#datamodel">Data model overview &amp; design principles</a></li>
+<li><a href="#masters">Schema &mdash; Masters (incl. normalized statutory tables)</a></li>
+<li><a href="#transactions">Schema &mdash; Transactions</a></li>
+<li><a href="#calculated">Schema &mdash; Payroll run, payslip &amp; results</a></li>
+<li><a href="#procedures">Stored procedures (pattern + examples)</a></li>
+<li><a href="#models">C# models &amp; data access</a></li>
+<li><a href="#names">DatabaseNames &amp; PageRouteNames</a></li>
+<li><a href="#engine">Calculation engine (standards-compliant)</a></li>
+<li><a href="#statutory">Statutory calculators (read from StatutoryRate)</a></li>
+<li><a href="#worked">Worked example (full payslip, real numbers)</a></li>
+<li><a href="#fa">Financial Accounting integration</a></li>
+<li><a href="#pages">Blazor pages</a></li>
+<li><a href="#reports">Reports &amp; statutory exports</a></li>
+<li><a href="#security">Security &amp; PII</a></li>
+<li><a href="#migration">Data migration</a></li>
+<li><a href="#phases">Phased implementation plan</a></li>
+<li><a href="#industry">How this matches the big platforms</a></li>
+<li><a href="#verdict">Final verdict</a></li>
+<li><a href="#sampledata">Sample dataset &mdash; the whole app in one example</a></li>
+</ol></div>
+
+<h2 id="overview">1. Overview &amp; scope</h2>
+<p>The module delivers the full Indian payroll cycle for Ashok Roadlines, reusing Strada's existing Company, Ledger, Financial Year, User, auth and accounting infrastructure.</p>
+<div class="cols">
+<div class="box ok"><b>In scope</b>
+<ul class="tight">
+<li>Employee master with dynamic salary structure</li>
+<li>Dynamic salary components (earnings/deductions)</li>
+<li>Normalized statutory schemes: EPF/EPS/EDLI, ESI, Profession Tax, LWF (+ future schemes as data)</li>
+<li>Monthly attendance &amp; loss-of-pay</li>
+<li>Advances with instalment recovery</li>
+<li>Payroll run lifecycle (calculate &rarr; approve &rarr; post &rarr; pay)</li>
+<li>Auto-posting of journal vouchers to Strada FA</li>
+<li>Payslips, salary register, statutory returns &amp; filings</li>
+</ul></div>
+<div class="box info"><b>Reused from existing Strada</b>
+<ul class="tight">
+<li><code>Company</code>, <code>Ledger</code>, <code>FinancialYear</code>, <code>User</code></li>
+<li><code>FinancialAccounting</code> voucher posting</li>
+<li><code>AuditTrailData</code>, authentication &amp; roles</li>
+<li><code>ExportUtils</code> (PDF/Excel), <code>MailUtils</code></li>
+<li>Syncfusion components, <code>CommonData</code> loaders</li>
+</ul></div>
+</div>
+
+<h2 id="architecture">2. Strada architecture &amp; conventions</h2>
+<p>Every artifact follows existing Strada patterns so the module is indistinguishable from the Fleet and Accounts modules.</p>
+<table><thead><tr><th>Layer</th><th>Project</th><th>Convention</th></tr></thead><tbody>
+<tr><td>Database</td><td><code>DBStrada/Payroll/</code></td><td><code>Table/</code>, <code>Insert/</code>, <code>Load/</code> subfolders; <code>INT IDENTITY</code> PKs; FK constraints; soft-delete via <code>Status BIT</code></td></tr>
+<tr><td>Logic + data access</td><td><code>StradaLibrary/Payroll/</code></td><td>Static <code>*Data</code> classes via Dapper + stored procedures; <code>SqlDataAccessTransaction</code> for multi-step writes</td></tr>
+<tr><td>UI</td><td><code>Strada.Shared/Pages/Payroll/</code></td><td>Partial-class pages (<code>.razor</code> + <code>.razor.cs</code>), <code>OnAfterRenderAsync</code>, Syncfusion only, global injected services</td></tr>
+<tr><td>Hosts</td><td><code>Strada.Web</code>, <code>Strada</code></td><td>No changes</td></tr>
+</tbody></table>
+<div class="box warn">
+<b>One deliberate divergence from Fleet:</b> payroll money columns use <code>DECIMAL(18,2)</code> and rate columns use <code>DECIMAL(9,4)</code> instead of <code>MONEY</code>. Statutory math multiplies/divides and rounds to the rupee for challans; <code>DECIMAL</code> gives predictable rounding and lets rates store precisely (e.g. <code>8.3300%</code>). Note this in <code>AGENTS.md</code>.
+</div>
+<h4>Standard audit columns (every transactional table)</h4>
+<pre>[CreatedBy] INT NOT NULL,
+[CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
+[CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
+[Status] BIT NOT NULL DEFAULT 1,
+[LastModifiedBy] INT NULL, [LastModifiedAt] DATETIME NULL, [LastModifiedFromPlatform] VARCHAR(MAX) NULL</pre>
+
+
+<h2 id="datamodel">3. Data model overview &amp; design principles</h2>
+
+<p>The model is built on five principles that keep it simple, correct, and future-proof:</p>
+<table><thead><tr><th>#</th><th>Principle</th><th>How it shows up</th></tr></thead><tbody>
+<tr><td>1</td><td><b>Definitions are data, not columns</b></td><td>Salary components and statutory schemes are rows in master tables, not hardcoded columns. New component or scheme = new row.</td></tr>
+<tr><td>2</td><td><b>Effective-dating</b></td><td>Rates (<code>StatutoryRate</code>, <code>EmployeeSalaryComponent</code>) carry <code>EffectiveFrom/To</code>; the engine picks the row valid on the period date, so old payslips stay reproducible.</td></tr>
+<tr><td>3</td><td><b>Separate definition from result</b></td><td>Component/scheme <i>definitions</i> live in masters; calculated <i>amounts</i> live in <code>Payslip*</code> rows. Changing a rate never alters a historical payslip.</td></tr>
+<tr><td>4</td><td><b>Results are rows, not columns</b></td><td><code>PayslipComponent</code> (earnings/deductions) and <code>PayslipStatutory</code> (one row per scheme) mean the payslip never needs new columns when a scheme is added.</td></tr>
+<tr><td>5</td><td><b>Immutable runs</b></td><td>A <code>PayrollRun</code> moves Draft&rarr;Approved&rarr;Posted&rarr;Paid; once posted, payslips and their vouchers are locked. Corrections flow forward as arrears.</td></tr>
+</tbody></table>
+
+<h3>3.1 Entity map</h3>
+<pre>EXISTING (reused):  Company ── Ledger ── FinancialYear ── User
+
+MASTERS
+  PayrollDepartment ─&lt; SalaryComponent
+  PayrollDepartment ─&lt; Employee ─&lt; EmployeeSalaryComponent &gt;─ SalaryComponent
+                                 └─&lt; EmployeeStatutoryApplicability &gt;─ StatutoryScheme
+  StatutoryScheme ─&lt; StatutoryRate        (effective-dated; national, or by state, + optional company/dept override)
+  StatutoryScheme ─&lt; StatutorySlab        (for slab schemes e.g. Profession Tax)
+  Company ─&lt; CompanyStatutoryRegistration &gt;─ StatutoryScheme
+  PayrollPeriod ;  LeaveBalance
+
+TRANSACTIONS
+  Attendance ;  Advance ;  PayrollPayment ;  PayrollReceipt
+
+RUN &amp; RESULTS
+  PayrollRun ─&lt; Payslip ─&lt; PayslipComponent      (earnings &amp; deductions, from SalaryComponent)
+                       └─&lt; PayslipStatutory      (one row per statutory scheme)
+                       └─&lt; AdvanceAdjustment     (advance recovered this run)
+  PayrollRun ─ PayslipSummary                    (department/company aggregates incl. admin charges)
+
+CONFIG
+  PayrollPostingProfile   (maps transaction legs &rarr; Ledger accounts for FA)</pre>
+
+<h3>3.2 The statutory model in one picture</h3>
+<div class="box info">
+<b>StatutoryScheme</b> says <i>what</i> a scheme is and which calculator handles it (EPF, ESI, PT, LWF&hellip;).<br>
+<b>StatutoryRate</b> says <i>how much</i> &mdash; employee %, employer %, wage ceiling, min/max, flat amounts &mdash; effective-dated. National schemes (EPF/ESI) use one all-India row; state schemes (LWF) are keyed by <code>StateUTId</code>; a company/department row overrides either only when needed.<br>
+<b>StatutorySlab</b> holds bands for slab schemes (Profession Tax), one set per state.<br>
+<b>EmployeeStatutoryApplicability</b> says <i>who</i> a scheme applies to (replacing the old per-scheme boolean columns) and carries the employee's registration number and any voluntary rate override.<br>
+The calculation engine reads these at run time; nothing statutory is hardcoded.
+</div>
+
+
+<h2 id="masters">4. Schema &mdash; Masters</h2>
+<p>All tables in <code>DBStrada/Payroll/Table/</code>. <span class="new">NEW</span> marks tables introduced by the normalized statutory model.</p>
+
+<h3>4.1 PayrollDepartment <span class="tag alt">slim</span></h3>
+<p>Now holds only identity and run preferences &mdash; <b>no statutory columns</b> (those moved to <code>StatutoryRate</code>).</p>
+<pre>CREATE TABLE [dbo].[PayrollDepartment]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [CompanyId] INT NOT NULL,
+    [Code] VARCHAR(20) NOT NULL UNIQUE,
+    [Name] VARCHAR(200) NOT NULL,
+    [RoundNetPayToRupee] BIT NOT NULL DEFAULT 1,   -- round net pay; remainder -> adjustment
+    [Remarks] VARCHAR(MAX) NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_PayrollDepartment_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id])
+)</pre>
+
+<h3>4.2 SalaryComponent <span class="tag alt">dynamic earnings/deductions</span></h3>
+<p>Defines the salary structure per department. <code>CalculationType</code> makes behaviour data-driven so the engine needs no per-component code.</p>
+<pre>CREATE TABLE [dbo].[SalaryComponent]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [PayrollDepartmentId] INT NOT NULL,
+    [SlotNo] INT NOT NULL,                       -- display/order; 1 is conventionally Basic
+    [Code] VARCHAR(20) NOT NULL,                 -- 'BASIC','HRA','DA','CONV','TIFFIN'...
+    [Name] VARCHAR(100) NOT NULL,
+    [ComponentTypeId] INT NOT NULL,              -- FK -> ComponentType (Earning/Deduction)
+    [CalculationTypeId] INT NOT NULL,            -- FK -> CalculationType (FlatProRata/Flat/Percentage/PerDay/PerUnit)
+    [ReferenceSlotNo] INT NULL,                  -- for 'Percentage' (e.g. HRA = % of slot 1)
+    [IsProRated] BIT NOT NULL DEFAULT 1,
+    [IsPartOfEPFBase] BIT NOT NULL DEFAULT 0,    -- typically only Basic (+DA)
+    [IsPartOfESIBase] BIT NOT NULL DEFAULT 1,    -- ESI base = full gross by default
+    [IsPartOfPTaxBase] BIT NOT NULL DEFAULT 1,
+    [IsPartOfGross] BIT NOT NULL DEFAULT 1,
+    [IsPreTax] BIT NOT NULL DEFAULT 0,           -- benefit reduces taxable income (NPS/VPF)
+    [DefaultRate] DECIMAL(18,4) NOT NULL DEFAULT 0,  -- monthly amount, % , per-day or per-unit rate
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_SalaryComponent_ToDepartment] FOREIGN KEY ([PayrollDepartmentId]) REFERENCES [PayrollDepartment]([Id]),
+    CONSTRAINT [FK_SalaryComponent_ToComponentType] FOREIGN KEY ([ComponentTypeId]) REFERENCES [ComponentType]([Id]),
+    CONSTRAINT [FK_SalaryComponent_ToCalculationType] FOREIGN KEY ([CalculationTypeId]) REFERENCES [CalculationType]([Id]),
+    CONSTRAINT [UQ_SalaryComponent] UNIQUE ([PayrollDepartmentId],[SlotNo])
+)</pre>
+<table><thead><tr><th>CalculationType</th><th>Meaning</th><th>Amount formula</th></tr></thead><tbody>
+<tr><td class="mono">FlatProRata</td><td>Fixed monthly amount, reduced for unpaid days (Basic, DA, most allowances)</td><td><code>round(rate &times; payableDays / periodDays)</code></td></tr>
+<tr><td class="mono">Flat</td><td>Fixed amount, never pro-rated (e.g. Tiffin)</td><td><code>rate</code></td></tr>
+<tr><td class="mono">Percentage</td><td>% of the referenced component's amount (e.g. HRA = 40% of Basic)</td><td><code>round(refAmount &times; rate / 100)</code></td></tr>
+<tr><td class="mono">PerDay</td><td>Daily rate &times; payable days</td><td><code>round(rate &times; payableDays)</code></td></tr>
+<tr><td class="mono">PerUnit</td><td>Rate &times; units (overtime hrs, trips) &mdash; units entered on attendance</td><td><code>round(rate &times; units)</code></td></tr>
+</tbody></table>
+<p>These five are the rows of the <code>CalculationType</code> lookup (§4.12); <code>SalaryComponent.CalculationTypeId</code> points at one, and <code>ComponentType</code> (Earning/Deduction) is likewise a lookup the engine reads by <code>Code</code>.</p>
+
+<h3>4.3 Employee <span class="tag alt">no statutory flags</span></h3>
+<p>The <code>IsEPFApplicable</code>/<code>IsESIApplicable</code>&hellip; booleans are gone &mdash; applicability now lives in <code>EmployeeStatutoryApplicability</code>.</p>
+<pre>CREATE TABLE [dbo].[Employee]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [PayrollDepartmentId] INT NOT NULL,
+    [Code] VARCHAR(20) NOT NULL UNIQUE,
+    [Name] VARCHAR(200) NOT NULL,
+    [FatherOrHusbandName] VARCHAR(200) NULL,
+    [GenderId] INT NULL,                         -- FK -> Gender
+    [DateOfBirth] DATETIME NULL,
+    [MaritalStatusId] INT NULL,                  -- FK -> MaritalStatus
+    [Address] VARCHAR(MAX) NULL,
+    [Mobile] VARCHAR(15) NULL,
+    [Email] VARCHAR(120) NULL,
+    [Designation] VARCHAR(100) NULL,
+    [EmployeeTypeId] INT NOT NULL,               -- FK -> EmployeeType (Staff/Worker)
+    [DateOfJoining] DATETIME NOT NULL,
+    [DateOfConfirmation] DATETIME NULL,
+    [DateOfTermination] DATETIME NULL,
+    [PANNumber] VARCHAR(10) NULL,
+    [AadhaarNumber] VARCHAR(12) NULL,            -- encrypt (see Security)
+    [UANNumber] VARCHAR(20) NULL,
+    [BankAccountLedgerId] INT NULL,              -- links to Ledger for FA posting
+    [BankName] VARCHAR(100) NULL,
+    [BankAccountNo] VARCHAR(30) NULL,            -- encrypt
+    [IFSCCode] VARCHAR(15) NULL,
+    [Remarks] VARCHAR(MAX) NULL,
+    [CreatedBy] INT NOT NULL,
+    [CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
+    [CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    [LastModifiedBy] INT NULL, [LastModifiedAt] DATETIME NULL, [LastModifiedFromPlatform] VARCHAR(MAX) NULL,
+    CONSTRAINT [FK_Employee_ToDepartment] FOREIGN KEY ([PayrollDepartmentId]) REFERENCES [PayrollDepartment]([Id]),
+    CONSTRAINT [FK_Employee_ToLedger] FOREIGN KEY ([BankAccountLedgerId]) REFERENCES [Ledger]([Id]),
+    CONSTRAINT [FK_Employee_ToGender] FOREIGN KEY ([GenderId]) REFERENCES [Gender]([Id]),
+    CONSTRAINT [FK_Employee_ToMaritalStatus] FOREIGN KEY ([MaritalStatusId]) REFERENCES [MaritalStatus]([Id]),
+    CONSTRAINT [FK_Employee_ToEmployeeType] FOREIGN KEY ([EmployeeTypeId]) REFERENCES [EmployeeType]([Id]),
+    CONSTRAINT [FK_Employee_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
+    CONSTRAINT [FK_Employee_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])
+)</pre>
+
+<h3>4.4 EmployeeSalaryComponent <span class="tag alt">effective-dated rates</span></h3>
+<p>Each employee's amount/rate per component, versioned by date so salary revisions keep history.</p>
+<pre>CREATE TABLE [dbo].[EmployeeSalaryComponent]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [EmployeeId] INT NOT NULL,
+    [SalaryComponentId] INT NOT NULL,
+    [Rate] DECIMAL(18,4) NOT NULL,               -- monthly amount / % / per-day / per-unit
+    [EffectiveFrom] DATETIME NOT NULL,
+    [EffectiveTo] DATETIME NULL,                 -- NULL = current
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_EmpSalComp_ToEmployee] FOREIGN KEY ([EmployeeId]) REFERENCES [Employee]([Id]),
+    CONSTRAINT [FK_EmpSalComp_ToComponent] FOREIGN KEY ([SalaryComponentId]) REFERENCES [SalaryComponent]([Id])
+)</pre>
+
+
+<h3>4.5 StatutoryScheme <span class="new">NEW</span></h3>
+<p>One row per statutory scheme. Defines its nature and which calculator handles it.</p>
+<pre>CREATE TABLE [dbo].[StatutoryScheme]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [Code] VARCHAR(20) NOT NULL UNIQUE,          -- 'EPF','EPS','EDLI','EPF_ADMIN','ESI','PT','LWF','NPS'
+    [Name] VARCHAR(100) NOT NULL,
+    [CalculatorTypeId] INT NOT NULL,             -- FK -> StatutoryCalculatorType (EPF/ESI/SLAB/FLAT)
+    [HasEmployeeShare] BIT NOT NULL DEFAULT 1,
+    [HasEmployerShare] BIT NOT NULL DEFAULT 1,
+    [PayFrequencyId] INT NOT NULL,               -- FK -> PayFrequency (Monthly/HalfYearly/Yearly)
+    [IsEmployeeDeduction] BIT NOT NULL DEFAULT 1, -- employee share reduces net pay
+    [DisplayOrder] INT NOT NULL DEFAULT 0,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_StatutoryScheme_ToCalculatorType] FOREIGN KEY ([CalculatorTypeId]) REFERENCES [StatutoryCalculatorType]([Id]),
+    CONSTRAINT [FK_StatutoryScheme_ToPayFrequency] FOREIGN KEY ([PayFrequencyId]) REFERENCES [PayFrequency]([Id])
+)</pre>
+<table><thead><tr><th>CalculatorType</th><th>Used by</th><th>Logic</th></tr></thead><tbody>
+<tr><td class="mono">EPF</td><td>EPF, EPS, EDLI, EPF_ADMIN</td><td>Provident-fund family: base = EPF-base components, capped at wage ceiling; splits employer share into EPF/EPS, adds EDLI &amp; admin</td></tr>
+<tr><td class="mono">ESI</td><td>ESI</td><td>Base = gross; applies only if gross &le; wage limit; rounds each share up to next rupee</td></tr>
+<tr><td class="mono">SLAB</td><td>PT (Profession Tax)</td><td>Looks up <code>StatutorySlab</code> by base amount</td></tr>
+<tr><td class="mono">FLAT</td><td>LWF</td><td>Flat employee/employer amount; only in the scheme's frequency months</td></tr>
+</tbody></table>
+
+<h3>4.6 StatutoryRate <span class="new">NEW</span> &mdash; effective-dated, scoped (national / state / company)</h3>
+<p>The numbers, as data. Each row carries a <b>scope</b>: leave <code>StateUTId</code>, <code>CompanyId</code> and <code>PayrollDepartmentId</code> all <code>NULL</code> for a <b>national</b> rate (EPF, ESI &mdash; identical everywhere in India, seeded once); set <code>StateUTId</code> for a <b>state</b> rate (e.g. LWF, which differs by state); set <code>CompanyId</code>/<code>PayrollDepartmentId</code> only to <b>override</b> one establishment. The engine reads the effective row whose scope is the <i>most-specific</i> match for the employee on the period date.</p>
+<pre>CREATE TABLE [dbo].[StatutoryRate]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [StatutorySchemeId] INT NOT NULL,
+    [StateUTId] INT NULL,                 -- NULL = national (EPF/ESI); set = state-specific (LWF...)
+    [CompanyId] INT NULL,                 -- set only to override one company
+    [PayrollDepartmentId] INT NULL,       -- set only to override one department
+    [EmployeeRate] DECIMAL(9,4) NULL,     -- % (e.g. 12.0000, 0.7500)
+    [EmployerRate] DECIMAL(9,4) NULL,     -- % (e.g. 3.6700, 8.3300, 3.2500)
+    [WageCeiling] DECIMAL(18,2) NULL,     -- base cap (EPF 15000) / eligibility limit (ESI 21000)
+    [MinAmount] DECIMAL(18,2) NULL,       -- e.g. EPF admin min 500 (establishment level)
+    [MaxAmount] DECIMAL(18,2) NULL,       -- e.g. EPS max 1250
+    [FlatEmployeeAmount] DECIMAL(18,2) NULL,  -- LWF employee
+    [FlatEmployerAmount] DECIMAL(18,2) NULL,  -- LWF employer
+    [ContributionMonths] VARCHAR(20) NULL,    -- non-monthly schemes, e.g. '6,12' for LWF; NULL = every month
+    [EffectiveFrom] DATETIME NOT NULL,
+    [EffectiveTo] DATETIME NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_StatutoryRate_ToScheme] FOREIGN KEY ([StatutorySchemeId]) REFERENCES [StatutoryScheme]([Id]),
+    CONSTRAINT [FK_StatutoryRate_ToStateUT] FOREIGN KEY ([StateUTId]) REFERENCES [StateUT]([Id]),
+    CONSTRAINT [FK_StatutoryRate_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_StatutoryRate_ToDepartment] FOREIGN KEY ([PayrollDepartmentId]) REFERENCES [PayrollDepartment]([Id])
+)</pre>
+
+
+<h3>4.7 StatutorySlab <span class="new">NEW</span> &mdash; for slab schemes (Profession Tax)</h3>
+<p>Profession Tax bands, one set per state. <code>Gender</code> and <code>ApplicableMonth</code> are normally <code>NULL</code>; they exist only for the few states whose bands differ for women or have a special month &mdash; so even those stay data, not code.</p>
+<pre>CREATE TABLE [dbo].[StatutorySlab]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [StatutorySchemeId] INT NOT NULL,
+    [StateUTId] INT NOT NULL,                    -- FK to existing StateUT master (PT is state-specific)
+    [GenderId] INT NULL,                         -- FK -> Gender; NULL = all genders
+    [ApplicableMonth] INT NULL,                  -- NULL = every month; e.g. 2 for a state's special Feb amount
+    [FromAmount] DECIMAL(18,2) NOT NULL,         -- monthly base lower bound (inclusive)
+    [ToAmount] DECIMAL(18,2) NULL,               -- upper bound (inclusive); NULL = no limit
+    [Amount] DECIMAL(18,2) NOT NULL,             -- tax for this band
+    [EffectiveFrom] DATETIME NOT NULL,
+    [EffectiveTo] DATETIME NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_StatutorySlab_ToScheme] FOREIGN KEY ([StatutorySchemeId]) REFERENCES [StatutoryScheme]([Id]),
+    CONSTRAINT [FK_StatutorySlab_ToStateUT] FOREIGN KEY ([StateUTId]) REFERENCES [StateUT]([Id]),
+    CONSTRAINT [FK_StatutorySlab_ToGender] FOREIGN KEY ([GenderId]) REFERENCES [Gender]([Id])
+)</pre>
+
+<h3>4.8 EmployeeStatutoryApplicability <span class="new">NEW</span> &mdash; replaces the boolean flags</h3>
+<p>Which schemes apply to which employee, with the employee's registration number and any voluntary rate override (e.g. VPF above 12%). New scheme &rarr; add rows, no <code>Employee</code> change.</p>
+<pre>CREATE TABLE [dbo].[EmployeeStatutoryApplicability]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [EmployeeId] INT NOT NULL,
+    [StatutorySchemeId] INT NOT NULL,
+    [IsApplicable] BIT NOT NULL DEFAULT 1,
+    [RegistrationNo] VARCHAR(50) NULL,           -- ESI IP no, PF member id, etc.
+    [OverrideEmployeeRate] DECIMAL(9,4) NULL,    -- e.g. voluntary higher PF %
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_EmpStat_ToEmployee] FOREIGN KEY ([EmployeeId]) REFERENCES [Employee]([Id]),
+    CONSTRAINT [FK_EmpStat_ToScheme] FOREIGN KEY ([StatutorySchemeId]) REFERENCES [StatutoryScheme]([Id]),
+    CONSTRAINT [UQ_EmpStat] UNIQUE ([EmployeeId],[StatutorySchemeId])
+)</pre>
+
+<h3>4.9 CompanyStatutoryRegistration <span class="new">NEW</span></h3>
+<p>Employer registration numbers per scheme (PF establishment code, ESI employer code, PT enrolment/registration, TAN). One row per company per scheme &mdash; replaces the scattered <code>co_*_no</code> columns.</p>
+<pre>CREATE TABLE [dbo].[CompanyStatutoryRegistration]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [CompanyId] INT NOT NULL,
+    [StatutorySchemeId] INT NOT NULL,
+    [RegistrationNo] VARCHAR(50) NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_CoStatReg_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_CoStatReg_ToScheme] FOREIGN KEY ([StatutorySchemeId]) REFERENCES [StatutoryScheme]([Id]),
+    CONSTRAINT [UQ_CoStatReg] UNIQUE ([CompanyId],[StatutorySchemeId])
+)</pre>
+
+<h3>4.10 PayrollPeriod &amp; LeaveBalance</h3>
+<pre>CREATE TABLE [dbo].[PayrollPeriod]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [CompanyId] INT NOT NULL,
+    [FinancialYearId] INT NOT NULL,
+    [Title] VARCHAR(50) NOT NULL,                -- 'May 2026'
+    [FromDate] DATETIME NOT NULL,
+    [ToDate] DATETIME NOT NULL,
+    [NumberOfDays] INT NOT NULL,                 -- calendar days in period (e.g. 31)
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_PayrollPeriod_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_PayrollPeriod_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [FinancialYear]([Id])
+);
+
+CREATE TABLE [dbo].[LeaveBalance]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [EmployeeId] INT NOT NULL,
+    [FromDate] DATETIME NOT NULL,
+    [ValidUpTo] DATETIME NULL,
+    [CasualLeave] DECIMAL(6,2) NOT NULL DEFAULT 0,
+    [SickLeave] DECIMAL(6,2) NOT NULL DEFAULT 0,
+    [PrivilegeLeave] DECIMAL(6,2) NOT NULL DEFAULT 0,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_LeaveBalance_ToEmployee] FOREIGN KEY ([EmployeeId]) REFERENCES [Employee]([Id])
+)</pre>
+<p>Period closing is handled by the <code>PayrollRun</code> lifecycle (§6), not a flag on the period.</p>
+
+
+<h3>4.11 Seed data &mdash; current (2025&ndash;26) statutory config as rows</h3>
+<p>This is the entire statutory setup expressed as data &mdash; and it <b>ships with the product</b>. Central schemes (the EPF/ESI family) are <b>national</b>: one row each, all-India. <b>State</b> schemes (Profession Tax, LWF) are keyed by <code>StateUTId</code> &mdash; seeded once per state. A company/department row is added only to <i>override</i> a specific establishment. To change a rate next year, insert a new row with a new <code>EffectiveFrom</code>; to add a scheme (e.g. NPS), insert a scheme + rate row. No schema change, ever.</p>
+<table><thead><tr><th>StatutoryScheme</th><th>Code</th><th>CalculatorType</th><th>Emp share?</th><th>Freq</th></tr></thead><tbody>
+<tr><td>Provident Fund</td><td class="mono">EPF</td><td class="mono">EPF</td><td>Yes</td><td>Monthly</td></tr>
+<tr><td>Pension Scheme</td><td class="mono">EPS</td><td class="mono">EPF</td><td>No (employer)</td><td>Monthly</td></tr>
+<tr><td>Deposit-Linked Insurance</td><td class="mono">EDLI</td><td class="mono">EPF</td><td>No (employer)</td><td>Monthly</td></tr>
+<tr><td>PF Admin Charge</td><td class="mono">EPF_ADMIN</td><td class="mono">EPF</td><td>No (employer)</td><td>Monthly</td></tr>
+<tr><td>State Insurance</td><td class="mono">ESI</td><td class="mono">ESI</td><td>Yes</td><td>Monthly</td></tr>
+<tr><td>Profession Tax (WB)</td><td class="mono">PT</td><td class="mono">SLAB</td><td>Yes</td><td>Monthly</td></tr>
+<tr><td>Labour Welfare Fund</td><td class="mono">LWF</td><td class="mono">FLAT</td><td>Yes</td><td>HalfYearly</td></tr>
+</tbody></table>
+<table><thead><tr><th>StatutoryRate</th><th>Scope</th><th>EmployeeRate</th><th>EmployerRate</th><th>WageCeiling</th><th>Min/Max</th><th>Flat E/Er &middot; Months</th></tr></thead><tbody>
+<tr><td class="mono">EPF</td><td>National</td><td class="right">12.0000</td><td class="right">3.6700</td><td class="right">15000.00</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td class="mono">EPS</td><td>National</td><td class="right">&mdash;</td><td class="right">8.3300</td><td class="right">15000.00</td><td>Max 1250</td><td>&mdash;</td></tr>
+<tr><td class="mono">EDLI</td><td>National</td><td class="right">&mdash;</td><td class="right">0.5000</td><td class="right">15000.00</td><td>Max 75</td><td>&mdash;</td></tr>
+<tr><td class="mono">EPF_ADMIN</td><td>National</td><td class="right">&mdash;</td><td class="right">0.5000</td><td class="right">15000.00</td><td>Min 500</td><td>&mdash;</td></tr>
+<tr><td class="mono">ESI</td><td>National</td><td class="right">0.7500</td><td class="right">3.2500</td><td class="right">21000.00</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td class="mono">PT</td><td>by State</td><td colspan="4">via <code>StatutorySlab</code> per state (below)</td></tr>
+<tr><td class="mono">LWF</td><td>State (WB)</td><td class="right">&mdash;</td><td class="right">&mdash;</td><td>&mdash;</td><td>&mdash;</td><td class="right">3.00 / 15.00 &middot; 6,12</td></tr>
+</tbody></table>
+<table><thead><tr><th>StatutorySlab (PT &mdash; West Bengal, salaried, monthly)</th><th>StateUTId</th><th>FromAmount</th><th>ToAmount</th><th>Amount</th></tr></thead><tbody>
+<tr><td>Nil</td><td class="right">19 (WB)</td><td class="right">0.00</td><td class="right">10000.00</td><td class="right">0.00</td></tr>
+<tr><td>Band 1</td><td class="right">19 (WB)</td><td class="right">10000.01</td><td class="right">15000.00</td><td class="right">110.00</td></tr>
+<tr><td>Band 2</td><td class="right">19 (WB)</td><td class="right">15000.01</td><td class="right">25000.00</td><td class="right">130.00</td></tr>
+<tr><td>Band 3</td><td class="right">19 (WB)</td><td class="right">25000.01</td><td class="right">40000.00</td><td class="right">150.00</td></tr>
+<tr><td>Band 4</td><td class="right">19 (WB)</td><td class="right">40000.01</td><td><i>NULL</i></td><td class="right">200.00</td></tr>
+</tbody></table>
+<div class="box info"><b>Notes on accuracy:</b> EPF employer 12% splits into 8.33% EPS (capped so max ₹1,250 on a ₹15,000 base) + 3.67% EPF; EDLI 0.50% (max ₹75) and admin 0.50% (min ₹500 at establishment level) are employer-only. ESI applies only while monthly gross &le; ₹21,000 and each share rounds <b>up</b> to the next rupee. WB LWF is collected half-yearly (June &amp; December) &mdash; modelled via <code>ContributionMonths='6,12'</code> on its state rate row; the flat amounts are the configurable values. Other states ship the same way &mdash; just more <code>StatutorySlab</code> (PT) and state <code>StatutoryRate</code> (LWF) rows; the engine and schema never change.</div>
+
+
+<h3>4.12 Fixed lookup tables (the "Type" masters) <span class="new">NEW</span></h3>
+<p>Every fixed list in the module &mdash; component types, calculation types, pay frequencies, run states&hellip; &mdash; is a small master table, exactly like Strada's existing <code>Nature</code>/<code>AccountType</code> masters. They are <b>seeded once and never edited or shown in the UI</b>, but existing as real tables gives proper foreign keys (no stray strings), clean joins and easy display. Every other table links to them by <code>Id</code>. They live in <code>DBStrada/Payroll/Table/</code> and all share one shape:</p>
+<pre>CREATE TABLE [dbo].[ComponentType]   -- representative; every lookup below is identical in shape
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [Code] VARCHAR(20) NOT NULL UNIQUE,   -- stable token the engine switches on (never shown)
+    [Name] VARCHAR(100) NOT NULL UNIQUE,  -- friendly label for display
+    [Status] BIT NOT NULL DEFAULT 1
+)</pre>
+<p>The complete set and their seed rows (<code>Code</code> = engine token, <code>Name</code> = human label):</p>
+<table><thead><tr><th>Lookup table</th><th>Linked from (FK column)</th><th>Seed rows</th></tr></thead><tbody>
+<tr><td class="mono">ComponentType</td><td>SalaryComponent.ComponentTypeId, PayslipComponent.ComponentTypeId</td><td>Earning; Deduction</td></tr>
+<tr><td class="mono">CalculationType</td><td>SalaryComponent.CalculationTypeId</td><td>FlatProRata; Flat; Percentage; PerDay; PerUnit</td></tr>
+<tr><td class="mono">StatutoryCalculatorType</td><td>StatutoryScheme.CalculatorTypeId</td><td>EPF; ESI; SLAB; FLAT</td></tr>
+<tr><td class="mono">PayFrequency</td><td>StatutoryScheme.PayFrequencyId</td><td>Monthly; HalfYearly; Yearly</td></tr>
+<tr><td class="mono">EmployeeType</td><td>Employee.EmployeeTypeId</td><td>Staff; Worker</td></tr>
+<tr><td class="mono">Gender</td><td>Employee.GenderId, StatutorySlab.GenderId</td><td>Male; Female; Other</td></tr>
+<tr><td class="mono">MaritalStatus</td><td>Employee.MaritalStatusId</td><td>Single; Married</td></tr>
+<tr><td class="mono">PayrollRunType</td><td>PayrollRun.RunTypeId</td><td>Regular; Arrear; Bonus</td></tr>
+<tr><td class="mono">PayrollRunState</td><td>PayrollRun.StateId</td><td>Draft; Calculated; Approved; Posted; Paid; Cancelled</td></tr>
+<tr><td class="mono">ModeOfPayment</td><td>PayrollPayment.ModeOfPaymentId, PayrollReceipt.ModeOfPaymentId</td><td>Bank; Cash; Cheque</td></tr>
+</tbody></table>
+<div class="box info">Because these never change at run time, the engine still switches on the stable <code>Code</code> (loaded via a join) &mdash; e.g. the EPF strategy is chosen because the scheme's <code>StatutoryCalculatorType.Code = 'EPF'</code>. The <code>Id</code> gives referential integrity; the <code>Code</code> keeps the logic readable. Note <code>StatutoryScheme.Code</code> stays its own column &mdash; it is the scheme's <i>identity</i> (EPF vs EPS vs PT), not a shared type.</div>
+
+<h2 id="transactions">5. Schema &mdash; Transactions</h2>
+
+<h3>5.1 Attendance</h3>
+<p>One row per employee per period. <b>Payable days</b> drives all pro-rata earnings: <code>PayableDays = NumberOfDays &minus; LossOfPayDays</code>. Leave taken is captured for the leave register; only unpaid days reduce pay.</p>
+<pre>CREATE TABLE [dbo].[Attendance]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [EmployeeId] INT NOT NULL,
+    [PayrollPeriodId] INT NOT NULL,
+    [PayrollDepartmentId] INT NOT NULL,
+    [DaysPresent] DECIMAL(6,2) NOT NULL DEFAULT 0,
+    [PaidLeaveDays] DECIMAL(6,2) NOT NULL DEFAULT 0,   -- CL/SL/PL that are paid
+    [LossOfPayDays] DECIMAL(6,2) NOT NULL DEFAULT 0,   -- unpaid absence (LOP)
+    [OvertimeUnits] DECIMAL(8,2) NOT NULL DEFAULT 0,   -- feeds PerUnit components
+    [ExtraUnits] DECIMAL(8,2) NOT NULL DEFAULT 0,      -- generic PerUnit (trips etc.)
+    [IncomeTaxDeduction] DECIMAL(18,2) NOT NULL DEFAULT 0,  -- manual TDS for the month
+    [OtherAdjustment] DECIMAL(18,2) NOT NULL DEFAULT 0,     -- +/- ad-hoc
+    [Remarks] VARCHAR(MAX) NULL,
+    [CreatedBy] INT NOT NULL,
+    [CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
+    [CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    [LastModifiedBy] INT NULL, [LastModifiedAt] DATETIME NULL, [LastModifiedFromPlatform] VARCHAR(MAX) NULL,
+    CONSTRAINT [FK_Attendance_ToEmployee] FOREIGN KEY ([EmployeeId]) REFERENCES [Employee]([Id]),
+    CONSTRAINT [FK_Attendance_ToPeriod] FOREIGN KEY ([PayrollPeriodId]) REFERENCES [PayrollPeriod]([Id]),
+    CONSTRAINT [FK_Attendance_ToDepartment] FOREIGN KEY ([PayrollDepartmentId]) REFERENCES [PayrollDepartment]([Id]),
+    CONSTRAINT [FK_Attendance_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
+    CONSTRAINT [UQ_Attendance] UNIQUE ([EmployeeId],[PayrollPeriodId]),
+    CONSTRAINT [CK_Attendance_Days] CHECK ([DaysPresent] &gt;= 0 AND [LossOfPayDays] &gt;= 0)
+)</pre>
+
+<h3>5.2 Advance</h3>
+<pre>CREATE TABLE [dbo].[Advance]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [TransactionNo] VARCHAR(100) NOT NULL UNIQUE,
+    [CompanyId] INT NOT NULL,
+    [FinancialYearId] INT NOT NULL,
+    [EmployeeId] INT NOT NULL,
+    [AdvanceDate] DATETIME NOT NULL,
+    [AdvanceAmount] DECIMAL(18,2) NOT NULL,
+    [InstalmentAmount] DECIMAL(18,2) NOT NULL,         -- recovered per period
+    [SuspendDeduction] BIT NOT NULL DEFAULT 0,
+    [PaymentLedgerId] INT NOT NULL,                    -- bank/cash paid from
+    [ChequeNo] VARCHAR(50) NULL, [ChequeDate] DATETIME NULL,
+    [Narration] VARCHAR(MAX) NULL,
+    [FAVoucherId] INT NULL,                            -- FinancialAccounting voucher
+    [CreatedBy] INT NOT NULL,
+    [CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
+    [CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    [LastModifiedBy] INT NULL, [LastModifiedAt] DATETIME NULL, [LastModifiedFromPlatform] VARCHAR(MAX) NULL,
+    CONSTRAINT [FK_Advance_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_Advance_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [FinancialYear]([Id]),
+    CONSTRAINT [FK_Advance_ToEmployee] FOREIGN KEY ([EmployeeId]) REFERENCES [Employee]([Id]),
+    CONSTRAINT [FK_Advance_ToLedger] FOREIGN KEY ([PaymentLedgerId]) REFERENCES [Ledger]([Id]),
+    CONSTRAINT [FK_Advance_ToVoucher] FOREIGN KEY ([FAVoucherId]) REFERENCES [FinancialAccounting]([Id]),
+    CONSTRAINT [FK_Advance_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id])
+)</pre>
+<p>Outstanding balance is derived: <code>AdvanceAmount &minus; SUM(AdvanceAdjustment.Amount)</code> (computed in the overview view, §7).</p>
+
+<h3>5.3 PayrollPayment &amp; PayrollReceipt</h3>
+<p>Salary disbursement and refunds. Same shape as Fleet transactions; both post FA vouchers.</p>
+<pre>CREATE TABLE [dbo].[PayrollPayment]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [TransactionNo] VARCHAR(100) NOT NULL UNIQUE,
+    [CompanyId] INT NOT NULL,
+    [FinancialYearId] INT NOT NULL,
+    [PayrollRunId] INT NULL,                 -- set when paying a run
+    [EmployeeId] INT NOT NULL,
+    [PaymentDate] DATETIME NOT NULL,
+    [Amount] DECIMAL(18,2) NOT NULL,
+    [PaymentLedgerId] INT NOT NULL,
+    [ModeOfPaymentId] INT NOT NULL,          -- FK -> ModeOfPayment (Bank/Cash/Cheque)
+    [ChequeNo] VARCHAR(50) NULL, [ChequeDate] DATETIME NULL,
+    [Narration] VARCHAR(MAX) NULL,
+    [FAVoucherId] INT NULL,
+    [CreatedBy] INT NOT NULL,
+    [CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
+    [CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    [LastModifiedBy] INT NULL, [LastModifiedAt] DATETIME NULL, [LastModifiedFromPlatform] VARCHAR(MAX) NULL,
+    CONSTRAINT [FK_PayrollPayment_ToEmployee] FOREIGN KEY ([EmployeeId]) REFERENCES [Employee]([Id]),
+    CONSTRAINT [FK_PayrollPayment_ToLedger] FOREIGN KEY ([PaymentLedgerId]) REFERENCES [Ledger]([Id]),
+    CONSTRAINT [FK_PayrollPayment_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_PayrollPayment_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [FinancialYear]([Id]),
+    CONSTRAINT [FK_PayrollPayment_ToModeOfPayment] FOREIGN KEY ([ModeOfPaymentId]) REFERENCES [ModeOfPayment]([Id]),
+    CONSTRAINT [FK_PayrollPayment_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id])
+)
+-- PayrollReceipt is identical in shape (ReceiptDate, ReceiptLedgerId, ModeOfPaymentId) for advance refunds.</pre>
+
+
+<h2 id="calculated">6. Schema &mdash; Payroll run, payslip &amp; results</h2>
+
+<h3>6.1 PayrollRun &mdash; the lifecycle that locks a period</h3>
+<p>A run is one department + one period (+ a run type). It owns all payslips it produces and enforces that posted payroll is never silently edited.</p>
+<pre>CREATE TABLE [dbo].[PayrollRun]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [CompanyId] INT NOT NULL,
+    [PayrollDepartmentId] INT NOT NULL,
+    [PayrollPeriodId] INT NOT NULL,
+    [RunTypeId] INT NOT NULL,                          -- FK -> PayrollRunType (Regular/Arrear/Bonus)
+    [StateId] INT NOT NULL,                            -- FK -> PayrollRunState (Draft/Calculated/Approved/Posted/Paid/Cancelled)
+    [EmployeeCount] INT NOT NULL DEFAULT 0,
+    [TotalEarnings] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalDeductions] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalNetPay] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [FAVoucherId] INT NULL,
+    [CalculatedBy] INT NULL, [CalculatedAt] DATETIME NULL,
+    [ApprovedBy] INT NULL,   [ApprovedAt] DATETIME NULL,
+    [PostedBy] INT NULL,     [PostedAt] DATETIME NULL,
+    [RowVersion] ROWVERSION,                            -- optimistic concurrency
+    [CreatedBy] INT NOT NULL,
+    [CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
+    [CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_PayrollRun_ToDepartment] FOREIGN KEY ([PayrollDepartmentId]) REFERENCES [PayrollDepartment]([Id]),
+    CONSTRAINT [FK_PayrollRun_ToPeriod] FOREIGN KEY ([PayrollPeriodId]) REFERENCES [PayrollPeriod]([Id]),
+    CONSTRAINT [FK_PayrollRun_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_PayrollRun_ToRunType] FOREIGN KEY ([RunTypeId]) REFERENCES [PayrollRunType]([Id]),
+    CONSTRAINT [FK_PayrollRun_ToState] FOREIGN KEY ([StateId]) REFERENCES [PayrollRunState]([Id]),
+    CONSTRAINT [UQ_PayrollRun] UNIQUE ([PayrollDepartmentId],[PayrollPeriodId],[RunTypeId])
+)</pre>
+<pre>Draft ──calculate──▶ Calculated ──approve──▶ Approved ──post FA──▶ Posted ──disburse──▶ Paid
+  ▲                       │
+  └──── recalculate ──────┘   (allowed only while Draft/Calculated)
+Any state except Paid ──cancel──▶ Cancelled (reverses the FA voucher if already Posted)</pre>
+<table><thead><tr><th>Transition</th><th>Guard</th><th>Effect</th></tr></thead><tbody>
+<tr><td>Calculate</td><td>Attendance exists for active employees</td><td>delete+reinsert this run's Payslip rows; recompute totals</td></tr>
+<tr><td>Approve</td><td>State=Calculated; Payroll-Approver role</td><td>lock payslips; State&rarr;Approved</td></tr>
+<tr><td>Post</td><td>State=Approved</td><td>create FA voucher in same transaction; State&rarr;Posted</td></tr>
+<tr><td>Disburse</td><td>State=Posted</td><td>create PayrollPayment rows + bank file; State&rarr;Paid</td></tr>
+<tr><td>Cancel</td><td>State&ne;Paid</td><td>reverse voucher if Posted; State&rarr;Cancelled</td></tr>
+</tbody></table>
+
+<h3>6.2 Payslip &mdash; slim header</h3>
+<p>Totals and payment info only. All the detail is in the two child tables (§6.3&ndash;6.4), so <b>the payslip never grows a column when a scheme is added</b>.</p>
+<pre>CREATE TABLE [dbo].[Payslip]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [PayrollRunId] INT NOT NULL,
+    [EmployeeId] INT NOT NULL,
+    [PayrollPeriodId] INT NOT NULL,
+    [AttendanceId] INT NULL,
+    [PayableDays] DECIMAL(6,2) NOT NULL,
+    [PeriodDays] INT NOT NULL,
+    [TotalEarnings] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalEmployeeStatutory] DECIMAL(18,2) NOT NULL DEFAULT 0,  -- sum of employee-side statutory
+    [TotalOtherDeductions] DECIMAL(18,2) NOT NULL DEFAULT 0,    -- deduction-type components
+    [IncomeTax] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [AdvanceDeduction] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [OtherAdjustment] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalDeductions] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [NetPay] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalEmployerCost] DECIMAL(18,2) NOT NULL DEFAULT 0,       -- employer statutory (CTC add-on)
+    [CalculationSnapshot] NVARCHAR(MAX) NULL CONSTRAINT [CK_Payslip_Json] CHECK (ISJSON([CalculationSnapshot])=1),
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_Payslip_ToRun] FOREIGN KEY ([PayrollRunId]) REFERENCES [PayrollRun]([Id]),
+    CONSTRAINT [FK_Payslip_ToEmployee] FOREIGN KEY ([EmployeeId]) REFERENCES [Employee]([Id]),
+    CONSTRAINT [FK_Payslip_ToPeriod] FOREIGN KEY ([PayrollPeriodId]) REFERENCES [PayrollPeriod]([Id]),
+    CONSTRAINT [FK_Payslip_ToAttendance] FOREIGN KEY ([AttendanceId]) REFERENCES [Attendance]([Id]),
+    CONSTRAINT [UQ_Payslip] UNIQUE ([PayrollRunId],[EmployeeId])
+)</pre>
+<p><code>CalculationSnapshot</code> stores the exact inputs used (rates, ceilings, factor, slab) as JSON, so any payslip can be re-explained or re-derived even after statutory tables change.</p>
+
+
+<h3>6.3 PayslipComponent &mdash; earnings &amp; deductions as rows</h3>
+<pre>CREATE TABLE [dbo].[PayslipComponent]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [PayslipId] INT NOT NULL,
+    [SalaryComponentId] INT NOT NULL,
+    [SlotNo] INT NOT NULL,
+    [Name] VARCHAR(100) NOT NULL,            -- snapshot of component name
+    [ComponentTypeId] INT NOT NULL,          -- FK -> ComponentType (Earning/Deduction)
+    [FullRate] DECIMAL(18,4) NOT NULL,       -- monthly/full rate before pro-rata
+    [Amount] DECIMAL(18,2) NOT NULL,         -- calculated amount
+    CONSTRAINT [FK_PayslipComponent_ToPayslip] FOREIGN KEY ([PayslipId]) REFERENCES [Payslip]([Id]),
+    CONSTRAINT [FK_PayslipComponent_ToComponent] FOREIGN KEY ([SalaryComponentId]) REFERENCES [SalaryComponent]([Id]),
+    CONSTRAINT [FK_PayslipComponent_ToComponentType] FOREIGN KEY ([ComponentTypeId]) REFERENCES [ComponentType]([Id])
+)</pre>
+
+<h3>6.4 PayslipStatutory &mdash; one row per scheme <span class="new">the key extensibility win</span></h3>
+<p>Every statutory result (EPF, EPS, EDLI, EPF admin, ESI, PT, LWF, &hellip;) is a <b>row</b> carrying base, rate, employee amount and employer amount. Add a scheme &rarr; you get a new row automatically; no payslip column ever changes.</p>
+<pre>CREATE TABLE [dbo].[PayslipStatutory]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [PayslipId] INT NOT NULL,
+    [StatutorySchemeId] INT NOT NULL,
+    [SchemeCode] VARCHAR(20) NOT NULL,       -- snapshot: 'EPF','EPS','ESI','PT'...
+    [BaseAmount] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [EmployeeRate] DECIMAL(9,4) NULL,
+    [EmployerRate] DECIMAL(9,4) NULL,
+    [EmployeeAmount] DECIMAL(18,2) NOT NULL DEFAULT 0,   -- reduces net pay (if IsEmployeeDeduction)
+    [EmployerAmount] DECIMAL(18,2) NOT NULL DEFAULT 0,   -- employer cost (CTC)
+    CONSTRAINT [FK_PayslipStatutory_ToPayslip] FOREIGN KEY ([PayslipId]) REFERENCES [Payslip]([Id]),
+    CONSTRAINT [FK_PayslipStatutory_ToScheme] FOREIGN KEY ([StatutorySchemeId]) REFERENCES [StatutoryScheme]([Id])
+)</pre>
+
+<h3>6.5 AdvanceAdjustment &mdash; recovery per run</h3>
+<pre>CREATE TABLE [dbo].[AdvanceAdjustment]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [AdvanceId] INT NOT NULL,
+    [PayslipId] INT NOT NULL,
+    [Amount] DECIMAL(18,2) NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_AdvAdj_ToAdvance] FOREIGN KEY ([AdvanceId]) REFERENCES [Advance]([Id]),
+    CONSTRAINT [FK_AdvAdj_ToPayslip] FOREIGN KEY ([PayslipId]) REFERENCES [Payslip]([Id])
+)</pre>
+
+<h3>6.6 PayslipSummary &mdash; department/company aggregates</h3>
+<p>Per run: totals plus the establishment-level charges that aren't per-employee (EPF admin minimum, EDLI totals) &mdash; used for the EPF challan and FA posting.</p>
+<pre>CREATE TABLE [dbo].[PayslipSummary]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [PayrollRunId] INT NOT NULL,
+    [TotalEarnings] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalEmployeeStatutory] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalEmployerStatutory] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalIncomeTax] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [TotalNetPay] DECIMAL(18,2) NOT NULL DEFAULT 0,
+    [EPFAdminCharge] DECIMAL(18,2) NOT NULL DEFAULT 0,   -- after applying the establishment minimum
+    [EmployeeCount] INT NOT NULL DEFAULT 0,
+    [StatutoryBreakupJson] NVARCHAR(MAX) NULL CONSTRAINT [CK_PaySummary_Json] CHECK (ISJSON([StatutoryBreakupJson])=1),
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_PaySummary_ToRun] FOREIGN KEY ([PayrollRunId]) REFERENCES [PayrollRun]([Id])
+);
+
+-- Config: maps each posting leg to a Ledger account for FA
+CREATE TABLE [dbo].[PayrollPostingProfile]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [CompanyId] INT NOT NULL,
+    [TransactionType] VARCHAR(40) NOT NULL,   -- 'SALARY_EXPENSE','SALARY_PAYABLE','STATUTORY_PAYABLE:EPF',...
+    [LedgerId] INT NOT NULL,
+    [DrOrCr] VARCHAR(2) NOT NULL,             -- 'Dr' | 'Cr'
+    [Status] BIT NOT NULL DEFAULT 1,
+    CONSTRAINT [FK_PostingProfile_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_PostingProfile_ToLedger] FOREIGN KEY ([LedgerId]) REFERENCES [Ledger]([Id])
+)</pre>
+<div class="box info">Statutory payable accounts are keyed <code>STATUTORY_PAYABLE:&lt;SchemeCode&gt;</code> so a new scheme maps to a ledger with a config row &mdash; consistent with the rows-not-columns theme.</div>
+
+
+<h2 id="procedures">7. Stored procedures (pattern + examples)</h2>
+<p>Every master/transaction table gets an <code>Insert_*</code> upsert proc (same pattern as Fleet's <code>Insert_Trip</code>) and a <code>*_Overview</code> view. New statutory tables follow the same shape.</p>
+<h4>Upsert pattern (all tables)</h4>
+<pre>CREATE PROCEDURE [dbo].[Insert_Employee]
+    @Id INT OUTPUT, @PayrollDepartmentId INT, @Code VARCHAR(20), @Name VARCHAR(200), /* ...all cols... */
+    @Status BIT, @LastModifiedBy INT, @LastModifiedAt DATETIME, @LastModifiedFromPlatform VARCHAR(MAX)
+AS
+BEGIN
+    IF @Id = 0
+    BEGIN
+        INSERT INTO [dbo].[Employee] (...) VALUES (...);
+        SET @Id = SCOPE_IDENTITY();
+    END
+    ELSE
+        UPDATE [dbo].[Employee] SET ... WHERE [Id] = @Id;
+    SELECT @Id AS Id;
+END</pre>
+<h4>Statutory rate resolver (used by the engine)</h4>
+<p>Picks the effective, most-specific rate for a scheme &mdash; a department/company override beats a state row, which beats the national row:</p>
+<pre>CREATE PROCEDURE [dbo].[Load_StatutoryRate_Effective]
+    @StatutorySchemeId INT, @StateUTId INT, @CompanyId INT, @PayrollDepartmentId INT, @OnDate DATETIME
+AS
+BEGIN
+    SELECT TOP 1 *
+    FROM [dbo].[StatutoryRate]
+    WHERE [StatutorySchemeId] = @StatutorySchemeId
+      AND [Status] = 1
+      AND @OnDate &gt;= [EffectiveFrom]
+      AND (@OnDate &lt;= [EffectiveTo] OR [EffectiveTo] IS NULL)
+      AND ([StateUTId] = @StateUTId OR [StateUTId] IS NULL)
+      AND ([CompanyId] = @CompanyId OR [CompanyId] IS NULL)
+      AND ([PayrollDepartmentId] = @PayrollDepartmentId OR [PayrollDepartmentId] IS NULL)
+    ORDER BY CASE WHEN [PayrollDepartmentId] IS NOT NULL THEN 0 ELSE 1 END,  -- dept override first
+             CASE WHEN [CompanyId] IS NOT NULL THEN 0 ELSE 1 END,            -- then company override
+             CASE WHEN [StateUTId] IS NOT NULL THEN 0 ELSE 1 END,            -- then state, then national
+             [EffectiveFrom] DESC;
+END</pre>
+<p>The matching <code>Load_StatutorySlab_Effective</code> picks a state's Profession-Tax band for the base amount (and gender/month only where a state needs it):</p>
+<pre>CREATE PROCEDURE [dbo].[Load_StatutorySlab_Effective]
+    @StatutorySchemeId INT, @StateUTId INT, @BaseAmount DECIMAL(18,2),
+    @Gender VARCHAR(10), @Month INT, @OnDate DATETIME
+AS
+BEGIN
+    SELECT TOP 1 *
+    FROM [dbo].[StatutorySlab]
+    WHERE [StatutorySchemeId] = @StatutorySchemeId
+      AND [StateUTId] = @StateUTId
+      AND [Status] = 1
+      AND @OnDate &gt;= [EffectiveFrom]
+      AND (@OnDate &lt;= [EffectiveTo] OR [EffectiveTo] IS NULL)
+      AND @BaseAmount &gt;= [FromAmount]
+      AND (@BaseAmount &lt;= [ToAmount] OR [ToAmount] IS NULL)
+      AND ([Gender] = @Gender OR [Gender] IS NULL)
+      AND ([ApplicableMonth] = @Month OR [ApplicableMonth] IS NULL)
+    ORDER BY CASE WHEN [ApplicableMonth] IS NOT NULL THEN 0 ELSE 1 END,
+             CASE WHEN [Gender] IS NOT NULL THEN 0 ELSE 1 END,
+             [EffectiveFrom] DESC;
+END</pre>
+<p>Key load procs: <code>Load_Attendance_By_Run</code>, <code>Load_Outstanding_Advances_By_Employee</code>, <code>Load_Payslip_Detail</code> (header + components + statutory).</p>
+
+<h2 id="models">8. C# models &amp; data access</h2>
+<p>In <code>StradaLibrary/Payroll/</code>, organized <code>Masters/</code>, <code>Transactions/</code>, <code>Calculation/</code>, <code>Data/</code>, <code>Exports/</code>. Models mirror columns (PascalCase, <code>decimal</code> for money/rates, nullable for optional). A column that is a lookup FK is stored as its <code>Id</code>, and the load procs <b>join</b> the lookup to also fill a read-only <code>*Code</code> that the engine switches on (e.g. <code>CalculatorTypeCode</code>, <code>ComponentTypeCode</code>, <code>CalculationTypeCode</code>). Example:</p>
+<pre>// StradaLibrary/Payroll/Masters/Models/StatutorySchemeModel.cs
+public class StatutorySchemeModel
+{
+    public int Id { get; set; }
+    public string Code { get; set; }
+    public string Name { get; set; }
+    public string CalculatorTypeCode { get; set; }     // joined: 'EPF'|'ESI'|'SLAB'|'FLAT' (engine switches on this)
+    public int CalculatorTypeId { get; set; }          // FK -> StatutoryCalculatorType
+    public bool HasEmployeeShare { get; set; }
+    public bool HasEmployerShare { get; set; }
+    public int PayFrequencyId { get; set; }            // FK -> PayFrequency
+    public string PayFrequencyCode { get; set; }       // joined: 'Monthly'|'HalfYearly'|'Yearly'
+    public bool IsEmployeeDeduction { get; set; }
+    public bool Status { get; set; }
+}
+
+// StradaLibrary/Payroll/Masters/Models/StatutoryRateModel.cs
+public class StatutoryRateModel
+{
+    public int Id { get; set; }
+    public int StatutorySchemeId { get; set; }
+    public int? StateUTId { get; set; }
+    public int? CompanyId { get; set; }
+    public int? PayrollDepartmentId { get; set; }
+    public decimal? EmployeeRate { get; set; }
+    public decimal? EmployerRate { get; set; }
+    public decimal? WageCeiling { get; set; }
+    public decimal? MinAmount { get; set; }
+    public decimal? MaxAmount { get; set; }
+    public decimal? FlatEmployeeAmount { get; set; }
+    public decimal? FlatEmployerAmount { get; set; }
+    public string ContributionMonths { get; set; }
+    public DateTime EffectiveFrom { get; set; }
+    public DateTime? EffectiveTo { get; set; }
+    public bool Status { get; set; }
+}</pre>
+<p>Data classes are static and follow <code>RouteData</code>: a one-line <code>Insert*</code> via <code>SqlDataAccess.LoadData&lt;int,dynamic&gt;</code>, soft-delete + audit-trail in a transaction. Reads use <code>CommonData.LoadTableData&lt;T&gt;</code> or dedicated load procs.</p>
+
+<h2 id="names">9. DatabaseNames &amp; PageRouteNames</h2>
+<pre>// StradaLibrary/DataAccess/DatabaseNames.cs  -> new class
+public static class PayrollNames
+{
+    // Lookups (fixed lists; seed-once, never shown)
+    public static string ComponentType => "ComponentType";
+    public static string CalculationType => "CalculationType";
+    public static string StatutoryCalculatorType => "StatutoryCalculatorType";
+    public static string PayFrequency => "PayFrequency";
+    public static string EmployeeType => "EmployeeType";
+    public static string Gender => "Gender";
+    public static string MaritalStatus => "MaritalStatus";
+    public static string PayrollRunType => "PayrollRunType";
+    public static string PayrollRunState => "PayrollRunState";
+    public static string ModeOfPayment => "ModeOfPayment";
+    // Masters
+    public static string PayrollDepartment => "PayrollDepartment";
+    public static string SalaryComponent => "SalaryComponent";
+    public static string Employee => "Employee";
+    public static string EmployeeSalaryComponent => "EmployeeSalaryComponent";
+    public static string StatutoryScheme => "StatutoryScheme";
+    public static string StatutoryRate => "StatutoryRate";
+    public static string StatutorySlab => "StatutorySlab";
+    public static string EmployeeStatutoryApplicability => "EmployeeStatutoryApplicability";
+    public static string CompanyStatutoryRegistration => "CompanyStatutoryRegistration";
+    public static string PayrollPeriod => "PayrollPeriod";
+    public static string LeaveBalance => "LeaveBalance";
+    // Transactions
+    public static string Attendance => "Attendance";
+    public static string Advance => "Advance";
+    public static string PayrollPayment => "PayrollPayment";
+    public static string PayrollReceipt => "PayrollReceipt";
+    // Run & results
+    public static string PayrollRun => "PayrollRun";
+    public static string Payslip => "Payslip";
+    public static string PayslipComponent => "PayslipComponent";
+    public static string PayslipStatutory => "PayslipStatutory";
+    public static string AdvanceAdjustment => "AdvanceAdjustment";
+    public static string PayslipSummary => "PayslipSummary";
+    public static string PayrollPostingProfile => "PayrollPostingProfile";
+    // Resolvers
+    public static string LoadStatutoryRateEffective => "Load_StatutoryRate_Effective";
+    public static string LoadStatutorySlabEffective => "Load_StatutorySlab_Effective";
+    // (+ Insert_* and *_Overview names per table, following existing convention)
+}</pre>
+<pre>// StradaLibrary/Common/PageRouteNames.cs  -> #region Payroll
+public const string PayrollEmployee = "/payroll/employee";
+public const string PayrollDepartment = "/payroll/department";
+public const string PayrollSalaryComponent = "/payroll/salary-component";
+public const string PayrollStatutoryScheme = "/payroll/statutory-scheme";
+public const string PayrollStatutoryRate = "/payroll/statutory-rate";
+public const string PayrollPeriod = "/payroll/period";
+public const string PayrollAttendance = "/payroll/attendance";
+public const string PayrollAdvance = "/payroll/advance";
+public const string PayrollRun = "/payroll/run";              // calculate/approve/post/pay
+public const string PayrollPayslipReport = "/payroll/reports/payslip";
+public const string PayrollSalaryRegister = "/payroll/reports/salary-register";
+public const string PayrollEPFReport = "/payroll/reports/epf";
+public const string PayrollESIReport = "/payroll/reports/esi";
+public const string PayrollPTReport = "/payroll/reports/profession-tax";</pre>
+
+
+<h2 id="engine">10. Calculation engine (standards-compliant)</h2>
+<p>A pure static method in <code>StradaLibrary/Payroll/Calculation/PayrollCalculationEngine.cs</code> &mdash; no DB calls, fully unit-testable. It takes the employee, attendance, component definitions+rates, applicable schemes and the effective statutory rates, and returns the payslip rows.</p>
+
+<h3>10.1 Order of operations (the standard sequence)</h3>
+<ol class="tight">
+<li>Compute <b>payable days</b> = <code>PeriodDays &minus; LossOfPayDays</code>.</li>
+<li>Compute each <b>earning</b> by its <code>CalculationType</code> (Percentage components resolve after their reference).</li>
+<li>Sum <b>gross earnings</b>; derive the per-scheme bases (EPF base, ESI base, PT base) from component flags.</li>
+<li>Run each applicable <b>statutory calculator</b> (§11), producing <code>PayslipStatutory</code> rows.</li>
+<li><b>Deductions</b> = employee-side statutory + deduction-type components + income tax + advance instalments.</li>
+<li><b>Net</b> = gross &minus; deductions + other adjustment; optionally round to the rupee.</li>
+</ol>
+
+<h3>10.2 Core code</h3>
+<pre>public static PayslipResult Calculate(PayslipInput in)
+{
+    var r = new PayslipResult();
+    decimal periodDays  = in.Period.NumberOfDays;
+    decimal payableDays = Math.Max(0, periodDays - in.Attendance.LossOfPayDays);
+    decimal factor      = periodDays &gt; 0 ? payableDays / periodDays : 0;
+    r.PayableDays = payableDays;
+
+    // ---- Earnings (Percentage components computed after slot-1 base exists) ----
+    decimal gross = 0, epfBase = 0, esiBase = 0, ptBase = 0;
+    var amountBySlot = new Dictionary&lt;int, decimal&gt;();
+
+    foreach (var c in in.Components.OrderBy(c =&gt; c.SlotNo))
+    {
+        decimal rate = in.RateFor(c.Id);                    // employee rate or component default
+        decimal amt = c.CalculationTypeCode switch
+        {
+            "Flat"        =&gt; rate,
+            "FlatProRata" =&gt; Math.Round(rate * factor, 0, MidpointRounding.AwayFromZero),
+            "PerDay"      =&gt; Math.Round(rate * payableDays, 0, MidpointRounding.AwayFromZero),
+            "PerUnit"     =&gt; Math.Round(rate * in.UnitsFor(c.Code), 0, MidpointRounding.AwayFromZero),
+            "Percentage"  =&gt; Math.Round(amountBySlot[c.ReferenceSlotNo.Value] * rate / 100m, 0, MidpointRounding.AwayFromZero),
+            _             =&gt; 0m
+        };
+        amountBySlot[c.SlotNo] = amt;
+        r.Components.Add(new(c.Id, c.SlotNo, c.Name, c.ComponentTypeId, rate, amt));
+
+        if (c.ComponentTypeCode == "Earning" &amp;&amp; c.IsPartOfGross) gross += amt;
+        else if (c.ComponentTypeCode == "Deduction") r.OtherDeductions += amt;
+        if (c.IsPartOfEPFBase)  epfBase += amt;
+        if (c.IsPartOfESIBase)  esiBase += amt;
+        if (c.IsPartOfPTaxBase) ptBase  += amt;
+    }
+    r.TotalEarnings = gross;
+
+    // ---- Statutory (each calculator reads the effective StatutoryRate rows) ----
+    var ctx = new StatutoryContext(in, gross, epfBase, esiBase, ptBase, payableDays);
+    foreach (var scheme in in.ApplicableSchemes)
+    {
+        var line = StatutoryCalculatorFactory.For(scheme.CalculatorTypeCode).Calculate(scheme, ctx);
+        if (line is null) continue;                          // not applicable this month
+        r.Statutory.Add(line);
+        if (scheme.IsEmployeeDeduction) r.TotalEmployeeStatutory += line.EmployeeAmount;
+        r.TotalEmployerCost += line.EmployerAmount;
+    }
+
+    // ---- Income tax (manual), advance recovery, totals ----
+    r.IncomeTax = in.Attendance.IncomeTaxDeduction;
+    foreach (var a in in.OutstandingAdvances.Where(a =&gt; !a.SuspendDeduction))
+    {
+        decimal rec = Math.Min(a.InstalmentAmount, a.AdvanceAmount - a.TotalAdjusted);
+        if (rec &gt; 0) { r.AdvanceDeduction += rec; r.Adjustments.Add(new(a.Id, rec)); }
+    }
+    r.TotalDeductions = r.TotalEmployeeStatutory + r.OtherDeductions + r.IncomeTax + r.AdvanceDeduction;
+
+    decimal net = gross - r.TotalDeductions + in.Attendance.OtherAdjustment;
+    if (in.Department.RoundNetPayToRupee)
+    {
+        decimal rounded = Math.Round(net, 0, MidpointRounding.AwayFromZero);
+        r.OtherAdjustment = in.Attendance.OtherAdjustment + (rounded - net);
+        net = rounded;
+    }
+    else r.OtherAdjustment = in.Attendance.OtherAdjustment;
+    r.NetPay = net;
+    return r;
+}</pre>
+<div class="box warn"><b>Net-pay rule (important):</b> only <b>employee-side</b> statutory amounts (EPF employee 12%, ESI employee 0.75%, PT, LWF employee) reduce net pay. Employer EPF/EPS/EDLI/admin and employer ESI are <b>employer cost</b> (CTC) &mdash; stored on the payslip and posted to FA, but never subtracted from the employee's salary.</div>
+
+
+<h2 id="statutory">11. Statutory calculators (read from StatutoryRate)</h2>
+<p>Each <code>StatutoryCalculatorType</code> (its <code>Code</code>) maps to one strategy implementing <code>IStatutoryCalculator</code>. The strategy reads the effective <code>StatutoryRate</code>/<code>StatutorySlab</code> row(s) from the context and returns a <code>PayslipStatutory</code> line. Adding a scheme that fits an existing type needs <b>no new code</b> &mdash; only data. The context also exposes the employee's <b>state</b>, <b>gender</b> and the period <b>month</b> (derived from the company, employee and period), so state-specific schemes like PT and LWF resolve with nothing hardcoded.</p>
+<pre>public interface IStatutoryCalculator
+{
+    PayslipStatutoryLine Calculate(StatutorySchemeModel scheme, StatutoryContext ctx);
+}</pre>
+
+<h3>11.1 EPF family (key <code>EPF</code>) &mdash; handles EPF, EPS, EDLI, EPF_ADMIN</h3>
+<p>All four share the EPF base (Basic+DA) capped at the wage ceiling. The single calculator branches on the scheme code:</p>
+<pre>var rate = ctx.Rate(scheme.Id);                       // effective StatutoryRate row
+decimal cappedBase = rate.WageCeiling is decimal c ? Math.Min(ctx.EpfBase, c) : ctx.EpfBase;
+
+decimal emp = 0, employer = 0;
+switch (scheme.Code)
+{
+    case "EPF":                                       // employee 12% + employer 3.67%
+        emp      = Round0(cappedBase * (ctx.OverrideRate(scheme.Id) ?? rate.EmployeeRate.Value) / 100);
+        employer = Round0(cappedBase * rate.EmployerRate.Value / 100);
+        break;
+    case "EPS":                                       // employer 8.33%, capped (max 1250)
+        employer = Round0(cappedBase * rate.EmployerRate.Value / 100);
+        if (rate.MaxAmount is decimal m) employer = Math.Min(employer, m);
+        break;
+    case "EDLI":                                      // employer 0.50% (max 75)
+        employer = Round0(cappedBase * rate.EmployerRate.Value / 100);
+        if (rate.MaxAmount is decimal me) employer = Math.Min(employer, me);
+        break;
+    case "EPF_ADMIN":                                 // employer 0.50% (establishment min applied in summary)
+        employer = Round0(cappedBase * rate.EmployerRate.Value / 100);
+        break;
+}
+return new PayslipStatutoryLine(scheme, cappedBase, emp, employer);</pre>
+<div class="box info">The EPF-admin <b>minimum ₹500</b> is an establishment-level floor, not per employee &mdash; applied once when building <code>PayslipSummary</code> (take <code>MAX(sum of per-employee admin, 500)</code>).</div>
+
+<h3>11.2 ESI (key <code>ESI</code>)</h3>
+<pre>if (ctx.Gross &gt; rate.WageCeiling) return null;        // not applicable when gross &gt; 21000
+decimal emp      = Math.Ceiling(ctx.Gross * rate.EmployeeRate.Value / 100);   // round UP to rupee
+decimal employer = Math.Ceiling(ctx.Gross * rate.EmployerRate.Value / 100);
+return new PayslipStatutoryLine(scheme, ctx.Gross, emp, employer);</pre>
+<p>ESI eligibility is normally frozen for the contribution period (Apr&ndash;Sep, Oct&ndash;Mar) even if wages cross the limit mid-period; handle that by checking eligibility at the period's contribution-period start (a flag carried on the context).</p>
+
+<h3>11.3 Profession Tax (key <code>SLAB</code>)</h3>
+<pre>// slab resolved for the employee's state (and gender/month only where a state needs it)
+var slab = ctx.Slab(scheme.Id, ctx.StateUTId, ctx.PtBase, ctx.Gender, ctx.Month);
+decimal emp = slab?.Amount ?? 0;
+return new PayslipStatutoryLine(scheme, ctx.PtBase, emp, 0);   // PT is employee-only; a state with no PT -> 0</pre>
+
+<h3>11.4 LWF (key <code>FLAT</code>)</h3>
+<pre>// contribution months come from the rate row (e.g. '6,12'), so each state's schedule is data
+if (!ctx.IsContributionMonth(rate)) return null;
+return new PayslipStatutoryLine(scheme, 0, rate.FlatEmployeeAmount ?? 0, rate.FlatEmployerAmount ?? 0);</pre>
+
+<div class="box ok"><b>Why this is simpler than the legacy code.</b> The old system had nine near-identical <code>wf_calc_comp_*</code> functions plus hardcoded slabs and a hardcoded 2002 ESI date. Here there are <b>four</b> small calculators, the slabs and rates are data, and a new scheme like NPS that is &ldquo;percentage of base&rdquo; reuses an existing key with zero new code.</div>
+
+
+<h2 id="worked">12. Worked example (full payslip, real numbers)</h2>
+<p>One employee, one month &mdash; traced end to end so the arithmetic can be verified against the rules above.</p>
+<div class="box info">
+<b>Inputs.</b> Period: May 2026, <b>31 calendar days</b> &mdash; but department uses a 30-day divisor convention, so <code>NumberOfDays = 30</code>. Attendance: <b>2 LOP days</b> &rarr; <b>payable days = 28</b>, factor = 28/30.<br>
+Salary structure: Basic <code>FlatProRata</code> ₹12,000 (EPF+ESI+PT base); HRA <code>Percentage</code> 40% of Basic (ESI+PT base); Conveyance <code>FlatProRata</code> ₹1,600 (ESI+PT base).<br>
+Applicable schemes: EPF, EPS, EDLI, EPF_ADMIN, ESI, PT. LWF not due (not June/December). Income tax: ₹0. No advance.
+</div>
+
+<h3>12.1 Earnings</h3>
+<table><thead><tr><th>Component</th><th>Type</th><th>Full rate</th><th>Calculation</th><th class="right">Amount</th></tr></thead><tbody>
+<tr><td>Basic</td><td>FlatProRata</td><td>12,000</td><td>round(12000 &times; 28/30)</td><td class="right">11,200</td></tr>
+<tr><td>HRA</td><td>Percentage (40% of Basic)</td><td>40%</td><td>round(11,200 &times; 40/100)</td><td class="right">4,480</td></tr>
+<tr><td>Conveyance</td><td>FlatProRata</td><td>1,600</td><td>round(1600 &times; 28/30)</td><td class="right">1,493</td></tr>
+<tr><td colspan="4"><b>Gross earnings</b></td><td class="right"><b>17,173</b></td></tr>
+</tbody></table>
+
+<h3>12.2 Statutory (PayslipStatutory rows)</h3>
+<p>EPF base = Basic only = ₹11,200 (below the ₹15,000 ceiling, so used as-is). ESI base = full gross ₹17,173 (≤ ₹21,000, so ESI applies). PT base = gross ₹17,173 &rarr; WB slab ₹15,001&ndash;25,000 = ₹130.</p>
+<table><thead><tr><th>Scheme</th><th>Base</th><th>Rate</th><th class="right">Employee</th><th class="right">Employer</th><th>Note</th></tr></thead><tbody>
+<tr><td>EPF</td><td>11,200</td><td>12% / 3.67%</td><td class="right">1,344</td><td class="right">411</td><td>employee 12%; employer 3.67%</td></tr>
+<tr><td>EPS</td><td>11,200</td><td>8.33%</td><td class="right">&mdash;</td><td class="right">933</td><td>employer only (&le; ₹1,250 cap)</td></tr>
+<tr><td>EDLI</td><td>11,200</td><td>0.50%</td><td class="right">&mdash;</td><td class="right">56</td><td>employer only (&le; ₹75)</td></tr>
+<tr><td>EPF Admin</td><td>11,200</td><td>0.50%</td><td class="right">&mdash;</td><td class="right">56</td><td>establishment min ₹500 applied in summary</td></tr>
+<tr><td>ESI</td><td>17,173</td><td>0.75% / 3.25%</td><td class="right">129</td><td class="right">559</td><td>each rounded <b>up</b> (128.80&rarr;129, 558.12&rarr;559)</td></tr>
+<tr><td>PT</td><td>17,173</td><td>slab</td><td class="right">130</td><td class="right">&mdash;</td><td>employee only</td></tr>
+</tbody></table>
+
+<h3>12.3 Net pay &amp; employer cost</h3>
+<div class="cols">
+<div class="box">
+<b>Employee deductions</b>
+<pre>EPF (employee)   1,344
+ESI (employee)     129
+Profession Tax     130
+Income Tax           0
+LWF                  0
+Advance              0
+                ──────
+Total deductions 1,603
+
+Gross           17,173
+&minus; Deductions    1,603
+                ──────
+NET PAY         15,570</pre>
+</div>
+<div class="box ok">
+<b>Employer cost (CTC add-on, not deducted)</b>
+<pre>EPF (employer)     411
+EPS                933
+EDLI                56
+EPF Admin           56
+ESI (employer)     559
+                ──────
+Employer total   2,015
+
+Total cost = 17,173 + 2,015 = 19,188</pre>
+</div>
+</div>
+<div class="box info">Net pay <b>₹15,570</b>. The six statutory lines are stored as six <code>PayslipStatutory</code> rows; the three earnings as three <code>PayslipComponent</code> rows; the payslip header stores the totals. If the firm later adds NPS, it appears as a seventh statutory row with no schema or payslip-table change.</div>
+
+
+<h2 id="fa">13. Financial Accounting integration</h2>
+<p>When a run is <b>Posted</b>, one balanced journal voucher is created via the existing <code>FinancialAccountingData</code>, inside the same <code>SqlDataAccessTransaction</code> that writes the payslips &mdash; so payroll and its voucher commit or roll back together. Accounts come from <code>PayrollPostingProfile</code>, so non-developers can remap them.</p>
+<h3>13.1 The salary voucher (per run)</h3>
+<table><thead><tr><th>Leg</th><th>PostingProfile key</th><th>Dr/Cr</th><th>Amount</th></tr></thead><tbody>
+<tr><td>Salary &amp; wages expense</td><td class="mono">SALARY_EXPENSE</td><td>Dr</td><td>gross earnings + employer statutory</td></tr>
+<tr><td>Net pay owed to staff</td><td class="mono">SALARY_PAYABLE</td><td>Cr</td><td>total net pay</td></tr>
+<tr><td>PF payable</td><td class="mono">STATUTORY_PAYABLE:EPF</td><td>Cr</td><td>EPF emp+employer + EPS + EDLI + admin</td></tr>
+<tr><td>ESI payable</td><td class="mono">STATUTORY_PAYABLE:ESI</td><td>Cr</td><td>ESI emp + employer</td></tr>
+<tr><td>PT payable</td><td class="mono">STATUTORY_PAYABLE:PT</td><td>Cr</td><td>PT total</td></tr>
+<tr><td>TDS payable</td><td class="mono">STATUTORY_PAYABLE:TDS</td><td>Cr</td><td>income tax total</td></tr>
+<tr><td>Advance recovered</td><td class="mono">ADVANCE_RECOVERED</td><td>Cr</td><td>advance instalments</td></tr>
+</tbody></table>
+<p>Debits (expense incl. employer cost) = Credits (net + every statutory liability + advance recovery), so the voucher always balances. Each statutory scheme maps to its payable ledger by the <code>STATUTORY_PAYABLE:&lt;Code&gt;</code> key &mdash; a new scheme just needs one profile row.</p>
+<pre>// StradaLibrary/Payroll/Data/PayrollFAPostingData.cs (shape)
+internal static async Task&lt;int&gt; PostRunVoucher(PayrollRunModel run, PayslipSummaryModel sum,
+    List&lt;PayrollPostingProfileModel&gt; profiles, int userId, string platform, SqlDataAccessTransaction tx)
+{
+    int faId = await FinancialAccountingData.InsertFinancialAccounting(BuildHeader(run, userId, platform), tx);
+    foreach (var leg in BuildLegs(sum, profiles))      // Dr expense; Cr payables + net + advance
+        await FinancialAccountingData.InsertFinancialAccountingLedger(leg.With(faId), tx);
+    return faId;   // stored on PayrollRun.FAVoucherId
+}</pre>
+<p>Advance issue, salary payment and receipt post their own small vouchers the same way (mirroring the Fleet modules). Cancelling a posted run reverses its voucher in one transaction.</p>
+
+<h2 id="pages">14. Blazor pages</h2>
+<p>In <code>Strada.Shared/Pages/Payroll/</code>, all gated by a new <code>UserRoles.Payroll</code> (and <code>UserRoles.PayrollApprover</code> for approve/post). Standard partial-class + Syncfusion + <code>OnAfterRenderAsync</code> pattern.</p>
+<table><thead><tr><th>Group</th><th>Page</th><th>Notes</th></tr></thead><tbody>
+<tr><td rowspan="6">Masters</td><td>EmployeePage</td><td>CRUD + salary structure (EmployeeSalaryComponent grid) + statutory applicability grid</td></tr>
+<tr><td>PayrollDepartmentPage</td><td>slim master</td></tr>
+<tr><td>SalaryComponentPage</td><td>define components + CalculationType + base flags</td></tr>
+<tr><td>StatutorySchemePage</td><td>list schemes (rarely changed)</td></tr>
+<tr><td>StatutoryRatePage</td><td>effective-dated rates + slabs &mdash; the &ldquo;update rates each year&rdquo; screen</td></tr>
+<tr><td>PayrollPeriodPage</td><td>open monthly periods</td></tr>
+<tr><td rowspan="2">Transactions</td><td>AttendancePage</td><td><b>bulk grid</b>: pick department+period, edit all employees' present/LOP/units at once</td></tr>
+<tr><td>AdvancePage</td><td>issue advance (posts FA voucher)</td></tr>
+<tr><td rowspan="2">Run</td><td>PayrollRunPage</td><td>the workspace: Retrieve &rarr; <b>Calculate</b> &rarr; review grid &rarr; <b>Approve</b> &rarr; <b>Post</b> &rarr; <b>Pay</b>; shows run State and totals</td></tr>
+<tr><td>PayslipDetailDialog</td><td>per-employee breakdown (components + statutory rows)</td></tr>
+<tr><td>Reports</td><td>see §15</td><td>read-only</td></tr>
+</tbody></table>
+<div class="box info"><b>PayrollRunPage</b> is the heart of the UI &mdash; it replaces the legacy &ldquo;pay-slip generation&rdquo; window and drives the state machine. Calculation runs server-side over all employees in the department for the period; results show in an editable-once-then-locked grid.</div>
+
+
+<h2 id="reports">15. Reports &amp; statutory exports</h2>
+<p>Reports are read-only views over <code>Payslip</code> + <code>PayslipComponent</code> + <code>PayslipStatutory</code>. Because statutory results are rows, a report can pivot any scheme without code changes. Built with the existing Syncfusion PDF/Excel utilities.</p>
+<table><thead><tr><th>Report / export</th><th>Source</th><th>Output</th></tr></thead><tbody>
+<tr><td>Pay slip (per employee)</td><td>Payslip + child rows</td><td>PDF, emailed via <code>MailUtils</code></td></tr>
+<tr><td>Salary register</td><td>run payslips pivoted</td><td>Excel/PDF</td></tr>
+<tr><td>EPF ECR</td><td>PayslipStatutory EPF/EPS/EDLI + UAN</td><td>EPFO text file</td></tr>
+<tr><td>ESIC contribution</td><td>PayslipStatutory ESI + IP no</td><td>ESIC CSV</td></tr>
+<tr><td>Profession Tax return</td><td>PayslipStatutory PT</td><td>WB CSV/PDF</td></tr>
+<tr><td>Form 24Q / Form 16</td><td>IncomeTax + annual aggregate</td><td>FVU text / PDF</td></tr>
+<tr><td>Bank salary file</td><td>PayrollPayment + Employee bank</td><td>bank NEFT CSV</td></tr>
+</tbody></table>
+<pre>// pluggable, so yearly format tweaks stay isolated
+public interface IStatutoryExport { string Name { get; } byte[] Generate(StatutoryExportContext ctx); }
+// EpfEcrExport, EsicExport, ProfessionTaxExport, BankFileExport : IStatutoryExport</pre>
+
+<h2 id="security">16. Security &amp; PII</h2>
+<p>Payroll holds Strada's most sensitive data. Under India's DPDP Act 2023 this must be protected.</p>
+<table><thead><tr><th>Risk</th><th>Mitigation</th></tr></thead><tbody>
+<tr><td>Aadhaar / bank account in clear text</td><td>SQL Server <b>Always Encrypted</b> on <code>AadhaarNumber</code>, <code>BankAccountNo</code></td></tr>
+<tr><td>PII / salary visible to all</td><td>Gate every page behind <code>UserRoles.Payroll</code>; mask Aadhaar/account in grids (show last 4)</td></tr>
+<tr><td>Who changed a salary / approved a run</td><td>Reuse <code>AuditTrailData</code> for rate changes, approvals, postings (actor + timestamp)</td></tr>
+<tr><td>Segregation of duties</td><td>Calculator role &ne; approver role &mdash; enforced by the run state machine</td></tr>
+<tr><td>PII in logs</td><td>Never log Aadhaar/account/amounts; reference employees by Id/Code</td></tr>
+</tbody></table>
+
+<h2 id="migration">17. Data migration (legacy &rarr; Strada)</h2>
+<ol class="tight">
+<li>Unzip <code>FASMANGO.DB</code>; connect via SQL Anywhere ODBC; dump the 12 legacy tables to a staging schema.</li>
+<li>Map <code>_ix decimal(0)</code> &rarr; <code>INT IDENTITY</code> (keep an old&rarr;new crosswalk); <code>char</code>&rarr;<code>varchar</code> (trim); <code>'Y'/'N'</code>&rarr;<code>BIT</code>.</li>
+<li><b>Components:</b> the 9 <code>comp_n</code> columns &rarr; <code>SalaryComponent</code> + <code>EmployeeSalaryComponent</code> rows.</li>
+<li><b>Statutory:</b> the <code>df_py_codept</code> rate columns &rarr; <code>StatutoryRate</code> rows; the per-employee <code>*_ded_flg</code> &rarr; <code>EmployeeStatutoryApplicability</code> rows.</li>
+<li><b>History (optional):</b> load closed <code>ti_py_pay</code> as historical <code>Payslip</code> + child rows for reporting continuity.</li>
+<li><b>Reconcile</b> control totals (net pay, head-count, EPF/ESI totals) per period, old vs new, before go-live.</li>
+</ol>
+<div class="box ok"><b>Golden-master tests:</b> feed real historical attendance+config into the new engine and assert it reproduces the legacy <code>ti_py_pay</code> net pay to the rupee. This is the safety net that proves the rewrite is correct &mdash; build it first, in a new <code>StradaLibrary.Tests</code> (xUnit) project.</div>
+
+
+<h2 id="phases">18. Phased implementation plan</h2>
+<table><thead><tr><th>Phase</th><th>Deliverables</th></tr></thead><tbody>
+<tr><td><span class="phase-badge p1">P1</span> Masters &amp; statutory config</td><td>DB folder; PayrollDepartment, SalaryComponent, Employee, EmployeeSalaryComponent, PayrollPeriod, LeaveBalance; <b>StatutoryScheme/Rate/Slab, EmployeeStatutoryApplicability, CompanyStatutoryRegistration</b>; seed current rates &amp; WB PT slabs; PayrollNames + routes; master pages. <i>Outcome: an employee with a full salary structure and statutory setup, all data-driven.</i></td></tr>
+<tr><td><span class="phase-badge p2">P2</span> Transactions</td><td>Attendance (bulk), Advance (+FA), PayrollPayment/Receipt (+FA). <i>Outcome: capture a month's attendance and advances.</i></td></tr>
+<tr><td><span class="phase-badge p3">P3</span> Run, engine &amp; calculators</td><td>PayrollRun + state machine; Payslip/PayslipComponent/PayslipStatutory/AdvanceAdjustment/PayslipSummary; <b>PayrollCalculationEngine</b> + four calculators reading StatutoryRate; FA posting; <b>golden-master tests first</b>; PayrollRunPage. <i>Outcome: calculate &rarr; approve &rarr; post a correct, balanced payroll.</i></td></tr>
+<tr><td><span class="phase-badge p4">P4</span> Reports &amp; filings</td><td>Payslip PDF + email, salary register, EPF ECR, ESIC, PT, bank file; dashboard tiles. <i>Outcome: statutory compliance &amp; disbursement.</i></td></tr>
+</tbody></table>
+<p>Dependency order within P1: Company/Ledger/FY (exist) &rarr; PayrollDepartment &rarr; SalaryComponent + StatutoryScheme/Rate/Slab &rarr; Employee &rarr; EmployeeSalaryComponent + EmployeeStatutoryApplicability.</p>
+
+<h2 id="industry">19. How this matches the big platforms</h2>
+<p>The normalized model is exactly how mature payroll engines are built &mdash; confirming the direction:</p>
+<table><thead><tr><th>Platform</th><th>Their concept</th><th>Our equivalent</th></tr></thead><tbody>
+<tr><td>SAP HCM</td><td>Wage types (primary entered + technical computed); rates in config tables; retro via deltas</td><td>SalaryComponent + PayslipStatutory rows; StatutoryRate; forward arrears</td></tr>
+<tr><td>Oracle/PeopleSoft</td><td>Elements + formulas + effective-dated rates</td><td>Components + CalculationType + effective-dated StatutoryRate/EmployeeSalaryComponent</td></tr>
+<tr><td>Zoho Payroll</td><td>Earning/deduction components with flags; pay run draft&rarr;approved; posts to Zoho Books (expense + liability)</td><td>SalaryComponent flags; PayrollRun states; FA voucher via PayrollPostingProfile</td></tr>
+<tr><td>greytHR / Keka</td><td>Pay groups; multi-state statutory; audit + record locking</td><td>PayrollDepartment; effective-dated multi-scope StatutoryRate; audit + run lock</td></tr>
+</tbody></table>
+<p>The decisive parallel: like Zoho&rarr;Books, Strada payroll posts into Strada's own accounting module &mdash; and like all of them, <b>statutory items are data rows, not code or columns</b>. We deliberately skip their heavy machinery (SAP PCR/schema interpreter, cluster tables, formula DSLs) &mdash; the scoped, effective-dated data model already gives a pan-India, multi-company, multi-state product without it.</p>
+
+<h2 id="verdict">20. Final verdict</h2>
+<div class="box ok">
+<b>This plan is coherent, standards-compliant, and simpler where it counts.</b> Normalizing statutory configuration into <code>StatutoryScheme</code> / <code>StatutoryRate</code> / <code>StatutorySlab</code> / <code>EmployeeStatutoryApplicability</code> &mdash; and storing results as <code>PayslipComponent</code> + <code>PayslipStatutory</code> rows &mdash; removes the two rigidities that would otherwise force schema changes (new scheme, new component) and matches how SAP, Oracle and Zoho are built.
+<br><br>
+The calculations were re-derived against current (2025&ndash;26) statutory rules and traced in a full worked example (net ₹15,570, employer cost ₹2,015 on ₹17,173 gross). The engine is a small, pure, testable function; the four calculators read their numbers from data; the payroll run is immutable once posted and balanced into FA.
+<br><br>
+<b>Non-negotiables when building:</b> employee vs employer split (employer EPS/EDLI/admin/ESI never reduce net pay); <code>DECIMAL</code> not <code>MONEY</code>; ESI rounds up; EPF base capped at the ceiling; rates resolved by effective date; golden-master tests against the legacy data first. Build P1&rarr;P4 in order and the module will be correct, compliant, and easy to keep current as the law changes.
+</div>
+
+<h2 id="sampledata">21. Sample dataset &mdash; the whole app in one example</h2>
+<p>This section is the fastest way to understand Strada Payroll: <b>one realistic company-month, every table filled with data that fits together, explained in plain words</b>. Read it top to bottom and you have seen the whole app. Employee <b>EMP001 (Rakesh Sharma)</b> is the same person from §12 (net <b>₹15,570</b>). All Ids are illustrative.</p>
+<div class="box info"><b>The whole app in plain words.</b>
+<ol class="tight">
+<li><b>Set up once:</b> create a <i>company</i> and a <i>salary group</i> (PayrollDepartment), list the <i>pay parts</i> (SalaryComponent: Basic, HRA&hellip;), and add <i>employees</i> with their amounts.</li>
+<li><b>Statutory is data:</b> the government schemes (PF, ESI, Profession Tax, LWF) and their rates already ship with the product &mdash; national rates for all India, state rates per state &mdash; so you only tick which apply to each employee.</li>
+<li><b>Every month:</b> open a <i>period</i> (e.g. May 2026), enter <i>attendance</i> (who lost how many days), then press <b>Calculate</b>. The engine builds each <i>payslip</i> &mdash; earnings, statutory deductions, advance instalments &mdash; and the net pay.</li>
+<li><b>Approve &rarr; Post &rarr; Pay:</b> a manager approves and posts (which writes one balanced <i>accounting voucher</i> into Strada's books), then salaries are paid and recorded.</li>
+</ol>
+That is the entire cycle &mdash; everything below is just these steps with real numbers.</div>
+<div class="box info"><b>Our example.</b> Company <i>Ashok Roadlines</i> (in West Bengal), salary group <i>Head Office</i>, three employees, month <b>May 2026</b> (paid on a 30-day basis). Sunil has a running loan (advance) and some income tax; Rakesh lost 2 days, Mamata 1. We calculate, approve, post to accounts, and pay.</div>
+
+<div class="box ok"><b>Plain-English glossary &mdash; read this first.</b> The app uses short government names; here is every one in simple words.
+<ul class="tight">
+<li><b>Gross</b> = everything earned before any cut. <b>Deduction</b> = money cut from salary. <b>Net pay / take-home</b> = what the employee actually gets (gross &minus; deductions). <b>Employer cost</b> = extra the company pays <i>on top</i> of salary &mdash; it never reduces take-home.</li>
+<li><b>Basic</b> = core salary. <b>HRA</b> = House Rent Allowance. <b>Conveyance</b> = travel allowance. <b>Tiffin</b> = food allowance. (These are just names of "pay parts".)</li>
+<li><b>EPF/PF</b> = Provident Fund, a retirement saving (12% cut from employee, company adds its share). <b>EPS</b> = the pension part of PF (company-only). <b>EDLI</b> = a small PF life-insurance (company-only). <b>EPF Admin</b> = PF processing fee (company-only).</li>
+<li><b>ESI</b> = Employees' State Insurance, medical cover for lower-paid staff (only if monthly gross &le; ₹21,000). <b>PT</b> = Profession Tax, a small state tax on salary (varies by state). <b>LWF</b> = Labour Welfare Fund, a tiny state contribution a few times a year. <b>TDS / Income Tax</b> = income tax held back from salary.</li>
+<li><b>LOP</b> = Loss Of Pay = unpaid absent days. <b>Advance</b> = a loan to the employee, recovered in monthly instalments. <b>UAN</b> = employee's PF number; <b>ESI IP no.</b> = employee's ESI number; <b>PAN</b> = tax ID; <b>IFSC</b> = bank-branch code.</li>
+<li><b>RoundNetPayToRupee</b> = a yes/no setting: if yes, take-home is rounded to whole rupees (₹15,569.60 &rarr; ₹15,570) and the few paise are recorded as a tiny adjustment.</li>
+<li><b>WageCeiling</b> = the most salary a rate is charged on (PF is figured on at most ₹15,000). <b>Min/Max</b> = a floor/cap on the resulting amount. <b>EffectiveFrom</b> = the date a rate starts (old payslips keep using the old rate).</li>
+<li><b>CalculatorType</b> = which built-in formula a scheme uses (you never change it). <b>Scope</b> = where a rate applies: <i>National</i> (all India), <i>State</i> (one state), or an override for one company.</li>
+</ul></div>
+
+<div class="box info"><b>How to read the tables below.</b>
+<ul class="tight">
+<li>A <b>1 means yes, 0 means no</b> &mdash; these are on/off switches on the screen.</li>
+<li>A value with <b>slashes</b> (e.g. <code>1 / 1 / 1</code> or <code>3 / 15</code>) is just several columns squeezed into one cell to save space; each part is its own field, explained where it appears. <b>You do not type slashes</b> &mdash; on the screen each is a separate box/toggle.</li>
+<li>A <b>middot</b> (e.g. <code>BASIC 12000 &middot; HRA 40</code>) separates what are really <b>separate rows</b>.</li>
+<li>Where a column is a <b>fixed list</b> (Type, CalculationType, RunType, State, Mode of payment&hellip;), the tables show the readable <b>name</b>, but the database stores that list's <b>Id</b> &mdash; the small lookup tables are in §4.12, and the ones used here are listed first in 21.2.</li>
+<li>Three kinds of data: things that <b>ship with the product</b> (the schemes &amp; rates), things <b>you type in</b> (employees, amounts, attendance), and things the app <b>calculates for you</b> (the payslips &amp; the accounting entry).</li>
+</ul></div>
+
+<h3>21.1 Existing records reused</h3>
+<p>Payroll reuses what Strada already has &mdash; it does not re-enter the company, the state list, the financial year, the users, or the ledger accounts.</p>
+<table><thead><tr><th>Table</th><th>Id</th><th>Key values</th></tr></thead><tbody>
+<tr><td>StateUT</td><td>19</td><td>West Bengal</td></tr>
+<tr><td>Company</td><td>1</td><td>Ashok Roadlines, Code ARL, StateUTId 19</td></tr>
+<tr><td>FinancialYear</td><td>4</td><td>2026-2027 (01-Apr-2026 &rarr; 31-Mar-2027)</td></tr>
+<tr><td>User</td><td>5 / 6</td><td>payroll.operator (calculates) / finance.manager (approves + posts)</td></tr>
+</tbody></table>
+<table><thead><tr><th>Ledger Id</th><th>Name</th><th>Use</th></tr></thead><tbody>
+<tr><td>101</td><td>Salary &amp; Wages A/c</td><td>expense (Dr)</td></tr>
+<tr><td>102</td><td>Salary Payable A/c</td><td>net-pay liability (Cr)</td></tr>
+<tr><td>103 / 104 / 105 / 106</td><td>EPF / ESI / Profession Tax / TDS Payable A/c</td><td>statutory liabilities (Cr)</td></tr>
+<tr><td>107</td><td>Staff Advance A/c</td><td>advance asset / recovery</td></tr>
+<tr><td>110</td><td>HDFC Bank &mdash; Current A/c</td><td>disbursement bank</td></tr>
+<tr><td>201&ndash;203</td><td>Rakesh / Sunil / Mamata salary sub-ledgers</td><td><code>Employee.BankAccountLedgerId</code></td></tr>
+</tbody></table>
+
+<h3>21.2 Payroll masters</h3>
+<p>The one-time setup: a salary group, the list of pay parts, the employees, and what each employee earns.</p>
+<h4>Fixed lists (lookup tables) &mdash; ship with the product</h4>
+<p>These are the small "Type" tables from §4.12 (like Strada's <code>Nature</code>). You don't create them; they just exist. Every "type" column below stores one of these <b>Ids</b> &mdash; we print the readable name for clarity.</p>
+<table><thead><tr><th>Lookup table</th><th>Rows (Id &mdash; Name)</th></tr></thead><tbody>
+<tr><td class="mono">ComponentType</td><td>1 Earning &middot; 2 Deduction</td></tr>
+<tr><td class="mono">CalculationType</td><td>1 FlatProRata &middot; 2 Flat &middot; 3 Percentage &middot; 4 PerDay &middot; 5 PerUnit</td></tr>
+<tr><td class="mono">StatutoryCalculatorType</td><td>1 EPF &middot; 2 ESI &middot; 3 SLAB &middot; 4 FLAT</td></tr>
+<tr><td class="mono">PayFrequency</td><td>1 Monthly &middot; 2 HalfYearly &middot; 3 Yearly</td></tr>
+<tr><td class="mono">EmployeeType</td><td>1 Staff &middot; 2 Worker</td></tr>
+<tr><td class="mono">Gender</td><td>1 Male &middot; 2 Female &middot; 3 Other</td></tr>
+<tr><td class="mono">PayrollRunType</td><td>1 Regular &middot; 2 Arrear &middot; 3 Bonus</td></tr>
+<tr><td class="mono">PayrollRunState</td><td>1 Draft &middot; 2 Calculated &middot; 3 Approved &middot; 4 Posted &middot; 5 Paid &middot; 6 Cancelled</td></tr>
+<tr><td class="mono">ModeOfPayment</td><td>1 Bank &middot; 2 Cash &middot; 3 Cheque</td></tr>
+</tbody></table>
+<p>So below, <i>Type = Earning</i> means <code>ComponentTypeId = 1</code> and <i>CalculationType = FlatProRata</i> means <code>CalculationTypeId = 1</code> &mdash; we print the name, the database keeps the Id.</p>
+<h4>PayrollDepartment</h4>
+<table><thead><tr><th>Id</th><th>CompanyId</th><th>Code</th><th>Name</th><th>RoundNetPayToRupee</th></tr></thead><tbody>
+<tr><td>1</td><td>1</td><td>HO</td><td>Head Office</td><td>1</td></tr>
+<tr><td>2</td><td>1</td><td>OPS</td><td>Operations</td><td>1</td></tr>
+</tbody></table>
+<h4>SalaryComponent (PayrollDepartmentId 1)</h4>
+<table><thead><tr><th>Id</th><th>Slot</th><th>Code</th><th>Name</th><th>Type</th><th>CalculationType</th><th>RefSlot</th><th>In PF/ESI/PT base?</th><th>DefaultRate</th></tr></thead><tbody>
+<tr><td>1</td><td>1</td><td class="mono">BASIC</td><td>Basic</td><td>Earning</td><td class="mono">FlatProRata</td><td>&mdash;</td><td>1 / 1 / 1</td><td class="right">0</td></tr>
+<tr><td>2</td><td>2</td><td class="mono">HRA</td><td>House Rent Allowance</td><td>Earning</td><td class="mono">Percentage</td><td>1</td><td>0 / 1 / 1</td><td class="right">40</td></tr>
+<tr><td>3</td><td>3</td><td class="mono">CONV</td><td>Conveyance</td><td>Earning</td><td class="mono">FlatProRata</td><td>&mdash;</td><td>0 / 1 / 1</td><td class="right">0</td></tr>
+<tr><td>4</td><td>4</td><td class="mono">TIFFIN</td><td>Tiffin Allowance</td><td>Earning</td><td class="mono">Flat</td><td>&mdash;</td><td>0 / 1 / 1</td><td class="right">0</td></tr>
+<tr><td>5</td><td>5</td><td class="mono">CANTEEN</td><td>Canteen Recovery</td><td>Deduction</td><td class="mono">Flat</td><td>&mdash;</td><td>0 / 0 / 0</td><td class="right">0</td></tr>
+</tbody></table>
+<p><b>What this table means.</b> A "salary component" is one <i>pay part</i>. For each, you choose from fixed dropdown lists on the screen (you don't type these values):</p>
+<ul class="tight">
+<li><b>Type</b> &mdash; <code>Earning</code> (adds to salary) or <code>Deduction</code> (cuts from it).</li>
+<li><b>CalculationType</b> &mdash; <i>how</i> the amount is worked out (this is the dropdown you asked about):
+  <ul class="tight">
+  <li><code>FlatProRata</code> &mdash; a fixed monthly amount that shrinks for unpaid days. Basic ₹12,000 with 2 unpaid days of 30 &rarr; ₹11,200. Most pay parts use this.</li>
+  <li><code>Flat</code> &mdash; a fixed amount, never reduced for absence (Tiffin ₹1,000 stays ₹1,000).</li>
+  <li><code>Percentage</code> &mdash; a percent of another pay part; <b>RefSlot</b> says which one (HRA = 40% of slot 1 = Basic).</li>
+  <li><code>PerDay</code> &mdash; a daily rate &times; days worked.</li>
+  <li><code>PerUnit</code> &mdash; a rate &times; a count you enter (overtime hours, trips&hellip;).</li>
+  </ul></li>
+<li><b>In PF/ESI/PT base?</b> &mdash; three yes/no switches (1=yes, 0=no) answering "should this pay part be counted when calculating PF, ESI and PT?" Basic counts for all three (<code>1 / 1 / 1</code>); HRA is not counted for PF but is for ESI &amp; PT (<code>0 / 1 / 1</code>). This is how the law decides what each item is charged on &mdash; on screen they are three checkboxes, not text.</li>
+<li><b>DefaultRate</b> &mdash; a starting value (e.g. 40 for HRA's percent); each employee's actual amount is set in the next table.</li>
+</ul>
+<p>Component 5 (Canteen) shows a <code>Deduction</code> pay part is supported; here it is defined but given to nobody this month, so it appears on no payslip.</p>
+<h4>Employee (all in Head Office)</h4>
+<table><thead><tr><th>Id</th><th>Code</th><th>Name</th><th>Type</th><th>DateOfJoining</th><th>PAN</th><th>UAN</th><th>BankAcctLedgerId</th></tr></thead><tbody>
+<tr><td>1</td><td>EMP001</td><td>Rakesh Sharma</td><td>Staff</td><td>01-Jun-2019</td><td class="mono">ABCPS1234K</td><td class="mono">100123456789</td><td>201</td></tr>
+<tr><td>2</td><td>EMP002</td><td>Sunil Das</td><td>Staff</td><td>10-Apr-2016</td><td class="mono">ABXPD9876L</td><td class="mono">100987654321</td><td>202</td></tr>
+<tr><td>3</td><td>EMP003</td><td>Mamata Roy</td><td>Worker</td><td>15-Sep-2021</td><td class="mono">AKLPR5432M</td><td class="mono">100456789123</td><td>203</td></tr>
+</tbody></table>
+<h4>EmployeeSalaryComponent (EffectiveFrom 01-Apr-2024, one row each)</h4>
+<table><thead><tr><th>EmployeeId</th><th>Components &rarr; Rate</th></tr></thead><tbody>
+<tr><td>1 Rakesh</td><td class="mono">BASIC 12000 &middot; HRA 40 &middot; CONV 1600</td></tr>
+<tr><td>2 Sunil</td><td class="mono">BASIC 25000 &middot; HRA 40 &middot; CONV 2500 &middot; TIFFIN 1000</td></tr>
+<tr><td>3 Mamata</td><td class="mono">BASIC 9000 &middot; HRA 40 &middot; CONV 1200</td></tr>
+</tbody></table>
+<p><b>This is what you type per employee.</b> Each pay part is its own row (the &middot; just lists them together). The number is that employee's value: e.g. Basic ₹12,000, Conveyance ₹1,600, and <b>HRA 40 means 40%</b> (because HRA's type is Percentage). Rakesh's three rows here are exactly what produce his payslip further down.</p>
+
+<h3>21.3 Statutory configuration</h3>
+<p>The government side, entirely as data. Schemes and rates ship with the product; you only choose who they apply to. National rates are one row for all of India; state taxes (PT, LWF) are stored per state.</p>
+<h4>StatutoryScheme</h4>
+<table><thead><tr><th>Id</th><th>Code</th><th>CalculatorType</th><th>EmpShare</th><th>ErShare</th><th>Frequency</th></tr></thead><tbody>
+<tr><td>1</td><td class="mono">EPF</td><td class="mono">EPF</td><td>1</td><td>1</td><td>Monthly</td></tr>
+<tr><td>2</td><td class="mono">EPS</td><td class="mono">EPF</td><td>0</td><td>1</td><td>Monthly</td></tr>
+<tr><td>3</td><td class="mono">EDLI</td><td class="mono">EPF</td><td>0</td><td>1</td><td>Monthly</td></tr>
+<tr><td>4</td><td class="mono">EPF_ADMIN</td><td class="mono">EPF</td><td>0</td><td>1</td><td>Monthly</td></tr>
+<tr><td>5</td><td class="mono">ESI</td><td class="mono">ESI</td><td>1</td><td>1</td><td>Monthly</td></tr>
+<tr><td>6</td><td class="mono">PT</td><td class="mono">SLAB</td><td>1</td><td>0</td><td>Monthly</td></tr>
+<tr><td>7</td><td class="mono">LWF</td><td class="mono">FLAT</td><td>1</td><td>1</td><td>HalfYearly</td></tr>
+</tbody></table>
+<h4>StatutoryRate (effective 01-Apr-2025) &mdash; ships with the product</h4>
+<table><thead><tr><th>SchemeId</th><th>Scope</th><th>EmpRate%</th><th>ErRate%</th><th>WageCeiling</th><th>Min</th><th>Max</th><th>Flat E/Er &middot; Months</th></tr></thead><tbody>
+<tr><td>1 EPF</td><td>National</td><td class="right">12.0000</td><td class="right">3.6700</td><td class="right">15000</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>2 EPS</td><td>National</td><td class="right">&mdash;</td><td class="right">8.3300</td><td class="right">15000</td><td>&mdash;</td><td class="right">1250</td><td>&mdash;</td></tr>
+<tr><td>3 EDLI</td><td>National</td><td class="right">&mdash;</td><td class="right">0.5000</td><td class="right">15000</td><td>&mdash;</td><td class="right">75</td><td>&mdash;</td></tr>
+<tr><td>4 EPF_ADMIN</td><td>National</td><td class="right">&mdash;</td><td class="right">0.5000</td><td class="right">15000</td><td class="right">500</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>5 ESI</td><td>National</td><td class="right">0.7500</td><td class="right">3.2500</td><td class="right">21000</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>7 LWF</td><td>State 19 (WB)</td><td class="right">&mdash;</td><td class="right">&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td class="right">3 / 15 &middot; 6,12</td></tr>
+</tbody></table>
+<p><b>In plain words:</b> the five EPF/ESI rows are <i>national</i> (<code>StateUTId</code>, <code>CompanyId</code>, <code>PayrollDepartmentId</code> all NULL) &mdash; one copy for all of India. LWF is a <i>state</i> row (StateUTId 19) collected in months 6 &amp; 12. Profession Tax (scheme 6) has no rate row &mdash; its amounts come from <code>StatutorySlab</code> per state. To run payroll in another state, you add that state's PT slabs and one LWF row; nothing else changes.</p>
+<h4>StatutorySlab (SchemeId 6 PT, StateUTId 19 WB, EffectiveFrom 01-Apr-2025)</h4>
+<table><thead><tr><th>FromAmount</th><th>ToAmount</th><th>Amount</th></tr></thead><tbody>
+<tr><td class="right">0.00</td><td class="right">10000.00</td><td class="right">0.00</td></tr>
+<tr><td class="right">10000.01</td><td class="right">15000.00</td><td class="right">110.00</td></tr>
+<tr><td class="right">15000.01</td><td class="right">25000.00</td><td class="right">130.00</td></tr>
+<tr><td class="right">25000.01</td><td class="right">40000.00</td><td class="right">150.00</td></tr>
+<tr><td class="right">40000.01</td><td><i>NULL</i></td><td class="right">200.00</td></tr>
+</tbody></table>
+<h4>EmployeeStatutoryApplicability (one row per employee&times;scheme; grouped)</h4>
+<table><thead><tr><th>EmployeeId</th><th>Scheme(s)</th><th>IsApplicable</th><th>RegistrationNo</th></tr></thead><tbody>
+<tr><td>1 Rakesh</td><td>1,2,3,4 (PF family)</td><td>1</td><td class="mono">UAN 100123456789</td></tr>
+<tr><td>1 Rakesh</td><td>5 ESI</td><td>1</td><td class="mono">IP 6100123456</td></tr>
+<tr><td>1 Rakesh</td><td>6 PT, 7 LWF</td><td>1</td><td>&mdash;</td></tr>
+<tr><td>2 Sunil</td><td>1,2,3,4 (PF family)</td><td>1</td><td class="mono">UAN 100987654321</td></tr>
+<tr><td>2 Sunil</td><td>5 ESI</td><td>0</td><td>gross &gt; ₹21,000</td></tr>
+<tr><td>2 Sunil</td><td>6 PT, 7 LWF</td><td>1</td><td>&mdash;</td></tr>
+<tr><td>3 Mamata</td><td>1,2,3,4 (PF family)</td><td>1</td><td class="mono">UAN 100456789123</td></tr>
+<tr><td>3 Mamata</td><td>5 ESI</td><td>1</td><td class="mono">IP 6100654321</td></tr>
+<tr><td>3 Mamata</td><td>6 PT, 7 LWF</td><td>1</td><td>&mdash;</td></tr>
+</tbody></table>
+<h4>CompanyStatutoryRegistration (CompanyId 1)</h4>
+<table><thead><tr><th>SchemeId</th><th>RegistrationNo</th></tr></thead><tbody>
+<tr><td>1 EPF (covers EPS/EDLI/Admin)</td><td class="mono">WBCAL1234567000</td></tr>
+<tr><td>5 ESI</td><td class="mono">41001234560001023</td></tr>
+<tr><td>6 PT</td><td class="mono">EC/WB/0123456</td></tr>
+<tr><td>7 LWF</td><td class="mono">WBLWF/123456</td></tr>
+</tbody></table>
+
+<h3>21.4 Period &amp; leave</h3>
+<p>Each month you process is a 'period'. Leave balances are tracked per employee alongside it.</p>
+<h4>PayrollPeriod</h4>
+<table><thead><tr><th>Id</th><th>CompanyId</th><th>FinancialYearId</th><th>Title</th><th>FromDate</th><th>ToDate</th><th>NumberOfDays</th></tr></thead><tbody>
+<tr><td>1</td><td>1</td><td>4</td><td>May 2026</td><td>01-May-2026</td><td>31-May-2026</td><td>30</td></tr>
+</tbody></table>
+<p><code>NumberOfDays = 30</code> is the payroll divisor (30-day convention), independent of the 31 calendar days.</p>
+<h4>LeaveBalance (FromDate 01-Apr-2026)</h4>
+<table><thead><tr><th>EmployeeId</th><th>CasualLeave</th><th>SickLeave</th><th>PrivilegeLeave</th></tr></thead><tbody>
+<tr><td>1</td><td class="right">12</td><td class="right">7</td><td class="right">15</td></tr>
+<tr><td>2</td><td class="right">12</td><td class="right">7</td><td class="right">18</td></tr>
+<tr><td>3</td><td class="right">10</td><td class="right">7</td><td class="right">12</td></tr>
+</tbody></table>
+
+<h3>21.5 Transactions</h3>
+<p>What actually happened during the month: attendance (days lost), plus any loans given or refunds received.</p>
+<h4>Attendance (PayrollPeriodId 1)</h4>
+<table><thead><tr><th>EmployeeId</th><th>DaysPresent</th><th>PaidLeaveDays</th><th>LossOfPayDays</th><th>PayableDays</th><th>IncomeTaxDeduction</th></tr></thead><tbody>
+<tr><td>1 Rakesh</td><td class="right">26</td><td class="right">2</td><td class="right">2</td><td class="right">28</td><td class="right">0</td></tr>
+<tr><td>2 Sunil</td><td class="right">30</td><td class="right">0</td><td class="right">0</td><td class="right">30</td><td class="right">2000</td></tr>
+<tr><td>3 Mamata</td><td class="right">28</td><td class="right">1</td><td class="right">1</td><td class="right">29</td><td class="right">0</td></tr>
+</tbody></table>
+<p><b>What you enter here</b>, per employee: <b>DaysPresent</b> (days worked), <b>PaidLeaveDays</b> (approved leave that is still paid), <b>LossOfPayDays / LOP</b> (unpaid absent days), and any <b>IncomeTaxDeduction</b> (income tax to hold this month). The app then uses <code>PayableDays = NumberOfDays &minus; LossOfPayDays</code> &mdash; only unpaid days cut pay; paid leave does not.</p>
+<h4>Advance &amp; PayrollReceipt</h4>
+<table><thead><tr><th>Table</th><th>Txn &mdash; Employee</th><th>Date</th><th>Amount</th><th>Instalment</th><th>Ledger</th><th>FAVoucherId</th></tr></thead><tbody>
+<tr><td>Advance #1</td><td>ADV/2026/001 &mdash; Sunil</td><td>15-Apr-2026</td><td class="right">50000</td><td class="right">5000</td><td>110</td><td>4990</td></tr>
+<tr><td>PayrollReceipt #1</td><td>RCP/2026/001 &mdash; Sunil</td><td>20-May-2026</td><td class="right">10000</td><td>&mdash;</td><td>110</td><td>4998</td></tr>
+</tbody></table>
+<p>Outstanding before the run = 50000 &minus; 10000 (receipt) = ₹40,000; May recovers one ₹5,000 instalment (<code>AdvanceAdjustment</code>), leaving <b>₹35,000</b>.</p>
+
+<h3>21.6 The run &amp; payslips</h3>
+<p>Press <b>Calculate</b> and this is the output: one run, one payslip per employee, split into pay-part rows and one row per government scheme &mdash; then the run totals.</p>
+<h4>PayrollRun</h4>
+<table><thead><tr><th>Id</th><th>Dept</th><th>Period</th><th>RunType</th><th>State</th><th>EmpCount</th><th>Earnings</th><th>Deductions</th><th>NetPay</th><th>FAVoucherId</th></tr></thead><tbody>
+<tr><td>1</td><td>1 HO</td><td>1</td><td>Regular</td><td>Posted&rarr;Paid</td><td>3</td><td class="right">69013</td><td class="right">11808</td><td class="right">57205</td><td>5001</td></tr>
+</tbody></table>
+<p>CalculatedBy 5 (operator); ApprovedBy = PostedBy = 6 (finance manager) &mdash; segregation of duties enforced by the state machine.</p>
+<h4>Payslip (header per employee)</h4>
+<table><thead><tr><th>EmpId</th><th>PayableDays</th><th>Earnings</th><th>EmpStatutory</th><th>IncomeTax</th><th>AdvanceDed</th><th>TotalDeductions</th><th>NetPay</th><th>EmployerCost</th></tr></thead><tbody>
+<tr><td>1 Rakesh</td><td class="right">28</td><td class="right">17173</td><td class="right">1603</td><td class="right">0</td><td class="right">0</td><td class="right">1603</td><td class="right">15570</td><td class="right">2015</td></tr>
+<tr><td>2 Sunil</td><td class="right">30</td><td class="right">38500</td><td class="right">1950</td><td class="right">2000</td><td class="right">5000</td><td class="right">8950</td><td class="right">29550</td><td class="right">1951</td></tr>
+<tr><td>3 Mamata</td><td class="right">29</td><td class="right">13340</td><td class="right">1255</td><td class="right">0</td><td class="right">0</td><td class="right">1255</td><td class="right">12085</td><td class="right">1566</td></tr>
+</tbody></table>
+<h4>PayslipComponent (earnings as rows)</h4>
+<table><thead><tr><th>EmpId</th><th>Slot</th><th>Name</th><th>FullRate</th><th>Amount</th></tr></thead><tbody>
+<tr><td>1 Rakesh</td><td>1</td><td>Basic</td><td class="right">12000</td><td class="right">11200</td></tr>
+<tr><td>1 Rakesh</td><td>2</td><td>HRA</td><td class="right">40%</td><td class="right">4480</td></tr>
+<tr><td>1 Rakesh</td><td>3</td><td>Conveyance</td><td class="right">1600</td><td class="right">1493</td></tr>
+<tr><td>2 Sunil</td><td>1</td><td>Basic</td><td class="right">25000</td><td class="right">25000</td></tr>
+<tr><td>2 Sunil</td><td>2</td><td>HRA</td><td class="right">40%</td><td class="right">10000</td></tr>
+<tr><td>2 Sunil</td><td>3</td><td>Conveyance</td><td class="right">2500</td><td class="right">2500</td></tr>
+<tr><td>2 Sunil</td><td>4</td><td>Tiffin</td><td class="right">1000</td><td class="right">1000</td></tr>
+<tr><td>3 Mamata</td><td>1</td><td>Basic</td><td class="right">9000</td><td class="right">8700</td></tr>
+<tr><td>3 Mamata</td><td>2</td><td>HRA</td><td class="right">40%</td><td class="right">3480</td></tr>
+<tr><td>3 Mamata</td><td>3</td><td>Conveyance</td><td class="right">1200</td><td class="right">1160</td></tr>
+</tbody></table>
+<h4>PayslipStatutory (one row per scheme)</h4>
+<table><thead><tr><th>EmpId</th><th>Scheme</th><th>Base</th><th>EmpRate</th><th>ErRate</th><th>Employee</th><th>Employer</th></tr></thead><tbody>
+<tr><td>1 Rakesh</td><td>EPF</td><td class="right">11200</td><td class="right">12%</td><td class="right">3.67%</td><td class="right">1344</td><td class="right">411</td></tr>
+<tr><td>1 Rakesh</td><td>EPS</td><td class="right">11200</td><td>&mdash;</td><td class="right">8.33%</td><td class="right">&mdash;</td><td class="right">933</td></tr>
+<tr><td>1 Rakesh</td><td>EDLI</td><td class="right">11200</td><td>&mdash;</td><td class="right">0.50%</td><td class="right">&mdash;</td><td class="right">56</td></tr>
+<tr><td>1 Rakesh</td><td>EPF_ADMIN</td><td class="right">11200</td><td>&mdash;</td><td class="right">0.50%</td><td class="right">&mdash;</td><td class="right">56</td></tr>
+<tr><td>1 Rakesh</td><td>ESI</td><td class="right">17173</td><td class="right">0.75%</td><td class="right">3.25%</td><td class="right">129</td><td class="right">559</td></tr>
+<tr><td>1 Rakesh</td><td>PT</td><td class="right">17173</td><td>slab</td><td>&mdash;</td><td class="right">130</td><td class="right">&mdash;</td></tr>
+<tr><td>2 Sunil</td><td>EPF</td><td class="right">15000</td><td class="right">12%</td><td class="right">3.67%</td><td class="right">1800</td><td class="right">551</td></tr>
+<tr><td>2 Sunil</td><td>EPS</td><td class="right">15000</td><td>&mdash;</td><td class="right">8.33%</td><td class="right">&mdash;</td><td class="right">1250</td></tr>
+<tr><td>2 Sunil</td><td>EDLI</td><td class="right">15000</td><td>&mdash;</td><td class="right">0.50%</td><td class="right">&mdash;</td><td class="right">75</td></tr>
+<tr><td>2 Sunil</td><td>EPF_ADMIN</td><td class="right">15000</td><td>&mdash;</td><td class="right">0.50%</td><td class="right">&mdash;</td><td class="right">75</td></tr>
+<tr><td>2 Sunil</td><td>PT</td><td class="right">38500</td><td>slab</td><td>&mdash;</td><td class="right">150</td><td class="right">&mdash;</td></tr>
+<tr><td>3 Mamata</td><td>EPF</td><td class="right">8700</td><td class="right">12%</td><td class="right">3.67%</td><td class="right">1044</td><td class="right">319</td></tr>
+<tr><td>3 Mamata</td><td>EPS</td><td class="right">8700</td><td>&mdash;</td><td class="right">8.33%</td><td class="right">&mdash;</td><td class="right">725</td></tr>
+<tr><td>3 Mamata</td><td>EDLI</td><td class="right">8700</td><td>&mdash;</td><td class="right">0.50%</td><td class="right">&mdash;</td><td class="right">44</td></tr>
+<tr><td>3 Mamata</td><td>EPF_ADMIN</td><td class="right">8700</td><td>&mdash;</td><td class="right">0.50%</td><td class="right">&mdash;</td><td class="right">44</td></tr>
+<tr><td>3 Mamata</td><td>ESI</td><td class="right">13340</td><td class="right">0.75%</td><td class="right">3.25%</td><td class="right">101</td><td class="right">434</td></tr>
+<tr><td>3 Mamata</td><td>PT</td><td class="right">13340</td><td>slab</td><td>&mdash;</td><td class="right">110</td><td class="right">&mdash;</td></tr>
+</tbody></table>
+<p><b>Reading this table:</b> one row per government scheme. <b>Base</b> = the amount the rate is charged on; <b>EmpRate/ErRate</b> = the employee's and company's percentages; <b>Employee</b> = amount cut from take-home; <b>Employer</b> = amount the company pays on top (never cut from salary). "slab" under a rate means PT uses a fixed lookup table instead of a percentage. Sunil has <b>no ESI row</b> (his gross &gt; ₹21,000, so ESI does not apply); LWF has no row this month (it is collected only in June &amp; December).</p>
+<h4>AdvanceAdjustment</h4>
+<table><thead><tr><th>Id</th><th>AdvanceId</th><th>PayslipId</th><th>Amount</th></tr></thead><tbody>
+<tr><td>1</td><td>1</td><td>2 (Sunil)</td><td class="right">5000</td></tr>
+</tbody></table>
+<h4>PayslipSummary (run aggregate)</h4>
+<table><thead><tr><th>Earnings</th><th>EmpStatutory</th><th>ErStatutory</th><th>IncomeTax</th><th>NetPay</th><th>EPFAdminCharge</th><th>EmpCount</th></tr></thead><tbody>
+<tr><td class="right">69013</td><td class="right">4808</td><td class="right">5857</td><td class="right">2000</td><td class="right">57205</td><td class="right">500</td><td class="right">3</td></tr>
+</tbody></table>
+<div class="box warn">Per-employee admin summed to ₹175 (56+75+44), but the <b>establishment minimum ₹500</b> applies, so summary/challan employer statutory is <b>₹5,857</b> (not ₹5,532). This is exactly why the floor lives in <code>PayslipSummary</code>, not on each payslip.</div>
+
+<h3>21.7 Financial Accounting posting (on Post)</h3>
+<p>On <b>Post</b>, payroll writes itself into Strada's accounts as one balanced voucher (debits = credits); on <b>Pay</b>, each employee is paid from the bank.</p>
+<h4>PayrollPostingProfile (CompanyId 1)</h4>
+<table><thead><tr><th>TransactionType</th><th>LedgerId</th><th>Dr/Cr</th></tr></thead><tbody>
+<tr><td class="mono">SALARY_EXPENSE</td><td>101</td><td>Dr</td></tr>
+<tr><td class="mono">SALARY_PAYABLE</td><td>102</td><td>Cr</td></tr>
+<tr><td class="mono">STATUTORY_PAYABLE:EPF</td><td>103</td><td>Cr</td></tr>
+<tr><td class="mono">STATUTORY_PAYABLE:ESI</td><td>104</td><td>Cr</td></tr>
+<tr><td class="mono">STATUTORY_PAYABLE:PT</td><td>105</td><td>Cr</td></tr>
+<tr><td class="mono">STATUTORY_PAYABLE:TDS</td><td>106</td><td>Cr</td></tr>
+<tr><td class="mono">ADVANCE_RECOVERED</td><td>107</td><td>Cr</td></tr>
+</tbody></table>
+<h4>Journal voucher (FinancialAccounting Id 5001)</h4>
+<table><thead><tr><th>Ledger</th><th class="right">Dr</th><th class="right">Cr</th><th>Derivation</th></tr></thead><tbody>
+<tr><td>Salary &amp; Wages (101)</td><td class="right">74870</td><td class="right">&mdash;</td><td>gross 69013 + employer statutory 5857</td></tr>
+<tr><td>Salary Payable (102)</td><td class="right">&mdash;</td><td class="right">57205</td><td>total net pay</td></tr>
+<tr><td>EPF Payable (103)</td><td class="right">&mdash;</td><td class="right">9052</td><td>EPF emp 4188 + er 1281 + EPS 2908 + EDLI 175 + admin 500</td></tr>
+<tr><td>ESI Payable (104)</td><td class="right">&mdash;</td><td class="right">1223</td><td>ESI emp 230 + er 993</td></tr>
+<tr><td>PT Payable (105)</td><td class="right">&mdash;</td><td class="right">390</td><td>130 + 150 + 110</td></tr>
+<tr><td>TDS Payable (106)</td><td class="right">&mdash;</td><td class="right">2000</td><td>Sunil's manual TDS</td></tr>
+<tr><td>Staff Advance (107)</td><td class="right">&mdash;</td><td class="right">5000</td><td>instalment recovered</td></tr>
+<tr><td><b>Total</b></td><td class="right"><b>74870</b></td><td class="right"><b>74870</b></td><td>balanced</td></tr>
+</tbody></table>
+<h4>PayrollPayment (on Pay, 05-Jun-2026, from HDFC 110)</h4>
+<table><thead><tr><th>Id</th><th>Employee</th><th>Amount</th><th>Mode</th><th>FAVoucherId</th></tr></thead><tbody>
+<tr><td>1</td><td>Rakesh</td><td class="right">15570</td><td>Bank</td><td>5002</td></tr>
+<tr><td>2</td><td>Sunil</td><td class="right">29550</td><td>Bank</td><td>5003</td></tr>
+<tr><td>3</td><td>Mamata</td><td class="right">12085</td><td>Bank</td><td>5004</td></tr>
+<tr><td><b>Total</b></td><td></td><td class="right"><b>57205</b></td><td></td><td></td></tr>
+</tbody></table>
+<div class="box ok"><b>End-to-end tie-out.</b> Gross ₹69,013 &rarr; net ₹57,205 = Salary Payable = total disbursed. Statutory liabilities EPF ₹9,052 + ESI ₹1,223 + PT ₹390 + TDS ₹2,000 = ₹12,665, plus advance ₹5,000 recovered. Employer cost above gross = ₹5,857. Every number is reproducible from the masters above by the §10&ndash;11 engine.</div>
+
+<div class="footer">
+Strada Payroll Module &mdash; End-to-End Implementation Plan (normalized statutory model)<br>
+Revised 29 May 2026. Statutory rates (EPF/EPS/EDLI/ESI, WB Profession Tax &amp; LWF) verified against current 2025&ndash;26 sources.<br>
+Built on analysis of FAS Payroll (<code>C:\Dev\payroll</code>) and the Strada codebase (<code>C:\Dev\Strada</code>).<br>
+Tip: press <b>Ctrl+P</b> &rarr; <b>Save as PDF</b> to export.
+</div>
+
+</body></html>

@@ -1,8 +1,8 @@
-namespace Strada.Shared.Pages.Fleet.Trip.Reports;
+namespace StradaLibrary.Common;
 
-internal sealed record YesNoFilterOption(int Id, string Name);
+public sealed record YesNoFilterOption(int Id, string Name);
 
-internal static class TripFilterOptions
+public static class YesNoFilterOptions
 {
 	public const int All = 0;
 	public const int Yes = 1;

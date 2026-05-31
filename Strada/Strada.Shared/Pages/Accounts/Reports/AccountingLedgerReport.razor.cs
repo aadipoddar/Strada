@@ -475,6 +475,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			case "TrialBalance": await AuthenticationService.NavigateToRoute(PageRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager); break;
 			case "ProfitLoss": await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager); break;
 			case "BalanceSheet": await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "BankReconciliation": await AuthenticationService.NavigateToRoute(PageRouteNames.BankReconciliation, FormFactor, JSRuntime, NavigationManager); break;
 			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
 			case "PeriodPreviousDay": await HandleDatesChanged(DateRangeType.Yesterday); break;
 			case "PeriodNextDay": await HandleDatesChanged(DateRangeType.NextDay); break;

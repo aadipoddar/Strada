@@ -8,8 +8,11 @@
     [ReferenceNo] VARCHAR(MAX) NULL,
     [Debit] MONEY NULL, 
     [Credit] MONEY NULL, 
-    [Remarks] VARCHAR(MAX) NULL, 
-    [Status] BIT NOT NULL DEFAULT 1, 
+    [InstrumentNo] VARCHAR(MAX) NULL,
+    [InstrumentDate] DATETIME NULL,
+    [ClearingDate] DATETIME NULL,
+    [Remarks] VARCHAR(MAX) NULL,
+    [Status] BIT NOT NULL DEFAULT 1,
     CONSTRAINT [FK_FinancialAccountingLedger_ToAccounting] FOREIGN KEY ([MasterId]) REFERENCES [FinancialAccounting]([Id]), 
     CONSTRAINT [FK_FinancialAccountingLedger_ToLedger] FOREIGN KEY ([LedgerId]) REFERENCES [Ledger]([Id])
 

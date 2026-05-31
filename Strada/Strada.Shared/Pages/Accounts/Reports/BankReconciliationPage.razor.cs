@@ -1,24 +1,20 @@
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
+using StradaLibrary.Accounts.FinancialAccounting.Data;
+using StradaLibrary.Accounts.FinancialAccounting.Exports;
+using StradaLibrary.Accounts.FinancialAccounting.Models;
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Fleet.OMC.Models;
-using StradaLibrary.Fleet.Route.Data;
-using StradaLibrary.Fleet.Route.Models;
-using StradaLibrary.Fleet.Trip;
-using StradaLibrary.Fleet.Trip.Exports;
-using StradaLibrary.Fleet.Trip.Models;
-using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
-namespace Strada.Shared.Pages.Fleet.Trip.Reports;
+namespace Strada.Shared.Pages.Accounts.Reports;
 
-public partial class TripExpensesReport : IAsyncDisposable
+public partial class BankReconciliationPage : IAsyncDisposable
 {
 	private PeriodicTimer _autoRefreshTimer;
 	private CancellationTokenSource _autoRefreshCts;
@@ -28,37 +24,32 @@ public partial class TripExpensesReport : IAsyncDisposable
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
-	private bool _showDeleted = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
 
 	private CompanyModel? _selectedCompany = null;
-	private OMCModel? _selectedOMC = null;
-	private VehicleModel? _selectedVehicle = null;
-	private RouteOverviewModel? _selectedRoute = null;
-	private DriverOverviewModel? _selectedDriver = null;
-	private int _vehicleEmptyFilter = YesNoFilterOptions.All;
-	private int _pendingBillsFilter = YesNoFilterOptions.All;
-	private YesNoFilterOption _selectedVehicleEmptyFilter;
-	private YesNoFilterOption _selectedPendingBillsFilter;
+	private AccountTypeModel? _selectedAccountType = null;
+	private LedgerModel? _selectedLedger = null;
+	private int _reconciledFilter = YesNoFilterOptions.All;
+	private YesNoFilterOption _selectedReconciledFilter;
 
 	private List<CompanyModel> _companies = [];
-	private List<OMCModel> _omcs = [];
-	private List<VehicleModel> _vehicles = [];
-	private List<RouteOverviewModel> _routes = [];
-	private List<DriverOverviewModel> _drivers = [];
-	private List<TripExpensesOverviewModel> _transactionOverviews = [];
+	private List<AccountTypeModel> _accountTypes = [];
+	private List<LedgerModel> _ledgers = [];
+
+	private List<FinancialAccountingLedgerOverviewModel> _transactionOverviews = [];
+	private readonly HashSet<int> _dirtyLineIds = [];
 
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
-		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
-		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
+		new() { Text = "Export PDF (Alt + P)", Id = "ExportSelectedPdf", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
+		new() { Text = "Export Excel (Alt + E)", Id = "ExportSelectedExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private SfGrid<TripExpensesOverviewModel> _sfGrid;
+	private SfGrid<FinancialAccountingLedgerOverviewModel> _sfGrid;
 	private CustomDateRangePicker _sfFirstFocus;
 	private ToastNotification _toastNotification;
 	private ConfirmationDialog _confirmationDialog;
@@ -75,7 +66,7 @@ public partial class TripExpensesReport : IAsyncDisposable
 
 		try
 		{
-			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet, UserRoles.Reports]);
+			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts, UserRoles.Reports]);
 			await InitializePage();
 		}
 		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
@@ -100,16 +91,17 @@ public partial class TripExpensesReport : IAsyncDisposable
 		_toDate = _fromDate;
 
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
-		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
-		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_routes = await RouteData.LoadRouteOverview();
-		_drivers = await DriverData.LoadDriverOverview();
+		_accountTypes = await CommonData.LoadTableDataByStatus<AccountTypeModel>(AccountNames.AccountType);
+		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 
 		_companies = [.. _companies.OrderBy(s => s.Name)];
-		_omcs = [.. _omcs.OrderBy(s => s.Name)];
-		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
-		_routes = [.. _routes.OrderBy(s => s.Code)];
-		_drivers = [.. _drivers.OrderBy(s => s.Name)];
+		_accountTypes = [.. _accountTypes.OrderBy(s => s.Name)];
+		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
+
+		// Default the Type filter to the configured bank account type (soft).
+		var bankTypeSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.BankAccountTypeId);
+		if (int.TryParse(bankTypeSetting?.Value, out var bankTypeId) && bankTypeId > 0)
+			_selectedAccountType = _accountTypes.FirstOrDefault(a => a.Id == bankTypeId);
 	}
 
 	private async Task LoadTransactionOverviews()
@@ -121,52 +113,39 @@ public partial class TripExpensesReport : IAsyncDisposable
 		{
 			_isProcessing = true;
 			StateHasChanged();
-			await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
+			await _toastNotification.ShowAsync("Loading", "Fetching ledger lines...", ToastType.Info);
 
-			_transactionOverviews = await CommonData.LoadTableDataByDate<TripExpensesOverviewModel>(
-				FleetNames.TripExpensesOverview,
+			_transactionOverviews = await CommonData.LoadTableDataByDate<FinancialAccountingLedgerOverviewModel>(
+				AccountNames.FinancialAccountingLedgerOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MinValue));
 
-			if (!_showDeleted)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.Status)];
-
 			if (_selectedCompany?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
+				_transactionOverviews = [.. _transactionOverviews.Where(l => l.CompanyId == _selectedCompany.Id)];
 
-			if (_selectedOMC?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.OMCId == _selectedOMC.Id)];
+			if (_selectedAccountType?.Id > 0)
+				_transactionOverviews = [.. _transactionOverviews.Where(l => l.AccountTypeId == _selectedAccountType.Id)];
 
-			if (_selectedVehicle?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.VehicleId == _selectedVehicle.Id)];
+			if (_selectedLedger?.Id > 0)
+				_transactionOverviews = [.. _transactionOverviews.Where(l => l.LedgerId == _selectedLedger.Id)];
 
-			if (_selectedRoute?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.RouteId == _selectedRoute.Id)];
-
-			if (_selectedDriver?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.DriverId == _selectedDriver.Id)];
-
-			if (_vehicleEmptyFilter == YesNoFilterOptions.Yes)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.VehicleEmpty)];
-			else if (_vehicleEmptyFilter == YesNoFilterOptions.No)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => !_.VehicleEmpty)];
-
-			if (_pendingBillsFilter == YesNoFilterOptions.Yes)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.BillId is null)];
-			else if (_pendingBillsFilter == YesNoFilterOptions.No)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.BillId is not null)];
+			if (_reconciledFilter == YesNoFilterOptions.Yes)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.ClearingDate is not null)];
+			else if (_reconciledFilter == YesNoFilterOptions.No)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.ClearingDate is null)];
 
 			_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
+
+			_dirtyLineIds.Clear();
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"Failed to load transactions: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error", $"Failed to load lines: {ex.Message}", ToastType.Error);
 		}
 		finally
 		{
 			if (_sfGrid is not null)
 				await _sfGrid.Refresh();
-
 			_isProcessing = false;
 			StateHasChanged();
 		}
@@ -184,52 +163,25 @@ public partial class TripExpensesReport : IAsyncDisposable
 	private async Task OnCompanyChanged(CompanyModel value)
 	{
 		_selectedCompany = value;
-
-		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
-		_vehicles = [.. _vehicles.OrderBy(v => v.Code)];
-		_selectedVehicle = null;
-
-		if (_selectedCompany?.Id > 0)
-			_vehicles = [.. _vehicles.Where(s => s.CompanyId == _selectedCompany.Id)];
-
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnOMCChanged(OMCModel value)
+	private async Task OnAccountTypeChanged(AccountTypeModel value)
 	{
-		_selectedOMC = value;
+		_selectedAccountType = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnVehicleChanged(VehicleModel value)
+	private async Task OnLedgerChanged(LedgerModel value)
 	{
-		_selectedVehicle = value;
+		_selectedLedger = value;
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnRouteChanged(RouteOverviewModel value)
+	private async Task OnReconciledFilterChanged(YesNoFilterOption value)
 	{
-		_selectedRoute = value;
-		await LoadTransactionOverviews();
-	}
-
-	private async Task OnDriverChanged(DriverOverviewModel value)
-	{
-		_selectedDriver = value;
-		await LoadTransactionOverviews();
-	}
-
-	private async Task OnVehicleEmptyFilterChanged(YesNoFilterOption value)
-	{
-		_selectedVehicleEmptyFilter = value;
-		_vehicleEmptyFilter = value?.Id ?? YesNoFilterOptions.All;
-		await LoadTransactionOverviews();
-	}
-
-	private async Task OnPendingBillsFilterChanged(YesNoFilterOption value)
-	{
-		_selectedPendingBillsFilter = value;
-		_pendingBillsFilter = value?.Id ?? YesNoFilterOptions.All;
+		_selectedReconciledFilter = value;
+		_reconciledFilter = value?.Id ?? YesNoFilterOptions.All;
 		await LoadTransactionOverviews();
 	}
 
@@ -237,6 +189,56 @@ public partial class TripExpensesReport : IAsyncDisposable
 	{
 		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
 		await LoadTransactionOverviews();
+	}
+	#endregion
+
+	#region Reconcile Editing
+	private void OnClearingDateChanged(FinancialAccountingLedgerOverviewModel line, DateTime? date)
+	{
+		if (line is null)
+			return;
+
+		line.ClearingDate = date;
+		_dirtyLineIds.Add(line.Id);
+		StateHasChanged();
+	}
+
+	private async Task SaveReconciliation()
+	{
+		if (_isProcessing)
+			return;
+
+		if (_dirtyLineIds.Count == 0)
+		{
+			await _toastNotification.ShowAsync("Nothing to Save", "No clearing dates have changed.", ToastType.Warning);
+			return;
+		}
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Saving", "Updating clearing dates...", ToastType.Info);
+
+			var changed = _transactionOverviews
+				.Where(l => _dirtyLineIds.Contains(l.Id))
+				.Select(l => new FinancialAccountingLedgerModel { Id = l.Id, ClearingDate = l.ClearingDate })
+				.ToList();
+
+			await FinancialAccountingData.SaveBRSDates(changed, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
+
+			await _toastNotification.ShowAsync("Saved", $"{changed.Count} line(s) updated successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"Failed to save reconciliation: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+			await LoadTransactionOverviews();
+		}
 	}
 	#endregion
 
@@ -252,19 +254,15 @@ public partial class TripExpensesReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await TripReportExport.ExportExpensesReport(
+			var (stream, fileName) = await FinancialAccountingReportExport.ExportLedgerReport(
 				_transactionOverviews,
 				ReportExportType.Excel,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
-				_showDeleted,
+				false,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
-				_selectedOMC?.Id > 0 ? _selectedOMC : null,
-				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
-				_selectedRoute?.Id > 0 ? _selectedRoute : null,
-				_selectedDriver?.Id > 0 ? _selectedDriver : null
-			);
+				_selectedLedger?.Id > 0 ? _selectedLedger : null);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -291,19 +289,15 @@ public partial class TripExpensesReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var (stream, fileName) = await TripReportExport.ExportExpensesReport(
+			var (stream, fileName) = await FinancialAccountingReportExport.ExportLedgerReport(
 				_transactionOverviews,
 				ReportExportType.PDF,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
-				_showDeleted,
+				false,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
-				_selectedOMC?.Id > 0 ? _selectedOMC : null,
-				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,
-				_selectedRoute?.Id > 0 ? _selectedRoute : null,
-				_selectedDriver?.Id > 0 ? _selectedDriver : null
-			 );
+				_selectedLedger?.Id > 0 ? _selectedLedger : null);
 			await SaveAndViewService.SaveAndView(fileName, stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -330,7 +324,7 @@ public partial class TripExpensesReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, true, false, CodeType.Trip);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, true, false);
 			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -357,7 +351,7 @@ public partial class TripExpensesReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, true, CodeType.Trip);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, true);
 			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
@@ -382,11 +376,11 @@ public partial class TripExpensesReport : IAsyncDisposable
 
 		if (!_sfGrid.SelectedRecords.First().Status)
 		{
-			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it or download invoice.", ToastType.Warning);
+			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it first.", ToastType.Warning);
 			return;
 		}
 
-		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false, CodeType.Trip);
+		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
 	}
 
@@ -405,13 +399,12 @@ public partial class TripExpensesReport : IAsyncDisposable
 
 			await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
 
-			var trip = await CommonData.LoadTableDataById<TripModel>(FleetNames.Trip, id)
+			var accounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, id)
 				?? throw new Exception("Transaction not found.");
-			trip.Status = false;
-			trip.LastModifiedBy = _user.Id;
-			trip.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-			trip.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			await TripData.DeleteTransaction(trip);
+			accounting.LastModifiedBy = _user.Id;
+			accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+			accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			await FinancialAccountingData.DeleteTransaction(accounting);
 
 			await _toastNotification.ShowAsync("Success", $"Transaction {transactionNo} has been deleted successfully.", ToastType.Success);
 		}
@@ -442,13 +435,12 @@ public partial class TripExpensesReport : IAsyncDisposable
 
 			await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
 
-			var trip = await CommonData.LoadTableDataById<TripModel>(FleetNames.Trip, id)
+			var accounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, id)
 				?? throw new Exception("Transaction not found.");
-			trip.Status = true;
-			trip.LastModifiedBy = _user.Id;
-			trip.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-			trip.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			await TripData.RecoverTransaction(trip);
+			accounting.LastModifiedBy = _user.Id;
+			accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+			accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			await FinancialAccountingData.RecoverTransaction(accounting);
 
 			await _toastNotification.ShowAsync("Success", $"Transaction {transactionNo} has been recovered successfully.", ToastType.Success);
 		}
@@ -506,9 +498,9 @@ public partial class TripExpensesReport : IAsyncDisposable
 	{
 		switch (args.Item.Id)
 		{
-			case "NewTransaction": await AuthenticationService.NavigateToRoute(PageRouteNames.Trip, FormFactor, JSRuntime, NavigationManager); break;
+			case "NewTransaction": await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccounting, FormFactor, JSRuntime, NavigationManager); break;
+			case "Save": await SaveReconciliation(); break;
 			case "Refresh": await LoadTransactionOverviews(); break;
-			case "ToggleDeleted": await ToggleDeleted(); break;
 			case "ToggleDetailsView": await ToggleDetailsView(); break;
 			case "ExportPdf": await ExportPdf(); break;
 			case "ExportExcel": await ExportExcel(); break;
@@ -516,9 +508,11 @@ public partial class TripExpensesReport : IAsyncDisposable
 			case "DownloadSelectedPdf": await ExportSelectedTransactionPdf(); break;
 			case "DownloadSelectedExcel": await ExportSelectedTransactionExcel(); break;
 			case "DeleteRecoverSelected": await DeleteRecoverSelectedTransaction(); break;
-			case "TripReport": await AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager); break;
-			case "CardPaymentsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager); break;
-			case "LedgerPaymentsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "AccountingLedger": await AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "AccountingReport": await AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "TrialBalance": await AuthenticationService.NavigateToRoute(PageRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "ProfitLoss": await AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager); break;
+			case "BalanceSheet": await AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager); break;
 			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
 			case "PeriodPreviousDay": await HandleDatesChanged(DateRangeType.Yesterday); break;
 			case "PeriodNextDay": await HandleDatesChanged(DateRangeType.NextDay); break;
@@ -532,13 +526,13 @@ public partial class TripExpensesReport : IAsyncDisposable
 		}
 	}
 
-	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<TripExpensesOverviewModel> args)
+	private async Task OnGridContextMenuItemClicked(ContextMenuClickEventArgs<FinancialAccountingLedgerOverviewModel> args)
 	{
 		switch (args.Item.Id)
 		{
 			case "View": await ViewSelectedTransaction(); break;
-			case "ExportPDF": await ExportSelectedTransactionPdf(); break;
-			case "ExportExcel": await ExportSelectedTransactionExcel(); break;
+			case "ExportSelectedPdf": await ExportSelectedTransactionPdf(); break;
+			case "ExportSelectedExcel": await ExportSelectedTransactionExcel(); break;
 			case "DeleteRecover": await DeleteRecoverSelectedTransaction(); break;
 		}
 	}
@@ -550,13 +544,6 @@ public partial class TripExpensesReport : IAsyncDisposable
 
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
-	}
-
-	private async Task ToggleDeleted()
-	{
-		_showDeleted = !_showDeleted;
-		await LoadTransactionOverviews();
-		StateHasChanged();
 	}
 
 	private async Task StartAutoRefresh()
@@ -574,7 +561,11 @@ public partial class TripExpensesReport : IAsyncDisposable
 		try
 		{
 			while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-				await LoadTransactionOverviews();
+			{
+				// Never clobber in-progress reconciliation edits.
+				if (_dirtyLineIds.Count == 0)
+					await LoadTransactionOverviews();
+			}
 		}
 		catch (OperationCanceledException)
 		{

@@ -37,6 +37,8 @@ public static class FinancialAccountingData
 			ReferenceType = item.ReferenceType,
 			ReferenceId = item.ReferenceId,
 			ReferenceNo = item.ReferenceNo,
+			InstrumentNo = item.InstrumentNo,
+			InstrumentDate = item.InstrumentDate,
 			Remarks = item.Remarks,
 			Status = true
 		})];
@@ -51,6 +53,7 @@ public static class FinancialAccountingData
 		}
 
 		await FinancialYearData.ValidateFinancialYear(accounting.TransactionDateTime, sqlDataAccessTransaction);
+		await ValidateBRS(accounting.Id, sqlDataAccessTransaction);
 
 		accounting.Status = false;
 		await InsertFinancialAccounting(accounting, sqlDataAccessTransaction);
@@ -106,6 +109,8 @@ public static class FinancialAccountingData
 
 			await FinancialYearData.ValidateFinancialYear(existingAccounting.TransactionDateTime, sqlDataAccessTransaction);
 
+			await ValidateBRS(accounting.Id, sqlDataAccessTransaction);
+
 			var user = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, accounting.LastModifiedBy.Value, sqlDataAccessTransaction);
 			if (!user.Admin)
 				throw new InvalidOperationException("Only admin users are allowed to modify transactions.");
@@ -116,6 +121,7 @@ public static class FinancialAccountingData
 		return accounting;
 	}
 
+	#region Saving
 	private static void ValidateTransactionLedgers(FinancialAccountingModel accounting, List<FinancialAccountingLedgerModel> ledgers)
 	{
 		if (ledgers is null || ledgers.Count == 0)
@@ -219,4 +225,43 @@ public static class FinancialAccountingData
 			CreatedFromPlatform = update ? accounting.LastModifiedFromPlatform : accounting.CreatedFromPlatform
 		}, sqlDataAccessTransaction);
 	}
+	#endregion
+
+	#region BRS
+	private static async Task ValidateBRS(int masterId, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		var existingLedgers = await CommonData.LoadTableDataByMasterId<FinancialAccountingLedgerModel>(AccountNames.FinancialAccountingLedger, masterId, sqlDataAccessTransaction);
+		if (existingLedgers.Any(l => l.Status && l.ClearingDate.HasValue))
+			throw new InvalidOperationException("This transaction cannot be modified or deleted because one or more of its lines have been bank reconciled. Remove the clearing date in Bank Reconciliation first.");
+	}
+
+	public static async Task SaveBRSDates(List<FinancialAccountingLedgerModel> changedLines, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			foreach (var line in changedLines)
+			{
+				var existingLine = await CommonData.LoadTableDataById<FinancialAccountingLedgerModel>(AccountNames.FinancialAccountingLedger, line.Id, transaction)
+					?? throw new InvalidOperationException("The ledger entry to be updated does not exist.");
+
+				var accounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, existingLine.MasterId, transaction)
+					?? throw new InvalidOperationException("The financial accounting transaction for the ledger entry does not exist.");
+
+				existingLine.ClearingDate = line.ClearingDate;
+				if (existingLine.ClearingDate.HasValue && existingLine.ClearingDate.Value.Date < (existingLine.InstrumentDate ?? accounting.TransactionDateTime).Date)
+					throw new InvalidOperationException("The clearing date cannot be earlier than the transaction or instrument date.");
+
+				await InsertFinancialAccountingLedger(existingLine, transaction);
+
+				await AuditTrailData.SaveAuditTrail(new()
+				{
+					Action = AuditTrailActionTypes.Update.ToString(),
+					TableName = AccountNames.FinancialAccountingLedger,
+					RecordNo = accounting.TransactionNo,
+					RecordValue = existingLine.ClearingDate.HasValue ? $"Clearing Date: {existingLine.ClearingDate:yyyy-MM-dd}" : "Clearing Date Removed",
+					CreatedBy = userId,
+					CreatedFromPlatform = platform
+				}, transaction);
+			}
+		});
+	#endregion
 }
