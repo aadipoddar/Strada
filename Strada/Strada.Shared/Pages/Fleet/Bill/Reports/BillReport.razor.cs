@@ -36,6 +36,7 @@ public partial class BillReport : IAsyncDisposable
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
 	private List<BillOverviewModel> _transactionOverviews = [];
+	private List<BillOverviewModel> _allTransactionOverviews = [];
 
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
@@ -104,21 +105,12 @@ public partial class BillReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
 
-			_transactionOverviews = await CommonData.LoadTableDataByDate<BillOverviewModel>(
+			_allTransactionOverviews = await CommonData.LoadTableDataByDate<BillOverviewModel>(
 				FleetNames.BillOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MinValue));
 
-			if (!_showDeleted)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.Status)];
-
-			if (_selectedCompany?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
-
-			if (_selectedOMC?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.OMCId == _selectedOMC.Id)];
-
-			_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
+			await ApplyFilters();
 		}
 		catch (Exception ex)
 		{
@@ -126,12 +118,24 @@ public partial class BillReport : IAsyncDisposable
 		}
 		finally
 		{
-			if (_sfGrid is not null)
-				await _sfGrid.Refresh();
-
 			_isProcessing = false;
 			StateHasChanged();
 		}
+	}
+
+	private async Task ApplyFilters()
+	{
+		var query = _allTransactionOverviews.AsEnumerable();
+
+		if (!_showDeleted) query = query.Where(t => t.Status);
+		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
+		if (_selectedOMC?.Id > 0) query = query.Where(t => t.OMCId == _selectedOMC.Id);
+
+		_transactionOverviews = [.. query.OrderBy(t => t.TransactionDateTime)];
+
+		if (_sfGrid is not null)
+			await _sfGrid.Refresh();
+		StateHasChanged();
 	}
 	#endregion
 
@@ -143,27 +147,27 @@ public partial class BillReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnCompanyChanged(CompanyModel value)
-	{
-		_selectedCompany = value;
-		await LoadTransactionOverviews();
-	}
-
-	private async Task OnOMCChanged(OMCModel value)
-	{
-		_selectedOMC = value;
-		await LoadTransactionOverviews();
-	}
-
 	private async Task HandleDatesChanged(DateRangeType dateRangeType)
 	{
 		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
 		await LoadTransactionOverviews();
 	}
+
+	private async Task OnCompanyChanged(CompanyModel value)
+	{
+		_selectedCompany = value;
+		await ApplyFilters();
+	}
+
+	private async Task OnOMCChanged(OMCModel value)
+	{
+		_selectedOMC = value;
+		await ApplyFilters();
+	}
 	#endregion
 
 	#region Exporting
-	private async Task ExportExcel()
+	private async Task ExportReport(bool isExcel = false)
 	{
 		if (_isProcessing)
 			return;
@@ -176,7 +180,7 @@ public partial class BillReport : IAsyncDisposable
 
 			var (stream, fileName) = await BillReportExport.ExportReport(
 				_transactionOverviews,
-				ReportExportType.Excel,
+				isExcel ? ReportExportType.Excel : ReportExportType.PDF,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
@@ -199,43 +203,7 @@ public partial class BillReport : IAsyncDisposable
 		}
 	}
 
-	private async Task ExportPdf()
-	{
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var (stream, fileName) = await BillReportExport.ExportReport(
-				_transactionOverviews,
-				ReportExportType.PDF,
-				DateOnly.FromDateTime(_fromDate),
-				DateOnly.FromDateTime(_toDate),
-				_showAllColumns,
-				_showDeleted,
-				_selectedCompany?.Id > 0 ? _selectedCompany : null,
-				_selectedOMC?.Id > 0 ? _selectedOMC : null
-			 );
-			await SaveAndViewService.SaveAndView(fileName, stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
-	}
-
-	private async Task ExportSelectedTransactionPdf()
+	private async Task ExportSelectedTransaction(bool isExcel = false)
 	{
 		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
@@ -246,35 +214,9 @@ public partial class BillReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, true, false, CodeType.Bill);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
-	}
-
-	private async Task ExportSelectedTransactionExcel()
-	{
-		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, true, CodeType.Bill);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, !isExcel, isExcel, CodeType.Bill);
+			await SaveAndViewService.SaveAndView(isExcel ? decodeTransactionNo.ExcelStream.fileName : decodeTransactionNo.PDFStream.fileName,
+				isExcel ? decodeTransactionNo.ExcelStream.stream : decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
 		}
@@ -386,11 +328,11 @@ public partial class BillReport : IAsyncDisposable
 			case "Refresh": await LoadTransactionOverviews(); break;
 			case "ToggleDeleted": await ToggleDeleted(); break;
 			case "ToggleDetailsView": await ToggleDetailsView(); break;
-			case "ExportPdf": await ExportPdf(); break;
-			case "ExportExcel": await ExportExcel(); break;
+			case "ExportPdf": await ExportReport(); break;
+			case "ExportExcel": await ExportReport(true); break;
 			case "ViewSelected": await ViewSelectedTransaction(); break;
-			case "DownloadSelectedPdf": await ExportSelectedTransactionPdf(); break;
-			case "DownloadSelectedExcel": await ExportSelectedTransactionExcel(); break;
+			case "DownloadSelectedPdf": await ExportSelectedTransaction(); break;
+			case "DownloadSelectedExcel": await ExportSelectedTransaction(true); break;
 			case "DeleteRecoverSelected": await DeleteRecoverSelectedTransaction(); break;
 			case "LedgerPaymentsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager); break;
 			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
@@ -411,8 +353,8 @@ public partial class BillReport : IAsyncDisposable
 		switch (args.Item.Id)
 		{
 			case "View": await ViewSelectedTransaction(); break;
-			case "ExportPDF": await ExportSelectedTransactionPdf(); break;
-			case "ExportExcel": await ExportSelectedTransactionExcel(); break;
+			case "ExportPDF": await ExportSelectedTransaction(); break;
+			case "ExportExcel": await ExportSelectedTransaction(true); break;
 			case "DeleteRecover": await DeleteRecoverSelectedTransaction(); break;
 		}
 	}
@@ -429,8 +371,7 @@ public partial class BillReport : IAsyncDisposable
 	private async Task ToggleDeleted()
 	{
 		_showDeleted = !_showDeleted;
-		await LoadTransactionOverviews();
-		StateHasChanged();
+		await ApplyFilters();
 	}
 
 	private async Task StartAutoRefresh()

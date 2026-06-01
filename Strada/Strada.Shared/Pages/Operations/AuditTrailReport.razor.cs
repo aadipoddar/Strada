@@ -116,7 +116,7 @@ public partial class AuditTrailReport : IAsyncDisposable
 	#endregion
 
 	#region Exporting
-	private async Task ExportExcel()
+	private async Task ExportReport(bool isExcel = false)
 	{
 		if (_isProcessing)
 			return;
@@ -129,40 +129,7 @@ public partial class AuditTrailReport : IAsyncDisposable
 
 			var (stream, fileName) = await AuditTrailExport.ExportReport(
 				_auditTrails,
-				ReportExportType.Excel,
-				DateOnly.FromDateTime(_fromDate),
-				DateOnly.FromDateTime(_toDate),
-				_showAllColumns
-			);
-			await SaveAndViewService.SaveAndView(fileName, stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
-	}
-
-	private async Task ExportPdf()
-	{
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var (stream, fileName) = await AuditTrailExport.ExportReport(
-				_auditTrails,
-				ReportExportType.PDF,
+				isExcel ? ReportExportType.Excel : ReportExportType.PDF,
 				DateOnly.FromDateTime(_fromDate),
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns
@@ -237,10 +204,10 @@ public partial class AuditTrailReport : IAsyncDisposable
 				await ToggleDetailsView();
 				break;
 			case "ExportPdf":
-				await ExportPdf();
+				await ExportReport();
 				break;
 			case "ExportExcel":
-				await ExportExcel();
+				await ExportReport(true);
 				break;
 			case "PeriodToday":
 				await HandleDatesChanged(DateRangeType.Today);

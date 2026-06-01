@@ -149,6 +149,7 @@ public static class FinancialAccountingReportExport
             [nameof(FinancialAccountingLedgerOverviewModel.InstrumentNo)] = new() { DisplayName = "Instrument No", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(FinancialAccountingLedgerOverviewModel.InstrumentDate)] = new() { DisplayName = "Instrument Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(FinancialAccountingLedgerOverviewModel.ClearingDate)] = new() { DisplayName = "Clearing Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
+            [nameof(FinancialAccountingLedgerOverviewModel.ReconciledStatus)] = new() { DisplayName = "Reconciled", Alignment = CellAlignment.Center, IncludeInTotal = false },
 
             [nameof(FinancialAccountingLedgerOverviewModel.Debit)] = new() { DisplayName = "Debit", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
             [nameof(FinancialAccountingLedgerOverviewModel.Credit)] = new() { DisplayName = "Credit", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
@@ -190,6 +191,7 @@ public static class FinancialAccountingReportExport
                 nameof(FinancialAccountingLedgerOverviewModel.InstrumentNo),
                 nameof(FinancialAccountingLedgerOverviewModel.InstrumentDate),
                 nameof(FinancialAccountingLedgerOverviewModel.ClearingDate),
+                nameof(FinancialAccountingLedgerOverviewModel.ReconciledStatus),
                 nameof(FinancialAccountingLedgerOverviewModel.Debit),
                 nameof(FinancialAccountingLedgerOverviewModel.Credit),
                 nameof(FinancialAccountingLedgerOverviewModel.LedgerRemarks),
@@ -228,6 +230,7 @@ public static class FinancialAccountingReportExport
                 nameof(FinancialAccountingLedgerOverviewModel.InstrumentNo),
                 nameof(FinancialAccountingLedgerOverviewModel.InstrumentDate),
                 nameof(FinancialAccountingLedgerOverviewModel.ClearingDate),
+                nameof(FinancialAccountingLedgerOverviewModel.ReconciledStatus),
                 nameof(FinancialAccountingLedgerOverviewModel.Debit),
                 nameof(FinancialAccountingLedgerOverviewModel.Credit),
                 nameof(FinancialAccountingLedgerOverviewModel.LedgerRemarks),

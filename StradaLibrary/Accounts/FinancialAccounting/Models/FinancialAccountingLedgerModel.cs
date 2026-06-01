@@ -53,6 +53,7 @@ public class FinancialAccountingLedgerOverviewModel
 	public string? InstrumentNo { get; set; }
 	public DateTime? InstrumentDate { get; set; }
 	public DateTime? ClearingDate { get; set; }
+	public bool? Reconciled { get; set; }
 
 	public string? LedgerRemarks { get; set; }
 
@@ -87,4 +88,9 @@ public class FinancialAccountingLedgerOverviewModel
 	public DateTime? LastModifiedAt { get; set; }
 	public string? LastModifiedFromPlatform { get; set; }
 	public bool Status { get; set; }
+
+	// Display text for exports; mirrors the grid's Reconciled column (blank when not an instrument line)
+	public string ReconciledStatus => Reconciled is null ? string.Empty : Reconciled.Value ? "Reconciled" : "Unreconciled";
+
+	public FinancialAccountingLedgerOverviewModel Clone() => (FinancialAccountingLedgerOverviewModel)MemberwiseClone();
 }
