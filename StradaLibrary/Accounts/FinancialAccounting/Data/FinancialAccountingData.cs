@@ -77,6 +77,9 @@ public static class FinancialAccountingData
 
 	public static async Task RecoverTransaction(FinancialAccountingModel accounting)
 	{
+		if (accounting.ReferenceId is not null || !string.IsNullOrWhiteSpace(accounting.ReferenceNo))
+			throw new InvalidOperationException("Transactions with reference cannot be recovered. Please create a new transaction instead.");
+
 		accounting.Status = true;
 		var ledgers = await CommonData.LoadTableDataByMasterId<FinancialAccountingLedgerModel>(AccountNames.FinancialAccountingLedger, accounting.Id);
 
