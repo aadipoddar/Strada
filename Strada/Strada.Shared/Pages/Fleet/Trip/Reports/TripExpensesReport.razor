@@ -580,12 +580,12 @@ else
 							<GridColumn Field="@nameof(TripExpensesOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(TripExpensesOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="300" Visible="_showAllColumns" />
 
-							<GridColumn Field="@nameof(TripExpensesOverviewModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
+							<GridColumn Field="@nameof(TripExpensesOverviewModel.MasterStatus)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
 										var item = (context as TripExpensesOverviewModel);
-										<span class="@(item.Status ? string.Empty : "grid-debit")">
-											@(item.Status ? "Active" : "Deleted")
+										<span class="@(item.MasterStatus ? string.Empty : "grid-debit")">
+											@(item.MasterStatus ? "Active" : "Deleted")
 										</span>
 									}
 								</Template>

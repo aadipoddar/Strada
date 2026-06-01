@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Load_TableData_By_MasterId]
+CREATE PROCEDURE [dbo].[Load_TableData_By_MasterId]
 	@TableName varchar(50),
 	@MasterId int
 AS

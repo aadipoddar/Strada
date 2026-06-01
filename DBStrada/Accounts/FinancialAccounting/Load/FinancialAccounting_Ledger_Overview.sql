@@ -63,7 +63,7 @@ SELECT
 	[a].[LastModifiedAt],
 	[a].[LastModifiedFromPlatform],
 
-	[a].[Status]
+	[a].[Status] AS MasterStatus
 
 FROM
 	[dbo].[FinancialAccountingLedger] ad

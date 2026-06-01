@@ -35,6 +35,16 @@ public static class BillData
 			Status = true
 		})];
 
+	internal static async Task UpdateFinancialAccountingId(int financialAccountingId, int? newFinancialAccountingId, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var bills = await CommonData.LoadTableDataByFinancialAccountingId<BillModel>(FleetNames.Bill, financialAccountingId, sqlDataAccessTransaction);
+		foreach (var bill in bills)
+		{
+			bill.FinancialAccountingId = newFinancialAccountingId;
+			await InsertBill(bill, sqlDataAccessTransaction);
+		}
+	}
+
 	#region Delete
 	public static async Task DeleteTransaction(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
@@ -83,18 +93,15 @@ public static class BillData
 
 	private static async Task DeleteAccounting(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
-		var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
-		var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
+		var existingAccounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, bill.FinancialAccountingId ?? 0, sqlDataAccessTransaction)
+			?? throw new InvalidOperationException("The associated financial accounting transaction for the bill does not exist.");
 
-		if (existingAccounting is not null && existingAccounting.Id > 0)
-		{
-			existingAccounting.Status = false;
-			existingAccounting.LastModifiedBy = bill.LastModifiedBy;
-			existingAccounting.LastModifiedAt = bill.LastModifiedAt;
-			existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
+		existingAccounting.Status = false;
+		existingAccounting.LastModifiedBy = bill.LastModifiedBy;
+		existingAccounting.LastModifiedAt = bill.LastModifiedAt;
+		existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
 
-			await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
-		}
+		await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
 	}
 	#endregion
 
@@ -356,7 +363,10 @@ public static class BillData
 		};
 
 		var ledgers = FinancialAccountingData.ConvertCartToDetails(accountingCart, accounting.Id);
-		await FinancialAccountingData.SaveTransaction(accounting, ledgers, false, sqlDataAccessTransaction);
+		accounting.Id = await FinancialAccountingData.SaveTransaction(accounting, ledgers, false, sqlDataAccessTransaction);
+
+		bill.FinancialAccountingId = accounting.Id;
+		await InsertBill(bill, sqlDataAccessTransaction);
 	}
 
 	private static async Task SaveAuditTrail(

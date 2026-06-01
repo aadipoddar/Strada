@@ -41,6 +41,7 @@ public partial class BillReport : IAsyncDisposable
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
+		new() { Text = "Open Accounting Posting", Id = "OpenAccountingPosting", IconCss = "e-icons e-link", Target = ".e-content" },
 		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
 		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
@@ -247,6 +248,37 @@ public partial class BillReport : IAsyncDisposable
 		await _toastNotification.ShowAsync("Not Allowed", "Transaction viewing will come soon in a future update.", ToastType.Info);
 	}
 
+	private async Task OpenFinancialAccountingPosting()
+	{
+		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
+			return;
+
+		var record = _sfGrid.SelectedRecords.First();
+		if (string.IsNullOrWhiteSpace(record.FinancialAccountingTransactionNo))
+		{
+			await _toastNotification.ShowAsync("No Posting", "This bill has no linked accounting posting.", ToastType.Warning);
+			return;
+		}
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+
+			var decoded = await DecodeCode.DecodeTransactionNo(record.FinancialAccountingTransactionNo, false, false, CodeType.FinancialAccounting);
+			await AuthenticationService.NavigateToRoute(decoded.PageRouteName, FormFactor, JSRuntime, NavigationManager);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"Failed to open accounting posting: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+
 	private async Task DeleteTransaction(int id, string transactionNo)
 	{
 		if (_isProcessing || id == 0)
@@ -331,6 +363,7 @@ public partial class BillReport : IAsyncDisposable
 			case "ExportPdf": await ExportReport(); break;
 			case "ExportExcel": await ExportReport(true); break;
 			case "ViewSelected": await ViewSelectedTransaction(); break;
+			case "OpenAccountingPosting": await OpenFinancialAccountingPosting(); break;
 			case "DownloadSelectedPdf": await ExportSelectedTransaction(); break;
 			case "DownloadSelectedExcel": await ExportSelectedTransaction(true); break;
 			case "DeleteRecoverSelected": await DeleteRecoverSelectedTransaction(); break;
@@ -353,6 +386,7 @@ public partial class BillReport : IAsyncDisposable
 		switch (args.Item.Id)
 		{
 			case "View": await ViewSelectedTransaction(); break;
+			case "OpenAccountingPosting": await OpenFinancialAccountingPosting(); break;
 			case "ExportPDF": await ExportSelectedTransaction(); break;
 			case "ExportExcel": await ExportSelectedTransaction(true); break;
 			case "DeleteRecover": await DeleteRecoverSelectedTransaction(); break;

@@ -65,6 +65,7 @@ else
 						<MenuItem Text="Transaction" IconCss="e-icons e-chart">
 							<MenuItems>
 								<MenuItem Text="View (Alt + O)" IconCss="e-icons e-eye" Id="ViewSelected" Disabled="@_isProcessing" />
+								<MenuItem Text="Open Accounting Posting" IconCss="e-icons e-link" Id="OpenAccountingPosting" Disabled="@_isProcessing" />
 								<MenuItem Text="Export PDF (Alt + P)" IconCss="e-icons e-export-pdf" Id="DownloadSelectedPdf" Disabled="@_isProcessing" />
 								<MenuItem Text="Export Excel (Alt + E)" IconCss="e-icons e-export-excel" Id="DownloadSelectedExcel" Disabled="@_isProcessing" />
 								<MenuItem Separator="true" />
@@ -296,6 +297,8 @@ else
 								</Template>
 							</GridColumn>
 							<GridColumn Field="@nameof(BillOverviewModel.TotalLedgerPaymentAmount)" HeaderText="Ledger Payment" Width="140" TextAlign="TextAlign.Right" Format="N2" />
+
+							<GridColumn Field="@nameof(BillOverviewModel.FinancialAccountingTransactionNo)" HeaderText="Accounting Trans No" Width="180" Visible="_showAllColumns" />
 
 							<GridColumn Field="@nameof(BillOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(BillOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />

@@ -32,6 +32,8 @@ public static class BillReportExport
 
 			[nameof(BillOverviewModel.TotalLedgerPaymentAmount)] = new() { DisplayName = "Ledger Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(BillOverviewModel.FinancialAccountingTransactionNo)] = new() { DisplayName = "Accounting Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+
 			[nameof(BillOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(BillOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -58,6 +60,7 @@ public static class BillReportExport
 				nameof(BillOverviewModel.TotalPenaltyAmount),
 				nameof(BillOverviewModel.TotalNetAmount),
 				nameof(BillOverviewModel.TotalLedgerPaymentAmount),
+				nameof(BillOverviewModel.FinancialAccountingTransactionNo),
 				nameof(BillOverviewModel.Remarks),
 				nameof(BillOverviewModel.CreatedByName),
 				nameof(BillOverviewModel.CreatedAt),
@@ -172,6 +175,8 @@ public static class BillReportExport
 
 			[nameof(BillLedgerPaymentsOverviewModel.TotalLedgerPaymentAmount)] = new() { DisplayName = "Ledger Payment", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
+			[nameof(BillLedgerPaymentsOverviewModel.FinancialAccountingTransactionNo)] = new() { DisplayName = "Accounting Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+
 			[nameof(BillLedgerPaymentsOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -179,7 +184,7 @@ public static class BillReportExport
 			[nameof(BillLedgerPaymentsOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(BillLedgerPaymentsOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(BillLedgerPaymentsOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(BillLedgerPaymentsOverviewModel.MasterStatus)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -202,6 +207,7 @@ public static class BillReportExport
 				nameof(BillLedgerPaymentsOverviewModel.TotalPenaltyAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalNetAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalLedgerPaymentAmount),
+				nameof(BillLedgerPaymentsOverviewModel.FinancialAccountingTransactionNo),
 				nameof(BillLedgerPaymentsOverviewModel.Remarks),
 				nameof(BillLedgerPaymentsOverviewModel.CreatedByName),
 				nameof(BillLedgerPaymentsOverviewModel.CreatedAt),
@@ -209,11 +215,11 @@ public static class BillReportExport
 				nameof(BillLedgerPaymentsOverviewModel.LastModifiedByUserName),
 				nameof(BillLedgerPaymentsOverviewModel.LastModifiedAt),
 				nameof(BillLedgerPaymentsOverviewModel.LastModifiedFromPlatform),
-				nameof(BillLedgerPaymentsOverviewModel.Status)
+				nameof(BillLedgerPaymentsOverviewModel.MasterStatus)
 			];
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.Status));
+				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.MasterStatus));
 		}
 		else
 		{
@@ -228,7 +234,7 @@ public static class BillReportExport
 				nameof(BillLedgerPaymentsOverviewModel.TotalPenaltyAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalNetAmount),
 				nameof(BillLedgerPaymentsOverviewModel.TotalLedgerPaymentAmount),
-				nameof(BillLedgerPaymentsOverviewModel.Status)
+				nameof(BillLedgerPaymentsOverviewModel.MasterStatus)
 			];
 
 			if (company is not null)
@@ -238,7 +244,7 @@ public static class BillReportExport
 				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.OMCName));
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.Status));
+				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.MasterStatus));
 		}
 
 		string fileName = $"BILL_LEDGER_PAYMENTS_REPORT";

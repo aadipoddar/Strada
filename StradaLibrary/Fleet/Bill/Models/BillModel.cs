@@ -14,8 +14,9 @@ public class BillModel
 	public decimal TotalPenaltyAmount { get; set; }
 	public decimal TotalNetAmount { get; set; }
 	public decimal TotalLedgerPaymentAmount { get; set; }
-	
+
 	public string? Remarks { get; set; }
+	public int? FinancialAccountingId { get; set; }
 	public int CreatedBy { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public string CreatedFromPlatform { get; set; }
@@ -45,6 +46,8 @@ public class BillOverviewModel
 	public decimal TotalLedgerPaymentAmount { get; set; }
 
 	public string? Remarks { get; set; }
+	public int? FinancialAccountingId { get; set; }
+	public string? FinancialAccountingTransactionNo { get; set; }
 	public int CreatedBy { get; set; }
 	public string CreatedByName { get; set; }
 	public DateTime CreatedAt { get; set; }

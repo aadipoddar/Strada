@@ -162,7 +162,7 @@ public static class ExpenseReportExport
 			[nameof(ExpenseDetailsOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(ExpenseDetailsOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(ExpenseDetailsOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
-			[nameof(ExpenseDetailsOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(ExpenseDetailsOverviewModel.MasterStatus)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -190,11 +190,11 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.LastModifiedByUserName),
 				nameof(ExpenseDetailsOverviewModel.LastModifiedAt),
 				nameof(ExpenseDetailsOverviewModel.LastModifiedFromPlatform),
-				nameof(ExpenseDetailsOverviewModel.Status)
+				nameof(ExpenseDetailsOverviewModel.MasterStatus)
 			];
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.Status));
+				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.MasterStatus));
 		}
 		else
 		{
@@ -207,7 +207,7 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.TransactionDateTime),
 				nameof(ExpenseDetailsOverviewModel.VehicleCode),
 				nameof(ExpenseDetailsOverviewModel.TotalExpense),
-				nameof(ExpenseDetailsOverviewModel.Status)
+				nameof(ExpenseDetailsOverviewModel.MasterStatus)
 			];
 
 			if (company is not null)
@@ -217,7 +217,7 @@ public static class ExpenseReportExport
 				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.VehicleCode));
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.Status));
+				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.MasterStatus));
 		}
 
 		string fileName = $"EXPENSE_DETAILS_REPORT";

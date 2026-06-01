@@ -270,7 +270,7 @@ public static class TripReportExport
 			[nameof(TripExpensesOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(TripExpensesOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(TripExpensesOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(TripExpensesOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(TripExpensesOverviewModel.MasterStatus)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -318,11 +318,11 @@ public static class TripReportExport
 				nameof(TripExpensesOverviewModel.LastModifiedByUserName),
 				nameof(TripExpensesOverviewModel.LastModifiedAt),
 				nameof(TripExpensesOverviewModel.LastModifiedFromPlatform),
-				nameof(TripExpensesOverviewModel.Status)
+				nameof(TripExpensesOverviewModel.MasterStatus)
 			];
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(TripExpensesOverviewModel.Status));
+				columnOrder.Remove(nameof(TripExpensesOverviewModel.MasterStatus));
 		}
 		else
 		{
@@ -345,7 +345,7 @@ public static class TripReportExport
 				nameof(TripExpensesOverviewModel.NetAmount),
 				nameof(TripExpensesOverviewModel.ProfitLoss),
 				nameof(TripExpensesOverviewModel.PendingDays),
-				nameof(TripExpensesOverviewModel.Status)
+				nameof(TripExpensesOverviewModel.MasterStatus)
 			];
 
 			if (company is not null)
@@ -364,7 +364,7 @@ public static class TripReportExport
 				columnOrder.Remove(nameof(TripExpensesOverviewModel.DriverDisplay));
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(TripExpensesOverviewModel.Status));
+				columnOrder.Remove(nameof(TripExpensesOverviewModel.MasterStatus));
 		}
 
 		string fileName = $"TRIP_EXPENSES_REPORT";
@@ -481,7 +481,7 @@ public static class TripReportExport
 			[nameof(TripCardPaymentsOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(TripCardPaymentsOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(TripCardPaymentsOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(TripCardPaymentsOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(TripCardPaymentsOverviewModel.MasterStatus)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -529,11 +529,11 @@ public static class TripReportExport
 				nameof(TripCardPaymentsOverviewModel.LastModifiedByUserName),
 				nameof(TripCardPaymentsOverviewModel.LastModifiedAt),
 				nameof(TripCardPaymentsOverviewModel.LastModifiedFromPlatform),
-				nameof(TripCardPaymentsOverviewModel.Status)
+				nameof(TripCardPaymentsOverviewModel.MasterStatus)
 			];
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.Status));
+				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.MasterStatus));
 		}
 		else
 		{
@@ -556,7 +556,7 @@ public static class TripReportExport
 				nameof(TripCardPaymentsOverviewModel.NetAmount),
 				nameof(TripCardPaymentsOverviewModel.ProfitLoss),
 				nameof(TripCardPaymentsOverviewModel.PendingDays),
-				nameof(TripCardPaymentsOverviewModel.Status)
+				nameof(TripCardPaymentsOverviewModel.MasterStatus)
 			];
 
 			if (company is not null)
@@ -575,7 +575,7 @@ public static class TripReportExport
 				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.DriverDisplay));
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.Status));
+				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.MasterStatus));
 		}
 
 		string fileName = $"TRIP_CARD_PAYMENTS_REPORT";
@@ -692,7 +692,7 @@ public static class TripReportExport
 			[nameof(TripLedgerPaymentsOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(TripLedgerPaymentsOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(TripLedgerPaymentsOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(TripLedgerPaymentsOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
+			[nameof(TripLedgerPaymentsOverviewModel.MasterStatus)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
 
 		List<string> columnOrder;
@@ -740,11 +740,11 @@ public static class TripReportExport
 				nameof(TripLedgerPaymentsOverviewModel.LastModifiedByUserName),
 				nameof(TripLedgerPaymentsOverviewModel.LastModifiedAt),
 				nameof(TripLedgerPaymentsOverviewModel.LastModifiedFromPlatform),
-				nameof(TripLedgerPaymentsOverviewModel.Status)
+				nameof(TripLedgerPaymentsOverviewModel.MasterStatus)
 			];
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(TripLedgerPaymentsOverviewModel.Status));
+				columnOrder.Remove(nameof(TripLedgerPaymentsOverviewModel.MasterStatus));
 		}
 		else
 		{
@@ -767,7 +767,7 @@ public static class TripReportExport
 				nameof(TripLedgerPaymentsOverviewModel.NetAmount),
 				nameof(TripLedgerPaymentsOverviewModel.ProfitLoss),
 				nameof(TripLedgerPaymentsOverviewModel.PendingDays),
-				nameof(TripLedgerPaymentsOverviewModel.Status)
+				nameof(TripLedgerPaymentsOverviewModel.MasterStatus)
 			];
 
 			if (company is not null)
@@ -786,7 +786,7 @@ public static class TripReportExport
 				columnOrder.Remove(nameof(TripLedgerPaymentsOverviewModel.DriverDisplay));
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(TripLedgerPaymentsOverviewModel.Status));
+				columnOrder.Remove(nameof(TripLedgerPaymentsOverviewModel.MasterStatus));
 		}
 
 		string fileName = $"TRIP_LEDGER_PAYMENTS_REPORT";

@@ -3,6 +3,7 @@ using StradaLibrary.Accounts.FinancialAccounting.Models;
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Common;
 using StradaLibrary.DataAccess;
+using StradaLibrary.Fleet.Bill;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
@@ -54,6 +55,7 @@ public static class FinancialAccountingData
 
 		await FinancialYearData.ValidateFinancialYear(accounting.TransactionDateTime, sqlDataAccessTransaction);
 		await ValidateBRS(accounting.Id, sqlDataAccessTransaction);
+		await DeletePostings(accounting.Id, sqlDataAccessTransaction);
 
 		accounting.Status = false;
 		await InsertFinancialAccounting(accounting, sqlDataAccessTransaction);
@@ -68,6 +70,11 @@ public static class FinancialAccountingData
 		}, sqlDataAccessTransaction);
 	}
 
+	private static async Task DeletePostings(int id, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		await BillData.UpdateFinancialAccountingId(id, null, sqlDataAccessTransaction);
+	}
+
 	public static async Task RecoverTransaction(FinancialAccountingModel accounting)
 	{
 		accounting.Status = true;
@@ -78,6 +85,7 @@ public static class FinancialAccountingData
 		await FinancialAccountingNotify.Notify(accounting.Id, NotifyType.Recovered);
 	}
 
+	#region Saving
 	private static async Task<FinancialAccountingModel> ValidateTransaction(FinancialAccountingModel accounting, bool update = false, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		accounting.Remarks = string.IsNullOrWhiteSpace(accounting.Remarks) ? null : accounting.Remarks.Trim();
@@ -121,7 +129,6 @@ public static class FinancialAccountingData
 		return accounting;
 	}
 
-	#region Saving
 	private static void ValidateTransactionLedgers(FinancialAccountingModel accounting, List<FinancialAccountingLedgerModel> ledgers)
 	{
 		if (ledgers is null || ledgers.Count == 0)

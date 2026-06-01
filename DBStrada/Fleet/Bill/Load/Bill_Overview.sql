@@ -20,6 +20,8 @@ SELECT
 	[t].[TotalLedgerPaymentAmount],
 
     [t].[Remarks],
+	[t].[FinancialAccountingId],
+	[fa].[TransactionNo] AS FinancialAccountingTransactionNo,
 	[t].[CreatedBy],
 	[u].[Name] AS CreatedByName,
 	[t].[CreatedAt],
@@ -39,6 +41,8 @@ INNER JOIN
     [dbo].[FinancialYear] fy ON t.FinancialYearId = fy.Id
 INNER JOIN
 	[dbo].[OMC] o ON t.OMCId = o.Id
+LEFT JOIN
+	[dbo].[FinancialAccounting] fa ON t.FinancialAccountingId = fa.Id
 INNER JOIN
 	[dbo].[User] AS u ON t.CreatedBy = u.Id
 LEFT JOIN

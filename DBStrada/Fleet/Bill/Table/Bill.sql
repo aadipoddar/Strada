@@ -12,6 +12,7 @@
     [TotalNetAmount] MONEY NOT NULL,
     [TotalLedgerPaymentAmount] MONEY NOT NULL,
     [Remarks] VARCHAR(MAX) NULL,
+	[FinancialAccountingId] INT NULL,
 	[CreatedBy] INT NOT NULL,
 	[CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
 	[CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
@@ -19,9 +20,10 @@
 	[LastModifiedBy] INT NULL,
 	[LastModifiedAt] DATETIME NULL, 
 	[LastModifiedFromPlatform] VARCHAR(MAX) NULL, 
-	CONSTRAINT [FK_Bill_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_Bill_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
     CONSTRAINT [FK_Bill_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [FinancialYear](Id), 
     CONSTRAINT [FK_Bill_ToOMC] FOREIGN KEY ([OMCId]) REFERENCES [OMC]([Id]),
+    CONSTRAINT [FK_Bill_ToFinancialAccounting] FOREIGN KEY ([FinancialAccountingId]) REFERENCES [FinancialAccounting]([Id]),
     CONSTRAINT [FK_Bill_CreatedBy_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 	CONSTRAINT [FK_Bill_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])
 )

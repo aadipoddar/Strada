@@ -60,7 +60,7 @@ SELECT
 	[t].[LastModifiedAt],
 	[t].[LastModifiedFromPlatform],
 
-	[t].[Status]
+	[t].[Status] AS MasterStatus
 
 FROM
     [dbo].[TripExpenses] te

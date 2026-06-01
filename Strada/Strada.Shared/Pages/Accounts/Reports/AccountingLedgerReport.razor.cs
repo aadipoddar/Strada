@@ -131,7 +131,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 	{
 		var query = _allTransactionOverviews.AsEnumerable();
 
-		if (!_showDeleted) query = query.Where(t => t.Status);
+		if (!_showDeleted) query = query.Where(t => t.MasterStatus);
 		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
 		if (_selectedVoucher?.Id > 0) query = query.Where(t => t.VoucherId == _selectedVoucher.Id);
 
@@ -283,7 +283,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
 
-		if (!_sfGrid.SelectedRecords.First().Status)
+		if (!_sfGrid.SelectedRecords.First().MasterStatus)
 		{
 			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it first.", ToastType.Warning);
 			return;
@@ -338,9 +338,9 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 
 		var record = _sfGrid.SelectedRecords.First();
 
-		await ShowConfirmation(record.Status ? "Delete" : "Recover",
-			$"Are you sure you want to {(record.Status ? "delete" : "recover")} transaction {record.TransactionNo}",
-			() => DeleteRecoverTransaction(record.MasterId, record.TransactionNo, !record.Status));
+		await ShowConfirmation(record.MasterStatus ? "Delete" : "Recover",
+			$"Are you sure you want to {(record.MasterStatus ? "delete" : "recover")} transaction {record.TransactionNo}",
+			() => DeleteRecoverTransaction(record.MasterId, record.TransactionNo, !record.MasterStatus));
 	}
 
 	private async Task ShowConfirmation(string title, string message, Func<Task> action)

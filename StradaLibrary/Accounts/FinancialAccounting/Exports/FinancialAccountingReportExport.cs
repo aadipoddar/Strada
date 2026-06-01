@@ -166,7 +166,7 @@ public static class FinancialAccountingReportExport
 			[nameof(FinancialAccountingLedgerOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(FinancialAccountingLedgerOverviewModel.LastModifiedByUserName)] = new() { DisplayName = "Modified By", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(FinancialAccountingLedgerOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = CellAlignment.Left, IncludeInTotal = false },
-			[nameof(FinancialAccountingLedgerOverviewModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false },
+			[nameof(FinancialAccountingLedgerOverviewModel.MasterStatus)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(FinancialAccountingLedgerOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(FinancialAccountingLedgerOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(FinancialAccountingLedgerOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
@@ -213,11 +213,11 @@ public static class FinancialAccountingReportExport
 				nameof(FinancialAccountingLedgerOverviewModel.LastModifiedByUserName),
 				nameof(FinancialAccountingLedgerOverviewModel.LastModifiedAt),
 				nameof(FinancialAccountingLedgerOverviewModel.LastModifiedFromPlatform),
-				nameof(FinancialAccountingLedgerOverviewModel.Status)
+				nameof(FinancialAccountingLedgerOverviewModel.MasterStatus)
 			];
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(FinancialAccountingLedgerOverviewModel.Status));
+				columnOrder.Remove(nameof(FinancialAccountingLedgerOverviewModel.MasterStatus));
 		}
         else
         {
@@ -234,11 +234,11 @@ public static class FinancialAccountingReportExport
                 nameof(FinancialAccountingLedgerOverviewModel.Debit),
                 nameof(FinancialAccountingLedgerOverviewModel.Credit),
                 nameof(FinancialAccountingLedgerOverviewModel.LedgerRemarks),
-				nameof(FinancialAccountingLedgerOverviewModel.Status)
+				nameof(FinancialAccountingLedgerOverviewModel.MasterStatus)
 			];
 
 			if (!showDeleted)
-				columnOrder.Remove(nameof(FinancialAccountingLedgerOverviewModel.Status));
+				columnOrder.Remove(nameof(FinancialAccountingLedgerOverviewModel.MasterStatus));
 
 			if (ledger is not null)
                 columnOrder.Remove(nameof(FinancialAccountingLedgerOverviewModel.LedgerName));

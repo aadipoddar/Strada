@@ -87,7 +87,7 @@ public class FinancialAccountingLedgerOverviewModel
 	public string? LastModifiedByUserName { get; set; }
 	public DateTime? LastModifiedAt { get; set; }
 	public string? LastModifiedFromPlatform { get; set; }
-	public bool Status { get; set; }
+	public bool MasterStatus { get; set; }
 
 	// Display text for exports; mirrors the grid's Reconciled column (blank when not an instrument line)
 	public string ReconciledStatus => Reconciled is null ? string.Empty : Reconciled.Value ? "Reconciled" : "Unreconciled";

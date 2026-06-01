@@ -41,6 +41,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "View (Alt + O)", Id = "View", IconCss = "e-icons e-eye", Target = ".e-content" },
+		new() { Text = "Open Accounting Posting", Id = "OpenAccountingPosting", IconCss = "e-icons e-link", Target = ".e-content" },
 		new() { Text = "Export PDF (Alt + P)", Id = "ExportPDF", IconCss = "e-icons e-export-pdf", Target = ".e-content" },
 		new() { Text = "Export Excel (Alt + E)", Id = "ExportExcel", IconCss = "e-icons e-export-excel", Target = ".e-content" },
 		new() { Text = "Delete / Recover (Del)", Id = "DeleteRecover", IconCss = "e-icons e-trash", Target = ".e-content" }
@@ -127,7 +128,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	{
 		var query = _allTransactionOverviews.AsEnumerable();
 
-		if (!_showDeleted) query = query.Where(t => t.Status);
+		if (!_showDeleted) query = query.Where(t => t.MasterStatus);
 		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
 		if (_selectedOMC?.Id > 0) query = query.Where(t => t.OMCId == _selectedOMC.Id);
 
@@ -238,7 +239,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
 			return;
 
-		if (!_sfGrid.SelectedRecords.First().Status)
+		if (!_sfGrid.SelectedRecords.First().MasterStatus)
 		{
 			await _toastNotification.ShowAsync("Cannot View", "The selected transaction is deleted. Please recover it or download invoice.", ToastType.Warning);
 			return;
@@ -246,6 +247,37 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 
 		var decodedTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, false, false, CodeType.Bill);
 		await AuthenticationService.NavigateToRoute(decodedTransactionNo.PageRouteName, FormFactor, JSRuntime, NavigationManager);
+	}
+
+	private async Task OpenFinancialAccountingPosting()
+	{
+		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
+			return;
+
+		var record = _sfGrid.SelectedRecords.First();
+		if (string.IsNullOrWhiteSpace(record.FinancialAccountingTransactionNo))
+		{
+			await _toastNotification.ShowAsync("No Posting", "This bill has no linked accounting posting.", ToastType.Warning);
+			return;
+		}
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+
+			var decoded = await DecodeCode.DecodeTransactionNo(record.FinancialAccountingTransactionNo, false, false, CodeType.FinancialAccounting);
+			await AuthenticationService.NavigateToRoute(decoded.PageRouteName, FormFactor, JSRuntime, NavigationManager);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"Failed to open accounting posting: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
 	}
 
 	private async Task DeleteTransaction(int id, string transactionNo)
@@ -290,7 +322,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 			return;
 
 		var record = _sfGrid.SelectedRecords.First();
-		if (!record.Status)
+		if (!record.MasterStatus)
 			return;
 
 		await ShowConfirmation("Delete", $"Are you sure you want to delete transaction {record.TransactionNo}", () => DeleteTransaction(record.MasterId, record.TransactionNo));
@@ -332,6 +364,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 			case "ExportPdf": await ExportReport(); break;
 			case "ExportExcel": await ExportReport(true); break;
 			case "ViewSelected": await ViewSelectedTransaction(); break;
+			case "OpenAccountingPosting": await OpenFinancialAccountingPosting(); break;
 			case "DownloadSelectedPdf": await ExportSelectedTransaction(); break;
 			case "DownloadSelectedExcel": await ExportSelectedTransaction(true); break;
 			case "DeleteRecoverSelected": await DeleteRecoverSelectedTransaction(); break;
@@ -354,6 +387,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 		switch (args.Item.Id)
 		{
 			case "View": await ViewSelectedTransaction(); break;
+			case "OpenAccountingPosting": await OpenFinancialAccountingPosting(); break;
 			case "ExportPDF": await ExportSelectedTransaction(); break;
 			case "ExportExcel": await ExportSelectedTransaction(true); break;
 			case "DeleteRecover": await DeleteRecoverSelectedTransaction(); break;

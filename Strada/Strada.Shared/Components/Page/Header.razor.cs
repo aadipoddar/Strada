@@ -92,7 +92,7 @@ public partial class Header
 			var decodedTransaction = await DecodeSearchTransactionAsync(searchText, false);
 			if (!string.IsNullOrWhiteSpace(decodedTransaction.PageRouteName))
 			{
-				NavigationManager.NavigateTo(decodedTransaction.PageRouteName, true);
+				NavigationManager.NavigateTo(decodedTransaction.PageRouteName);
 				return true;
 			}
 		}

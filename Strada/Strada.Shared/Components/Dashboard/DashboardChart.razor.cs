@@ -120,8 +120,8 @@ public partial class DashboardChart
 
 			_trips = [.. _trips.Where(_ => _.Status)];
 			_expenses = [.. _expenses.Where(_ => _.Status)];
-			_tripExpenses = [.. _tripExpenses.Where(_ => _.Status)];
-			_expenseDetails = [.. _expenseDetails.Where(_ => _.Status)];
+			_tripExpenses = [.. _tripExpenses.Where(_ => _.MasterStatus)];
+			_expenseDetails = [.. _expenseDetails.Where(_ => _.MasterStatus)];
 
 			BuildAll();
 		}
