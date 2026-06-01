@@ -47,4 +47,6 @@ public static class SettingsKeys
 	public static string AutoRefreshReportTimer => "AutoRefreshReportTimer";
 
 	public static string ReportWarningDays => "ReportWarningDays";
+
+	public static string AnalysisCacheHours => "AnalysisCacheHours";
 }

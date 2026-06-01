@@ -413,6 +413,16 @@ else
 												Max="365"
 												Required="false" />
 						</div>
+						<div class="form-field">
+							<CustomNumericField T="int"
+												@bind-Value="_analysisCacheHours"
+												Label="Analysis Cache (Hours)"
+												Placeholder="e.g., 12"
+												Format="N0"
+												Min="1"
+												Max="168"
+												Required="false" />
+						</div>
 					</div>
 				</div>
 			</div>

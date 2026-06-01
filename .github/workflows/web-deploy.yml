@@ -93,7 +93,7 @@ jobs:
           app-name: 'strada'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AA7D8C888E9D42C58BC300240511EDC2 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F0A62B4AF46F4060AEE9CAD90C56D79B }}
       
       - name: Deployment Summary
         run: |

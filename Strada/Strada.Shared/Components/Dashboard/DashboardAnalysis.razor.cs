@@ -19,6 +19,7 @@ public partial class DashboardAnalysis
 	private List<VehicleDocumentRenewalOverviewModel> _dueDocuments = [];
 
 	private int _warningDays = 30;
+	private int _cacheHours = 12;
 
 	private int _unbilledTripsCount = 0;
 
@@ -55,7 +56,7 @@ public partial class DashboardAnalysis
 
 		await LoadFresh();
 
-		var expiry = TimeSpan.FromHours(1);
+		var expiry = TimeSpan.FromHours(_cacheHours);
 		MemoryCache.Set(StorageFileNames.UnBilledTripsDataFileName, _unBilledTrips, expiry);
 		MemoryCache.Set(StorageFileNames.TripsOverviewDataFileName, _trips, expiry);
 		MemoryCache.Set(StorageFileNames.ExpensesOverviewDataFileName, _expenses, expiry);
@@ -89,6 +90,9 @@ public partial class DashboardAnalysis
 
 			var warningSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.ReportWarningDays);
 			_warningDays = int.TryParse(warningSetting?.Value, out var days) ? days : 30;
+
+			var cacheSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.AnalysisCacheHours);
+			_cacheHours = int.TryParse(cacheSetting?.Value, out var hours) && hours > 0 ? hours : 12;
 
 			_unBilledTrips = await TripData.LoadTripOverviewByBillIdDate();
 			_trips = await CommonData.LoadTableDataByDate<TripOverviewModel>(FleetNames.TripOverview, lastMonthStart, thisMonthEnd);
