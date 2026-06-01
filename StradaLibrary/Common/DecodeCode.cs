@@ -2,7 +2,6 @@
 using StradaLibrary.Accounts.FinancialAccounting.Models;
 using StradaLibrary.Accounts.Masters.Exports;
 using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.DataAccess;
 using StradaLibrary.Fleet.Bill.Exports;
 using StradaLibrary.Fleet.Bill.Models;
 using StradaLibrary.Fleet.Expense.Exports;
@@ -13,6 +12,8 @@ using StradaLibrary.Fleet.Route.Exports;
 using StradaLibrary.Fleet.Route.Models;
 using StradaLibrary.Fleet.Trip.Exports;
 using StradaLibrary.Fleet.Trip.Models;
+using StradaLibrary.Fleet.Tyre.Exports;
+using StradaLibrary.Fleet.Tyre.Models;
 using StradaLibrary.Fleet.Vehicle.Exports;
 using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Fleet.VehicleDocument.Exports;
@@ -91,6 +92,14 @@ public static class DecodeCode
 				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.DriverMaster}/{(decodeTransactionNoModel.TransactionModel as DriverModel).Id}";
 				if (pdf) decodeTransactionNoModel.PDFStream = await DriverExport.ExportMaster(drivers, ReportExportType.PDF);
 				if (excel) decodeTransactionNoModel.ExcelStream = await DriverExport.ExportMaster(drivers, ReportExportType.Excel);
+				break;
+
+			case CodeType.TyreCompany:
+				var tyreCompanies = await CommonData.LoadTableData<TyreCompanyModel>(FleetNames.TyreCompany);
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByCode<TyreCompanyModel>(FleetNames.TyreCompany, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.TyreCompanyMaster}/{(decodeTransactionNoModel.TransactionModel as TyreCompanyModel).Id}";
+				if (pdf) decodeTransactionNoModel.PDFStream = await TyreCompanyExport.ExportMaster(tyreCompanies, ReportExportType.PDF);
+				if (excel) decodeTransactionNoModel.ExcelStream = await TyreCompanyExport.ExportMaster(tyreCompanies, ReportExportType.Excel);
 				break;
 
 			case CodeType.OMC:

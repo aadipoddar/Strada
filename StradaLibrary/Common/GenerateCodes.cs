@@ -1,15 +1,16 @@
 ﻿using StradaLibrary.Accounts.FinancialAccounting.Models;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.DataAccess;
-using StradaLibrary.Operations.Models;
-using StradaLibrary.Operations.Data;
 using StradaLibrary.Fleet.Bill.Models;
 using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.OMC.Models;
-using StradaLibrary.Fleet.Trip.Models;
-using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Fleet.Route.Models;
+using StradaLibrary.Fleet.Trip.Models;
+using StradaLibrary.Fleet.Tyre.Models;
+using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Fleet.VehicleDocument.Models;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
 
 namespace StradaLibrary.Common;
 
@@ -55,6 +56,11 @@ public static class GenerateCodes
 				case CodeType.Driver:
 					var driver = await CommonData.LoadTableDataByCode<DriverModel>(FleetNames.Driver, code, sqlDataAccessTransaction);
 					isDuplicate = driver is not null;
+					break;
+
+				case CodeType.TyreCompany:
+					var tyreCompany = await CommonData.LoadTableDataByCode<TyreCompanyModel>(FleetNames.TyreCompany, code, sqlDataAccessTransaction);
+					isDuplicate = tyreCompany is not null;
 					break;
 
 				case CodeType.OMC:
@@ -287,6 +293,31 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{driverPrefix}00001", 5, CodeType.Driver, sqlDataAccessTransaction);
+	}
+	#endregion
+
+	#region Tyre
+	public static async Task<string> GenerateTyreCompanyCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var items = await CommonData.LoadTableData<TyreCompanyModel>(FleetNames.TyreCompany, sqlDataAccessTransaction);
+		var itemPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.TyreCompanyCodePrefix, sqlDataAccessTransaction)).Value;
+
+		var lastItem = items.OrderByDescending(tc => tc.Id).FirstOrDefault();
+		if (lastItem is not null)
+		{
+			var lastItemCode = lastItem.Code;
+			if (lastItemCode.StartsWith(itemPrefix))
+			{
+				var lastNumberPart = lastItemCode[itemPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{itemPrefix}{nextNumber:D5}", 5, CodeType.TyreCompany, sqlDataAccessTransaction);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{itemPrefix}00001", 5, CodeType.TyreCompany, sqlDataAccessTransaction);
 	}
 	#endregion
 

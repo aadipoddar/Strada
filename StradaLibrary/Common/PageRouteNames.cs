@@ -55,6 +55,9 @@ public static class PageRouteNames
 	public const string DriverMaster = "/fleet/driver";
 	public const string VehicleDriverMaster = "/fleet/vehicle-driver";
 
+	public const string TyreCompanyMaster = "/fleet/tyre-company";
+	public const string TyreMounting = "/fleet/tyre-mounting";
+
 	public const string OMCMaster = "/fleet/omc";
 	public const string OMCCardMaster = "/fleet/omc-card";
 

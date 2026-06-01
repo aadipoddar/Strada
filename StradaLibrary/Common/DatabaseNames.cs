@@ -1,4 +1,4 @@
-﻿namespace StradaLibrary.DataAccess;
+﻿namespace StradaLibrary.Common;
 
 public static class OperationNames
 {
@@ -159,5 +159,15 @@ public static class FleetNames
 	public static string InsertVehicle => "Insert_Vehicle";
 	public static string InsertVehicleType => "Insert_VehicleType";
 	public static string InsertExpenseType => "Insert_ExpenseType";
+	#endregion
+
+	#region Tyre
+	public static string TyreCompany => "TyreCompany";
+	public static string TyreMounting => "TyreMounting";
+
+	public static string InsertTyreCompany => "Insert_TyreCompany";
+	public static string InsertTyreMounting => "Insert_TyreMounting";
+
+	public static string DeleteTyreMounting => "Delete_TyreMounting";
 	#endregion
 }

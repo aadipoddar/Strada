@@ -42,6 +42,7 @@ public partial class SettingsPage
 	private string _routeCodePrefix = string.Empty;
 	private string _driverCodePrefix = string.Empty;
 	private string _expenseTypeCodePrefix = string.Empty;
+	private string _tyreCompanyCodePrefix = string.Empty;
 
 	// Transaction Prefixes
 	private string _financialAccountingTransactionPrefix = string.Empty;
@@ -153,6 +154,9 @@ public partial class SettingsPage
 
 		s = await SettingsData.LoadSettingsByKey(SettingsKeys.ExpenseTypeCodePrefix);
 		_expenseTypeCodePrefix = s?.Value ?? string.Empty;
+
+		s = await SettingsData.LoadSettingsByKey(SettingsKeys.TyreCompanyCodePrefix);
+		_tyreCompanyCodePrefix = s?.Value ?? string.Empty;
 
 		s = await SettingsData.LoadSettingsByKey(SettingsKeys.FinancialAccountingTransactionPrefix);
 		_financialAccountingTransactionPrefix = s?.Value ?? string.Empty;
@@ -327,6 +331,7 @@ public partial class SettingsPage
 			await UpdateSetting(SettingsKeys.RouteCodePrefix, _routeCodePrefix, Desc(SettingsKeys.RouteCodePrefix));
 			await UpdateSetting(SettingsKeys.DriverCodePrefix, _driverCodePrefix, Desc(SettingsKeys.DriverCodePrefix));
 			await UpdateSetting(SettingsKeys.ExpenseTypeCodePrefix, _expenseTypeCodePrefix, Desc(SettingsKeys.ExpenseTypeCodePrefix));
+			await UpdateSetting(SettingsKeys.TyreCompanyCodePrefix, _tyreCompanyCodePrefix, Desc(SettingsKeys.TyreCompanyCodePrefix));
 
 			await UpdateSetting(SettingsKeys.FinancialAccountingTransactionPrefix, _financialAccountingTransactionPrefix, Desc(SettingsKeys.FinancialAccountingTransactionPrefix));
 			await UpdateSetting(SettingsKeys.TripTransactionPrefix, _tripTransactionPrefix, Desc(SettingsKeys.TripTransactionPrefix));
