@@ -1,3 +1,4 @@
+@using StradaLibrary.Accounts.Masters.Models
 @using StradaLibrary.Fleet.OMC.Models
 
 @attribute [Route(PageRouteNames.OMCCardMaster)]
@@ -87,6 +88,16 @@ else
 						</div>
 
 						<div class="form-field">
+							<CustomAutoComplete T="LedgerModel"
+												@bind-Value="_selectedLedger"
+												DataSource="@_ledgers"
+												Placeholder="Select Ledger"
+												Label="Ledger"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
+						</div>
+
+						<div class="form-field">
 							<CustomNumericField T="decimal"
 												@bind-Value="_omcCard.OpeningBalance"
 												Label="Opening Balance"
@@ -134,6 +145,15 @@ else
 										var item = (context as OMCCardModel);
 										var omc = _omcs.FirstOrDefault(o => o.Id == item.OMCId);
 										<span>@(omc is not null ? omc.Name : "N/A")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(OMCCardModel.LedgerId)" HeaderText="Ledger" Width="250">
+								<Template>
+									@{
+										var item = (context as OMCCardModel);
+										var ledger = _ledgers.FirstOrDefault(l => l.Id == item.LedgerId);
+										<span>@(ledger is not null ? ledger.Name : "N/A")</span>
 									}
 								</Template>
 							</GridColumn>

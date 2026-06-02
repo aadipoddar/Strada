@@ -3,6 +3,7 @@
 	@CardNumber VARCHAR(250),
 	@Code VARCHAR(10),
 	@OMCId INT,
+	@LedgerId INT,
 	@OpeningBalance MONEY,
 	@Remarks VARCHAR(MAX),
 	@Status BIT = 1
@@ -15,6 +16,7 @@ BEGIN
 			[CardNumber],
 			[Code],
 			[OMCId],
+			[LedgerId],
 			[OpeningBalance],
 			[Remarks],
 			[Status]
@@ -24,6 +26,7 @@ BEGIN
 			@CardNumber,
 			@Code,
 			@OMCId,
+			@LedgerId,
 			@OpeningBalance,
 			@Remarks,
 			@Status
@@ -39,6 +42,7 @@ BEGIN
 			[CardNumber] = @CardNumber,
 			[Code] = @Code,
 			[OMCId] = @OMCId,
+			[LedgerId] = @LedgerId,
 			[OpeningBalance] = @OpeningBalance,
 			[Remarks] = @Remarks,
 			[Status] = @Status

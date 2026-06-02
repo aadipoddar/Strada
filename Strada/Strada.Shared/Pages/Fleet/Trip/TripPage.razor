@@ -60,6 +60,9 @@ else
 					</MenuItems>
 				</SfMenu>
 			</LeftContent>
+			<RightContent>
+				<RecheckSaveButton OnClick="() => SaveTransaction()" Disabled="@_isProcessing" />
+			</RightContent>
 		</Header>
 
 		<!-- Main Content Container -->

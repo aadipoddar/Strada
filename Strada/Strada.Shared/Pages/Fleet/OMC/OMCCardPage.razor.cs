@@ -1,6 +1,7 @@
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
+using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Fleet.OMC.Data;
 using StradaLibrary.Fleet.OMC.Exports;
 using StradaLibrary.Fleet.OMC.Models;
@@ -20,9 +21,11 @@ public partial class OMCCardPage
 
 	private OMCCardModel _omcCard = new();
 	private OMCModel _selectedOMC;
+	private LedgerModel _selectedLedger;
 
 	private List<OMCCardModel> _omcCards = [];
 	private List<OMCModel> _omcs = [];
+	private List<LedgerModel> _ledgers = [];
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
@@ -59,6 +62,10 @@ public partial class OMCCardPage
 		_omcs = [.. _omcs.OrderBy(omc => omc.Name)];
 		_selectedOMC = _omcs.FirstOrDefault(omc => omc.Id == _omcCard.OMCId);
 
+		_ledgers = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger);
+		_ledgers = [.. _ledgers.OrderBy(ledger => ledger.Name)];
+		_selectedLedger = _ledgers.FirstOrDefault(ledger => ledger.Id == _omcCard.LedgerId);
+
 		if (!_showDeleted)
 			_omcCards = [.. _omcCards.Where(omc => omc.Status)];
 
@@ -90,6 +97,7 @@ public partial class OMCCardPage
 			await _toastNotification.ShowAsync("Processing", "Please wait while the transaction is being saved...", ToastType.Info);
 
 			_omcCard.OMCId = _selectedOMC?.Id ?? 0;
+			_omcCard.LedgerId = _selectedLedger?.Id ?? 0;
 
 			await OMCCardData.SaveTransaction(_omcCard, _user.Id, FormFactor.GetFormFactor() + FormFactor.GetPlatform());
 
@@ -122,6 +130,7 @@ public partial class OMCCardPage
 		}
 
 		_selectedOMC = _omcs.FirstOrDefault(omc => omc.Id == _omcCard.OMCId);
+		_selectedLedger = _ledgers.FirstOrDefault(ledger => ledger.Id == _omcCard.LedgerId);
 		StateHasChanged();
 		await _sfFirstFocus.FocusAsync();
 	}
