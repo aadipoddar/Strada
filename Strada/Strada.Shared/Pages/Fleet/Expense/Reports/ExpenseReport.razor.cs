@@ -174,72 +174,6 @@ public partial class ExpenseReport : IAsyncDisposable
 	}
 	#endregion
 
-	#region Exporting
-	private async Task ExportReport(bool isExcel = false)
-	{
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var (stream, fileName) = await ExpenseReportExport.ExportReport(
-				_transactionOverviews,
-				isExcel ? ReportExportType.Excel : ReportExportType.PDF,
-				DateOnly.FromDateTime(_fromDate),
-				DateOnly.FromDateTime(_toDate),
-				_showAllColumns,
-				_showDeleted,
-				_selectedCompany?.Id > 0 ? _selectedCompany : null,
-				_selectedVehicle?.Id > 0 ? _selectedVehicle : null
-			);
-			await SaveAndViewService.SaveAndView(fileName, stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
-	}
-
-	private async Task ExportSelectedTransaction(bool isExcel = false)
-	{
-		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			StateHasChanged();
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, !isExcel, isExcel, CodeType.Expense);
-			await SaveAndViewService.SaveAndView(isExcel ? decodeTransactionNo.ExcelStream.fileName : decodeTransactionNo.PDFStream.fileName,
-				isExcel ? decodeTransactionNo.ExcelStream.stream : decodeTransactionNo.PDFStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
-	}
-	#endregion
-
 	#region Actions
 	private async Task ViewSelectedTransaction()
 	{
@@ -328,6 +262,72 @@ public partial class ExpenseReport : IAsyncDisposable
 	{
 		_confirmAction = null;
 		await _confirmationDialog.HideAsync();
+	}
+	#endregion
+
+	#region Exporting
+	private async Task ExportReport(bool isExcel = false)
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+
+			var (stream, fileName) = await ExpenseReportExport.ExportReport(
+				_transactionOverviews,
+				isExcel ? ReportExportType.Excel : ReportExportType.PDF,
+				DateOnly.FromDateTime(_fromDate),
+				DateOnly.FromDateTime(_toDate),
+				_showAllColumns,
+				_showDeleted,
+				_selectedCompany?.Id > 0 ? _selectedCompany : null,
+				_selectedVehicle?.Id > 0 ? _selectedVehicle : null
+			);
+			await SaveAndViewService.SaveAndView(fileName, stream);
+
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+
+	private async Task ExportSelectedTransaction(bool isExcel = false)
+	{
+		if (_isProcessing || _sfGrid is null || _sfGrid.SelectedRecords is null || _sfGrid.SelectedRecords.Count == 0)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
+
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_sfGrid.SelectedRecords.First().TransactionNo, !isExcel, isExcel, CodeType.Expense);
+			await SaveAndViewService.SaveAndView(isExcel ? decodeTransactionNo.ExcelStream.fileName : decodeTransactionNo.PDFStream.fileName,
+				isExcel ? decodeTransactionNo.ExcelStream.stream : decodeTransactionNo.PDFStream.stream);
+
+			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
 	}
 	#endregion
 
