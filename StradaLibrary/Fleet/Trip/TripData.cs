@@ -31,6 +31,9 @@ public static class TripData
 	public static async Task<List<TripOverviewModel>> LoadTripOverviewByBillIdDate(int? BillId = null, DateTime? StartDate = null, DateTime? EndDate = null, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		await SqlDataAccess.LoadData<TripOverviewModel, dynamic>(FleetNames.LoadTripOverviewByBillIdDate, new { BillId, StartDate, EndDate }, sqlDataAccessTransaction);
 
+	public static async Task<TripOverviewModel> LoadTripBySlNoFinancialYear(string SlNo, int FinancialYearId, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+		(await SqlDataAccess.LoadData<TripOverviewModel, dynamic>(FleetNames.LoadTripBySlNoFinancialYear, new { SlNo, FinancialYearId }, sqlDataAccessTransaction)).FirstOrDefault();
+
 	public static List<TripExpensesModel> ConvertExpensesCartToDetails(List<TripExpensesCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new TripExpensesModel
 		{
@@ -105,9 +108,12 @@ public static class TripData
 	#region Save
 	private static async Task<TripModel> ValidateTransaction(TripModel trip, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
-		trip.SlNo = string.IsNullOrWhiteSpace(trip.SlNo) ? null : trip.SlNo.Trim();
+		trip.SlNo = trip.SlNo.Trim();
 		trip.ChallanNo = string.IsNullOrWhiteSpace(trip.ChallanNo) ? null : trip.ChallanNo.Trim();
 		trip.Remarks = string.IsNullOrWhiteSpace(trip.Remarks) ? null : trip.Remarks.Trim();
+
+		if (string.IsNullOrWhiteSpace(trip.SlNo))
+			throw new InvalidOperationException("Please enter a sl no for the transaction.");
 
 		if (trip.CompanyId <= 0)
 			throw new InvalidOperationException("Please select a company for the transaction.");

@@ -5,7 +5,7 @@
     [CompanyId] INT NOT NULL,
     [TransactionDateTime] DATETIME NOT NULL,
     [FinancialYearId] INT NOT NULL,
-    [SlNo] VARCHAR(MAX) NULL,
+    [SlNo] VARCHAR(MAX) NOT NULL,
     [ChallanNo] VARCHAR(MAX) NULL,
     [OMCId] INT NOT NULL,
     [VehicleId] INT NOT NULL,

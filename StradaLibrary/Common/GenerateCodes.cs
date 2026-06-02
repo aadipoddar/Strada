@@ -5,6 +5,7 @@ using StradaLibrary.Fleet.Bill.Models;
 using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.OMC.Models;
 using StradaLibrary.Fleet.Route.Models;
+using StradaLibrary.Fleet.Trip;
 using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Fleet.Tyre.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
@@ -23,6 +24,7 @@ public static class GenerateCodes
 		{
 			switch (type)
 			{
+				#region Accounts
 				case CodeType.FinancialAccounting:
 					var accounting = await CommonData.LoadTableDataByTransactionNo<FinancialAccountingModel>(AccountNames.FinancialAccounting, code, sqlDataAccessTransaction);
 					isDuplicate = accounting is not null;
@@ -31,7 +33,9 @@ public static class GenerateCodes
 					var ledger = await CommonData.LoadTableDataByCode<LedgerModel>(AccountNames.Ledger, code, sqlDataAccessTransaction);
 					isDuplicate = ledger is not null;
 					break;
+				#endregion
 
+				#region Fleet
 				case CodeType.Trip:
 					var trip = await CommonData.LoadTableDataByTransactionNo<TripModel>(FleetNames.Trip, code, sqlDataAccessTransaction);
 					isDuplicate = trip is not null;
@@ -84,6 +88,7 @@ public static class GenerateCodes
 					var expenseType = await CommonData.LoadTableDataByCode<ExpenseTypeModel>(FleetNames.ExpenseType, code, sqlDataAccessTransaction);
 					isDuplicate = expenseType is not null;
 					break;
+				#endregion
 			}
 
 			if (!isDuplicate)
@@ -109,7 +114,7 @@ public static class GenerateCodes
 		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, accounting.CompanyId, sqlDataAccessTransaction)).Code;
 		var accountingPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.FinancialAccountingTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastAccounting = await CommonData.LoadLastTableDataByFinancialYear<FinancialAccountingModel>(AccountNames.FinancialAccounting, accounting.FinancialYearId, sqlDataAccessTransaction);
+		var lastAccounting = await CommonData.LoadLastTableDataByCompanyFinancialYear<FinancialAccountingModel>(AccountNames.FinancialAccounting, accounting.CompanyId, accounting.FinancialYearId, sqlDataAccessTransaction);
 		if (lastAccounting is not null)
 		{
 			var lastTransactionNo = lastAccounting.TransactionNo;
@@ -158,7 +163,7 @@ public static class GenerateCodes
 		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, trip.CompanyId, sqlDataAccessTransaction)).Code;
 		var tripPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.TripTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastTrip = await CommonData.LoadLastTableDataByFinancialYear<TripModel>(FleetNames.Trip, trip.FinancialYearId, sqlDataAccessTransaction);
+		var lastTrip = await CommonData.LoadLastTableDataByCompanyFinancialYear<TripModel>(FleetNames.Trip, trip.CompanyId, trip.FinancialYearId, sqlDataAccessTransaction);
 		if (lastTrip is not null)
 		{
 			var lastTransactionNo = lastTrip.TransactionNo;
@@ -176,13 +181,33 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{tripPrefix}00001", 5, CodeType.Trip, sqlDataAccessTransaction);
 	}
 
+	public static async Task<string> GenerateTripSlNo(TripModel trip, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		// Sl No format is {CompanyCode}-{Number}, sequential per company per financial year (e.g. ARL-1, ARL-2, ...).
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, trip.CompanyId, sqlDataAccessTransaction)).Code;
+		var nextNumber = 1;
+
+		var lastTrip = await CommonData.LoadLastTableDataByCompanyFinancialYear<TripModel>(FleetNames.Trip, trip.CompanyId, trip.FinancialYearId, sqlDataAccessTransaction);
+		if (lastTrip is not null && lastTrip.SlNo.StartsWith($"{companyPrefix}-"))
+		{
+			var lastNumberPart = lastTrip.SlNo[(companyPrefix.Length + 1)..]; // skip the company prefix and the '-' separator
+			if (int.TryParse(lastNumberPart, out int lastNumber))
+				nextNumber = lastNumber + 1;
+		}
+
+		while (await TripData.LoadTripBySlNoFinancialYear($"{companyPrefix}-{nextNumber}", trip.FinancialYearId, sqlDataAccessTransaction) is not null)
+			nextNumber++;
+
+		return $"{companyPrefix}-{nextNumber}";
+	}
+
 	public static async Task<string> GenerateBillTransactionNo(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, bill.FinancialYearId, sqlDataAccessTransaction);
 		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, bill.CompanyId, sqlDataAccessTransaction)).Code;
 		var billPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.BillTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastBill = await CommonData.LoadLastTableDataByFinancialYear<BillModel>(FleetNames.Bill, bill.FinancialYearId, sqlDataAccessTransaction);
+		var lastBill = await CommonData.LoadLastTableDataByCompanyFinancialYear<BillModel>(FleetNames.Bill, bill.CompanyId, bill.FinancialYearId, sqlDataAccessTransaction);
 		if (lastBill is not null)
 		{
 			var lastTransactionNo = lastBill.TransactionNo;
@@ -206,7 +231,7 @@ public static class GenerateCodes
 		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(AccountNames.Company, expense.CompanyId, sqlDataAccessTransaction)).Code;
 		var expensePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ExpenseTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-		var lastExpense = await CommonData.LoadLastTableDataByFinancialYear<ExpenseModel>(FleetNames.Expense, expense.FinancialYearId, sqlDataAccessTransaction);
+		var lastExpense = await CommonData.LoadLastTableDataByCompanyFinancialYear<ExpenseModel>(FleetNames.Expense, expense.CompanyId, expense.FinancialYearId, sqlDataAccessTransaction);
 		if (lastExpense is not null)
 		{
 			var lastTransactionNo = lastExpense.TransactionNo;

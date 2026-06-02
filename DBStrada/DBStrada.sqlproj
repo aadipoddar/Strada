@@ -203,6 +203,7 @@
     <Build Include="Common\Load_TableData_By_MasterId.sql" />
     <Build Include="Common\Load_TableData_By_Status.sql" />
     <Build Include="Common\Load_TableData_By_TransactionNo.sql" />
+    <Build Include="Fleet\Trip\Load\Load_Trip_By_SlNo_FinancialYear.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

@@ -105,6 +105,7 @@ public static class FleetNames
 	public static string TripCardPaymentsOverview => "TripCardPayments_Overview";
 	public static string TripLedgerPaymentsOverview => "TripLedgerPayments_Overview";
 	public static string LoadTripOverviewByBillIdDate => "Load_Trip_Overview_By_BillId_Date";
+	public static string LoadTripBySlNoFinancialYear => "Load_Trip_By_SlNo_FinancialYear";
 
 	public static string InsertTrip => "Insert_Trip";
 	public static string InsertTripExpenses => "Insert_TripExpenses";

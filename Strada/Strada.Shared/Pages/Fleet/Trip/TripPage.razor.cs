@@ -228,6 +228,18 @@ public partial class TripPage
 			LastModifiedFromPlatform = null
 		};
 
+		var lastTransaction = await CommonData.LoadLastTableData<TripModel>(FleetNames.Trip);
+		if (lastTransaction is not null)
+		{
+			_trip.TransactionDateTime = lastTransaction.TransactionDateTime;
+			_trip.VehicleId = lastTransaction.VehicleId;
+
+			if (_vehicles.FirstOrDefault(v => v.Id == lastTransaction.VehicleId) is { } lastVehicle)
+				_trip.CompanyId = lastVehicle.CompanyId;
+		}
+
+		_trip.SlNo = await GenerateCodes.GenerateTripSlNo(_trip);
+
 		await DeleteLocalFiles();
 	}
 
@@ -257,13 +269,6 @@ public partial class TripPage
 			_selectedRoute = _routes.FirstOrDefault(s => s.Id == _trip.RouteId) ?? _routes.FirstOrDefault();
 		else
 			_selectedRoute = _routes.FirstOrDefault();
-
-		if (_trip.Id == 0)
-		{
-			var lastTransaction = await CommonData.LoadLastTableData<TripModel>(FleetNames.Trip);
-			if (lastTransaction is not null)
-				_trip.TransactionDateTime = lastTransaction.TransactionDateTime;
-		}
 	}
 
 	private async Task ResolveExpensesCart()
@@ -427,6 +432,12 @@ public partial class TripPage
 		_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId);
 		_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _selectedVehicle.OMCId) ?? _omcs.FirstOrDefault();
 		_selectedDriver = _vehicleDrivers.FirstOrDefault(vd => vd.VehicleId == _selectedVehicle.Id) is var vehicleDriver && vehicleDriver is not null ? _drivers.FirstOrDefault(d => d.Id == vehicleDriver.DriverId) : _drivers.FirstOrDefault();
+
+		if (_trip.Id == 0)
+		{
+			_trip.CompanyId = _selectedCompany.Id;
+			_trip.SlNo = await GenerateCodes.GenerateTripSlNo(_trip);
+		}
 
 		await SaveTransactionFile();
 	}
