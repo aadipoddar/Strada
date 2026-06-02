@@ -59,7 +59,6 @@ public static class AccountNames
 	#region Masters
 	public static string Company => "Company";
 	public static string Group => "Group";
-	public static string Nature => "Nature";
 	public static string AccountType => "AccountType";
 	public static string StateUT => "StateUT";
 	public static string Ledger => "Ledger";

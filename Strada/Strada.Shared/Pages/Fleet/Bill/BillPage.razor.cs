@@ -514,6 +514,7 @@ public partial class BillPage
 
 		_pendingTrips = [.. _allPendingTrips
 			.Where(s => !_tripCart.Any(c => c.Id == s.Id))
+			.Where (s => s.CompanyId == _selectedCompany.Id)
 			.OrderBy(s => s.TransactionDateTime)];
 
 		#region Financial Year

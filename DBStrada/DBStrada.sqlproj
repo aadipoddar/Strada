@@ -135,7 +135,6 @@
     <Build Include="Accounts\Masters\Table\FinancialYear.sql" />
     <Build Include="Accounts\Masters\Table\Group.sql" />
     <Build Include="Accounts\Masters\Table\Ledger.sql" />
-    <Build Include="Accounts\Masters\Table\Nature.sql" />
     <Build Include="Accounts\Masters\Table\StateUT.sql" />
     <Build Include="Accounts\Masters\Table\Voucher.sql" />
     <Build Include="Fleet\VehicleDocument\Table\VehicleDocument.sql" />

@@ -19,10 +19,8 @@ public partial class GroupPage
 	private bool _showDeleted = false;
 
 	private GroupModel _group = new();
-	private NatureModel _selectedNature;
 
 	private List<GroupModel> _groups = [];
-	private List<NatureModel> _natures = [];
 	private readonly List<ContextMenuItemModel> _gridContextMenuItems =
 	[
 		new() { Text = "Edit (Insert)", Id = "EditSelectedItem", IconCss = "e-icons e-edit", Target = ".e-content" },
@@ -54,11 +52,7 @@ public partial class GroupPage
 
 	private async Task LoadData()
 	{
-		_natures = await CommonData.LoadTableDataByStatus<NatureModel>(AccountNames.Nature);
 		_groups = await CommonData.LoadTableData<GroupModel>(AccountNames.Group);
-
-		_natures = [.. _natures.OrderBy(n => n.Name)];
-		_selectedNature = _natures.FirstOrDefault(n => n.Id == _group.NatureId);
 
 		if (!_showDeleted)
 			_groups = [.. _groups.Where(g => g.Status)];
@@ -71,14 +65,6 @@ public partial class GroupPage
 
 		if (_sfFirstFocus is not null)
 			await _sfFirstFocus.FocusAsync();
-	}
-	#endregion
-
-	#region Changed Events
-	private void OnNatureChanged(NatureModel value)
-	{
-		_selectedNature = value;
-		_group.NatureId = value?.Id ?? 0;
 	}
 	#endregion
 
@@ -128,7 +114,6 @@ public partial class GroupPage
 			return;
 		}
 
-		_selectedNature = _natures.FirstOrDefault(n => n.Id == _group.NatureId);
 		StateHasChanged();
 		await _sfFirstFocus.FocusAsync();
 	}
