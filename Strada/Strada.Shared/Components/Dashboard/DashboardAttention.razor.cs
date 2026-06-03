@@ -52,8 +52,8 @@ public partial class DashboardAttention
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (!firstRender)
-			return;
+		// if (!firstRender)
+		return;
 
 		await LoadData();
 	}
