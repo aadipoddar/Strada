@@ -592,6 +592,6 @@ else
 	</div>
 }
 
-<NavigationLock ConfirmExternalNavigation="@_isProcessing" />
-
 <ToastNotification @ref="_toastNotification" />
+
+<CloseGuard Block="_isProcessing" />

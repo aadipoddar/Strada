@@ -21,7 +21,7 @@ public static partial class Secrets
 	public static string Email => "softaadi@gmail.com";
 	public static string EmailPassword = GetSecret(nameof(EmailPassword));
 
-	public static string ToEmail = "aadipoddarmail@gmail.com";
+	public static string ToEmail = "ajay@ashokroadlines.com";
 	public static string ToName => "Strada";
 
 	public static string OnlineFullLogoPath => "https://raw.githubusercontent.com/aadipoddar/Strada/refs/heads/main/Strada/Strada.Web/wwwroot/images/logo_full.png";

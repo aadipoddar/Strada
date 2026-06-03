@@ -19,8 +19,9 @@ public static class TripInvoiceExport
 
 		LedgerModel ledger = new()
 		{
-			Name = $"Challan: {transaction.ChallanNo ?? "N/A"}",
-			Address = $"From: {transaction.FromLocation}" +
+			Name = $"Sl No: {transaction.SlNo ?? "N/A"}",
+			Address = $"Challan: {transaction.ChallanNo ?? "N/A"}" +
+			$"From: {transaction.FromLocation}" +
 			$" \nTo: {transaction.ToLocation}" +
 			$" \nVehicle: {transaction.VehicleCode}" +
 			$" \nDriver: {transaction.DriverName} ({transaction.DriverMobile})" +
