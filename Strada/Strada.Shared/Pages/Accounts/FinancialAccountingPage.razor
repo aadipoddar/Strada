@@ -26,7 +26,7 @@
 else
 {
 	<div class="page-shell">
-		<Header Title="Financial Accounting Entry">
+		<Header Title="@(_accounting.Id > 0 ? $"Edit Financial Accounting {_accounting.TransactionNo}" : "Create Financial Accounting")">
 			<LeftContent>
 				<MudBlazor.MudMenu Label="File" Dense="true" Disabled="_isProcessing">
 					<MudBlazor.MudMenuItem Label="New Transaction (Ctrl + N)" OnClick="ResetPage" />
