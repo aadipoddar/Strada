@@ -558,21 +558,6 @@ public partial class ExpensePage
 	#endregion
 
 	#region Utilities
-	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
-	{
-		switch (args.Item.Id)
-		{
-			case "NewTransaction": await ResetPage(); break;
-			case "SaveTransaction": await SaveTransaction(); break;
-			case "SavePdfInvoice": await SaveTransaction(savePDF: true); break;
-			case "SaveExcelInvoice": await SaveTransaction(saveExcel: true); break;
-			case "ExportPdfInvoice": await ExportPdfInvoice(); break;
-			case "ExportExcelInvoice": await ExportExcelInvoice(); break;
-			case "ExpenseReport": await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager); break;
-			case "ExpenseDetailsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseDetailsReport, FormFactor, JSRuntime, NavigationManager); break;
-		}
-	}
-
 	private async Task OnExpensesCartGridContextMenuItemClicked(ContextMenuClickEventArgs<ExpenseDetailsCartModel> args)
 	{
 		switch (args.Item.Id)

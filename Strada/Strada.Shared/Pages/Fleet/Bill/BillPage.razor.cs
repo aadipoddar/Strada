@@ -689,21 +689,6 @@ public partial class BillPage
 	#endregion
 
 	#region Utilities
-	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
-	{
-		switch (args.Item.Id)
-		{
-			case "NewTransaction": await ResetPage(); break;
-			case "SaveTransaction": await SaveTransaction(); break;
-			case "SavePdfInvoice": await SaveTransaction(savePDF: true); break;
-			case "SaveExcelInvoice": await SaveTransaction(saveExcel: true); break;
-			case "ExportPdfInvoice": await ExportPdfInvoice(); break;
-			case "ExportExcelInvoice": await ExportExcelInvoice(); break;
-			case "TransactionHistory": await AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager); break;
-			case "LedgerPaymentsReport": await AuthenticationService.NavigateToRoute(PageRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager); break;
-		}
-	}
-
 	private async Task OnPendingTripGridContextMenuItemClicked(ContextMenuClickEventArgs<TripOverviewModel> args)
 	{
 		switch (args.Item.Id)

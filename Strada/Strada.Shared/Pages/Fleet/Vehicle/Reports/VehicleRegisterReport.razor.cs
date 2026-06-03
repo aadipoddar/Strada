@@ -385,30 +385,6 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 	#endregion
 
 	#region Utilities
-	private async Task OnMenuSelected(Syncfusion.Blazor.Navigations.MenuEventArgs<Syncfusion.Blazor.Navigations.MenuItem> args)
-	{
-		switch (args.Item.Id)
-		{
-			case "TripReport": NavigationManager.NavigateTo(PageRouteNames.TripReport); break;
-			case "ExpenseReport": NavigationManager.NavigateTo(PageRouteNames.ExpenseReport); break;
-			case "BillReport": NavigationManager.NavigateTo(PageRouteNames.BillReport); break;
-			case "Refresh": await LoadTransactionOverviews(); break;
-			case "ToggleDetailsView": await ToggleDetailsView(); break;
-			case "ExportPdf": await ExportPdf(); break;
-			case "ExportExcel": await ExportExcel(); break;
-			case "PeriodToday": await HandleDatesChanged(DateRangeType.Today); break;
-			case "PeriodPreviousDay": await HandleDatesChanged(DateRangeType.Yesterday); break;
-			case "PeriodNextDay": await HandleDatesChanged(DateRangeType.NextDay); break;
-			case "PeriodCurrentMonth": await HandleDatesChanged(DateRangeType.CurrentMonth); break;
-			case "PeriodPreviousMonth": await HandleDatesChanged(DateRangeType.PreviousMonth); break;
-			case "PeriodNextMonth": await HandleDatesChanged(DateRangeType.NextMonth); break;
-			case "PeriodCurrentFinancialYear": await HandleDatesChanged(DateRangeType.CurrentFinancialYear); break;
-			case "PeriodPreviousFinancialYear": await HandleDatesChanged(DateRangeType.PreviousFinancialYear); break;
-			case "PeriodNextFinancialYear": await HandleDatesChanged(DateRangeType.NextFinancialYear); break;
-			case "PeriodAllTime": await HandleDatesChanged(DateRangeType.AllTime); break;
-		}
-	}
-
 	private async Task ToggleDetailsView()
 	{
 		_showAllColumns = !_showAllColumns;
