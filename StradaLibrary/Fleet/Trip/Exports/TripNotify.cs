@@ -1,5 +1,6 @@
 using StradaLibrary.Common;
 using StradaLibrary.Fleet.Trip.Models;
+using StradaLibrary.Operations.Data;
 using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Utils.MailUtils;
 
@@ -34,7 +35,8 @@ internal static class TripNotify
 				["Expenses"] = transaction.TotalExpense.ToString(),
 				[type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = transaction.LastModifiedByUserName ?? transaction.CreatedByName
 			},
-			Remarks = transaction.Remarks
+			Remarks = transaction.Remarks,
+			Differences = type == NotifyType.Updated ? (await AuditTrailData.LoadLastAuditTrailByTableRecord(FleetNames.Trip, transaction.TransactionNo)).RecordValue : null
 		};
 
 		// For update emails, include before and after invoices

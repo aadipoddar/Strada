@@ -1,5 +1,6 @@
 using StradaLibrary.Common;
 using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Operations.Data;
 using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Utils.MailUtils;
 
@@ -30,7 +31,8 @@ internal static class OMCCardMoneyTransferNotify
 				["Amount"] = transaction.TotalAmount.FormatIndianCurrency(),
 				[type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = transaction.LastModifiedByUserName ?? transaction.CreatedByName
 			},
-			Remarks = transaction.Remarks
+			Remarks = transaction.Remarks,
+			Differences = type == NotifyType.Updated ? (await AuditTrailData.LoadLastAuditTrailByTableRecord(FleetNames.OMCCardMoneyTransfer, transaction.TransactionNo)).RecordValue : null
 		};
 
 		if (type == NotifyType.Updated && previousInvoice.HasValue)

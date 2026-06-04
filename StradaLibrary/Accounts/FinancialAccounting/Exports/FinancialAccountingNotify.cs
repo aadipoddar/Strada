@@ -1,5 +1,6 @@
 using StradaLibrary.Accounts.FinancialAccounting.Models;
 using StradaLibrary.Common;
+using StradaLibrary.Operations.Data;
 using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Utils.MailUtils;
 
@@ -36,7 +37,8 @@ internal static class FinancialAccountingNotify
 				["Total Amount"] = transaction.TotalAmount.FormatIndianCurrency(),
 				[type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = transaction.LastModifiedByUserName ?? transaction.CreatedByName
 			},
-			Remarks = transaction.Remarks
+			Remarks = transaction.Remarks,
+			Differences = type == NotifyType.Updated ? (await AuditTrailData.LoadLastAuditTrailByTableRecord(AccountNames.FinancialAccounting, transaction.TransactionNo)).RecordValue : null
 		};
 
 		// For update emails, include before and after invoices

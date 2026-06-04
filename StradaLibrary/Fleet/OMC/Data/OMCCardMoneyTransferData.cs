@@ -271,7 +271,6 @@ public static class OMCCardMoneyTransferData
 		await InsertOMCCardMoneyTransfer(oMCCardMoneyTransfer, sqlDataAccessTransaction);
 	}
 
-
 	private static async Task SaveAuditTrail(
 		OMCCardMoneyTransferModel oMCCardMoneyTransfer,
 		bool update,

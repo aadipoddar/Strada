@@ -21,6 +21,7 @@ internal static class TransactionMailing
 		public string LocationName { get; set; }
 		public Dictionary<string, string> Details { get; set; } // Key-value pairs for transaction details
 		public string Remarks { get; set; }
+		public string Differences { get; set; } // Audit-style "before -> after" change summary (for update actions)
 		public Dictionary<MemoryStream, string> Attachments { get; set; } // PDF attachments (for non-update actions)
 		public (MemoryStream stream, string fileName)? BeforeAttachment { get; set; } // For update emails - before state
 		public (MemoryStream stream, string fileName)? AfterAttachment { get; set; } // For update emails - after state
@@ -87,95 +88,66 @@ internal static class TransactionMailing
 
 	private static string GenerateTransactionEmailHtml(TransactionEmailData data)
 	{
-		var actionText = data.Action switch
+		// Single accent per action — text colour, soft background tint, border tint, label
+		var (accent, accentSoft, accentBorder, actionLabel) = data.Action switch
 		{
-			NotifyType.Created => "CREATED",
-			NotifyType.Updated => "UPDATED",
-			NotifyType.Deleted => "DELETED",
-			NotifyType.Recovered => "RECOVERED",
-			_ => "MODIFIED"
+			NotifyType.Created => ("#047857", "#ecfdf5", "#a7f3d0", "Created"),
+			NotifyType.Updated => ("#b45309", "#fffbeb", "#fde68a", "Updated"),
+			NotifyType.Deleted => ("#b91c1c", "#fef2f2", "#fecaca", "Deleted"),
+			NotifyType.Recovered => ("#0369a1", "#eff6ff", "#bae6fd", "Recovered"),
+			_ => ("#374151", "#f3f4f6", "#e5e7eb", "Modified")
 		};
 
-		var actionColor = data.Action switch
+		var typeLower = data.TransactionType.ToLower();
+		var intro = data.Action switch
 		{
-			NotifyType.Created => "#2563eb",
-			NotifyType.Updated => "#ffc107",
-			NotifyType.Deleted => "#dc3545",
-			NotifyType.Recovered => "#17a2b8",
-			_ => "#6c757d"
+			NotifyType.Created => $"A new {typeLower} has been recorded in {Secrets.DatabaseName}. A summary is provided below.",
+			NotifyType.Updated => $"An existing {typeLower} has been updated. The changes and current details are summarised below.",
+			NotifyType.Deleted => $"A {typeLower} has been deleted from {Secrets.DatabaseName}. The details are retained below for your records.",
+			NotifyType.Recovered => $"A previously deleted {typeLower} has been restored. A summary is provided below.",
+			_ => $"A {typeLower} has been modified. A summary is provided below."
 		};
 
-		var actionEmoji = data.Action switch
+		// Summary rows (last row has no divider)
+		var detailCount = data.Details.Count;
+		var detailRows = string.Join("\n", data.Details.Select((detail, i) =>
 		{
-			NotifyType.Created => "✅",
-			NotifyType.Updated => "✏️",
-			NotifyType.Deleted => "⚠️",
-			NotifyType.Recovered => "♻️",
-			_ => "ℹ️"
-		};
-
-		var actionMessage = data.Action switch
-		{
-			NotifyType.Created => $"A new {data.TransactionType.ToLower()} has been created in the system. Please review the details below:",
-			NotifyType.Updated => $"A {data.TransactionType.ToLower()} has been updated in the system. Please review the details below and compare the attached before/after invoices:",
-			NotifyType.Deleted => $"A {data.TransactionType.ToLower()} has been deleted from the system. Please review the details below:",
-			NotifyType.Recovered => $"A {data.TransactionType.ToLower()} has been recovered in the system. Please review the details below:",
-			_ => $"A {data.TransactionType.ToLower()} has been modified. Please review the details below:"
-		};
-
-		// Generate detail rows
-		var detailRows = string.Join("\n", data.Details.Select(detail => $@"
-                                            <tr class=""detail-row"">
-                                                <td class=""detail-label"" style=""padding: 10px 0; border-bottom: 1px solid #e2e8f0;"">
-                                                    <span style=""color: #666666; font-size: 14px;"">{detail.Key}</span>
+			var divider = i < detailCount - 1 ? "border-bottom: 1px solid #eef0f2;" : "";
+			return $@"
+                                            <tr>
+                                                <td style=""padding: 12px 0; {divider}"">
+                                                    <span style=""color: #6b7280; font-size: 13px;"">{Encode(detail.Key)}</span>
                                                 </td>
-                                                <td class=""detail-value"" style=""padding: 10px 0; border-bottom: 1px solid #e2e8f0; text-align: right;"">
-                                                    <strong style=""color: #333333; font-size: 14px;"">{detail.Value}</strong>
+                                                <td style=""padding: 12px 0; {divider} text-align: right;"">
+                                                    <span style=""color: #111827; font-size: 14px; font-weight: 600;"">{Encode(detail.Value)}</span>
                                                 </td>
-                                            </tr>"));
+                                            </tr>";
+		}));
 
-		// Fix the last row border
-		var lastDetailKey = data.Details.Last().Key;
-		detailRows = detailRows.Replace(
-			$@"<span style=""color: #666666; font-size: 14px;"">{lastDetailKey}</span>
-                                                </td>
-                                                <td class=""detail-value"" style=""padding: 10px 0; border-bottom: 1px solid #e2e8f0;",
-			$@"<span style=""color: #666666; font-size: 14px;"">{lastDetailKey}</span>
-                                                </td>
-                                                <td class=""detail-value"" style=""padding: 10px 0;"
-		);
+		// Changes section (updates only)
+		var changesSection = data.Action == NotifyType.Updated ? BuildDifferencesHtml(data.Differences, accent, accentSoft, accentBorder) : "";
 
-		// Generate remarks section (if any)
+		// Remarks callout
 		var remarksSection = string.IsNullOrWhiteSpace(data.Remarks) ? "" : $@"
-                            <!-- Remarks Section -->
-                            <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 20px 0;"">
+                            <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 0 0 24px 0; background-color: #f9fafb; border: 1px solid #eef0f2; border-radius: 8px;"">
                                 <tr>
-                                    <td style=""padding: 15px 20px; background-color: #fff8e1; border-left: 4px solid #ffc107; border-radius: 4px;"">
-                                        <p style=""margin: 0; color: #8a6d3b; font-size: 14px;"">
-                                            <strong>📝 Remarks:</strong> {data.Remarks}
-                                        </p>
+                                    <td style=""padding: 16px 20px;"">
+                                        <p style=""margin: 0 0 4px 0; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;"">Remarks</p>
+                                        <p style=""margin: 0; color: #374151; font-size: 14px; line-height: 1.6;"">{Encode(data.Remarks)}</p>
                                     </td>
                                 </tr>
                             </table>";
 
-		// Generate attachment notice (only if attachments exist)
+		// Attachment line (only when something is attached)
 		var hasAttachments = (data.Action == NotifyType.Updated && data.BeforeAttachment.HasValue && data.AfterAttachment.HasValue) ||
 							(data.Attachments != null && data.Attachments.Count > 0);
 
-		var attachmentNotice = !hasAttachments ? "" : $@"<strong>📎 Attachment:</strong> {(data.Action == NotifyType.Updated ? "Before/After comparison invoices are" : "The " + data.TransactionType.ToLower() + " invoice PDF is")} attached to this email for your records.<br>";
-
-		var websiteLinkSection = $@"
-                            <!-- Website Link Notice -->
-                            <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 25px 0;"">
-                                <tr>
-                                    <td style=""padding: 15px 20px; background-color: #e8f4fd; border-left: 4px solid #2196F3; border-radius: 4px; text-align: center;"">
-                                        <p style=""margin: 0; color: #1565c0; font-size: 14px;"">
-                                            {attachmentNotice}
-                                            <a href=""{Secrets.AppWebsite}"" style=""color: #2563eb; text-decoration: none; font-weight: 600; margin-top: 8px; display: inline-block;"">Visit {Secrets.DatabaseName}</a>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>";
+		var attachmentLine = !hasAttachments ? "" : $@"
+                            <p style=""margin: 0 0 24px 0; color: #6b7280; font-size: 13px; line-height: 1.6;"">
+                                {(data.Action == NotifyType.Updated
+									? "Before and after copies of the document are attached to this email as PDF."
+									: $"A PDF copy of the {typeLower} is attached to this email for your records.")}
+                            </p>";
 
 		return $@"
 <!DOCTYPE html>
@@ -183,123 +155,78 @@ internal static class TransactionMailing
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-    <title>{data.TransactionType} {actionText} Notification</title>
+    <title>{data.TransactionType} {actionLabel}</title>
     <style>
         @media only screen and (max-width: 600px) {{
-            .email-container {{
-                width: 100% !important;
-                margin: 0 !important;
-            }}
-            .content-padding {{
-                padding: 20px !important;
-            }}
-            .header-padding {{
-                padding: 20px !important;
-            }}
-            .alert-padding {{
-                padding: 12px 20px !important;
-            }}
-            .details-padding {{
-                padding: 15px !important;
-            }}
-            .detail-row {{
-                display: block !important;
-                width: 100% !important;
-            }}
-            .detail-label {{
-                display: block !important;
-                width: 100% !important;
-                padding: 8px 0 4px 0 !important;
-                text-align: left !important;
-            }}
-            .detail-value {{
-                display: block !important;
-                width: 100% !important;
-                padding: 0 0 8px 0 !important;
-                text-align: left !important;
-                border-bottom: 1px solid #e2e8f0 !important;
-            }}
-            .footer-padding {{
-                padding: 20px !important;
-            }}
-            .outer-padding {{
-                padding: 20px 10px !important;
-            }}
+            .email-container {{ width: 100% !important; }}
+            .pad {{ padding: 24px !important; }}
+            .pad-header {{ padding: 22px 24px !important; }}
+            .outer-padding {{ padding: 16px 10px !important; }}
         }}
     </style>
 </head>
-<body style=""margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: {MailTheme.PageBackground};"">
+<body style=""margin: 0; padding: 0; -webkit-font-smoothing: antialiased; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: {MailTheme.PageBackground};"">
+    <span style=""display: none; max-height: 0; overflow: hidden; opacity: 0;"">{data.TransactionType} {actionLabel} — {data.TransactionNo}</span>
     <table role=""presentation"" style=""width: 100%; border-collapse: collapse; background-color: {MailTheme.PageBackground};"">
         <tr>
             <td align=""center"" class=""outer-padding"" style=""padding: 40px 20px;"">
-                <table role=""presentation"" class=""email-container"" style=""width: 600px; max-width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);"">
-                    
+                <table role=""presentation"" class=""email-container"" style=""width: 680px; max-width: 100%; border-collapse: collapse; background-color: #ffffff; border: 1px solid #e6e8eb; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);"">
+
+                    <!-- Accent bar -->
+                    <tr><td style=""height: 4px; background-color: {accent}; font-size: 0; line-height: 0;"">&nbsp;</td></tr>
+
                     <!-- Header -->
                     <tr>
-                        <td class=""header-padding"" style=""padding: 30px; text-align: center; background-color: #eff6ff; border-radius: 12px 12px 0 0;"">
-                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""{Secrets.DatabaseName}"" style=""max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
+                        <td class=""pad-header"" style=""padding: 26px 32px; text-align: center; border-bottom: 1px solid #eef0f2;"">
+                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""{Secrets.DatabaseName}"" style=""max-width: 280px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
                         </td>
                     </tr>
-                    
-                    <!-- Alert Banner -->
+
+                    <!-- Body -->
                     <tr>
-                        <td style=""padding: 0;"">
-                            <table role=""presentation"" style=""width: 100%; border-collapse: collapse; background-color: {actionColor};"">
+                        <td class=""pad"" style=""padding: 32px;"">
+
+                            <span style=""display: inline-block; padding: 4px 12px; border-radius: 999px; background-color: {accentSoft}; color: {accent}; border: 1px solid {accentBorder}; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase;"">{actionLabel}</span>
+
+                            <h1 style=""margin: 16px 0 0 0; color: #111827; font-size: 20px; font-weight: 600; line-height: 1.3;"">{data.TransactionType} {actionLabel}</h1>
+                            <p style=""margin: 8px 0 4px 0; color: #6b7280; font-size: 14px; line-height: 1.6;"">{intro}</p>
+                            <p style=""margin: 0 0 28px 0; color: #6b7280; font-size: 13px;"">Reference&nbsp;<span style=""color: #111827; font-weight: 600; font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;"">{Encode(data.TransactionNo)}</span></p>
+
+                            <!-- Summary card -->
+                            <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 0 0 24px 0; background-color: #ffffff; border: 1px solid #e6e8eb; border-radius: 8px;"">
                                 <tr>
-                                    <td class=""alert-padding"" style=""padding: 15px 40px; text-align: center;"">
-                                        <span style=""color: #ffffff; font-size: 14px; font-weight: 600; letter-spacing: 0.5px;"">{actionEmoji} {data.TransactionType.ToUpper()} {actionText}</span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content -->
-                    <tr>
-                        <td class=""content-padding"" style=""padding: 40px;"">
-                            <p style=""margin: 0 0 25px 0; color: #333333; font-size: 16px; line-height: 1.6;"">
-                                {actionMessage}
-                            </p>
-                            
-                            <!-- Transaction Details Card -->
-                            <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 25px 0; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;"">
-                                <tr>
-                                    <td class=""details-padding"" style=""padding: 25px;"">
-                                        <h3 style=""margin: 0 0 20px 0; color: #1e40af; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;"">{data.TransactionType} Details</h3>
-                                        
+                                    <td style=""padding: 8px 20px;"">
                                         <table role=""presentation"" style=""width: 100%; border-collapse: collapse;"">
                                             {detailRows}
                                         </table>
                                     </td>
                                 </tr>
                             </table>
+
+                            {changesSection}
                             {remarksSection}
-                            {websiteLinkSection}
-                            
+                            {attachmentLine}
+
+                            <!-- CTA -->
+                            <table role=""presentation"" style=""border-collapse: collapse; margin: 4px 0 8px 0;"">
+                                <tr>
+                                    <td style=""border-radius: 6px; background-color: #111827;"">
+                                        <a href=""{Secrets.AppWebsite}"" style=""display: inline-block; padding: 11px 22px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600;"">Open in {Secrets.DatabaseName}</a>
+                                    </td>
+                                </tr>
+                            </table>
+
                         </td>
                     </tr>
-                    
+
                     <!-- Footer -->
                     <tr>
-                        <td class=""footer-padding"" style=""padding: 30px 40px; background-color: #f8fafc; border-radius: 0 0 12px 12px; border-top: 1px solid #e2e8f0;"">
-                            <p style=""margin: 0 0 10px 0; color: #999999; font-size: 14px; line-height: 1.6;"">
-                                Best regards,<br>
-                                <strong style=""color: #1e40af;"">The AadiSoft Team</strong>
+                        <td style=""padding: 22px 32px; background-color: #fafafa; border-top: 1px solid #eef0f2;"">
+                            <p style=""margin: 0 0 6px 0; color: #9ca3af; font-size: 12px; line-height: 1.6;"">
+                                This is an automated notification from {Secrets.DatabaseName}. Please do not reply to this email.
                             </p>
-                            <p style=""margin: 20px 0 0 0; color: #999999; font-size: 12px; line-height: 1.6;"">
-                                This is an automated message, please do not reply to this email.<br>
-                                <a href=""{Secrets.AadiSoftWebsite}"" style=""color: #2563eb; text-decoration: none;"">Visit our website</a>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-                
-                <!-- Footer Text -->
-                <table role=""presentation"" class=""email-container"" style=""width: 600px; max-width: 100%; border-collapse: collapse; margin-top: 20px;"">
-                    <tr>
-                        <td align=""center"" style=""padding: 0 20px;"">
-                            <p style=""margin: 0; color: #999999; font-size: 12px; line-height: 1.6;"">
-                                © {DateTime.Now.Year} AadiSoft. All Rights Reserved.
+                            <p style=""margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.6;"">
+                                © {DateTime.Now.Year} {Secrets.DatabaseName} · Powered by <a href=""{Secrets.AadiSoftWebsite}"" style=""color: #6b7280; text-decoration: none; font-weight: 600;"">AadiSoft</a>
                             </p>
                         </td>
                     </tr>
@@ -310,6 +237,88 @@ internal static class TransactionMailing
 </body>
 </html>";
 	}
+
+	private static string BuildDifferencesHtml(string differences, string accent, string accentSoft, string accentBorder)
+	{
+		if (string.IsNullOrWhiteSpace(differences))
+			return "";
+
+		var rows = new System.Text.StringBuilder();
+
+		foreach (var rawLine in differences.Replace("\r\n", "\n").Split('\n'))
+		{
+			var line = rawLine.Trim();
+			if (line.Length == 0)
+				continue;
+
+			var arrowIndex = line.IndexOf(" -> ", StringComparison.Ordinal);
+			var colonIndex = line.IndexOf(':');
+
+			if (arrowIndex >= 0)
+			{
+				// Field change: "Label: old -> new"
+				var label = colonIndex >= 0 && colonIndex < arrowIndex ? line[..colonIndex].Trim() : "";
+				var rest = colonIndex >= 0 && colonIndex < arrowIndex ? line[(colonIndex + 1)..].Trim() : line;
+				var restArrow = rest.IndexOf(" -> ", StringComparison.Ordinal);
+				var oldValue = Encode(rest[..restArrow].Trim());
+				var newValue = Encode(rest[(restArrow + 4)..].Trim());
+
+				rows.Append($@"
+                                            <tr>
+                                                <td style=""padding: 12px 0; border-bottom: 1px solid #f1f2f4;"">
+                                                    <div style=""color: #6b7280; font-size: 12px; margin-bottom: 5px;"">{Encode(label)}</div>
+                                                    <span style=""color: #9ca3af; font-size: 14px; text-decoration: line-through;"">{oldValue}</span>
+                                                    <span style=""color: #c4c7cc; font-size: 14px;"">&nbsp;&rarr;&nbsp;</span>
+                                                    <span style=""color: #111827; font-size: 14px; font-weight: 600;"">{newValue}</span>
+                                                </td>
+                                            </tr>");
+			}
+			else if (line.StartsWith('-'))
+			{
+				// List item, e.g. "- Card Number: X | Amount: 50.00"
+				var text = Encode(line.TrimStart('-', ' '));
+				rows.Append($@"
+                                            <tr>
+                                                <td style=""padding: 4px 0 4px 16px;"">
+                                                    <span style=""color: #c4c7cc; font-size: 13px;"">&bull;</span>
+                                                    <span style=""color: #6b7280; font-size: 13px;"">&nbsp;{text}</span>
+                                                </td>
+                                            </tr>");
+			}
+			else
+			{
+				// Section header, e.g. "Details:", "Added:", "Removed:"
+				var headerColor = line.StartsWith("Added", StringComparison.OrdinalIgnoreCase) ? "#047857"
+					: line.StartsWith("Removed", StringComparison.OrdinalIgnoreCase) ? "#b91c1c"
+					: "#374151";
+				var text = Encode(line.TrimEnd(':'));
+				rows.Append($@"
+                                            <tr>
+                                                <td style=""padding: 16px 0 6px 0;"">
+                                                    <span style=""color: {headerColor}; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;"">{text}</span>
+                                                </td>
+                                            </tr>");
+			}
+		}
+
+		return $@"
+                            <!-- Changes -->
+                            <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 0 0 24px 0; background-color: #ffffff; border: 1px solid #e6e8eb; border-radius: 8px; overflow: hidden;"">
+                                <tr>
+                                    <td style=""padding: 13px 20px; background-color: {accentSoft}; border-bottom: 1px solid {accentBorder};"">
+                                        <span style=""color: {accent}; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;"">Changes</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style=""padding: 6px 20px 14px 20px;"">
+                                        <table role=""presentation"" style=""width: 100%; border-collapse: collapse;"">{rows}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>";
+	}
+
+	private static string Encode(string value) => System.Net.WebUtility.HtmlEncode(value ?? string.Empty);
 }
 
 public enum NotifyType

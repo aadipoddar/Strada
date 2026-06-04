@@ -37,6 +37,7 @@ public static class OperationNames
 	#region Audit Trail
 	public static string AuditTrail => "AuditTrail";
 	public static string InsertAuditTrail => "Insert_AuditTrail";
+	public static string LoadLastAuditTrailByTableRecord => "Load_Last_AuditTrail_By_Table_Record";
 	#endregion
 }
 

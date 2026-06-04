@@ -13,6 +13,9 @@ public static class AuditTrailData
 		(await SqlDataAccess.LoadData<int, dynamic>(OperationNames.InsertAuditTrail, auditTrail, sqlDataAccessTransaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Audit Trail.");
 
+	public static async Task<AuditTrailModel> LoadLastAuditTrailByTableRecord(string TableName, string RecordNo) =>
+		(await SqlDataAccess.LoadData<AuditTrailModel, dynamic>(OperationNames.LoadLastAuditTrailByTableRecord, new { TableName, RecordNo })).FirstOrDefault();
+
 	public static async Task SaveAuditTrail(AuditTrailModel auditTrail, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var user = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, auditTrail.CreatedBy, sqlDataAccessTransaction);
@@ -22,7 +25,7 @@ public static class AuditTrailData
 
 	private static readonly HashSet<string> _ignoredProperties = new(StringComparer.OrdinalIgnoreCase)
 	{
-		"Id", "MasterId", "Status",
+		"Id", "MasterId", "Status", "MasterStatus",
 		"CreatedBy", "CreatedByName", "CreatedAt", "CreatedFromPlatform",
 		"LastModifiedBy", "LastModifiedByUserName", "LastModifiedAt", "LastModifiedFromPlatform"
 	};
