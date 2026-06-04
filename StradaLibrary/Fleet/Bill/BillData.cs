@@ -305,10 +305,7 @@ public static class BillData
 		}
 
 		var billOverview = await CommonData.LoadTableDataById<BillOverviewModel>(FleetNames.BillOverview, bill.Id, sqlDataAccessTransaction);
-		if (billOverview is null)
-			return;
-
-		if (billOverview.TotalLedgerPaymentAmount == 0)
+		if (billOverview is null || billOverview.TotalLedgerPaymentAmount == 0)
 			return;
 
 		var ledgerPayments = await CommonData.LoadTableDataByMasterId<BillLedgerPaymentsOverviewModel>(FleetNames.BillLedgerPaymentsOverview, bill.Id, sqlDataAccessTransaction);

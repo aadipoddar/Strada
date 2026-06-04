@@ -1,0 +1,298 @@
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.OMC.Models
+
+@attribute [Route(PageRouteNames.OMCCardMoneyTransferDetailsReport)]
+
+<PageTitle>OMC Card Money Transfer Details Report - Strada</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransfer, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyQ KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDetailsView" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.Delete KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ToggleDeleted" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportReport(true)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportReport()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyO KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="ViewSelectedTransaction" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction(true)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="DeleteRecoverSelectedTransaction" Disabled="@_isProcessing" />
+
+@if (_isLoading || _user is null)
+{
+	<LoadingScreen />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="OMC Card Money Transfer Details Report">
+			<LeftContent>
+				<MudBlazor.MudMenu Label="File" Dense="true" Disabled="_isProcessing">
+					<MudBlazor.MudMenuItem Label="New Transaction (Ctrl + N)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransfer, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Refresh Data (Ctrl + R / F5)" OnClick="LoadTransactionOverviews" />
+					<MudBlazor.MudMenuItem Label="@(_showDeleted ? "Hide Deleted (Ctrl + Del)" : "Show Deleted (Ctrl + Del)")" OnClick="() => ToggleDeleted()" />
+					<MudBlazor.MudMenuItem Label="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")" OnClick="ToggleDetailsView" />
+					<MudBlazor.MudDivider />
+					<MudBlazor.MudMenuItem Label="Export PDF (Ctrl + P)" OnClick="() => ExportReport()" />
+					<MudBlazor.MudMenuItem Label="Export Excel (Ctrl + E)" OnClick="() => ExportReport(true)" />
+				</MudBlazor.MudMenu>
+
+				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
+					<MudBlazor.MudMenuItem Label="OMC Card Money Transfer Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" />
+				</MudBlazor.MudMenu>
+
+				<MudBlazor.MudMenu Label="Periods" Dense="true" Disabled="_isProcessing">
+					<MudBlazor.MudMenuItem Label="Today" OnClick="() => HandleDatesChanged(DateRangeType.Today)" />
+					<MudBlazor.MudMenuItem Label="Previous Day" OnClick="() => HandleDatesChanged(DateRangeType.Yesterday)" />
+					<MudBlazor.MudMenuItem Label="Next Day" OnClick="() => HandleDatesChanged(DateRangeType.NextDay)" />
+					<MudBlazor.MudMenuItem Label="Current Month" OnClick="() => HandleDatesChanged(DateRangeType.CurrentMonth)" />
+					<MudBlazor.MudMenuItem Label="Previous Month" OnClick="() => HandleDatesChanged(DateRangeType.PreviousMonth)" />
+					<MudBlazor.MudMenuItem Label="Next Month" OnClick="() => HandleDatesChanged(DateRangeType.NextMonth)" />
+					<MudBlazor.MudMenuItem Label="Current FY" OnClick="() => HandleDatesChanged(DateRangeType.CurrentFinancialYear)" />
+					<MudBlazor.MudMenuItem Label="Previous FY" OnClick="() => HandleDatesChanged(DateRangeType.PreviousFinancialYear)" />
+					<MudBlazor.MudMenuItem Label="Next FY" OnClick="() => HandleDatesChanged(DateRangeType.NextFinancialYear)" />
+					<MudBlazor.MudMenuItem Label="All Time" OnClick="() => HandleDatesChanged(DateRangeType.AllTime)" />
+				</MudBlazor.MudMenu>
+
+				<MudBlazor.MudMenu Label="Transaction" Dense="true" Disabled="_isProcessing">
+					<MudBlazor.MudMenuItem Label="View (Alt + O)" OnClick="ViewSelectedTransaction" />
+					<MudBlazor.MudMenuItem Label="Export PDF (Alt + P)" OnClick="() => ExportSelectedTransaction()" />
+					<MudBlazor.MudMenuItem Label="Export Excel (Alt + E)" OnClick="() => ExportSelectedTransaction(true)" />
+					<MudBlazor.MudDivider />
+					<MudBlazor.MudMenuItem Label="Delete / Recover (Del)" OnClick="DeleteRecoverSelectedTransaction" />
+				</MudBlazor.MudMenu>
+			</LeftContent>
+		</Header>
+
+		<!-- Main Content Container -->
+		<div class="page-container">
+
+			<!-- Filters Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+						</svg>
+						<h2 class="section-title">Filters</h2>
+					</div>
+				</div>
+				<div class="section-body">
+					<div class="filters-grid">
+						<!-- Date Range -->
+						<div class="form-field">
+							<CustomDateRangePicker @ref="_sfFirstFocus" Value="@(new MudBlazor.DateRange(_fromDate, _toDate))"
+												   ValueChanged="OnDateRangeChanged"
+												   Label="Date Range (Ctrl + F)"
+												   Required="false" />
+						</div>
+
+						<!-- OMC Card -->
+						<div class="form-field">
+							<CustomAutoComplete T="OMCCardModel"
+												Value="_selectedOMCCard"
+												DataSource="@_omcCards"
+												Placeholder="All OMC Cards"
+												Label="OMC Card" Required="false"
+												ValueChanged="OnOMCCardChanged"
+												FieldValue="@nameof(OMCCardModel.CardNumber)"
+												AddNewRoute="@PageRouteNames.OMCCardMaster" />
+						</div>
+
+						<!-- Company -->
+						<div class="form-field">
+							<CustomAutoComplete T="CompanyModel"
+												Value="_selectedCompany"
+												DataSource="@_companies"
+												Placeholder="All Companies"
+												Label="Company" Required="false"
+												ValueChanged="OnCompanyChanged"
+												FieldValue="@nameof(CompanyModel.Name)"
+												AddNewRoute="@PageRouteNames.CompanyMaster" />
+						</div>
+
+						<!-- Ledger -->
+						<div class="form-field">
+							<CustomAutoComplete T="LedgerModel"
+												Value="_selectedLedger"
+												DataSource="@_ledgers"
+												Placeholder="All Ledgers"
+												Label="Ledger" Required="false"
+												ValueChanged="OnLedgerChanged"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
+						</div>
+
+						<!-- OMC -->
+						<div class="form-field">
+							<CustomAutoComplete T="OMCModel"
+												Value="_selectedOMC"
+												DataSource="@_omcs"
+												Placeholder="All OMCs"
+												Label="OMC" Required="false"
+												ValueChanged="OnOMCChanged"
+												FieldValue="@nameof(OMCModel.Name)"
+												AddNewRoute="@PageRouteNames.OMCMaster" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Report Grid Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<line x1="8" y1="6" x2="21" y2="6" />
+							<line x1="8" y1="12" x2="21" y2="12" />
+							<line x1="8" y1="18" x2="21" y2="18" />
+							<line x1="3" y1="6" x2="3.01" y2="6" />
+							<line x1="3" y1="12" x2="3.01" y2="12" />
+							<line x1="3" y1="18" x2="3.01" y2="18" />
+						</svg>
+						<h2 class="section-title">Transactions</h2>
+					</div>
+				</div>
+				<div class="section-body grid-body">
+					<SfGrid @ref="_sfGrid" TValue="OMCCardMoneyTransferDetailsOverviewModel" DataSource="_transactionOverviews"
+							AllowTextWrap="true" AllowPaging="true" AllowSorting="true" AllowResizing="true"
+							AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true" GridLines="GridLine.Horizontal"
+							AllowGrouping="true" CssClass="professional-grid" ContextMenuItems="@_gridContextMenuItems"
+							Toolbar="@(new List<string>() { "Search" })">
+
+						<GridEvents TValue="OMCCardMoneyTransferDetailsOverviewModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
+						<GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+						<GridAggregates>
+							<GridAggregate>
+								<GridAggregateColumns>
+									<GridAggregateColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TransactionNo)" Type="AggregateType.Count">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Transactions: @aggregate.Count</strong>
+											</div>
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Transactions: @aggregate.Count</strong>
+											</div>
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Transactions: @aggregate.Count</strong>
+											</div>
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TransferAmount)" Type="AggregateType.Sum" Format="N2">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</FooterTemplate>
+										<GroupFooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupFooterTemplate>
+										<GroupCaptionTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												<div class="aggregate-value aggregate-total">
+													<strong>@aggregate.Sum</strong>
+												</div>
+											}
+										</GroupCaptionTemplate>
+									</GridAggregateColumn>
+								</GridAggregateColumns>
+							</GridAggregate>
+						</GridAggregates>
+
+						<GridColumns>
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.OMCCardNumber)" HeaderText="OMC Card Number" Width="170" Visible="@(_showAllColumns || _selectedOMCCard is null || _selectedOMCCard.Id <= 0)" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.OMCCardCode)" HeaderText="OMC Card Code" Width="130" Visible="_showAllColumns" />
+
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TransferAmount)" HeaderText="Transfer Amt" Width="150" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = (context as OMCCardMoneyTransferDetailsOverviewModel);
+										<span class="grid-total">@item.TransferAmount.ToString("N2")</span>
+									}
+								</Template>
+							</GridColumn>
+
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.OMCName)" HeaderText="OMC Name" Width="170" Visible="@(_showAllColumns && (_selectedOMC is null || _selectedOMC.Id <= 0))" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TransferRemarks)" HeaderText="Transfer Remarks" Width="170" Visible="_showAllColumns" />
+
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns && (_selectedCompany is null || _selectedCompany.Id <= 0))" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="130" Visible="@(_showAllColumns || _selectedLedger is null || _selectedLedger.Id <= 0)" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TotalItems)" HeaderText="Total Items" Width="150" TextAlign="TextAlign.Right" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.TotalAmount)" HeaderText="Total Amount" Width="150" TextAlign="TextAlign.Right">
+								<Template>
+									@{
+										var item = (context as OMCCardMoneyTransferDetailsOverviewModel);
+										<span class="grid-total">@item.TotalAmount.ToString("N2")</span>
+									}
+								</Template>
+							</GridColumn>
+
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.FinancialAccountingTransactionNo)" HeaderText="Accounting Trans No" Width="180" Visible="_showAllColumns" />
+
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
+
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsOverviewModel.MasterStatus)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
+								<Template>
+									@{
+										var item = (context as OMCCardMoneyTransferDetailsOverviewModel);
+										<span class="@(item.MasterStatus ? string.Empty : "grid-debit")">
+											@(item.MasterStatus ? "Active" : "Deleted")
+										</span>
+									}
+								</Template>
+							</GridColumn>
+						</GridColumns>
+					</SfGrid>
+				</div>
+			</div>
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<ConfirmationDialog @ref="_confirmationDialog" Title="@_confirmTitle" Message="@_confirmMessage"
+					OnConfirm="OnConfirmed" OnCancel="OnCancelled" />
+
+<ToastNotification @ref="_toastNotification" />
+
+<CloseGuard Block="_isProcessing" />

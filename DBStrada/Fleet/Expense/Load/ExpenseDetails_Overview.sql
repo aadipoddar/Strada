@@ -24,6 +24,7 @@ SELECT
 
 	[r].[VehicleId],
 	[v].[Code] AS VehicleCode,
+	[r].[TotalItems],
 	[r].[TotalExpense],
 
     [r].[Remarks],

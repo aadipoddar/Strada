@@ -52,6 +52,10 @@ public static class PageRouteNames
 	public const string BillReport = "/fleet/bill-report";
 	public const string BillLedgerPaymentsReport = "/fleet/bill-ledger-payments-report";
 
+	public const string OMCCardMoneyTransfer = "/fleet/omc-card-money-transfer";
+	public const string OMCCardMoneyTransferReport = "/fleet/omc-card-money-transfer-report";
+	public const string OMCCardMoneyTransferDetailsReport = "/fleet/omc-card-money-transfer-details-report";
+
 	public const string LocationMaster = "/fleet/location";
 	public const string RouteMaster = "/fleet/route";
 	public const string DriverMaster = "/fleet/driver";

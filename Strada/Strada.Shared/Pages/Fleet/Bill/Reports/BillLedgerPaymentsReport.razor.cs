@@ -30,9 +30,11 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
 
+	private LedgerModel? _selectedLedger = null;
 	private CompanyModel? _selectedCompany = null;
 	private OMCModel? _selectedOMC = null;
 
+	private List<LedgerModel> _ledgers = [];
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
 	private List<BillLedgerPaymentsOverviewModel> _transactionOverviews = [];
@@ -88,9 +90,11 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 		_fromDate = await CommonData.LoadCurrentDateTime();
 		_toDate = _fromDate;
 
+		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 
+		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		_omcs = [.. _omcs.OrderBy(s => s.Name)];
 	}
@@ -126,16 +130,14 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 
 	private async Task ApplyFilters()
 	{
-		var query = _allTransactionOverviews.AsEnumerable();
+		_transactionOverviews = [.. _allTransactionOverviews.Where(t =>
+				(_showDeleted || t.MasterStatus) &&
+				(_selectedLedger == null || _selectedLedger.Id == 0 || t.LedgerId == _selectedLedger.Id) &&
+				(_selectedCompany == null || _selectedCompany.Id == 0 || t.CompanyId == _selectedCompany.Id) &&
+				(_selectedOMC == null || _selectedOMC.Id == 0 || t.OMCId == _selectedOMC.Id))
+			.OrderBy(t => t.TransactionDateTime)];
 
-		if (!_showDeleted) query = query.Where(t => t.MasterStatus);
-		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
-		if (_selectedOMC?.Id > 0) query = query.Where(t => t.OMCId == _selectedOMC.Id);
-
-		_transactionOverviews = [.. query.OrderBy(t => t.TransactionDateTime)];
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
 	}
 	#endregion
@@ -152,6 +154,12 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 	{
 		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
 		await LoadTransactionOverviews();
+	}
+
+	private async Task OnLedgerChanged(LedgerModel value)
+	{
+		_selectedLedger = value;
+		await ApplyFilters();
 	}
 
 	private async Task OnCompanyChanged(CompanyModel value)
@@ -305,6 +313,7 @@ public partial class BillLedgerPaymentsReport : IAsyncDisposable
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
 				_showDeleted,
+				_selectedLedger?.Id > 0 ? _selectedLedger : null,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null
 			);

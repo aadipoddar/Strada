@@ -243,6 +243,13 @@ else
 											 Placeholder="e.g., EX"
 											 Required="false" />
 						</div>
+
+						<div class="form-field">
+							<CustomTextField @bind-Value="_omcCardMoneyTransferTransactionPrefix"
+											 Label="OMC Card Money Transfer Prefix"
+											 Placeholder="e.g., OMCMT"
+											 Required="false" />
+						</div>
 					</div>
 				</div>
 			</div>
@@ -292,6 +299,17 @@ else
 												Placeholder="Select bill ledger"
 												Label="Bill Ledger"
 												ValueChanged="OnBillLedgerChange"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
+						</div>
+
+						<div class="form-field">
+							<CustomAutoComplete T="LedgerModel"
+												Value="_selectedOMCCardMoneyTransferLedger"
+												DataSource="@_ledgers"
+												Placeholder="Select OMC card money transfer ledger"
+												Label="OMC Card Money Transfer Ledger"
+												ValueChanged="OnOMCCardMoneyTransferLedgerChange"
 												FieldValue="@nameof(LedgerModel.Name)"
 												AddNewRoute="@PageRouteNames.LedgerMaster" />
 						</div>
@@ -365,6 +383,17 @@ else
 												Placeholder="Select bill voucher"
 												Label="Bill Voucher"
 												ValueChanged="OnBillVoucherChange"
+												FieldValue="@nameof(VoucherModel.Name)"
+												AddNewRoute="@PageRouteNames.VoucherMaster" />
+						</div>
+
+						<div class="form-field">
+							<CustomAutoComplete T="VoucherModel"
+												Value="_selectedOMCCardMoneyTransferVoucher"
+												DataSource="@_vouchers"
+												Placeholder="Select OMC card money transfer voucher"
+												Label="OMC Card Money Transfer Voucher"
+												ValueChanged="OnOMCCardMoneyTransferVoucherChange"
 												FieldValue="@nameof(VoucherModel.Name)"
 												AddNewRoute="@PageRouteNames.VoucherMaster" />
 						</div>

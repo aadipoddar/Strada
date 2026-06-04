@@ -140,9 +140,16 @@ public static class FleetNames
 	#region OMC
 	public static string OMC => "OMC";
 	public static string OMCCard => "OMCCard";
+	public static string OMCCardMoneyTransfer => "OMCCardMoneyTransfer";
+	public static string OMCCardMoneyTransferDetails => "OMCCardMoneyTransferDetails";
+
+	public static string OMCCardMoneyTransferOverview => "OMCCardMoneyTransfer_Overview";
+	public static string OMCCardMoneyTransferDetailsOverview => "OMCCardMoneyTransferDetails_Overview";
 
 	public static string InsertOMC => "Insert_OMC";
 	public static string InsertOMCCard => "Insert_OMCCard";
+	public static string InsertOMCCardMoneyTransfer => "Insert_OMCCardMoneyTransfer";
+	public static string InsertOMCCardMoneyTransferDetails => "Insert_OMCCardMoneyTransferDetails";
 	#endregion
 
 	#region Vehicle Document

@@ -7,42 +7,40 @@ namespace StradaLibrary.Fleet.Trip.Exports;
 
 internal static class TripNotify
 {
-	internal static async Task Notify(int tripId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
+	internal static async Task Notify(int transactionId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
 	{
-		if (type == NotifyType.Created)
-			return;
-
-		await NotifyByMail(tripId, type, previousInvoice);
+		if (type != NotifyType.Created)
+			await NotifyByMail(transactionId, type, previousInvoice);
 	}
 
-	private static async Task NotifyByMail(int tripId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
+	private static async Task NotifyByMail(int transactionId, NotifyType type, (MemoryStream, string)? previousInvoice = null)
 	{
-		var trip = await CommonData.LoadTableDataById<TripOverviewModel>(FleetNames.TripOverview, tripId);
+		var transaction = await CommonData.LoadTableDataById<TripOverviewModel>(FleetNames.TripOverview, transactionId);
 
 		var emailData = new TransactionMailing.TransactionEmailData
 		{
 			TransactionType = "Trip",
-			TransactionNo = trip.TransactionNo,
+			TransactionNo = transaction.TransactionNo,
 			Action = type,
-			LocationName = trip.OMCName,
+			LocationName = transaction.OMCName,
 			Details = new Dictionary<string, string>
 			{
-				["Transaction Number"] = trip.TransactionNo,
-				["Sl No"] = trip.SlNo ?? "N/A",
-				["Challan Number"] = trip.ChallanNo ?? "N/A",
-				["Route"] = $"{trip.FromLocation} to {trip.ToLocation}",
-				["Vehicle"] = $"{trip.VehicleCode}",
-				["Driver"] = $"{trip.DriverName} ({trip.DriverMobile})",
-				["Expenses"] = trip.TotalExpense.ToString(),
-				[type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = trip.LastModifiedByUserName ?? trip.CreatedByName
+				["Transaction Number"] = transaction.TransactionNo,
+				["Sl No"] = transaction.SlNo ?? "N/A",
+				["Challan Number"] = transaction.ChallanNo ?? "N/A",
+				["Route"] = $"{transaction.FromLocation} to {transaction.ToLocation}",
+				["Vehicle"] = $"{transaction.VehicleCode}",
+				["Driver"] = $"{transaction.DriverName} ({transaction.DriverMobile})",
+				["Expenses"] = transaction.TotalExpense.ToString(),
+				[type == NotifyType.Deleted ? "Deleted By" : type == NotifyType.Updated ? "Updated By" : "Modified By"] = transaction.LastModifiedByUserName ?? transaction.CreatedByName
 			},
-			Remarks = trip.Remarks
+			Remarks = transaction.Remarks
 		};
 
 		// For update emails, include before and after invoices
 		if (type == NotifyType.Updated && previousInvoice.HasValue)
 		{
-			var (afterStream, afterFileName) = await TripInvoiceExport.ExportInvoice(tripId, InvoiceExportType.PDF);
+			var (afterStream, afterFileName) = await TripInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
 
 			// Rename files to make it clear which is which
 			var beforeFileName = $"BEFORE_{previousInvoice.Value.Item2}";
@@ -54,7 +52,7 @@ internal static class TripNotify
 		else
 		{
 			// For delete/recover, just attach the current invoice
-			var (pdfStream, pdfFileName) = await TripInvoiceExport.ExportInvoice(tripId, InvoiceExportType.PDF);
+			var (pdfStream, pdfFileName) = await TripInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
 			emailData.Attachments = new Dictionary<MemoryStream, string> { { pdfStream, pdfFileName } };
 		}
 

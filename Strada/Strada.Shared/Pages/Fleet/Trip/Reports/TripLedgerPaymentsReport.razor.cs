@@ -33,6 +33,7 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
 
+	private LedgerModel? _selectedLedger = null;
 	private CompanyModel? _selectedCompany = null;
 	private OMCModel? _selectedOMC = null;
 	private VehicleModel? _selectedVehicle = null;
@@ -43,6 +44,7 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 	private YesNoFilterOption _selectedVehicleEmptyFilter;
 	private YesNoFilterOption _selectedPendingBillsFilter;
 
+	private List<LedgerModel> _ledgers = [];
 	private List<CompanyModel> _companies = [];
 	private List<OMCModel> _omcs = [];
 	private List<VehicleModel> _vehicles = [];
@@ -100,12 +102,14 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 		_fromDate = await CommonData.LoadCurrentDateTime();
 		_toDate = _fromDate;
 
+		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 		_routes = await RouteData.LoadRouteOverview();
 		_drivers = await DriverData.LoadDriverOverview();
 
+		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		_omcs = [.. _omcs.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
@@ -144,25 +148,23 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 
 	private async Task ApplyFilters()
 	{
-		var query = _allTransactionOverviews.AsEnumerable();
+		_transactionOverviews = [.. _allTransactionOverviews.Where(t =>
+				(_showDeleted || t.MasterStatus) &&
+				(_selectedLedger == null || _selectedLedger.Id == 0 || t.LedgerId == _selectedLedger.Id) &&
+				(_selectedCompany == null || _selectedCompany.Id == 0 || t.CompanyId == _selectedCompany.Id) &&
+				(_selectedOMC == null || _selectedOMC.Id == 0 || t.OMCId == _selectedOMC.Id) &&
+				(_selectedVehicle == null || _selectedVehicle.Id == 0 || t.VehicleId == _selectedVehicle.Id) &&
+				(_selectedRoute == null || _selectedRoute.Id == 0 || t.RouteId == _selectedRoute.Id) &&
+				(_selectedDriver == null || _selectedDriver.Id == 0 || t.DriverId == _selectedDriver.Id) &&
+				(_vehicleEmptyFilter == YesNoFilterOptions.All ||
+					(t.VehicleEmpty && _vehicleEmptyFilter == YesNoFilterOptions.Yes) ||
+					(!t.VehicleEmpty && _vehicleEmptyFilter == YesNoFilterOptions.No)) &&
+				(_pendingBillsFilter == YesNoFilterOptions.All ||
+					(t.BillId == null && _pendingBillsFilter == YesNoFilterOptions.Yes) ||
+					(t.BillId != null && _pendingBillsFilter == YesNoFilterOptions.No)))
+			.OrderBy(t => t.TransactionDateTime)];
 
-		if (!_showDeleted) query = query.Where(t => t.MasterStatus);
-		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
-		if (_selectedOMC?.Id > 0) query = query.Where(t => t.OMCId == _selectedOMC.Id);
-		if (_selectedVehicle?.Id > 0) query = query.Where(t => t.VehicleId == _selectedVehicle.Id);
-		if (_selectedRoute?.Id > 0) query = query.Where(t => t.RouteId == _selectedRoute.Id);
-		if (_selectedDriver?.Id > 0) query = query.Where(t => t.DriverId == _selectedDriver.Id);
-
-		if (_vehicleEmptyFilter == YesNoFilterOptions.Yes) query = query.Where(t => t.VehicleEmpty);
-		else if (_vehicleEmptyFilter == YesNoFilterOptions.No) query = query.Where(t => !t.VehicleEmpty);
-
-		if (_pendingBillsFilter == YesNoFilterOptions.Yes) query = query.Where(t => t.BillId is null);
-		else if (_pendingBillsFilter == YesNoFilterOptions.No) query = query.Where(t => t.BillId is not null);
-
-		_transactionOverviews = [.. query.OrderBy(t => t.TransactionDateTime)];
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
 	}
 	#endregion
@@ -179,6 +181,12 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 	{
 		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
 		await LoadTransactionOverviews();
+	}
+
+	private async Task OnLedgerChanged(LedgerModel value)
+	{
+		_selectedLedger = value;
+		await ApplyFilters();
 	}
 
 	private async Task OnCompanyChanged(CompanyModel value)
@@ -344,6 +352,7 @@ public partial class TripLedgerPaymentsReport : IAsyncDisposable
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
 				_showDeleted,
+				_selectedLedger?.Id > 0 ? _selectedLedger : null,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedOMC?.Id > 0 ? _selectedOMC : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null,

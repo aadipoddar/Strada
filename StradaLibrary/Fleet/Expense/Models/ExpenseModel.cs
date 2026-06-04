@@ -8,6 +8,7 @@ public class ExpenseModel
 	public DateTime TransactionDateTime { get; set; }
 	public int FinancialYearId { get; set; }
 	public int VehicleId { get; set; }
+	public int TotalItems { get; set; }
 	public decimal TotalExpense { get; set; }
 	public string? Remarks { get; set; }
 	public int CreatedBy { get; set; }
@@ -32,6 +33,7 @@ public class ExpenseOverviewModel
 
 	public int VehicleId { get; set; }
 	public string VehicleCode { get; set; }
+	public int TotalItems { get; set; }
 	public decimal TotalExpense { get; set; }
 
 	public string? Remarks { get; set; }

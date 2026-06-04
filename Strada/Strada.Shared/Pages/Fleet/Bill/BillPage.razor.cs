@@ -6,14 +6,12 @@ using Strada.Shared.Components.Input;
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Fleet.Bill;
-using StradaLibrary.Fleet.Bill.Exports;
 using StradaLibrary.Fleet.Bill.Models;
 using StradaLibrary.Fleet.OMC.Models;
 using StradaLibrary.Fleet.Trip;
 using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -202,6 +200,10 @@ public partial class BillPage
 			LastModifiedFromPlatform = null
 		};
 
+		var lastTransaction = await CommonData.LoadLastTableData<BillModel>(FleetNames.Bill);
+		if (lastTransaction is not null)
+			_bill.TransactionDateTime = lastTransaction.TransactionDateTime;
+
 		await DeleteLocalFiles();
 	}
 
@@ -214,13 +216,6 @@ public partial class BillPage
 			_selectedOMC = _omcs.FirstOrDefault(s => s.Id == _bill.OMCId) ?? _omcs.FirstOrDefault();
 		else
 			_selectedOMC = _omcs.FirstOrDefault();
-
-		if (_bill.Id == 0)
-		{
-			var lastTransaction = await CommonData.LoadLastTableData<BillModel>(FleetNames.Bill);
-			if (lastTransaction is not null)
-				_bill.TransactionDateTime = lastTransaction.TransactionDateTime;
-		}
 	}
 
 	private async Task ResolvePendingTripsCart()
@@ -594,18 +589,10 @@ public partial class BillPage
 
 			var ledgerPayments = BillData.ConvertLedgerPaymentCartToDetails(_ledgerPaymentsCart, _bill.Id);
 			_bill.Id = await BillData.SaveTransaction(_bill, ledgerPayments, _tripCart);
+			_bill = await CommonData.LoadTableDataById<BillModel>(FleetNames.Bill, _bill.Id);
 
-			if (savePDF)
-			{
-				var (pdfStream, pdfFileName) = await BillInvoiceExport.ExportInvoice(_bill.Id, InvoiceExportType.PDF);
-				await SaveAndViewService.SaveAndView(pdfFileName, pdfStream);
-			}
-
-			if (saveExcel)
-			{
-				var (excelStream, excelFileName) = await BillInvoiceExport.ExportInvoice(_bill.Id, InvoiceExportType.Excel);
-				await SaveAndViewService.SaveAndView(excelFileName, excelStream);
-			}
+			if (savePDF) await ExportSelectedTransaction(false, true);
+			if (saveExcel) await ExportSelectedTransaction(true, true);
 
 			await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully.", ToastType.Success);
 
@@ -625,15 +612,9 @@ public partial class BillPage
 	#endregion
 
 	#region Exporting
-	private async Task ExportPdfInvoice()
+	private async Task ExportSelectedTransaction(bool isExcel = false, bool force = false)
 	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
+		if (_bill.Id <= 0 || (_isProcessing && !force))
 			return;
 
 		try
@@ -641,39 +622,9 @@ public partial class BillPage
 			_isProcessing = true;
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_bill.TransactionNo, true, false, CodeType.Bill);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-		}
-	}
-
-	private async Task ExportExcelInvoice()
-	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_bill.TransactionNo, false, true, CodeType.Bill);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_bill.TransactionNo, !isExcel, isExcel, CodeType.Bill);
+			await SaveAndViewService.SaveAndView(isExcel ? decodeTransactionNo.ExcelStream.fileName : decodeTransactionNo.PDFStream.fileName,
+				isExcel ? decodeTransactionNo.ExcelStream.stream : decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
 		}

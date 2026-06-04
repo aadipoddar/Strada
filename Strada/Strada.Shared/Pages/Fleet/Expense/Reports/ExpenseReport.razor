@@ -93,25 +93,25 @@ else
 						<!-- Company -->
 						<div class="form-field">
 							<CustomAutoComplete T="CompanyModel"
-												 Value="_selectedCompany"
-												 DataSource="@_companies"
-												 Placeholder="All Companies"
-												 Label="Company" Required="false"
-												 ValueChanged="OnCompanyChanged"
-												 FieldValue="@nameof(CompanyModel.Name)"
-												 AddNewRoute="@PageRouteNames.CompanyMaster" />
+												Value="_selectedCompany"
+												DataSource="@_companies"
+												Placeholder="All Companies"
+												Label="Company" Required="false"
+												ValueChanged="OnCompanyChanged"
+												FieldValue="@nameof(CompanyModel.Name)"
+												AddNewRoute="@PageRouteNames.CompanyMaster" />
 						</div>
 
 						<!-- Vehicle -->
 						<div class="form-field">
 							<CustomAutoComplete T="VehicleModel"
-												 Value="_selectedVehicle"
-												 DataSource="@_vehicles"
-												 Placeholder="All Vehicles"
-												 Label="Vehicle" Required="false"
-												 ValueChanged="OnVehicleChanged"
-												 FieldValue="@nameof(VehicleModel.Code)"
-												 AddNewRoute="@PageRouteNames.VehicleMaster" />
+												Value="_selectedVehicle"
+												DataSource="@_vehicles"
+												Placeholder="All Vehicles"
+												Label="Vehicle" Required="false"
+												ValueChanged="OnVehicleChanged"
+												FieldValue="@nameof(VehicleModel.Code)"
+												AddNewRoute="@PageRouteNames.VehicleMaster" />
 						</div>
 					</div>
 				</div>
@@ -176,8 +176,7 @@ else
 											</div>
 										</GroupCaptionTemplate>
 									</GridAggregateColumn>
-									<GridAggregateColumn Field="@nameof(ExpenseOverviewModel.TotalExpense)"
-														 Type="AggregateType.Sum" Format="N2">
+									<GridAggregateColumn Field="@nameof(ExpenseOverviewModel.TotalExpense)" Type="AggregateType.Sum" Format="N2">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
@@ -213,6 +212,7 @@ else
 							<GridColumn Field="@nameof(ExpenseOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(ExpenseOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(ExpenseOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
+							<GridColumn Field="@nameof(ExpenseOverviewModel.TotalItems)" HeaderText="Total Items" Width="150" TextAlign="TextAlign.Right" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(ExpenseOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right">
 								<Template>
 									@{

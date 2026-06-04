@@ -144,25 +144,22 @@ public partial class TripReport : IAsyncDisposable
 
 	private async Task ApplyFilters()
 	{
-		var query = _allTransactionOverviews.AsEnumerable();
+		_transactionOverviews = [.. _allTransactionOverviews.Where(t =>
+				(_showDeleted || t.Status) &&
+				(_selectedCompany == null || _selectedCompany.Id == 0 || t.CompanyId == _selectedCompany.Id) &&
+				(_selectedOMC == null || _selectedOMC.Id == 0 || t.OMCId == _selectedOMC.Id) &&
+				(_selectedVehicle == null || _selectedVehicle.Id == 0 || t.VehicleId == _selectedVehicle.Id) &&
+				(_selectedRoute == null || _selectedRoute.Id == 0 || t.RouteId == _selectedRoute.Id) &&
+				(_selectedDriver == null || _selectedDriver.Id == 0 || t.DriverId == _selectedDriver.Id) &&
+				(_vehicleEmptyFilter == YesNoFilterOptions.All ||
+					(t.VehicleEmpty && _vehicleEmptyFilter == YesNoFilterOptions.Yes) ||
+					(!t.VehicleEmpty && _vehicleEmptyFilter == YesNoFilterOptions.No)) &&
+				(_pendingBillsFilter == YesNoFilterOptions.All ||
+					(t.BillId == null && _pendingBillsFilter == YesNoFilterOptions.Yes) ||
+					(t.BillId != null && _pendingBillsFilter == YesNoFilterOptions.No)))
+			.OrderBy(t => t.TransactionDateTime)];
 
-		if (!_showDeleted) query = query.Where(t => t.Status);
-		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
-		if (_selectedOMC?.Id > 0) query = query.Where(t => t.OMCId == _selectedOMC.Id);
-		if (_selectedVehicle?.Id > 0) query = query.Where(t => t.VehicleId == _selectedVehicle.Id);
-		if (_selectedRoute?.Id > 0) query = query.Where(t => t.RouteId == _selectedRoute.Id);
-		if (_selectedDriver?.Id > 0) query = query.Where(t => t.DriverId == _selectedDriver.Id);
-
-		if (_vehicleEmptyFilter == YesNoFilterOptions.Yes) query = query.Where(t => t.VehicleEmpty);
-		else if (_vehicleEmptyFilter == YesNoFilterOptions.No) query = query.Where(t => !t.VehicleEmpty);
-
-		if (_pendingBillsFilter == YesNoFilterOptions.Yes) query = query.Where(t => t.BillId is null);
-		else if (_pendingBillsFilter == YesNoFilterOptions.No) query = query.Where(t => t.BillId is not null);
-
-		_transactionOverviews = [.. query.OrderBy(t => t.TransactionDateTime)];
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
 	}
 	#endregion

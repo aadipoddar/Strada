@@ -8,7 +8,7 @@ using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Utils.MailUtils;
 
-namespace StradaLibrary.Fleet.Expense;
+namespace StradaLibrary.Fleet.Expense.Data;
 
 public static class ExpenseData
 {
@@ -77,6 +77,9 @@ public static class ExpenseData
 		if (expense.VehicleId <= 0)
 			throw new InvalidOperationException("Please select a vehicle for the transaction.");
 
+		if (expense.TotalItems <= 0)
+			throw new InvalidOperationException("Total items must be greater than zero.");
+
 		if (expense.TotalExpense < 0)
 			throw new InvalidOperationException("Total expense cannot be negative.");
 
@@ -106,6 +109,9 @@ public static class ExpenseData
 	{
 		if (expensesDetails.Any(ed => ed.Amount <= 0))
 			throw new InvalidOperationException("Expense amount must be greater than zero.");
+
+		if (expensesDetails.Count != expense.TotalItems)
+			throw new InvalidOperationException("Total items must be equal to the number of expense details.");
 
 		if (expensesDetails.Sum(ed => ed.Amount) != expense.TotalExpense)
 			throw new InvalidOperationException("Total expense amount must be equal to total expense of the transaction.");

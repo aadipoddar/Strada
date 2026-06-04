@@ -6,6 +6,7 @@
     [TransactionDateTime] DATETIME NOT NULL,
     [FinancialYearId] INT NOT NULL,
     [VehicleId] INT NOT NULL,
+	[TotalItems] INT NOT NULL,
     [TotalExpense] MONEY NOT NULL,
     [Remarks] VARCHAR(MAX) NULL,
 	[CreatedBy] INT NOT NULL,

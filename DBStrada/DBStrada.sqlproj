@@ -102,6 +102,7 @@
     <Folder Include="Fleet\Tyre\Insert" />
     <Folder Include="Fleet\Tyre\Table" />
     <Folder Include="Common" />
+    <Folder Include="Fleet\OMC\Load" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Operations\User\Insert_User.sql" />
@@ -203,6 +204,12 @@
     <Build Include="Common\Load_TableData_By_Status.sql" />
     <Build Include="Common\Load_TableData_By_TransactionNo.sql" />
     <Build Include="Fleet\Trip\Load\Load_Trip_By_SlNo_FinancialYear.sql" />
+    <Build Include="Fleet\OMC\Table\OMCCardMoneyTransfer.sql" />
+    <Build Include="Fleet\OMC\Table\OMCCardMoneyTransferDetails.sql" />
+    <Build Include="Fleet\OMC\Insert\Insert_OMCCardMoneyTransferDetails.sql" />
+    <Build Include="Fleet\OMC\Insert\Insert_OMCCardMoneyTransfer.sql" />
+    <Build Include="Fleet\OMC\Load\OMCCardMoneyTransfer_Overview.sql" />
+    <Build Include="Fleet\OMC\Load\OMCCardMoneyTransferDetails_Overview.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />

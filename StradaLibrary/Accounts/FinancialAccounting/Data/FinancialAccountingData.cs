@@ -4,6 +4,7 @@ using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Common;
 using StradaLibrary.DataAccess;
 using StradaLibrary.Fleet.Bill;
+using StradaLibrary.Fleet.OMC.Data;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
 using StradaLibrary.Utils.ExportUtils;
@@ -73,6 +74,7 @@ public static class FinancialAccountingData
 	private static async Task DeletePostings(int id, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
 		await BillData.UpdateFinancialAccountingId(id, null, sqlDataAccessTransaction);
+		await OMCCardMoneyTransferData.UpdateFinancialAccountingId(id, null, sqlDataAccessTransaction);
 	}
 
 	public static async Task RecoverTransaction(FinancialAccountingModel accounting)

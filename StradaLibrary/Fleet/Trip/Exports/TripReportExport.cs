@@ -216,6 +216,7 @@ public static class TripReportExport
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
 		bool showDeleted = false,
+		ExpenseTypeModel expenseType = null,
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
@@ -348,6 +349,9 @@ public static class TripReportExport
 				nameof(TripExpensesOverviewModel.MasterStatus)
 			];
 
+			if (expenseType is not null)
+				columnOrder.Remove(nameof(TripExpensesOverviewModel.ExpenseTypeName));
+
 			if (company is not null)
 				columnOrder.Remove(nameof(TripExpensesOverviewModel.CompanyName));
 
@@ -384,6 +388,7 @@ public static class TripReportExport
 				useLandscape: showAllColumns,
 				new()
 				{
+					["Expense Type"] = expenseType?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
@@ -407,6 +412,7 @@ public static class TripReportExport
 				columnOrder,
 				new()
 				{
+					["Expense Type"] = expenseType?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
@@ -427,6 +433,7 @@ public static class TripReportExport
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
 		bool showDeleted = false,
+		OMCCardModel omcCard = null,
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
@@ -559,6 +566,9 @@ public static class TripReportExport
 				nameof(TripCardPaymentsOverviewModel.MasterStatus)
 			];
 
+			if (omcCard is not null)
+				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.OMCCardNumber));
+
 			if (company is not null)
 				columnOrder.Remove(nameof(TripCardPaymentsOverviewModel.CompanyName));
 
@@ -595,6 +605,7 @@ public static class TripReportExport
 				useLandscape: showAllColumns,
 				new()
 				{
+					["OMC Card"] = omcCard?.CardNumber ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
@@ -618,6 +629,7 @@ public static class TripReportExport
 				columnOrder,
 				new()
 				{
+					["OMC Card"] = omcCard?.CardNumber ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
@@ -638,6 +650,7 @@ public static class TripReportExport
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
 		bool showDeleted = false,
+		LedgerModel ledger = null,
 		CompanyModel company = null,
 		OMCModel omc = null,
 		VehicleModel vehicle = null,
@@ -770,6 +783,9 @@ public static class TripReportExport
 				nameof(TripLedgerPaymentsOverviewModel.MasterStatus)
 			];
 
+			if (ledger is not null)
+				columnOrder.Remove(nameof(TripLedgerPaymentsOverviewModel.LedgerName));
+
 			if (company is not null)
 				columnOrder.Remove(nameof(TripLedgerPaymentsOverviewModel.CompanyName));
 
@@ -806,6 +822,7 @@ public static class TripReportExport
 				useLandscape: showAllColumns,
 				new()
 				{
+					["Ledger"] = ledger?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,
@@ -829,6 +846,7 @@ public static class TripReportExport
 				columnOrder,
 				new()
 				{
+					["Ledger"] = ledger?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null,

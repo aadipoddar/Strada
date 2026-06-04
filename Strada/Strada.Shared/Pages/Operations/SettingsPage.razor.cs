@@ -49,6 +49,7 @@ public partial class SettingsPage
 	private string _tripTransactionPrefix = string.Empty;
 	private string _billTransactionPrefix = string.Empty;
 	private string _expenseTransactionPrefix = string.Empty;
+	private string _omcCardMoneyTransferTransactionPrefix = string.Empty;
 
 	// Ledger Linking
 	private string _cashLedgerId = string.Empty;
@@ -57,6 +58,8 @@ public partial class SettingsPage
 	private LedgerModel _selectedGSTLedger;
 	private string _billLedgerId = string.Empty;
 	private LedgerModel _selectedBillLedger;
+	private string _omcCardMoneyTransferLedgerId = string.Empty;
+	private LedgerModel _selectedOMCCardMoneyTransferLedger;
 	private List<LedgerModel> _ledgers = [];
 
 	// Bank Reconciliation
@@ -69,6 +72,8 @@ public partial class SettingsPage
 	private VoucherModel _selectedDefaultVoucher;
 	private string _billVoucherId = string.Empty;
 	private VoucherModel _selectedBillVoucher;
+	private string _omcCardMoneyTransferVoucherId = string.Empty;
+	private VoucherModel _selectedOMCCardMoneyTransferVoucher;
 	private List<VoucherModel> _vouchers = [];
 
 	// Report Settings
@@ -148,11 +153,13 @@ public partial class SettingsPage
 		_tripTransactionPrefix = Str(SettingsKeys.TripTransactionPrefix) ?? string.Empty;
 		_billTransactionPrefix = Str(SettingsKeys.BillTransactionPrefix) ?? string.Empty;
 		_expenseTransactionPrefix = Str(SettingsKeys.ExpenseTransactionPrefix) ?? string.Empty;
+		_omcCardMoneyTransferTransactionPrefix = Str(SettingsKeys.OMCCardMoneyTransferTransactionPrefix) ?? string.Empty;
 
 		// Ledger Linking
 		_cashLedgerId = Str(SettingsKeys.CashLedgerId) ?? string.Empty;
 		_gstLedgerId = Str(SettingsKeys.GSTLedgerId) ?? string.Empty;
 		_billLedgerId = Str(SettingsKeys.BillLedgerId) ?? string.Empty;
+		_omcCardMoneyTransferLedgerId = Str(SettingsKeys.OMCCardMoneyTransferLedgerId) ?? string.Empty;
 
 		// Bank Reconciliation
 		_bankAccountTypeId = Str(SettingsKeys.BankAccountTypeId) ?? string.Empty;
@@ -160,6 +167,7 @@ public partial class SettingsPage
 		// Default Values
 		_defaultSelectedVoucherId = Str(SettingsKeys.DefaultSelectedVoucherId) ?? string.Empty;
 		_billVoucherId = Str(SettingsKeys.BillVoucherId) ?? string.Empty;
+		_omcCardMoneyTransferVoucherId = Str(SettingsKeys.OMCCardMoneyTransferVoucherId) ?? string.Empty;
 
 		// Report Settings
 		_autoRefreshReportTimer = Int(SettingsKeys.AutoRefreshReportTimer, 5);
@@ -205,6 +213,9 @@ public partial class SettingsPage
 		if (!string.IsNullOrWhiteSpace(_billLedgerId) && int.TryParse(_billLedgerId, out var billLedgerId))
 			_selectedBillLedger = _ledgers.FirstOrDefault(l => l.Id == billLedgerId);
 
+		if (!string.IsNullOrWhiteSpace(_omcCardMoneyTransferLedgerId) && int.TryParse(_omcCardMoneyTransferLedgerId, out var omcCardMoneyTransferLedgerId))
+			_selectedOMCCardMoneyTransferLedger = _ledgers.FirstOrDefault(l => l.Id == omcCardMoneyTransferLedgerId);
+
 		if (!string.IsNullOrWhiteSpace(_bankAccountTypeId) && int.TryParse(_bankAccountTypeId, out var bankAccountTypeId))
 			_selectedBankAccountType = _accountTypes.FirstOrDefault(a => a.Id == bankAccountTypeId);
 
@@ -213,6 +224,9 @@ public partial class SettingsPage
 
 		if (!string.IsNullOrWhiteSpace(_billVoucherId) && int.TryParse(_billVoucherId, out var billVoucherId))
 			_selectedBillVoucher = _vouchers.FirstOrDefault(v => v.Id == billVoucherId);
+
+		if (!string.IsNullOrWhiteSpace(_omcCardMoneyTransferVoucherId) && int.TryParse(_omcCardMoneyTransferVoucherId, out var omcCardMoneyTransferVoucherId))
+			_selectedOMCCardMoneyTransferVoucher = _vouchers.FirstOrDefault(v => v.Id == omcCardMoneyTransferVoucherId);
 	}
 
 	#endregion
@@ -243,6 +257,12 @@ public partial class SettingsPage
 		_billLedgerId = value?.Id.ToString() ?? string.Empty;
 	}
 
+	private void OnOMCCardMoneyTransferLedgerChange(LedgerModel value)
+	{
+		_selectedOMCCardMoneyTransferLedger = value;
+		_omcCardMoneyTransferLedgerId = value?.Id.ToString() ?? string.Empty;
+	}
+
 	private void OnBankAccountTypeChange(AccountTypeModel value)
 	{
 		_selectedBankAccountType = value;
@@ -259,6 +279,12 @@ public partial class SettingsPage
 	{
 		_selectedBillVoucher = value;
 		_billVoucherId = value?.Id.ToString() ?? string.Empty;
+	}
+
+	private void OnOMCCardMoneyTransferVoucherChange(VoucherModel value)
+	{
+		_selectedOMCCardMoneyTransferVoucher = value;
+		_omcCardMoneyTransferVoucherId = value?.Id.ToString() ?? string.Empty;
 	}
 
 	#endregion
@@ -312,11 +338,13 @@ public partial class SettingsPage
 			await UpdateSetting(SettingsKeys.TripTransactionPrefix, _tripTransactionPrefix, Desc(SettingsKeys.TripTransactionPrefix));
 			await UpdateSetting(SettingsKeys.BillTransactionPrefix, _billTransactionPrefix, Desc(SettingsKeys.BillTransactionPrefix));
 			await UpdateSetting(SettingsKeys.ExpenseTransactionPrefix, _expenseTransactionPrefix, Desc(SettingsKeys.ExpenseTransactionPrefix));
+			await UpdateSetting(SettingsKeys.OMCCardMoneyTransferTransactionPrefix, _omcCardMoneyTransferTransactionPrefix, Desc(SettingsKeys.OMCCardMoneyTransferTransactionPrefix));
 
 			// Ledger Linking
 			await UpdateSetting(SettingsKeys.CashLedgerId, _cashLedgerId, Desc(SettingsKeys.CashLedgerId));
 			await UpdateSetting(SettingsKeys.GSTLedgerId, _gstLedgerId, Desc(SettingsKeys.GSTLedgerId));
 			await UpdateSetting(SettingsKeys.BillLedgerId, _billLedgerId, Desc(SettingsKeys.BillLedgerId));
+			await UpdateSetting(SettingsKeys.OMCCardMoneyTransferLedgerId, _omcCardMoneyTransferLedgerId, Desc(SettingsKeys.OMCCardMoneyTransferLedgerId));
 
 			// Bank Reconciliation
 			await UpdateSetting(SettingsKeys.BankAccountTypeId, _bankAccountTypeId, Desc(SettingsKeys.BankAccountTypeId));
@@ -324,6 +352,7 @@ public partial class SettingsPage
 			// Default Values
 			await UpdateSetting(SettingsKeys.DefaultSelectedVoucherId, _defaultSelectedVoucherId, Desc(SettingsKeys.DefaultSelectedVoucherId));
 			await UpdateSetting(SettingsKeys.BillVoucherId, _billVoucherId, Desc(SettingsKeys.BillVoucherId));
+			await UpdateSetting(SettingsKeys.OMCCardMoneyTransferVoucherId, _omcCardMoneyTransferVoucherId, Desc(SettingsKeys.OMCCardMoneyTransferVoucherId));
 
 			// Report Settings
 			await UpdateSetting(SettingsKeys.AutoRefreshReportTimer, _autoRefreshReportTimer.ToString(), Desc(SettingsKeys.AutoRefreshReportTimer));

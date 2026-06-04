@@ -253,6 +253,22 @@ else
 				<!-- FLEET TRANSACTIONS -->
 				<MudBlazor.MudTabPanel Text="Fleet Transactions" Visible="_user.Fleet">
 
+					<!-- Live Tracking -->
+					<div class="launchpad-section">
+						<h2 class="launchpad-section-title">Live Tracking</h2>
+						<div class="dashboard-grid">
+							<FioriTile Title="Live Fleet Map" Subtitle="Track all trucks live on a map" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.LiveFleetMap)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+										<line x1="8" y1="2" x2="8" y2="18" />
+										<line x1="16" y1="6" x2="16" y2="22" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+						</div>
+					</div>
+
 					<!-- Daily Entries -->
 					<div class="launchpad-section">
 						<div class="dashboard-grid">
@@ -286,6 +302,19 @@ else
 										<line x1="7" y1="9" x2="17" y2="9" />
 										<line x1="7" y1="13" x2="17" y2="13" />
 										<line x1="7" y1="17" x2="13" y2="17" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="OMC Card Money Transfer" Subtitle="Record money loaded onto OMC fuel cards" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMoneyTransfer)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<rect x="2" y="4" width="20" height="13" rx="2" ry="2" />
+										<line x1="2" y1="9" x2="22" y2="9" />
+										<polyline points="7 21 10 21 8.5 19" />
+										<path d="M8.5 19a4 4 0 0 0 7 0" />
+										<polyline points="17 14 14 14 15.5 16" />
+										<path d="M15.5 16a4 4 0 0 0-7 0" />
 									</svg>
 								</IconContent>
 							</FioriTile>
@@ -416,6 +445,34 @@ else
 										<line x1="21" y1="21" x2="16.65" y2="16.65" />
 										<line x1="8" y1="11" x2="14" y2="11" />
 										<line x1="11" y1="8" x2="11" y2="14" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+						</div>
+					</div>
+
+					<!-- OMC Card Money Transfer Reports -->
+					<div class="launchpad-section">
+						<h2 class="launchpad-section-title">OMC Card Money Transfer Reports</h2>
+						<div class="dashboard-grid">
+							<FioriTile Title="OMC Card Money Transfer Report" Subtitle="Summary of money transferred onto OMC cards by date range" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMoneyTransferReport)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+										<polyline points="14 2 14 8 20 8" />
+										<rect x="7" y="11" width="10" height="6" rx="1" />
+										<line x1="7" y1="13.5" x2="17" y2="13.5" />
+									</svg>
+								</IconContent>
+							</FioriTile>
+
+							<FioriTile Title="OMC Card Money Transfer Details Report" Subtitle="Card-wise breakdown of every OMC money transfer entry" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMoneyTransferDetailsReport)">
+								<IconContent>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<circle cx="11" cy="11" r="8" />
+										<line x1="21" y1="21" x2="16.65" y2="16.65" />
+										<rect x="7.5" y="8.5" width="7" height="5" rx="1" />
+										<line x1="7.5" y1="10.5" x2="14.5" y2="10.5" />
 									</svg>
 								</IconContent>
 							</FioriTile>

@@ -9,11 +9,9 @@ using StradaLibrary.Fleet.OMC.Models;
 using StradaLibrary.Fleet.Route.Data;
 using StradaLibrary.Fleet.Route.Models;
 using StradaLibrary.Fleet.Trip;
-using StradaLibrary.Fleet.Trip.Exports;
 using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -833,18 +831,10 @@ public partial class TripPage
 			var cardPayments = TripData.ConvertCardPaymentCartToDetails(_cardPaymentsCart, _trip.Id);
 			var ledgerPayments = TripData.ConvertLedgerPaymentCartToDetails(_ledgerPaymentsCart, _trip.Id);
 			_trip.Id = await TripData.SaveTransaction(_trip, expenses, cardPayments, ledgerPayments);
+			_trip = await CommonData.LoadTableDataById<TripModel>(FleetNames.Trip, _trip.Id);
 
-			if (savePDF)
-			{
-				var (pdfStream, pdfFileName) = await TripInvoiceExport.ExportInvoice(_trip.Id, InvoiceExportType.PDF);
-				await SaveAndViewService.SaveAndView(pdfFileName, pdfStream);
-			}
-
-			if (saveExcel)
-			{
-				var (excelStream, excelFileName) = await TripInvoiceExport.ExportInvoice(_trip.Id, InvoiceExportType.Excel);
-				await SaveAndViewService.SaveAndView(excelFileName, excelStream);
-			}
+			if (savePDF) await ExportSelectedTransaction(false, true);
+			if (saveExcel) await ExportSelectedTransaction(true, true);
 
 			await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully.", ToastType.Success);
 
@@ -864,15 +854,9 @@ public partial class TripPage
 	#endregion
 
 	#region Exporting
-	private async Task ExportPdfInvoice()
+	private async Task ExportSelectedTransaction(bool isExcel = false, bool force = false)
 	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
+		if (_trip.Id <= 0 || (_isProcessing && !force))
 			return;
 
 		try
@@ -880,39 +864,9 @@ public partial class TripPage
 			_isProcessing = true;
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_trip.TransactionNo, true, false, CodeType.Trip);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-		}
-	}
-
-	private async Task ExportExcelInvoice()
-	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_trip.TransactionNo, false, true, CodeType.Trip);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_trip.TransactionNo, !isExcel, isExcel, CodeType.Trip);
+			await SaveAndViewService.SaveAndView(isExcel ? decodeTransactionNo.ExcelStream.fileName : decodeTransactionNo.PDFStream.fileName,
+				isExcel ? decodeTransactionNo.ExcelStream.stream : decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
 		}

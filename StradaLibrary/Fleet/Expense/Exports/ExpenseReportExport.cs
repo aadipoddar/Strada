@@ -24,6 +24,7 @@ public static class ExpenseReportExport
 			[nameof(ExpenseOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
 			[nameof(ExpenseOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
 			[nameof(ExpenseOverviewModel.VehicleCode)] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(ExpenseOverviewModel.TotalItems)] = new() { DisplayName = "Total Items", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(ExpenseOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(ExpenseOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -47,6 +48,7 @@ public static class ExpenseReportExport
 				nameof(ExpenseOverviewModel.TransactionDateTime),
 				nameof(ExpenseOverviewModel.FinancialYear),
 				nameof(ExpenseOverviewModel.VehicleCode),
+				nameof(ExpenseOverviewModel.TotalItems),
 				nameof(ExpenseOverviewModel.TotalExpense),
 				nameof(ExpenseOverviewModel.Remarks),
 				nameof(ExpenseOverviewModel.CreatedByName),
@@ -135,6 +137,7 @@ public static class ExpenseReportExport
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
 		bool showDeleted = false,
+		ExpenseTypeModel expenseType = null,
 		CompanyModel company = null,
 		VehicleModel vehicle = null)
 	{
@@ -153,6 +156,7 @@ public static class ExpenseReportExport
 			[nameof(ExpenseDetailsOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Left, IncludeInTotal = false },
 
 			[nameof(ExpenseDetailsOverviewModel.VehicleCode)] = new() { DisplayName = "Vehicle", Alignment = CellAlignment.Left, IncludeInTotal = false },
+			[nameof(ExpenseDetailsOverviewModel.TotalItems)] = new() { DisplayName = "Total Items", Alignment = CellAlignment.Right, IncludeInTotal = true },
 			[nameof(ExpenseDetailsOverviewModel.TotalExpense)] = new() { DisplayName = "Expenses", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true },
 
 			[nameof(ExpenseDetailsOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -181,6 +185,7 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.TransactionDateTime),
 				nameof(ExpenseDetailsOverviewModel.FinancialYear),
 				nameof(ExpenseDetailsOverviewModel.VehicleCode),
+				nameof(ExpenseDetailsOverviewModel.TotalItems),
 				nameof(ExpenseDetailsOverviewModel.TotalExpense),
 				nameof(ExpenseDetailsOverviewModel.TransactionNo),
 				nameof(ExpenseDetailsOverviewModel.Remarks),
@@ -210,6 +215,9 @@ public static class ExpenseReportExport
 				nameof(ExpenseDetailsOverviewModel.MasterStatus)
 			];
 
+			if (expenseType is not null)
+				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.ExpenseTypeName));
+
 			if (company is not null)
 				columnOrder.Remove(nameof(ExpenseDetailsOverviewModel.CompanyName));
 
@@ -237,6 +245,7 @@ public static class ExpenseReportExport
 				useLandscape: showAllColumns,
 				new()
 				{
+					["Expense Type"] = expenseType?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null
 				}
@@ -257,6 +266,7 @@ public static class ExpenseReportExport
 				columnOrder,
 				new()
 				{
+					["Expense Type"] = expenseType?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["Vehicle"] = vehicle?.Code ?? null
 				}

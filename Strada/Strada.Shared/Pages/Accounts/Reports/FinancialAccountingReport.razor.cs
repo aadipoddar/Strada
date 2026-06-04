@@ -124,16 +124,13 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
 	private async Task ApplyFilters()
 	{
-		var query = _allTransactionOverviews.AsEnumerable();
+		_transactionOverviews = [.. _allTransactionOverviews.Where(t =>
+				(_showDeleted || t.Status) &&
+				(_selectedCompany == null || _selectedCompany.Id == 0 || t.CompanyId == _selectedCompany.Id) &&
+				(_selectedVoucher == null || _selectedVoucher.Id == 0 || t.VoucherId == _selectedVoucher.Id))
+			.OrderBy(t => t.TransactionDateTime)];
 
-		if (!_showDeleted) query = query.Where(t => t.Status);
-		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
-		if (_selectedVoucher?.Id > 0) query = query.Where(t => t.VoucherId == _selectedVoucher.Id);
-
-		_transactionOverviews = [.. query.OrderBy(t => t.TransactionDateTime)];
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
 	}
 	#endregion

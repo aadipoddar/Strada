@@ -36,11 +36,13 @@ public static class SettingsKeys
 	public static string TripTransactionPrefix => "TripTransactionPrefix";
 	public static string BillTransactionPrefix => "BillTransactionPrefix";
 	public static string ExpenseTransactionPrefix => "ExpenseTransactionPrefix";
+	public static string OMCCardMoneyTransferTransactionPrefix => "OMCCardMoneyTransferTransactionPrefix";
 
 	// Ledger Linking
 	public static string CashLedgerId => "CashLedgerId";
 	public static string GSTLedgerId => "GSTLedgerId";
 	public static string BillLedgerId => "BillLedgerId";
+	public static string OMCCardMoneyTransferLedgerId => "OMCCardMoneyTransferLedgerId";
 
 	// Bank Reconciliation
 	public static string BankAccountTypeId => "BankAccountTypeId";
@@ -48,6 +50,7 @@ public static class SettingsKeys
 	// Default Values
 	public static string DefaultSelectedVoucherId => "DefaultSelectedVoucherId";
 	public static string BillVoucherId => "BillVoucherId";
+	public static string OMCCardMoneyTransferVoucherId => "OMCCardMoneyTransferVoucherId";
 
 	// Report Settings
 	public static string AutoRefreshReportTimer => "AutoRefreshReportTimer";

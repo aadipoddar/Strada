@@ -71,6 +71,12 @@ public static class DecodeCode
 				if (pdf) decodeTransactionNoModel.PDFStream = await ExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as ExpenseModel).Id, InvoiceExportType.PDF);
 				if (excel) decodeTransactionNoModel.ExcelStream = await ExpenseInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as ExpenseModel).Id, InvoiceExportType.Excel);
 				break;
+			case CodeType.OMCCardMoneyTransfer:
+				decodeTransactionNoModel.TransactionModel = await CommonData.LoadTableDataByTransactionNo<OMCCardMoneyTransferModel>(FleetNames.OMCCardMoneyTransfer, transactionNo);
+				decodeTransactionNoModel.PageRouteName = $"{PageRouteNames.OMCCardMoneyTransfer}/{(decodeTransactionNoModel.TransactionModel as OMCCardMoneyTransferModel).Id}";
+				if (pdf) decodeTransactionNoModel.PDFStream = await OMCCardMoneyTransferInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as OMCCardMoneyTransferModel).Id, InvoiceExportType.PDF);
+				if (excel) decodeTransactionNoModel.ExcelStream = await OMCCardMoneyTransferInvoiceExport.ExportInvoice((decodeTransactionNoModel.TransactionModel as OMCCardMoneyTransferModel).Id, InvoiceExportType.Excel);
+				break;
 
 			case CodeType.Location:
 				var locations = await CommonData.LoadTableData<LocationModel>(FleetNames.Location);

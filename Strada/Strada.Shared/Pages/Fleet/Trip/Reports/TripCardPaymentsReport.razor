@@ -95,6 +95,18 @@ else
 												   Required="false" />
 						</div>
 
+						<!-- OMC Card -->
+						<div class="form-field">
+							<CustomAutoComplete T="OMCCardModel"
+												Value="_selectedOMCCard"
+												DataSource="@_omcCards"
+												Placeholder="All OMC Cards"
+												Label="OMC Card" Required="false"
+												ValueChanged="OnOMCCardChanged"
+												FieldValue="@nameof(OMCCardModel.CardNumber)"
+												AddNewRoute="@PageRouteNames.OMCCardMaster" />
+						</div>
+
 						<!-- Company -->
 						<div class="form-field">
 							<CustomAutoComplete T="CompanyModel"
@@ -493,7 +505,7 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.OMCCardNumber)" HeaderText="Card Number" Width="170" />
+							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.OMCCardNumber)" HeaderText="Card Number" Width="170" Visible="@(_showAllColumns || _selectedOMCCard is null || _selectedOMCCard.Id <= 0)" />
 							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.OMCCardCode)" HeaderText="Card Code" Width="130" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(TripCardPaymentsOverviewModel.PaymentAmount)" HeaderText="Payment Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>

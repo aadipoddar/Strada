@@ -3,7 +3,7 @@ using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Fleet.Expense;
+using StradaLibrary.Fleet.Expense.Data;
 using StradaLibrary.Fleet.Expense.Exports;
 using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
@@ -30,9 +30,11 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
 
+	private ExpenseTypeModel? _selectedExpenseType = null;
 	private CompanyModel? _selectedCompany = null;
 	private VehicleModel? _selectedVehicle = null;
 
+	private List<ExpenseTypeModel> _expenseTypes = [];
 	private List<CompanyModel> _companies = [];
 	private List<VehicleModel> _vehicles = [];
 	private List<ExpenseDetailsOverviewModel> _transactionOverviews = [];
@@ -87,9 +89,11 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 		_fromDate = await CommonData.LoadCurrentDateTime();
 		_toDate = _fromDate;
 
+		_expenseTypes = await CommonData.LoadTableDataByStatus<ExpenseTypeModel>(FleetNames.ExpenseType);
 		_companies = await CommonData.LoadTableDataByStatus<CompanyModel>(AccountNames.Company);
 		_vehicles = await CommonData.LoadTableDataByStatus<VehicleModel>(FleetNames.Vehicle);
 
+		_expenseTypes = [.. _expenseTypes.OrderBy(s => s.Name)];
 		_companies = [.. _companies.OrderBy(s => s.Name)];
 		_vehicles = [.. _vehicles.OrderBy(s => s.ShortCode)];
 	}
@@ -125,16 +129,14 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 
 	private async Task ApplyFilters()
 	{
-		var query = _allTransactionOverviews.AsEnumerable();
+		_transactionOverviews = [.. _allTransactionOverviews.Where(t =>
+				(_showDeleted || t.MasterStatus) &&
+				(_selectedExpenseType == null || _selectedExpenseType.Id == 0 || t.ExpenseTypeId == _selectedExpenseType.Id) &&
+				(_selectedCompany == null || _selectedCompany.Id == 0 || t.CompanyId == _selectedCompany.Id) &&
+				(_selectedVehicle == null || _selectedVehicle.Id == 0 || t.VehicleId == _selectedVehicle.Id))
+			.OrderBy(t => t.TransactionDateTime)];
 
-		if (!_showDeleted) query = query.Where(t => t.MasterStatus);
-		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
-		if (_selectedVehicle?.Id > 0) query = query.Where(t => t.VehicleId == _selectedVehicle.Id);
-
-		_transactionOverviews = [.. query.OrderBy(t => t.TransactionDateTime)];
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
 	}
 	#endregion
@@ -151,6 +153,12 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 	{
 		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
 		await LoadTransactionOverviews();
+	}
+
+	private async Task OnExpenseTypeChanged(ExpenseTypeModel value)
+	{
+		_selectedExpenseType = value;
+		await ApplyFilters();
 	}
 
 	private async Task OnCompanyChanged(CompanyModel value)
@@ -284,6 +292,7 @@ public partial class ExpenseDetailsReport : IAsyncDisposable
 				DateOnly.FromDateTime(_toDate),
 				_showAllColumns,
 				_showDeleted,
+				_selectedExpenseType?.Id > 0 ? _selectedExpenseType : null,
 				_selectedCompany?.Id > 0 ? _selectedCompany : null,
 				_selectedVehicle?.Id > 0 ? _selectedVehicle : null
 			);

@@ -8,6 +8,7 @@ public enum CodeType
 	Trip,
 	Bill,
 	Expense,
+	OMCCardMoneyTransfer,
 
 	Location,
 	Route,

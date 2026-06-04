@@ -5,12 +5,10 @@ using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Fleet.Expense;
-using StradaLibrary.Fleet.Expense.Exports;
+using StradaLibrary.Fleet.Expense.Data;
 using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -63,10 +61,7 @@ public partial class ExpensePage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 			await InitializePage();
 		}
-		catch
-		{
-			await ResetPage();
-		}
+		catch { await ResetPage(); }
 	}
 
 	private async Task InitializePage()
@@ -168,6 +163,7 @@ public partial class ExpensePage
 			TransactionDateTime = currentDateTime,
 			FinancialYearId = financialYear is null ? 0 : financialYear.Id,
 			VehicleId = _selectedVehicle.Id,
+			TotalItems = 0,
 			TotalExpense = 0,
 			Remarks = string.Empty,
 			CreatedBy = _user.Id,
@@ -178,6 +174,10 @@ public partial class ExpensePage
 			LastModifiedBy = null,
 			LastModifiedFromPlatform = null
 		};
+
+		var lastTransaction = await CommonData.LoadLastTableData<ExpenseModel>(FleetNames.Expense);
+		if (lastTransaction is not null)
+			_expense.TransactionDateTime = lastTransaction.TransactionDateTime;
 
 		await DeleteLocalFiles();
 	}
@@ -193,13 +193,6 @@ public partial class ExpensePage
 			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _expense.CompanyId) ?? _companies.FirstOrDefault();
 		else
 			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _selectedVehicle.CompanyId) ?? _companies.FirstOrDefault();
-
-		if (_expense.Id == 0)
-		{
-			var lastTransaction = await CommonData.LoadLastTableData<ExpenseModel>(FleetNames.Expense);
-			if (lastTransaction is not null)
-				_expense.TransactionDateTime = lastTransaction.TransactionDateTime;
-		}
 	}
 
 	private async Task ResolveExpensesCart()
@@ -391,6 +384,7 @@ public partial class ExpensePage
 
 		_expense.CompanyId = _selectedCompany.Id;
 		_expense.VehicleId = _selectedVehicle.Id;
+		_expense.TotalItems = _expensesCart.Count;
 		_expense.TotalExpense = _expensesCart.Sum(s => s.Amount);
 
 		#region Financial Year
@@ -463,18 +457,10 @@ public partial class ExpensePage
 
 			var expenses = ExpenseData.ConvertExpensesCartToDetails(_expensesCart, _expense.Id);
 			_expense.Id = await ExpenseData.SaveTransaction(_expense, expenses);
+			_expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, _expense.Id);
 
-			if (savePDF)
-			{
-				var (pdfStream, pdfFileName) = await ExpenseInvoiceExport.ExportInvoice(_expense.Id, InvoiceExportType.PDF);
-				await SaveAndViewService.SaveAndView(pdfFileName, pdfStream);
-			}
-
-			if (saveExcel)
-			{
-				var (excelStream, excelFileName) = await ExpenseInvoiceExport.ExportInvoice(_expense.Id, InvoiceExportType.Excel);
-				await SaveAndViewService.SaveAndView(excelFileName, excelStream);
-			}
+			if (savePDF) await ExportSelectedTransaction(false, true);
+			if (saveExcel) await ExportSelectedTransaction(true, true);
 
 			await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully.", ToastType.Success);
 
@@ -494,24 +480,20 @@ public partial class ExpensePage
 	#endregion
 
 	#region Exporting
-	private async Task ExportPdfInvoice()
+	private async Task ExportSelectedTransaction(bool isExcel = false, bool force = false)
 	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
+		if (_expense.Id <= 0 || (_isProcessing && !force))
 			return;
 
 		try
 		{
 			_isProcessing = true;
+			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_expense.TransactionNo, true, false, CodeType.Expense);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_expense.TransactionNo, !isExcel, isExcel, CodeType.Expense);
+			await SaveAndViewService.SaveAndView(isExcel ? decodeTransactionNo.ExcelStream.fileName : decodeTransactionNo.PDFStream.fileName,
+				isExcel ? decodeTransactionNo.ExcelStream.stream : decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
 		}
@@ -522,37 +504,7 @@ public partial class ExpensePage
 		finally
 		{
 			_isProcessing = false;
-		}
-	}
-
-	private async Task ExportExcelInvoice()
-	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_expense.TransactionNo, false, true, CodeType.Expense);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
+			StateHasChanged();
 		}
 	}
 	#endregion

@@ -1,0 +1,269 @@
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.OMC.Models
+
+@attribute [Route(PageRouteNames.OMCCardMoneyTransfer)]
+@attribute [Route(PageRouteNames.OMCCardMoneyTransfer + "/{Id:int}")]
+
+<PageTitle>OMC Card Money Transfer - Strada</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyG KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfOMCCardAutoComplete.FocusAsync()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.Enter KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="AddTransfersToCart" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(savePDF: true)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction(true)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedTransfersCartItem" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="RemoveSelectedTransfersCartItem" Disabled="@_isProcessing" />
+
+@if (_isLoading || _user is null)
+{
+	<LoadingScreen />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="@(_transfer.Id > 0 ? $"Edit Transfer {_transfer.TransactionNo}" : "Create Transfer")">
+			<LeftContent>
+				<MudBlazor.MudMenu Label="File" Dense="true" Disabled="_isProcessing">
+					<MudBlazor.MudMenuItem Label="New Transaction (Ctrl + N)" OnClick="() => ResetPage()" />
+					<MudBlazor.MudDivider />
+					<MudBlazor.MudMenuItem Label="Save (Ctrl + S)" OnClick="() => SaveTransaction()" />
+					<MudBlazor.MudMenuItem Label="Save & PDF (Ctrl + P)" OnClick="() => SaveTransaction(savePDF: true)" />
+					<MudBlazor.MudMenuItem Label="Save & Excel (Ctrl + E)" OnClick="() => SaveTransaction(saveExcel: true)" />
+					<MudBlazor.MudDivider />
+					<MudBlazor.MudMenuItem Label="Export PDF (Alt + P)" OnClick="() => ExportSelectedTransaction()" Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
+					<MudBlazor.MudMenuItem Label="Export Excel (Alt + E)" OnClick="() => ExportSelectedTransaction(true)" Disabled="@(_isProcessing || !Id.HasValue || Id.Value <= 0)" />
+				</MudBlazor.MudMenu>
+
+				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
+					<MudBlazor.MudMenuItem Label="OMC Card Money Transfer Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="OMC Card Money Transfer Details Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferDetailsReport, FormFactor, JSRuntime, NavigationManager)" />
+				</MudBlazor.MudMenu>
+			</LeftContent>
+			<RightContent>
+				<RecheckSaveButton OnClick="() => SaveTransaction()" Disabled="@_isProcessing" />
+			</RightContent>
+		</Header>
+
+		<!-- Main Content Container -->
+		<div class="page-container">
+
+			<!-- Transaction Summary Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+							 stroke-linecap="round" stroke-linejoin="round">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+							<polyline points="14 2 14 8 20 8" />
+							<line x1="16" y1="13" x2="8" y2="13" />
+							<line x1="16" y1="17" x2="8" y2="17" />
+							<polyline points="10 9 9 9 8 9" />
+						</svg>
+						<h2 class="section-title">Transaction Summary</h2>
+					</div>
+				</div>
+
+				<div class="section-body">
+					<div class="form-grid">
+						<!-- Ledger -->
+						<div class="form-field">
+							<CustomAutoComplete @ref="_sfFirstFocus" T="LedgerModel"
+												Value="_selectedLedger"
+												DataSource="@_ledgers"
+												Placeholder="Select a Ledger"
+												Label="Ledger (Ctrl + F)"
+												ValueChanged="OnLedgerChanged"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
+						</div>
+
+						<!-- Company -->
+						<div class="form-field">
+							<CustomAutoComplete T="CompanyModel"
+												Value="_selectedCompany"
+												DataSource="@_companies"
+												Placeholder="Select a Company (Ctrl + F)"
+												Label="Company"
+												ValueChanged="OnCompanyChanged"
+												FieldValue="@nameof(CompanyModel.Name)"
+												AddNewRoute="@PageRouteNames.CompanyMaster" />
+						</div>
+
+						<!-- Transaction Date -->
+						<div class="form-field">
+							<CustomDatePicker @bind-Value="_transfer.TransactionDateTime"
+											  FinancialYear="@_selectedFinancialYear" />
+						</div>
+
+						<!-- Transaction No -->
+						<div class="form-field">
+							<CustomTextField @bind-Value="_transfer.TransactionNo"
+											 Label="Transaction No"
+											 Placeholder="Transaction No"
+											 ReadOnly="true"
+											 TabIndex="-1" />
+						</div>
+
+						<!-- Total Transfer Amount -->
+						<div class="form-field">
+							<CustomNumericField T="decimal"
+												Value="@_transfer.TotalAmount"
+												Label="Total Transfer Amount"
+												Placeholder="Total Transfer Amount"
+												ReadOnly="true"
+												Required="false"
+												TabIndex="-1" />
+						</div>
+
+						<!-- Remarks -->
+						<div class="form-field">
+							<CustomTextField @bind-Value="_transfer.Remarks"
+											 Label="Remarks / Narration"
+											 Placeholder="Enter remarks..."
+											 Required="false"
+											 Lines="2" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Add to Cart Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<circle cx="9" cy="21" r="1" />
+							<circle cx="20" cy="21" r="1" />
+							<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+						</svg>
+						<h2 class="section-title">Add OMC Card Money Transfers to Cart</h2>
+					</div>
+				</div>
+
+				<div class="section-body">
+					<div class="cart-input-row">
+						<!-- OMC Card -->
+						<div class="cart-field cart-field-wide">
+							<CustomAutoComplete T="OMCCardModel"
+												@ref="_sfOMCCardAutoComplete"
+												FieldValue="@nameof(OMCCardModel.CardNumber)" Value="_selectedOMCCard"
+												DataSource="@_omcCards" Placeholder="Select OMC Card"
+												ValueChanged="OnOMCCardChanged"
+												OpenOnFocus="false"
+												Label="OMC Card (Ctrl + G)"
+												AddNewRoute="@PageRouteNames.OMCCardMaster" />
+						</div>
+
+						<!-- Amount -->
+						<div class="cart-field">
+							<CustomNumericField T="decimal"
+												@bind-Value="_selectedTransferCart.Amount"
+												Min="0"
+												Label="Amount"
+												Placeholder="0.00" />
+						</div>
+
+						<!-- Remarks -->
+						<div class="cart-field cart-field-wide">
+							<CustomTextField @bind-Value="_selectedTransferCart.Remarks"
+											 Label="Remarks"
+											 Placeholder="Item Narration..."
+											 Required="false" />
+						</div>
+
+						<!-- Add Button -->
+						<div class="cart-field">
+							<label class="cart-label">&nbsp;</label>
+							<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart"
+										OnClick="AddTransfersToCart" />
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- Transfers Cart Grid Section -->
+			<div class="section-card">
+				<div class="section-header">
+					<div class="section-title-wrapper">
+						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+							 stroke-linejoin="round">
+							<path d="M3 3h7a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H3V3z" />
+							<path d="M14 3h7v17h-7V3z" />
+						</svg>
+						<h2 class="section-title">Transfers Cart</h2>
+					</div>
+				</div>
+
+				<div class="section-body grid-body">
+					<SfGrid ID="_sfCartGrid" @ref="_sfTransfersCartGrid" DataSource="_transfersCart" AllowTextWrap="true"
+							AllowPaging="false" AllowSorting="true" AllowResizing="true" AllowFiltering="true"
+							GridLines="GridLine.Horizontal" CssClass="professional-grid"
+							ContextMenuItems="@_transfersCartGridContextMenuItems" Toolbar="@(new List<string>() { "Search" })">
+
+						<GridEvents TValue="OMCCardMoneyTransferDetailsCartModel" ContextMenuItemClicked="OnTransfersCartGridContextMenuItemClicked" />
+						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+						<GridAggregates>
+							<GridAggregate>
+								<GridAggregateColumns>
+									<GridAggregateColumn Field="@nameof(OMCCardMoneyTransferDetailsCartModel.OMCCardNumber)" Type="AggregateType.Count">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+											}
+											<div class="aggregate-label">
+												<strong>Total Transfer Types: @aggregate.Count</strong>
+											</div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+									<GridAggregateColumn Field="@nameof(OMCCardMoneyTransferDetailsCartModel.Amount)" Type="AggregateType.Sum">
+										<FooterTemplate>
+											@{
+												var aggregate = (context as AggregateTemplateContext);
+												var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+											}
+											<div class="aggregate-value aggregate-total">
+												<strong>@sum.ToString("N2")</strong>
+											</div>
+										</FooterTemplate>
+									</GridAggregateColumn>
+								</GridAggregateColumns>
+							</GridAggregate>
+						</GridAggregates>
+
+						<GridColumns>
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsCartModel.OMCCardNumber)" HeaderText="Card Number" Width="200" />
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsCartModel.Amount)" HeaderText="Amount" Width="130" TextAlign="TextAlign.Right" Format="N2">
+								<Template>
+									@{
+										var item = (context as dynamic);
+										<span class="grid-total">@item.Amount.ToString("N2")</span>
+									}
+								</Template>
+							</GridColumn>
+							<GridColumn Field="@nameof(OMCCardMoneyTransferDetailsCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+						</GridColumns>
+
+					</SfGrid>
+				</div>
+			</div>
+
+		</div>
+
+		<Footer />
+	</div>
+}
+
+<ToastNotification @ref="_toastNotification" />
+
+<CloseGuard Block="_isProcessing" />

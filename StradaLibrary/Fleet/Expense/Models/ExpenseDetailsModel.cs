@@ -48,6 +48,7 @@ public class ExpenseDetailsOverviewModel
 
 	public int VehicleId { get; set; }
 	public string VehicleCode { get; set; }
+	public int TotalItems { get; set; }
 	public decimal TotalExpense { get; set; }
 
 	public string? Remarks { get; set; }

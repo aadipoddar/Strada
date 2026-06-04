@@ -91,6 +91,18 @@ else
 												   Required="false" />
 						</div>
 
+						<!-- Expense Type -->
+						<div class="form-field">
+							<CustomAutoComplete T="ExpenseTypeModel"
+												Value="_selectedExpenseType"
+												DataSource="@_expenseTypes"
+												Placeholder="All Expense Types"
+												Label="Expense Type" Required="false"
+												ValueChanged="OnExpenseTypeChanged"
+												FieldValue="@nameof(ExpenseTypeModel.Name)"
+												AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+						</div>
+
 						<!-- Company -->
 						<div class="form-field">
 							<CustomAutoComplete T="CompanyModel"
@@ -208,8 +220,8 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="170" />
-							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseTypeCode)" HeaderText="Expense Type Cdode" Width="130" Visible="_showAllColumns" />
+							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseTypeName)" HeaderText="Expense Type" Width="170" Visible="@(_showAllColumns || _selectedExpenseType is null || _selectedExpenseType.Id <= 0)" />
+							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseTypeCode)" HeaderText="Expense Type Code" Width="130" Visible="_showAllColumns" />
 
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.LedgerName)" HeaderText="Ledger" Width="130" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.ExpenseAmount)" HeaderText="Expense Amt" Width="150" TextAlign="TextAlign.Right">
@@ -229,6 +241,7 @@ else
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="130" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="130" Visible="@(_showAllColumns || _selectedVehicle is null || _selectedVehicle.Id <= 0)" />
+							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TotalItems)" HeaderText="Total Items" Width="150" TextAlign="TextAlign.Right" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(ExpenseDetailsOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="150" TextAlign="TextAlign.Right">
 								<Template>
 									@{

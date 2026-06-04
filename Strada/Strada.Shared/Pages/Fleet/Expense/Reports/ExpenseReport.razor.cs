@@ -3,7 +3,7 @@ using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Fleet.Expense;
+using StradaLibrary.Fleet.Expense.Data;
 using StradaLibrary.Fleet.Expense.Exports;
 using StradaLibrary.Fleet.Expense.Models;
 using StradaLibrary.Fleet.Vehicle.Models;
@@ -125,16 +125,13 @@ public partial class ExpenseReport : IAsyncDisposable
 
 	private async Task ApplyFilters()
 	{
-		var query = _allTransactionOverviews.AsEnumerable();
+		_transactionOverviews = [.. _allTransactionOverviews.Where(t =>
+				(_showDeleted || t.Status) &&
+				(_selectedCompany == null || _selectedCompany.Id == 0 || t.CompanyId == _selectedCompany.Id) &&
+				(_selectedVehicle == null || _selectedVehicle.Id == 0 || t.VehicleId == _selectedVehicle.Id))
+			.OrderBy(t => t.TransactionDateTime)];
 
-		if (!_showDeleted) query = query.Where(t => t.Status);
-		if (_selectedCompany?.Id > 0) query = query.Where(t => t.CompanyId == _selectedCompany.Id);
-		if (_selectedVehicle?.Id > 0) query = query.Where(t => t.VehicleId == _selectedVehicle.Id);
-
-		_transactionOverviews = [.. query.OrderBy(t => t.TransactionDateTime)];
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
 	}
 	#endregion
@@ -144,6 +141,12 @@ public partial class ExpenseReport : IAsyncDisposable
 	{
 		_fromDate = range?.Start ?? _fromDate;
 		_toDate = range?.End ?? _toDate;
+		await LoadTransactionOverviews();
+	}
+
+	private async Task HandleDatesChanged(DateRangeType dateRangeType)
+	{
+		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
 		await LoadTransactionOverviews();
 	}
 
@@ -165,12 +168,6 @@ public partial class ExpenseReport : IAsyncDisposable
 	{
 		_selectedVehicle = value;
 		await ApplyFilters();
-	}
-
-	private async Task HandleDatesChanged(DateRangeType dateRangeType)
-	{
-		(_fromDate, _toDate) = await FinancialYearData.GetDateRange(dateRangeType, _fromDate, _toDate);
-		await LoadTransactionOverviews();
 	}
 	#endregion
 

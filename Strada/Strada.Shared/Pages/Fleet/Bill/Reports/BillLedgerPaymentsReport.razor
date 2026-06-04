@@ -92,6 +92,18 @@ else
 												   Required="false" />
 						</div>
 
+						<!-- Ledger -->
+						<div class="form-field">
+							<CustomAutoComplete T="LedgerModel"
+												Value="_selectedLedger"
+												DataSource="@_ledgers"
+												Placeholder="All Ledgers"
+												Label="Ledger" Required="false"
+												ValueChanged="OnLedgerChanged"
+												FieldValue="@nameof(LedgerModel.Name)"
+												AddNewRoute="@PageRouteNames.LedgerMaster" />
+						</div>
+
 						<!-- Company -->
 						<div class="form-field">
 							<CustomAutoComplete T="CompanyModel"
@@ -288,7 +300,7 @@ else
 						</GridAggregates>
 
 						<GridColumns>
-							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.LedgerName)" HeaderText="Ledger" Width="180" />
+							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.LedgerName)" HeaderText="Ledger" Width="180" Visible="@(_showAllColumns || _selectedLedger is null || _selectedLedger.Id <= 0)" />
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.LedgerCode)" HeaderText="Ledger Code" Width="130" Visible="_showAllColumns" />
 							<GridColumn Field="@nameof(BillLedgerPaymentsOverviewModel.PaymentAmount)" HeaderText="Payment Amt" Width="150" TextAlign="TextAlign.Right">
 								<Template>

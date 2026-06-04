@@ -4,13 +4,11 @@ using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
 using StradaLibrary.Accounts.FinancialAccounting.Data;
-using StradaLibrary.Accounts.FinancialAccounting.Exports;
 using StradaLibrary.Accounts.FinancialAccounting.Models;
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Accounts.Masters.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -164,6 +162,10 @@ public partial class FinancialAccountingPage
 			LastModifiedFromPlatform = null
 		};
 
+		var lastTransaction = await CommonData.LoadLastTableData<FinancialAccountingModel>(AccountNames.FinancialAccounting);
+		if (lastTransaction is not null)
+			_accounting.TransactionDateTime = lastTransaction.TransactionDateTime;
+
 		await DeleteLocalFiles();
 	}
 
@@ -192,13 +194,6 @@ public partial class FinancialAccountingPage
 
 		if (_selectedFinancialYear is not null)
 			_accounting.FinancialYearId = _selectedFinancialYear.Id;
-
-		if (_accounting.Id == 0)
-		{
-			var lastTransaction = await CommonData.LoadLastTableData<FinancialAccountingModel>(AccountNames.FinancialAccounting);
-			if (lastTransaction is not null)
-				_accounting.TransactionDateTime = lastTransaction.TransactionDateTime;
-		}
 	}
 
 	private async Task LoadCart()
@@ -619,18 +614,10 @@ public partial class FinancialAccountingPage
 
 			var ledgers = FinancialAccountingData.ConvertCartToDetails(_cart, _accounting.Id);
 			_accounting.Id = await FinancialAccountingData.SaveTransaction(_accounting, ledgers);
+			_accounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, _accounting.Id);
 
-			if (savePDF)
-			{
-				var (pdfStream, pdfFileName) = await FinancialAccountingInvoiceExport.ExportInvoice(_accounting.Id, InvoiceExportType.PDF);
-				await SaveAndViewService.SaveAndView(pdfFileName, pdfStream);
-			}
-
-			if (saveExcel)
-			{
-				var (excelStream, excelFileName) = await FinancialAccountingInvoiceExport.ExportInvoice(_accounting.Id, InvoiceExportType.Excel);
-				await SaveAndViewService.SaveAndView(excelFileName, excelStream);
-			}
+			if (savePDF) await ExportSelectedTransaction(false, true);
+			if (saveExcel) await ExportSelectedTransaction(true, true);
 
 			await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully.", ToastType.Success);
 
@@ -650,15 +637,9 @@ public partial class FinancialAccountingPage
 	#endregion
 
 	#region Exporting
-	private async Task ExportPdfInvoice()
+	private async Task ExportSelectedTransaction(bool isExcel = false, bool force = false)
 	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
+		if (_accounting.Id <= 0 || (_isProcessing && !force))
 			return;
 
 		try
@@ -666,39 +647,9 @@ public partial class FinancialAccountingPage
 			_isProcessing = true;
 			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
 
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_accounting.TransactionNo, true, false);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-		}
-	}
-
-	private async Task ExportExcelInvoice()
-	{
-		if (!Id.HasValue || Id.Value <= 0)
-		{
-			await _toastNotification.ShowAsync("Nothing to Export", "There is nothing to export.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_accounting.TransactionNo, false, true);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.ExcelStream.fileName, decodeTransactionNo.ExcelStream.stream);
+			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_accounting.TransactionNo, !isExcel, isExcel, CodeType.FinancialAccounting);
+			await SaveAndViewService.SaveAndView(isExcel ? decodeTransactionNo.ExcelStream.fileName : decodeTransactionNo.PDFStream.fileName,
+				isExcel ? decodeTransactionNo.ExcelStream.stream : decodeTransactionNo.PDFStream.stream);
 
 			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
 		}

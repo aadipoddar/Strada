@@ -11,6 +11,9 @@ public static class StorageFileNames
 	public static string ExpenseDataFileName => "expense_data.json";
 	public static string ExpenseDetailsCartDataFileName => "expense_details_cart_data.json";
 
+	public static string OMCCardMoneyTransferDataFileName => "omc_card_money_transfer_data.json";
+	public static string OMCCardMoneyTransferDetailsCartDataFileName => "omc_card_money_transfer_details_cart_data.json";
+
 	public static string TripDataFileName => "trip_data.json";
 	public static string TripExpensesCartDataFileName => "trip_expenses_cart_data.json";
 	public static string TripCardPaymentsCartDataFileName => "trip_card_payments_cart_data.json";

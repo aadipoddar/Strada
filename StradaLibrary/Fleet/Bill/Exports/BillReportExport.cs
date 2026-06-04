@@ -152,6 +152,7 @@ public static class BillReportExport
 		DateOnly? dateRangeEnd = null,
 		bool showAllColumns = true,
 		bool showDeleted = false,
+		LedgerModel ledger = null,
 		CompanyModel company = null,
 		OMCModel omc = null)
 	{
@@ -237,6 +238,9 @@ public static class BillReportExport
 				nameof(BillLedgerPaymentsOverviewModel.MasterStatus)
 			];
 
+			if (ledger is not null)
+				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.LedgerName));
+
 			if (company is not null)
 				columnOrder.Remove(nameof(BillLedgerPaymentsOverviewModel.CompanyName));
 
@@ -264,6 +268,7 @@ public static class BillReportExport
 				useLandscape: showAllColumns,
 				new()
 				{
+					["Ledger"] = ledger?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null
 				}
@@ -284,6 +289,7 @@ public static class BillReportExport
 				columnOrder,
 				new()
 				{
+					["Ledger"] = ledger?.Name ?? null,
 					["Company"] = company?.Name ?? null,
 					["OMC"] = omc?.Name ?? null
 				}
