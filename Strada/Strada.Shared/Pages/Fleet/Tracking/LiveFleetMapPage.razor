@@ -1,0 +1,39 @@
+@attribute [Route(PageRouteNames.LiveFleetMap)]
+
+<PageTitle>Live Fleet Map - Strada</PageTitle>
+
+@if (_isLoading || _user is null)
+{
+	<LoadingScreen />
+}
+else
+{
+	<div class="page-shell">
+		<Header Title="Live Fleet Map">
+			<RightContent>
+				<IconButton Icon="IconType.Refresh" Title="Refresh" Disabled="_isProcessing" OnClick="Refresh" />
+			</RightContent>
+		</Header>
+
+		<div class="page-container fleet-map-page">
+
+			<div class="fleet-summary">
+				<span class="chip total">@_vehicles.Count Trucks</span>
+				<span class="chip moving">@_movingCount Moving</span>
+				<span class="chip idle">@_idleCount Idle</span>
+				<span class="chip stopped">@_stoppedCount Stopped</span>
+				<span class="chip offline">@_offlineCount Offline</span>
+			</div>
+
+			@if (_error is not null)
+			{
+				<div class="fleet-error">Couldn't load live data: @_error</div>
+			}
+
+			<div id="@MapId" class="fleet-map"></div>
+
+		</div>
+
+		<Footer />
+	</div>
+}

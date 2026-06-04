@@ -1,0 +1,59 @@
+.fleet-summary {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.chip {
+	font-size: 13px;
+	font-weight: 600;
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: #f1f5f9;
+	color: #334155;
+	border: 1px solid #e2e8f0;
+}
+
+.chip.moving {
+	background: #dcfce7;
+	color: #166534;
+	border-color: #bbf7d0;
+}
+
+.chip.idle {
+	background: #fef3c7;
+	color: #92400e;
+	border-color: #fde68a;
+}
+
+.chip.stopped {
+	background: #f3f4f6;
+	color: #374151;
+	border-color: #e5e7eb;
+}
+
+.chip.offline {
+	background: #fee2e2;
+	color: #991b1b;
+	border-color: #fecaca;
+}
+
+.fleet-error {
+	margin-bottom: 12px;
+	padding: 10px 14px;
+	border-radius: 8px;
+	background: #fef2f2;
+	color: #991b1b;
+	border: 1px solid #fecaca;
+	font-size: 13px;
+}
+
+.fleet-map {
+	width: 100%;
+	height: calc(100vh - 230px);
+	min-height: 420px;
+	border-radius: 12px;
+	overflow: hidden;
+	z-index: 0;
+}

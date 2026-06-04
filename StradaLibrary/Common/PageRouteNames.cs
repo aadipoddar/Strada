@@ -34,6 +34,8 @@ public static class PageRouteNames
 	#endregion
 
 	#region Fleet
+	public const string LiveFleetMap = "/fleet/live-map";
+
 	public const string VehicleRegisterReport = "/fleet/vehicle-register-report";
 
 	public const string Expense = "/fleet/expense";

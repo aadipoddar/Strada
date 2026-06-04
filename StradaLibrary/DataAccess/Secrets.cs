@@ -18,6 +18,8 @@ public static partial class Secrets
 
 	public static string SyncfusionLicense = GetSecret(nameof(SyncfusionLicense));
 
+	public static string WheelsEyeAccessToken = GetSecret(nameof(WheelsEyeAccessToken));
+
 	public static string Email => "softaadi@gmail.com";
 	public static string EmailPassword = GetSecret(nameof(EmailPassword));
 
