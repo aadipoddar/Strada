@@ -58,9 +58,6 @@ public static class OMCCardData
 		if (omcCard.LedgerId <= 0)
 			throw new Exception("Associated ledger is required. Please select a valid ledger.");
 
-		if (omcCard.OpeningBalance < 0)
-			throw new Exception("Opening balance cannot be negative.");
-
 		if (omcCard.Id == 0)
 			omcCard.Code = await GenerateCodes.GenerateOMCCardCode();
 

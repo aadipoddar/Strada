@@ -1,6 +1,8 @@
 using StradaLibrary.Accounts.Masters.Data;
 using StradaLibrary.Common;
 using StradaLibrary.DataAccess;
+using StradaLibrary.Fleet.OMC.Data;
+using StradaLibrary.Fleet.OMC.Models;
 using StradaLibrary.Fleet.Trip.Exports;
 using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Operations.Data;
@@ -67,6 +69,7 @@ public static class TripData
 			Status = true
 		})];
 
+	#region Delete
 	public static async Task DeleteTransaction(TripModel trip, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		if (sqlDataAccessTransaction is null)
@@ -83,6 +86,7 @@ public static class TripData
 
 		trip.Status = false;
 		await InsertTrip(trip, sqlDataAccessTransaction);
+		await DeleteOMCBalance(trip, sqlDataAccessTransaction);
 
 		await AuditTrailData.SaveAuditTrail(new()
 		{
@@ -93,6 +97,18 @@ public static class TripData
 			CreatedFromPlatform = trip.LastModifiedFromPlatform
 		}, sqlDataAccessTransaction);
 	}
+
+	private static async Task DeleteOMCBalance(TripModel trip, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		var cardPayments = await CommonData.LoadTableDataByMasterId<TripCardPaymentsModel>(FleetNames.TripCardPayments, trip.Id, sqlDataAccessTransaction);
+		foreach (var cardPayment in cardPayments)
+		{
+			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, cardPayment.OMCCardId, sqlDataAccessTransaction);
+			omcCard.CurrentBalance += cardPayment.Amount;
+			await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
+		}
+	}
+	#endregion
 
 	public static async Task RecoverTransaction(TripModel trip)
 	{
@@ -242,6 +258,7 @@ public static class TripData
 		await SaveExpensesDetail(trip, expensesDetails, update, sqlDataAccessTransaction);
 		await SaveCardPaymentDetail(trip, cardPaymentDetails, update, sqlDataAccessTransaction);
 		await SaveLedgerPaymentDetail(trip, ledgerPaymentDetails, update, sqlDataAccessTransaction);
+		await SaveOMCCardBalance(cardPaymentDetails, update, previousCardPaymentDetails, sqlDataAccessTransaction);
 		await SaveAuditTrail(trip, update, recover, previousTrip, previousExpensesDetails, previousCardPaymentDetails, previousLedgerPaymentDetails, sqlDataAccessTransaction);
 
 		return trip.Id;
@@ -301,6 +318,24 @@ public static class TripData
 		{
 			item.MasterId = trip.Id;
 			await InsertTripLedgerPayments(item, sqlDataAccessTransaction);
+		}
+	}
+
+	private static async Task SaveOMCCardBalance(List<TripCardPaymentsModel> paymentDetails, bool update, List<TripCardPaymentsOverviewModel> previousPaymentDetails, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		if (update)
+			foreach (var paymentDetail in previousPaymentDetails)
+			{
+				var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, paymentDetail.OMCCardId, sqlDataAccessTransaction);
+				omcCard.CurrentBalance += paymentDetail.PaymentAmount;
+				await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
+			}
+
+		foreach (var paymentDetail in paymentDetails)
+		{
+			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, paymentDetail.OMCCardId, sqlDataAccessTransaction);
+			omcCard.CurrentBalance -= paymentDetail.Amount;
+			await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
 		}
 	}
 

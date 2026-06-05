@@ -4,7 +4,7 @@
 	@Code VARCHAR(10),
 	@OMCId INT,
 	@LedgerId INT,
-	@OpeningBalance MONEY,
+	@CurrentBalance MONEY,
 	@Remarks VARCHAR(MAX),
 	@Status BIT = 1
 AS
@@ -17,7 +17,7 @@ BEGIN
 			[Code],
 			[OMCId],
 			[LedgerId],
-			[OpeningBalance],
+			[CurrentBalance],
 			[Remarks],
 			[Status]
 		)
@@ -27,7 +27,7 @@ BEGIN
 			@Code,
 			@OMCId,
 			@LedgerId,
-			@OpeningBalance,
+			@CurrentBalance,
 			@Remarks,
 			@Status
 		);
@@ -43,7 +43,7 @@ BEGIN
 			[Code] = @Code,
 			[OMCId] = @OMCId,
 			[LedgerId] = @LedgerId,
-			[OpeningBalance] = @OpeningBalance,
+			[CurrentBalance] = @CurrentBalance,
 			[Remarks] = @Remarks,
 			[Status] = @Status
 		WHERE [Id] = @Id;

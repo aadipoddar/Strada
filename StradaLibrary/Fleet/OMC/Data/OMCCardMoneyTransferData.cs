@@ -43,6 +43,7 @@ public static class OMCCardMoneyTransferData
 		}
 	}
 
+	#region Delete
 	public static async Task DeleteTransaction(OMCCardMoneyTransferModel omcCardMoneyTransfer, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		if (sqlDataAccessTransaction is null)
@@ -57,6 +58,7 @@ public static class OMCCardMoneyTransferData
 		omcCardMoneyTransfer.Status = false;
 		await InsertOMCCardMoneyTransfer(omcCardMoneyTransfer, sqlDataAccessTransaction);
 		await DeleteAccounting(omcCardMoneyTransfer, sqlDataAccessTransaction);
+		await DeleteOMCBalance(omcCardMoneyTransfer, sqlDataAccessTransaction);
 
 		await AuditTrailData.SaveAuditTrail(new()
 		{
@@ -81,6 +83,18 @@ public static class OMCCardMoneyTransferData
 		await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
 	}
 
+	private static async Task DeleteOMCBalance(OMCCardMoneyTransferModel omcCardMoneyTransfer, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		var transferDetails = await CommonData.LoadTableDataByMasterId<OMCCardMoneyTransferDetailsModel>(FleetNames.OMCCardMoneyTransferDetails, omcCardMoneyTransfer.Id, sqlDataAccessTransaction);
+		foreach (var transfer in transferDetails)
+		{
+			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, transfer.OMCCardId, sqlDataAccessTransaction);
+			omcCard.CurrentBalance -= transfer.Amount;
+			await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
+		}
+	}
+	#endregion
+
 	public static async Task RecoverTransaction(OMCCardMoneyTransferModel omcCardMoneyTransfer)
 	{
 		omcCardMoneyTransfer.Status = true;
@@ -91,6 +105,7 @@ public static class OMCCardMoneyTransferData
 		await OMCCardMoneyTransferNotify.Notify(omcCardMoneyTransfer.Id, NotifyType.Recovered);
 	}
 
+	#region Saving
 	private static async Task<OMCCardMoneyTransferModel> ValidateTransaction(OMCCardMoneyTransferModel oMCCardMoneyTransfer, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
 		oMCCardMoneyTransfer.Remarks = string.IsNullOrWhiteSpace(oMCCardMoneyTransfer.Remarks) ? null : oMCCardMoneyTransfer.Remarks.Trim();
@@ -173,6 +188,7 @@ public static class OMCCardMoneyTransferData
 		oMCCardMoneyTransfer.Id = await InsertOMCCardMoneyTransfer(oMCCardMoneyTransfer, sqlDataAccessTransaction);
 		await SaveTransferDetail(oMCCardMoneyTransfer, transferDetails, update, sqlDataAccessTransaction);
 		await SaveAccounting(oMCCardMoneyTransfer, update, sqlDataAccessTransaction);
+		await SaveOMCCardBalance(transferDetails, update, previousTransferDetails, sqlDataAccessTransaction);
 		await SaveAuditTrail(oMCCardMoneyTransfer, update, recover, previousTransfer, previousTransferDetails, sqlDataAccessTransaction);
 
 		return oMCCardMoneyTransfer.Id;
@@ -271,6 +287,24 @@ public static class OMCCardMoneyTransferData
 		await InsertOMCCardMoneyTransfer(oMCCardMoneyTransfer, sqlDataAccessTransaction);
 	}
 
+	private static async Task SaveOMCCardBalance(List<OMCCardMoneyTransferDetailsModel> transferDetails, bool update, List<OMCCardMoneyTransferDetailsOverviewModel> previousTransferDetails, SqlDataAccessTransaction sqlDataAccessTransaction)
+	{
+		if (update)
+			foreach (var transfer in previousTransferDetails)
+			{
+				var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, transfer.OMCCardId, sqlDataAccessTransaction);
+				omcCard.CurrentBalance -= transfer.TransferAmount;
+				await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
+			}
+
+		foreach (var transfer in transferDetails)
+		{
+			var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, transfer.OMCCardId, sqlDataAccessTransaction);
+			omcCard.CurrentBalance += transfer.Amount;
+			await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
+		}
+	}
+
 	private static async Task SaveAuditTrail(
 		OMCCardMoneyTransferModel oMCCardMoneyTransfer,
 		bool update,
@@ -304,4 +338,5 @@ public static class OMCCardMoneyTransferData
 			CreatedFromPlatform = update ? oMCCardMoneyTransfer.LastModifiedFromPlatform : oMCCardMoneyTransfer.CreatedFromPlatform
 		}, sqlDataAccessTransaction);
 	}
+	#endregion
 }

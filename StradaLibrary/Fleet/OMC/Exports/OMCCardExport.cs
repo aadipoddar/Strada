@@ -21,7 +21,7 @@ public static class OMCCardExport
 			omc.Code,
 			OMC = omcs.FirstOrDefault(o => o.Id == omc.OMCId)?.Name ?? "N/A",
 			Ledger = ledgers.FirstOrDefault(l => l.Id == omc.LedgerId)?.Name ?? "N/A",
-			omc.OpeningBalance,
+			omc.CurrentBalance,
 			omc.Remarks,
 			Status = omc.Status ? "Active" : "Deleted"
 		});
@@ -33,7 +33,7 @@ public static class OMCCardExport
 			[nameof(OMCCardModel.Code)] = new() { DisplayName = "Code", Alignment = CellAlignment.Left, IsRequired = true },
 			["OMC"] = new() { DisplayName = "OMC", Alignment = CellAlignment.Left },
 			["Ledger"] = new() { DisplayName = "Ledger", Alignment = CellAlignment.Left },
-			[nameof(OMCCardModel.OpeningBalance)] = new() { DisplayName = "Opening Balance", Alignment = CellAlignment.Right, Format = "#,##0.00" },
+			[nameof(OMCCardModel.CurrentBalance)] = new() { DisplayName = "Current Balance", Alignment = CellAlignment.Right, Format = "#,##0.00" },
 			[nameof(OMCCardModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left },
 			[nameof(OMCCardModel.Status)] = new() { DisplayName = "Status", Alignment = CellAlignment.Center, IncludeInTotal = false }
 		};
@@ -45,7 +45,7 @@ public static class OMCCardExport
 			nameof(OMCCardModel.Code),
 			"OMC",
 			"Ledger",
-			nameof(OMCCardModel.OpeningBalance),
+			nameof(OMCCardModel.CurrentBalance),
 			nameof(OMCCardModel.Remarks),
 			nameof(OMCCardModel.Status)
 		];

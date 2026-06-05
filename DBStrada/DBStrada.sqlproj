@@ -216,4 +216,7 @@
     <None Include="PublishLocations\LocalStrada.publish.xml" />
     <None Include="PublishLocations\AzureStrada.publish.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="DBStrada.refactorlog" />
+  </ItemGroup>
 </Project>

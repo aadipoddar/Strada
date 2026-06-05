@@ -90,10 +90,9 @@ else
 
 						<div class="form-field">
 							<CustomNumericField T="decimal"
-												@bind-Value="_omcCard.OpeningBalance"
-												Label="Opening Balance"
-												Placeholder="Enter opening balance"
-												Min="0" />
+												@bind-Value="_omcCard.CurrentBalance"
+												Label="Current Balance"
+												Placeholder="Enter current balance" />
 						</div>
 
 						<div class="form-field">
@@ -148,7 +147,7 @@ else
 									}
 								</Template>
 							</GridColumn>
-							<GridColumn Field="@nameof(OMCCardModel.OpeningBalance)" HeaderText="Opening Balance" Width="180" TextAlign="TextAlign.Right" Format="N2" />
+							<GridColumn Field="@nameof(OMCCardModel.CurrentBalance)" HeaderText="Current Balance" Width="180" TextAlign="TextAlign.Right" Format="N2" />
 							<GridColumn Field="@nameof(OMCCardModel.Remarks)" HeaderText="Remarks" Width="400" />
 							<GridColumn Field="@nameof(OMCCardModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
