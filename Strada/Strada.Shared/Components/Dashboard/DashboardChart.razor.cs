@@ -1,23 +1,11 @@
-using Microsoft.Extensions.Caching.Memory;
-
 using MudBlazor;
 
-using StradaLibrary.Fleet.Expense.Models;
-using StradaLibrary.Fleet.Trip.Models;
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
+using StradaLibrary.Fleet.Analysis;
 
 namespace Strada.Shared.Components.Dashboard;
 
 public partial class DashboardChart
 {
-	private int _cacheHours = 12;
-
-	private List<TripOverviewModel> _trips = [];
-	private List<ExpenseOverviewModel> _expenses = [];
-	private List<TripExpensesOverviewModel> _tripExpenses = [];
-	private List<ExpenseDetailsOverviewModel> _expenseDetails = [];
-
 	// Row 1 - Revenue line / Expense bar
 	private List<ChartSeries<double>> _revenueSeries = [];
 	private List<ChartSeries<double>> _expenseSeries = [];
@@ -56,6 +44,7 @@ public partial class DashboardChart
 		ShowLegend = false,
 		YAxisLines = true,
 		XAxisLines = false,
+		XAxisLabelRotation = 45
 	};
 
 	private readonly PieChartOptions _expenseTypeOptions = new()
@@ -74,72 +63,24 @@ public partial class DashboardChart
 
 	private async Task LoadData()
 	{
-		if (LoadCached())
-			return;
-
-		await LoadFresh();
-
-		var expiry = TimeSpan.FromHours(_cacheHours);
-		MemoryCache.Set(StorageFileNames.TripsYearOverviewDataFileName, _trips, expiry);
-		MemoryCache.Set(StorageFileNames.ExpensesYearOverviewDataFileName, _expenses, expiry);
-		MemoryCache.Set(StorageFileNames.TripExpensesYearOverviewDataFileName, _tripExpenses, expiry);
-		MemoryCache.Set(StorageFileNames.ExpenseDetailsYearOverviewDataFileName, _expenseDetails, expiry);
-	}
-
-	private bool LoadCached()
-	{
-		if (!MemoryCache.TryGetValue(StorageFileNames.TripsYearOverviewDataFileName, out List<TripOverviewModel> trips))
-			return false;
-
-		_trips = trips ?? [];
-		_expenses = MemoryCache.Get<List<ExpenseOverviewModel>>(StorageFileNames.ExpensesYearOverviewDataFileName) ?? [];
-		_tripExpenses = MemoryCache.Get<List<TripExpensesOverviewModel>>(StorageFileNames.TripExpensesYearOverviewDataFileName) ?? [];
-		_expenseDetails = MemoryCache.Get<List<ExpenseDetailsOverviewModel>>(StorageFileNames.ExpenseDetailsYearOverviewDataFileName) ?? [];
-
-		BuildAll();
-		StateHasChanged();
-		return true;
-	}
-
-	private async Task LoadFresh()
-	{
 		try
 		{
-			var cacheSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.AnalysisCacheHours);
-			_cacheHours = int.TryParse(cacheSetting?.Value, out var hours) && hours > 0 ? hours : 12;
-
 			// Window: first day of month 11 months ago → end of current month (12 months total).
 			var thisMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 			var windowStart = thisMonthStart.AddMonths(-11);
 			var windowEnd = thisMonthStart.AddMonths(1).AddSeconds(-1);
 
-			_trips = await CommonData.LoadTableDataByDate<TripOverviewModel>(FleetNames.TripOverview, windowStart, windowEnd);
-			_expenses = await CommonData.LoadTableDataByDate<ExpenseOverviewModel>(FleetNames.ExpenseOverview, windowStart, windowEnd);
-			_tripExpenses = await CommonData.LoadTableDataByDate<TripExpensesOverviewModel>(FleetNames.TripExpensesOverview, windowStart, windowEnd);
-			_expenseDetails = await CommonData.LoadTableDataByDate<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, windowStart, windowEnd);
-
-			_trips = [.. _trips.Where(_ => _.Status)];
-			_expenses = [.. _expenses.Where(_ => _.Status)];
-			_tripExpenses = [.. _tripExpenses.Where(_ => _.MasterStatus)];
-			_expenseDetails = [.. _expenseDetails.Where(_ => _.MasterStatus)];
-
-			BuildAll();
+			// SQL does all the grouping and summing; we just read the finished numbers.
+			BuildMonthlyTrend(await AnalysisData.LoadDashboardMonthlyTrend(windowStart, windowEnd), thisMonthStart);
+			BuildTopVehicles(await AnalysisData.LoadDashboardTopVehicles(windowStart, windowEnd));
+			BuildExpenseBreakdown(await AnalysisData.LoadDashboardExpenseBreakdown(windowStart, windowEnd));
 		}
 		catch { }
 		finally { StateHasChanged(); }
 	}
 
-	private void BuildAll()
+	private void BuildMonthlyTrend(List<MonthlyTrendModel> rows, DateTime thisMonthStart)
 	{
-		BuildMonthlyTrend();
-		BuildTopVehicles();
-		BuildExpenseBreakdown();
-	}
-
-	private void BuildMonthlyTrend()
-	{
-		var thisMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-
 		var buckets = Enumerable.Range(0, 12)
 			.Select(i => thisMonthStart.AddMonths(-11 + i))
 			.ToList();
@@ -151,75 +92,41 @@ public partial class DashboardChart
 
 		for (int i = 0; i < 12; i++)
 		{
-			var monthStart = buckets[i];
-			var monthEnd = monthStart.AddMonths(1);
-
-			revenue[i] = (double)_trips
-				.Where(t => t.TransactionDateTime >= monthStart && t.TransactionDateTime < monthEnd)
-				.Sum(t => t.NetAmount ?? 0);
-
-			var tripExpense = _trips
-				.Where(t => t.TransactionDateTime >= monthStart && t.TransactionDateTime < monthEnd)
-				.Sum(t => t.TotalExpense);
-			var standaloneExpense = _expenses
-				.Where(e => e.TransactionDateTime >= monthStart && e.TransactionDateTime < monthEnd)
-				.Sum(e => e.TotalExpense);
-			expense[i] = (double)(tripExpense + standaloneExpense);
+			var row = rows.FirstOrDefault(r => r.Year == buckets[i].Year && r.Month == buckets[i].Month);
+			revenue[i] = (double)(row?.Revenue ?? 0);
+			expense[i] = (double)(row?.Expense ?? 0);
 		}
 
 		_revenueSeries = [new ChartSeries<double> { Name = "Revenue", Data = revenue }];
 		_expenseSeries = [new ChartSeries<double> { Name = "Expense", Data = expense }];
 	}
 
-	private void BuildTopVehicles()
+	private void BuildTopVehicles(List<VehicleProfitModel> rows)
 	{
-		// Profit per vehicle = trip revenue − trip expenses − standalone expenses.
-		var perVehicle = _trips
-			.GroupBy(t => t.VehicleCode)
-			.Select(g => new
-			{
-				Vehicle = g.Key,
-				Profit = (double)(g.Sum(t => (t.NetAmount ?? 0) - t.TotalExpense)
-					- _expenses.Where(e => e.VehicleCode == g.Key).Sum(e => e.TotalExpense)),
-			})
-			.OrderByDescending(x => x.Profit)
-			.Take(5)
-			.ToList();
-
-		_vehicleLabels = [.. perVehicle.Select(v => v.Vehicle)];
-		var profitData = perVehicle.Select(v => v.Profit).ToArray();
-		_vehicleProfitSeries = perVehicle.Count == 0
+		_vehicleLabels = [.. rows.Select(v => v.VehicleCode)];
+		var profitData = rows.Select(v => (double)v.Profit).ToArray();
+		_vehicleProfitSeries = rows.Count == 0
 			? []
 			: [new ChartSeries<double> { Name = "Profit", Data = profitData }];
 	}
 
-	private void BuildExpenseBreakdown()
+	private void BuildExpenseBreakdown(List<ExpenseTypeModel> rows)
 	{
-		// Combine trip-level expense lines and standalone expense lines, grouped by ExpenseTypeName.
-		var combined = _tripExpenses
-			.Select(t => new { t.ExpenseTypeName, Amount = t.ExpenseAmount })
-			.Concat(_expenseDetails.Select(e => new { e.ExpenseTypeName, Amount = e.ExpenseAmount }))
-			.GroupBy(x => x.ExpenseTypeName ?? "Other")
-			.Select(g => new { Type = g.Key, Total = (double)g.Sum(x => x.Amount) })
-			.Where(x => x.Total > 0)
-			.OrderByDescending(x => x.Total)
-			.ToList();
-
 		// Keep top 7 slices, bucket the rest into "Other" so the donut stays readable.
 		const int topN = 7;
 		var labels = new List<string>();
 		var values = new List<double>();
 
-		foreach (var item in combined.Take(topN))
+		foreach (var item in rows.Take(topN))
 		{
-			labels.Add(item.Type);
-			values.Add(item.Total);
+			labels.Add(item.ExpenseTypeName);
+			values.Add((double)item.Total);
 		}
 
-		if (combined.Count > topN)
+		if (rows.Count > topN)
 		{
 			labels.Add("Other");
-			values.Add(combined.Skip(topN).Sum(x => x.Total));
+			values.Add(rows.Skip(topN).Sum(x => (double)x.Total));
 		}
 
 		_expenseTypeLabels = [.. labels];

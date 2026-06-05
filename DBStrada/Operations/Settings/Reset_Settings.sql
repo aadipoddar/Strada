@@ -49,6 +49,5 @@ BEGIN
 	-- Report Settings
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'AutoRefreshReportTimer', N'5', N'Auto refresh interval for reports in minutes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ReportWarningDays', N'30', N'Days threshold used to highlight due items in reports')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'AnalysisCacheHours', N'12', N'Hours to cache dashboard analysis data before reloading from the database')
 
 END

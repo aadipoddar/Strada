@@ -81,6 +81,8 @@
     <Folder Include="Fleet\Trip\Table" />
     <Folder Include="Fleet\Trip\Insert" />
     <Folder Include="Fleet\Trip\Load" />
+    <Folder Include="Fleet\Analysis" />
+    <Folder Include="Fleet\Analysis\Load" />
     <Folder Include="Fleet\Expense" />
     <Folder Include="Fleet\OMC" />
     <Folder Include="Fleet\OMC\Insert" />
@@ -169,6 +171,9 @@
     <Build Include="Fleet\Bill\Load\Bill_Overview.sql" />
     <Build Include="Fleet\Bill\Load\BillLedgerPayments_Overview.sql" />
     <Build Include="Fleet\Trip\Load\Load_Trip_Overview_By_BillId_Date.sql" />
+    <Build Include="Fleet\Analysis\Load\Load_Dashboard_MonthlyTrend.sql" />
+    <Build Include="Fleet\Analysis\Load\Load_Dashboard_TopVehicles.sql" />
+    <Build Include="Fleet\Analysis\Load\Load_Dashboard_ExpenseBreakdown.sql" />
     <Build Include="Fleet\Route\Insert\Insert_Route.sql" />
     <Build Include="Fleet\Route\Insert\Insert_Location.sql" />
     <Build Include="Fleet\Route\Insert\Insert_Driver.sql" />
@@ -215,8 +220,5 @@
   <ItemGroup>
     <None Include="PublishLocations\LocalStrada.publish.xml" />
     <None Include="PublishLocations\AzureStrada.publish.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="DBStrada.refactorlog" />
   </ItemGroup>
 </Project>

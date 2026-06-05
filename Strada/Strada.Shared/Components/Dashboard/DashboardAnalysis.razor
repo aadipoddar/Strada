@@ -1,3 +1,9 @@
+﻿@using StradaLibrary.Fleet.OMC.Models
+@using StradaLibrary.Fleet.Trip.Models
+@using StradaLibrary.Fleet.Vehicle.Models
+@using StradaLibrary.Fleet.VehicleDocument.Models
+
+<!-- KPI -->
 <div class="launchpad-section">
 	<h2 class="launchpad-section-title">Key Figures</h2>
 	<div class="dashboard-grid">
@@ -76,4 +82,215 @@
 		</FioriTile>
 
 	</div>
+</div>
+
+<DashboardChart />
+
+<!-- Attention -->
+<div class="launchpad-section attention-row">
+
+	<div class="attention-col">
+		<h2 class="launchpad-section-title">Document Renewal</h2>
+		<div class="section-card">
+			<div class="section-body grid-body">
+				<SfGrid @ref="_sfGrid" TValue="VehicleDocumentRenewalOverviewModel" DataSource="_dueDocuments"
+						AllowTextWrap="true" AllowSorting="true" AllowResizing="true" AllowPaging="true"
+						GridLines="GridLine.Horizontal" CssClass="professional-grid"
+						ContextMenuItems="@_gridContextMenuItems"
+						Toolbar="@(new List<string>() { "Search" })">
+
+					<GridEvents TValue="VehicleDocumentRenewalOverviewModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
+					<GridPageSettings PageSize="5" PageSizes="@(new string[] { "5", "10", "20", "50", "100", "All" })" />
+
+					<GridColumns>
+						<GridColumn Field="@nameof(VehicleDocumentRenewalOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="140" />
+						<GridColumn Field="@nameof(VehicleDocumentRenewalOverviewModel.VehicleDocumentTypeName)" HeaderText="Document Type" Width="180" />
+
+						<GridColumn Field="@nameof(VehicleDocumentRenewalOverviewModel.RenewalDate)" HeaderText="Renewal Date" Width="140" Format="dd/MM/yy" Type="ColumnType.DateTime">
+							<Template>
+								@{
+									var item = (context as VehicleDocumentRenewalOverviewModel);
+									<span class="@(item.DaysRemaining < _warningDays ? "grid-debit" : string.Empty)">@item.RenewalDate.ToString("dd/MM/yy")</span>
+								}
+							</Template>
+						</GridColumn>
+						<GridColumn Field="@nameof(VehicleDocumentRenewalOverviewModel.DaysRemaining)" HeaderText="Days Remaining" Width="140" TextAlign="TextAlign.Right">
+							<Template>
+								@{
+									var item = (context as VehicleDocumentRenewalOverviewModel);
+									<span class="@(item.DaysRemaining < _warningDays ? "grid-debit" : string.Empty)">@item.DaysRemaining</span>
+								}
+							</Template>
+						</GridColumn>
+					</GridColumns>
+				</SfGrid>
+			</div>
+		</div>
+	</div>
+
+	<div class="attention-col">
+		<h2 class="launchpad-section-title">Loss-Making Trips</h2>
+		<div class="section-card">
+			<div class="section-body grid-body">
+				<SfGrid @ref="_lossGrid" TValue="TripOverviewModel" DataSource="_lossTrips"
+						AllowTextWrap="true" AllowSorting="true" AllowResizing="true" AllowPaging="true"
+						GridLines="GridLine.Horizontal" CssClass="professional-grid"
+						ContextMenuItems="@_lossContextMenuItems"
+						Toolbar="@(new List<string>() { "Search" })">
+
+					<GridEvents TValue="TripOverviewModel" ContextMenuItemClicked="OnLossContextMenuItemClicked" />
+					<GridPageSettings PageSize="5" PageSizes="@(new string[] { "5", "10", "20", "50", "100", "All" })" />
+
+					<GridAggregates>
+						<GridAggregate>
+							<GridAggregateColumns>
+								<GridAggregateColumn Field="@nameof(TripOverviewModel.NetAmount)" Type="AggregateType.Sum" Format="N2">
+									<FooterTemplate>
+										@{
+											var aggregate = (context as AggregateTemplateContext);
+											<div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+										}
+									</FooterTemplate>
+								</GridAggregateColumn>
+								<GridAggregateColumn Field="@nameof(TripOverviewModel.TotalExpense)" Type="AggregateType.Sum" Format="N2">
+									<FooterTemplate>
+										@{
+											var aggregate = (context as AggregateTemplateContext);
+											<div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+										}
+									</FooterTemplate>
+								</GridAggregateColumn>
+								<GridAggregateColumn Field="@nameof(TripOverviewModel.ProfitLoss)" Type="AggregateType.Sum" Format="N2">
+									<FooterTemplate>
+										@{
+											var aggregate = (context as AggregateTemplateContext);
+											<div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+										}
+									</FooterTemplate>
+								</GridAggregateColumn>
+							</GridAggregateColumns>
+						</GridAggregate>
+					</GridAggregates>
+
+					<GridColumns>
+						<GridColumn Field="@nameof(TripOverviewModel.TransactionDateTime)" HeaderText="Trip Date" Width="130" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+						<GridColumn Field="@nameof(TripOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="140" />
+						<GridColumn Field="@nameof(TripOverviewModel.RouteDisplay)" HeaderText="Route" Width="200" />
+						<GridColumn Field="@nameof(TripOverviewModel.NetAmount)" HeaderText="Net Amount" Width="140" TextAlign="TextAlign.Right" Format="N2" />
+						<GridColumn Field="@nameof(TripOverviewModel.TotalExpense)" HeaderText="Total Expense" Width="140" TextAlign="TextAlign.Right" Format="N2" />
+						<GridColumn Field="@nameof(TripOverviewModel.ProfitLoss)" HeaderText="Profit / Loss" Width="140" TextAlign="TextAlign.Right">
+							<Template>
+								@{
+									var item = (context as TripOverviewModel);
+									<span class="grid-debit">@(item.ProfitLoss?.ToString("N2") ?? "-")</span>
+								}
+							</Template>
+						</GridColumn>
+					</GridColumns>
+				</SfGrid>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<div class="launchpad-section attention-row">
+
+	<div class="attention-col">
+		<h2 class="launchpad-section-title">Pending Trips</h2>
+		<div class="section-card">
+			<div class="section-body grid-body">
+				<SfGrid @ref="_tripsGrid" TValue="TripOverviewModel" DataSource="_unBilledTrips"
+						AllowTextWrap="true" AllowSorting="true" AllowResizing="true" AllowPaging="true"
+						GridLines="GridLine.Horizontal" CssClass="professional-grid"
+						ContextMenuItems="@_tripContextMenuItems"
+						Toolbar="@(new List<string>() { "Search" })">
+
+					<GridEvents TValue="TripOverviewModel" ContextMenuItemClicked="OnTripsContextMenuItemClicked" />
+					<GridPageSettings PageSize="5" PageSizes="@(new string[] { "5", "10", "20", "50", "100", "All" })" />
+
+					<GridColumns>
+						<GridColumn Field="@nameof(TripOverviewModel.TransactionDateTime)" HeaderText="Trip Date" Width="130" Format="dd/MM/yy" Type="ColumnType.DateTime" />
+						<GridColumn Field="@nameof(TripOverviewModel.VehicleCode)" HeaderText="Vehicle" Width="140" />
+						<GridColumn Field="@nameof(TripOverviewModel.RouteDisplay)" HeaderText="Route" Width="200" />
+						<GridColumn Field="@nameof(TripOverviewModel.PendingDays)" HeaderText="Pending Days" Width="140" TextAlign="TextAlign.Right" />
+					</GridColumns>
+				</SfGrid>
+			</div>
+		</div>
+	</div>
+
+	<div class="attention-col">
+		<h2 class="launchpad-section-title">Idle Vehicles</h2>
+		<div class="section-card">
+			<div class="section-body grid-body">
+				<SfGrid @ref="_idleGrid" TValue="VehicleModel" DataSource="_idleVehicles"
+						AllowTextWrap="true" AllowSorting="true" AllowResizing="true" AllowPaging="true"
+						GridLines="GridLine.Horizontal" CssClass="professional-grid"
+						ContextMenuItems="@_idleContextMenuItems"
+						Toolbar="@(new List<string>() { "Search" })">
+
+					<GridEvents TValue="VehicleModel" ContextMenuItemClicked="OnIdleContextMenuItemClicked" />
+					<GridPageSettings PageSize="5" PageSizes="@(new string[] { "5", "10", "20", "50", "100", "All" })" />
+
+					<GridColumns>
+						<GridColumn Field="@nameof(VehicleModel.Code)" HeaderText="Vehicle" Width="160" />
+						<GridColumn Field="@nameof(VehicleModel.CompanyId)" HeaderText="Company" Width="220">
+							<Template>
+								@{
+									var item = (context as VehicleModel);
+									var company = _companies.FirstOrDefault(c => c.Id == item.CompanyId);
+									<span>@(company is not null ? company.Name : "N/A")</span>
+								}
+							</Template>
+						</GridColumn>
+						<GridColumn Field="@nameof(VehicleModel.OMCId)" HeaderText="OMC" Width="220">
+							<Template>
+								@{
+									var item = (context as VehicleModel);
+									var omc = _omcs.FirstOrDefault(o => o.Id == item.OMCId);
+									<span>@(omc is not null ? omc.Name : "N/A")</span>
+								}
+							</Template>
+						</GridColumn>
+					</GridColumns>
+				</SfGrid>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<div class="launchpad-section attention-row">
+
+	<div class="attention-col">
+		<h2 class="launchpad-section-title">OMC Card Balances</h2>
+		<div class="section-card">
+			<div class="section-body grid-body">
+				<SfGrid @ref="_cardGrid" TValue="OMCCardModel" DataSource="_omcCards"
+						AllowTextWrap="true" AllowSorting="true" AllowResizing="true" AllowPaging="true"
+						GridLines="GridLine.Horizontal" CssClass="professional-grid"
+						Toolbar="@(new List<string>() { "Search" })">
+
+					<GridPageSettings PageSize="5" PageSizes="@(new string[] { "5", "10", "20", "50", "100", "All" })" />
+
+					<GridColumns>
+						<GridColumn Field="@nameof(OMCCardModel.Code)" HeaderText="Card" Width="140" />
+						<GridColumn Field="@nameof(OMCCardModel.CardNumber)" HeaderText="Card Number" Width="200" />
+						<GridColumn Field="@nameof(OMCCardModel.OMCId)" HeaderText="OMC" Width="180">
+							<Template>
+								@{
+									var item = (context as OMCCardModel);
+									var omc = _omcs.FirstOrDefault(o => o.Id == item.OMCId);
+									<span>@(omc is not null ? omc.Name : "N/A")</span>
+								}
+							</Template>
+						</GridColumn>
+						<GridColumn Field="@nameof(OMCCardModel.CurrentBalance)" HeaderText="Current Balance" Width="160" TextAlign="TextAlign.Right" Format="N2" />
+					</GridColumns>
+				</SfGrid>
+			</div>
+		</div>
+	</div>
+
 </div>

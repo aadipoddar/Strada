@@ -22,21 +22,4 @@ public static class StorageFileNames
 	public static string BillDataFileName => "bill_data.json";
 	public static string BillPendingTripsCartDataFileName => "bill_pending_trips_cart_data.json";
 	public static string BillLedgerPaymentsCartDataFileName => "bill_ledger_payments_cart_data.json";
-
-
-	#region Dashboard Analysis
-	public static string TripsOverviewDataFileName => "trips_overview_data.json";
-	public static string UnBilledTripsDataFileName => "unbilled_trips_data.json";
-	public static string ExpensesOverviewDataFileName => "expenses_overview_data.json";
-	public static string VehiclesDataFileName => "vehicles_data.json";
-	public static string DueDocumentsDataFileName => "due_documents_data.json";
-	public static string LossTripsDataFileName => "loss_trips_data.json";
-	public static string IdleVehiclesDataFileName => "idle_vehicles_data.json";
-	public static string CompaniesDataFileName => "companies_data.json";
-	public static string OMCsDataFileName => "omcs_data.json";
-	public static string TripsYearOverviewDataFileName => "trips_year_overview_data.json";
-	public static string ExpensesYearOverviewDataFileName => "expenses_year_overview_data.json";
-	public static string TripExpensesYearOverviewDataFileName => "trip_expenses_year_overview_data.json";
-	public static string ExpenseDetailsYearOverviewDataFileName => "expense_details_year_overview_data.json";
-	#endregion
 }

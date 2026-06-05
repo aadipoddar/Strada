@@ -70,12 +70,10 @@ else
 							   TabHeaderClass="launchpad-tab-header"
 							   TabPanelsClass="launchpad-tab-panels">
 
-				<!-- ANALYSIS (Overview) -->
-				@* <MudBlazor.MudTabPanel Text="Analysis">
+				<!-- ANALYSIS -->
+				<MudBlazor.MudTabPanel Text="Analysis">
 					<DashboardAnalysis />
-					<DashboardChart />
-					<DashboardAttention />
-				</MudBlazor.MudTabPanel> *@
+				</MudBlazor.MudTabPanel>
 
 				<!-- ACCOUNTS -->
 				<MudBlazor.MudTabPanel Text="Accounts" Visible="_user.Accounts">

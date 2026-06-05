@@ -80,6 +80,12 @@ public static class AccountNames
 
 public static class FleetNames
 {
+	#region Analysis
+	public static string LoadDashboardMonthlyTrend => "Load_Dashboard_MonthlyTrend";
+	public static string LoadDashboardTopVehicles => "Load_Dashboard_TopVehicles";
+	public static string LoadDashboardExpenseBreakdown => "Load_Dashboard_ExpenseBreakdown";
+	#endregion
+
 	#region Bill
 	public static string Bill => "Bill";
 	public static string BillCardPayments => "BillCardPayments";
