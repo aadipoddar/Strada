@@ -80,6 +80,9 @@ public partial class SettingsPage
 	private int _autoRefreshReportTimer = 5;
 	private int _reportWarningDays = 30;
 
+	// Notification Settings
+	private string _notificationEmail = string.Empty;
+
 	#endregion
 
 	#region Load Data
@@ -171,6 +174,9 @@ public partial class SettingsPage
 		// Report Settings
 		_autoRefreshReportTimer = Int(SettingsKeys.AutoRefreshReportTimer, 5);
 		_reportWarningDays = Int(SettingsKeys.ReportWarningDays, 30);
+
+		// Notification Settings
+		_notificationEmail = Str(SettingsKeys.NotificationEmail) ?? string.Empty;
 	}
 
 	private async Task LoadCompanies()
@@ -355,6 +361,9 @@ public partial class SettingsPage
 			// Report Settings
 			await UpdateSetting(SettingsKeys.AutoRefreshReportTimer, _autoRefreshReportTimer.ToString(), Desc(SettingsKeys.AutoRefreshReportTimer));
 			await UpdateSetting(SettingsKeys.ReportWarningDays, _reportWarningDays.ToString(), Desc(SettingsKeys.ReportWarningDays));
+
+			// Notification Settings
+			await UpdateSetting(SettingsKeys.NotificationEmail, _notificationEmail, Desc(SettingsKeys.NotificationEmail));
 
 			await _toastNotification.ShowAsync("Saved", "Settings saved successfully.", ToastType.Success);
 		}

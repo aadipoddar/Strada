@@ -31,7 +31,7 @@ BEGIN
 		@CreatedFromPlatform
 	);
 
-	SELECT SCOPE_IDENTITY() AS Id;
+	SET @Id = SCOPE_IDENTITY();
 
-	SELECT @Id AS Id
+	SELECT @Id AS Id;
 END

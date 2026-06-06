@@ -2,7 +2,6 @@
 
 public static class CommonNames
 {
-	#region Common
 	public static string LoadTableData => "Load_TableData";
 	public static string LoadTableDataById => "Load_TableData_By_Id";
 	public static string LoadTableDataByStatus => "Load_TableData_By_Status";
@@ -15,7 +14,6 @@ public static class CommonNames
 	public static string LoadLastTableDataByFinancialYear => "Load_LastTableData_By_FinancialYear";
 	public static string LoadLastTableDataByCompanyFinancialYear => "Load_LastTableData_By_Company_FinancialYear";
 	public static string LoadCurrentDateTime => "Load_CurrentDateTime";
-	#endregion
 }
 
 public static class OperationNames

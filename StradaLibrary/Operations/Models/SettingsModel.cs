@@ -55,4 +55,7 @@ public static class SettingsKeys
 	// Report Settings
 	public static string AutoRefreshReportTimer => "AutoRefreshReportTimer";
 	public static string ReportWarningDays => "ReportWarningDays";
+
+	// Notification Settings
+	public static string NotificationEmail => "NotificationEmail";
 }

@@ -420,7 +420,7 @@ FodyWeavers.xsd
 *.csproj.lscache
 *.lscache
 
-StradaLibrary/DataAccess/Secrets.local_secrets.cs
+*.local_secrets.cs
 .claude
 AGENTS.md
 CLAUDE.md
