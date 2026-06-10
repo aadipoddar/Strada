@@ -90,7 +90,7 @@ public static class OMCData
 				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
 				TableName = FleetNames.OMC,
 				RecordNo = omc.Name,
-				RecordValue = diff,
+				RecordValue = isUpdate ? diff : null,
 				CreatedBy = userId,
 				CreatedFromPlatform = platform
 			}, transaction);

@@ -214,20 +214,20 @@ else
 
 							<!-- Route Estimated Distance / Cost -->
 							<div class="form-field">
-								<label class="field-label">
-									Estimated Distance / Cost
-								</label>
 								<div class="date-year-wrapper">
 									<CustomNumericField T="int"
 														@bind-Value="_selectedRoute.EstimatedDistance"
-														Placeholder="Enter estimated distance..."
+														Placeholder="Estimated distance to Destination"
+														Label="Estimated Distance"
 														Format="N0"
 														ReadOnly="true"
 														Required="false"
 														TabIndex="-1" />
 									<CustomNumericField T="decimal"
 														@bind-Value="_selectedRoute.EstimatedCost"
-														Placeholder="Enter estimated cost..."
+														Placeholder="Estimated cost to Destination"
+														Label="Estimated Cost"
+														Format="N2"
 														ReadOnly="true"
 														Required="false"
 														TabIndex="-1" />
@@ -236,20 +236,19 @@ else
 
 							<!-- Route Estimated Hours / Fuel -->
 							<div class="form-field">
-								<label class="field-label">
-									Estimated Hours / Fuel
-								</label>
 								<div class="date-year-wrapper">
 									<CustomNumericField T="int"
 														@bind-Value="_selectedRoute.EstimatedHours"
-														Placeholder="Enter estimated hours..."
+														Placeholder="Estimated hours to Destination"
+														Label="Estimated Hours"
 														Format="N0"
 														ReadOnly="true"
 														Required="false"
 														TabIndex="-1" />
 									<CustomNumericField T="int"
 														@bind-Value="_selectedRoute.EstimatedFuelConsumption"
-														Placeholder="Enter estimated fuel..."
+														Placeholder="Estimated fuel consumption"
+														Label="Estimated Fuel"
 														Format="N0"
 														ReadOnly="true"
 														Required="false"
@@ -326,7 +325,6 @@ else
 
 							<!-- Add Button -->
 							<div class="cart-field cart-field-wide">
-								<label class="cart-label">&nbsp;</label>
 								<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add"
 											Title="Add to Cart" OnClick="AddCardPaymentsToCart" />
 							</div>
@@ -426,7 +424,6 @@ else
 							</div>
 
 							<div class="cart-field cart-field-wide">
-								<label class="cart-label">&nbsp;</label>
 								<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add"
 											Title="Add Ledger Payment (Ctrl + Shift + Enter)" OnClick="AddLedgerPaymentsToCart" />
 							</div>
@@ -533,7 +530,6 @@ else
 
 						<!-- Add Button -->
 						<div class="cart-field">
-							<label class="cart-label">&nbsp;</label>
 							<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart"
 										OnClick="AddExpensesToCart" />
 						</div>
@@ -568,8 +564,7 @@ else
 						<GridAggregates>
 							<GridAggregate>
 								<GridAggregateColumns>
-									<GridAggregateColumn Field="@nameof(TripExpensesCartModel.ExpenseTypeName)"
-														 Type="AggregateType.Count">
+									<GridAggregateColumn Field="@nameof(TripExpensesCartModel.ExpenseTypeName)" Type="AggregateType.Count">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);
@@ -579,8 +574,7 @@ else
 											</div>
 										</FooterTemplate>
 									</GridAggregateColumn>
-									<GridAggregateColumn Field="@nameof(TripExpensesCartModel.Amount)"
-														 Type="AggregateType.Sum">
+									<GridAggregateColumn Field="@nameof(TripExpensesCartModel.Amount)" Type="AggregateType.Sum">
 										<FooterTemplate>
 											@{
 												var aggregate = (context as AggregateTemplateContext);

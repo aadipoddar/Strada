@@ -185,10 +185,7 @@ public partial class TripPage
 		try
 		{
 			_trip = JsonSerializer.Deserialize<TripModel>(await DataStorageService.LocalGetAsync(StorageFileNames.TripDataFileName));
-			if (_trip is null)
-				return false;
-
-			return true;
+			return _trip is not null;
 		}
 		catch
 		{
