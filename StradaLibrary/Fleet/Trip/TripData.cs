@@ -249,10 +249,10 @@ public static class TripData
 		await ValidateCardPaymentDetails(trip, cardPaymentDetails);
 		await ValidateLedgerPaymentDetails(trip, ledgerPaymentDetails);
 
-		var previousTrip = update && !recover ? await CommonData.LoadTableDataById<TripOverviewModel>(FleetNames.TripOverview, trip.Id, sqlDataAccessTransaction) : null;
-		var previousExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripExpensesOverviewModel>(FleetNames.TripExpensesOverview, trip.Id, sqlDataAccessTransaction) : null;
-		var previousCardPaymentDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripCardPaymentsOverviewModel>(FleetNames.TripCardPaymentsOverview, trip.Id, sqlDataAccessTransaction) : null;
-		var previousLedgerPaymentDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsOverviewModel>(FleetNames.TripLedgerPaymentsOverview, trip.Id, sqlDataAccessTransaction) : null;
+		var previousTrip = update && !recover ? await CommonData.LoadTableDataById<TripOverviewModel>(FleetNames.TripOverview, trip.Id, sqlDataAccessTransaction) : new();
+		var previousExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripExpensesOverviewModel>(FleetNames.TripExpensesOverview, trip.Id, sqlDataAccessTransaction) : [];
+		var previousCardPaymentDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripCardPaymentsOverviewModel>(FleetNames.TripCardPaymentsOverview, trip.Id, sqlDataAccessTransaction) : [];
+		var previousLedgerPaymentDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<TripLedgerPaymentsOverviewModel>(FleetNames.TripLedgerPaymentsOverview, trip.Id, sqlDataAccessTransaction) : [];
 
 		trip.Id = await InsertTrip(trip, sqlDataAccessTransaction);
 		await SaveExpensesDetail(trip, expensesDetails, update, sqlDataAccessTransaction);
@@ -324,7 +324,7 @@ public static class TripData
 	private static async Task SaveOMCCardBalance(List<TripCardPaymentsModel> paymentDetails, bool update, List<TripCardPaymentsOverviewModel> previousPaymentDetails, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
 		if (update)
-			foreach (var paymentDetail in previousPaymentDetails)
+			foreach (var paymentDetail in previousPaymentDetails.ToList())
 			{
 				var omcCard = await CommonData.LoadTableDataById<OMCCardModel>(FleetNames.OMCCard, paymentDetail.OMCCardId, sqlDataAccessTransaction);
 				omcCard.CurrentBalance += paymentDetail.PaymentAmount;

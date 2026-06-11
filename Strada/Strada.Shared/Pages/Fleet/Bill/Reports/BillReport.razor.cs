@@ -121,6 +121,7 @@ public partial class BillReport : IAsyncDisposable
 		{
 			_isProcessing = false;
 			StateHasChanged();
+			await _toastNotification.HideAllInfoAsync();
 		}
 	}
 
@@ -176,7 +177,7 @@ public partial class BillReport : IAsyncDisposable
 			return;
 		}
 
-		await _toastNotification.ShowAsync("Not Allowed", "Transaction viewing will come soon in a future update.", ToastType.Info);
+		await _toastNotification.ShowAsync("Not Allowed", "Transaction viewing will come soon in a future update.", ToastType.Warning);
 	}
 
 	private async Task OpenFinancialAccountingPosting()

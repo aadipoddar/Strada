@@ -663,68 +663,6 @@ public partial class FinancialAccountingPage
 		}
 	}
 
-	private async Task ExportReferencePDF()
-	{
-		if (_accounting.ReferenceId is null or <= 0)
-		{
-			await _toastNotification.ShowAsync("Invalid Reference", "No reference transaction found.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_accounting.ReferenceNo, true, false);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-		}
-	}
-
-	private async Task ExportCartReferencePDF()
-	{
-		if (_selectedAccountingLedger is null || _selectedAccountingLedger.LedgerReferenceId is null || _selectedAccountingLedger.LedgerReferenceId <= 0)
-		{
-			await _toastNotification.ShowAsync("Invalid Reference", "No reference transaction found.", ToastType.Error);
-			return;
-		}
-
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isProcessing = true;
-			await _toastNotification.ShowAsync("Processing", "Generating the Export...", ToastType.Info);
-
-			var decodeTransactionNo = await DecodeCode.DecodeTransactionNo(_selectedAccountingLedger.LedgerReferenceNo, true, false);
-			await SaveAndViewService.SaveAndView(decodeTransactionNo.PDFStream.fileName, decodeTransactionNo.PDFStream.stream);
-
-			await _toastNotification.ShowAsync("Exported", "The export has been downloaded successfully.", ToastType.Success);
-		}
-		catch (Exception ex)
-		{
-			await _toastNotification.ShowAsync("Error While Exporting", ex.Message, ToastType.Error);
-		}
-		finally
-		{
-			_isProcessing = false;
-		}
-	}
-
 	private async Task ViewReferenceTransaction()
 	{
 		if (_accounting.ReferenceId is null || _accounting.ReferenceId <= 0)

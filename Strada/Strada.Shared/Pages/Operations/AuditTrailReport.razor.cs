@@ -96,6 +96,7 @@ public partial class AuditTrailReport : IAsyncDisposable
 				await _sfGrid.Refresh();
 			_isProcessing = false;
 			StateHasChanged();
+			await _toastNotification.HideAllInfoAsync();
 		}
 	}
 	#endregion

@@ -104,6 +104,7 @@ public partial class VehicleDocumentRenewalReport : IAsyncDisposable
 		{
 			_isProcessing = false;
 			StateHasChanged();
+			await _toastNotification.HideAllInfoAsync();
 		}
 	}
 

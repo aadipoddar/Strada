@@ -105,6 +105,7 @@ public partial class BalanceSheetPage : IAsyncDisposable
 			if (_liabilitiesGrid is not null) await _liabilitiesGrid.Refresh();
 			_isProcessing = false;
 			StateHasChanged();
+			await _toastNotification.HideAllInfoAsync();
 		}
 	}
 	#endregion

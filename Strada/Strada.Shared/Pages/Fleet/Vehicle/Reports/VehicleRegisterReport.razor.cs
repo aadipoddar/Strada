@@ -111,6 +111,7 @@ public partial class VehicleRegisterReport : IAsyncDisposable
 
 			_isProcessing = false;
 			StateHasChanged();
+			await _toastNotification.HideAllInfoAsync();
 		}
 	}
 

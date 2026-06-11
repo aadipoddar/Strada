@@ -128,6 +128,7 @@ public partial class OMCCardMoneyTransferDetailsReport : IAsyncDisposable
 		{
 			_isProcessing = false;
 			StateHasChanged();
+			await _toastNotification.HideAllInfoAsync();
 		}
 	}
 

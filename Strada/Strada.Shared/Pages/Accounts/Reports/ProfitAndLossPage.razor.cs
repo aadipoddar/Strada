@@ -105,6 +105,7 @@ public partial class ProfitAndLossPage : IAsyncDisposable
 			if (_expenseGrid is not null) await _expenseGrid.Refresh();
 			_isProcessing = false;
 			StateHasChanged();
+			await _toastNotification.HideAllInfoAsync();
 		}
 	}
 	#endregion

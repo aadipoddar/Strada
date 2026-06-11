@@ -142,38 +142,12 @@ else
 							<GridColumn Field="@nameof(UserModel.Name)" HeaderText="Name" Width="220" />
 							<GridColumn Field="@nameof(UserModel.Phone)" HeaderText="Phone" Width="140" />
 							<GridColumn Field="@nameof(UserModel.Email)" HeaderText="Email" Width="220" />
-							<GridColumn Field="@nameof(UserModel.Accounts)" HeaderText="Accounts" Width="110" TextAlign="TextAlign.Center">
-								<Template>
-									@{
-										var item = (context as UserModel);
-										<span class="@(item.Accounts ? "grid-credit" : "grid-debit")">@(item.Accounts ? "Yes" : "No")</span>
-									}
-								</Template>
-							</GridColumn>
-							<GridColumn Field="@nameof(UserModel.Fleet)" HeaderText="Fleet" Width="110" TextAlign="TextAlign.Center">
-								<Template>
-									@{
-										var item = (context as UserModel);
-										<span class="@(item.Fleet ? "grid-credit" : "grid-debit")">@(item.Fleet ? "Yes" : "No")</span>
-									}
-								</Template>
-							</GridColumn>
-							<GridColumn Field="@nameof(UserModel.Reports)" HeaderText="Reports" Width="110" TextAlign="TextAlign.Center">
-								<Template>
-									@{
-										var item = (context as UserModel);
-										<span class="@(item.Reports ? "grid-credit" : "grid-debit")">@(item.Reports ? "Yes" : "No")</span>
-									}
-								</Template>
-							</GridColumn>
-							<GridColumn Field="@nameof(UserModel.Admin)" HeaderText="Admin" Width="110" TextAlign="TextAlign.Center">
-								<Template>
-									@{
-										var item = (context as UserModel);
-										<span class="@(item.Admin ? "grid-credit" : "grid-debit")">@(item.Admin ? "Yes" : "No")</span>
-									}
-								</Template>
-							</GridColumn>
+
+							<GridColumn Field="@nameof(UserModel.Accounts)" HeaderText="Accounts" Width="110" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
+							<GridColumn Field="@nameof(UserModel.Fleet)" HeaderText="Fleet" Width="110" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
+							<GridColumn Field="@nameof(UserModel.Reports)" HeaderText="Reports" Width="110" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
+							<GridColumn Field="@nameof(UserModel.Admin)" HeaderText="Admin" Width="110" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
+							
 							<GridColumn Field="@nameof(UserModel.Remarks)" HeaderText="Remarks" Width="220" />
 							<GridColumn Field="@nameof(UserModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>

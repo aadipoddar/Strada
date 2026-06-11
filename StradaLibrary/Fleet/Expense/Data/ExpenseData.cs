@@ -146,8 +146,8 @@ public static class ExpenseData
 		expense = await ValidateTransaction(expense, update, sqlDataAccessTransaction);
 		ValidateExpensesDetails(expense, expensesDetails);
 
-		var previousExpense = update && !recover ? await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, expense.Id, sqlDataAccessTransaction) : null;
-		var previousExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id, sqlDataAccessTransaction) : null;
+		var previousExpense = update && !recover ? await CommonData.LoadTableDataById<ExpenseOverviewModel>(FleetNames.ExpenseOverview, expense.Id, sqlDataAccessTransaction) : new();
+		var previousExpensesDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<ExpenseDetailsOverviewModel>(FleetNames.ExpenseDetailsOverview, expense.Id, sqlDataAccessTransaction) : [];
 
 		expense.Id = await InsertExpense(expense, sqlDataAccessTransaction);
 		await SaveExpensesDetail(expense, expensesDetails, update, sqlDataAccessTransaction);

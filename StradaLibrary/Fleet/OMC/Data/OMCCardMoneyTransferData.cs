@@ -182,8 +182,8 @@ public static class OMCCardMoneyTransferData
 		oMCCardMoneyTransfer = await ValidateTransaction(oMCCardMoneyTransfer, update, sqlDataAccessTransaction);
 		ValidateTransferDetails(oMCCardMoneyTransfer, transferDetails);
 
-		var previousTransfer = update && !recover ? await CommonData.LoadTableDataById<OMCCardMoneyTransferOverviewModel>(FleetNames.OMCCardMoneyTransferOverview, oMCCardMoneyTransfer.Id, sqlDataAccessTransaction) : null;
-		var previousTransferDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<OMCCardMoneyTransferDetailsOverviewModel>(FleetNames.OMCCardMoneyTransferDetailsOverview, oMCCardMoneyTransfer.Id, sqlDataAccessTransaction) : null;
+		var previousTransfer = update && !recover ? await CommonData.LoadTableDataById<OMCCardMoneyTransferOverviewModel>(FleetNames.OMCCardMoneyTransferOverview, oMCCardMoneyTransfer.Id, sqlDataAccessTransaction) : new();
+		var previousTransferDetails = update && !recover ? await CommonData.LoadTableDataByMasterId<OMCCardMoneyTransferDetailsOverviewModel>(FleetNames.OMCCardMoneyTransferDetailsOverview, oMCCardMoneyTransfer.Id, sqlDataAccessTransaction) : [];
 
 		oMCCardMoneyTransfer.Id = await InsertOMCCardMoneyTransfer(oMCCardMoneyTransfer, sqlDataAccessTransaction);
 		await SaveTransferDetail(oMCCardMoneyTransfer, transferDetails, update, sqlDataAccessTransaction);
