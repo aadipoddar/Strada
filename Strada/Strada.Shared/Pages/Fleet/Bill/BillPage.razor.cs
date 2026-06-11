@@ -49,7 +49,7 @@ public partial class BillPage
 	private SfGrid<TripOverviewModel> _sfTripCartGrid;
 	private SfGrid<BillLedgerPaymentsCartModel> _sfLedgerPaymentsCartGrid;
 	private CustomTextField _sfChallanNoTextBox;
-	private CustomAutoComplete<CompanyModel> _sfFirstFocus;
+	private CustomAutoComplete<CompanyModel> _firstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _pendingTripGridContextMenuItems =
@@ -96,8 +96,8 @@ public partial class BillPage
 
 		await SaveTransactionFile();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()

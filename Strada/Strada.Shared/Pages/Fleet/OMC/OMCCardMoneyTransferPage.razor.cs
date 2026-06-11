@@ -38,7 +38,7 @@ public partial class OMCCardMoneyTransferPage
 
 	private CustomAutoComplete<OMCCardModel> _sfOMCCardAutoComplete;
 	private SfGrid<OMCCardMoneyTransferDetailsCartModel> _sfTransfersCartGrid;
-	private CustomAutoComplete<LedgerModel> _sfFirstFocus;
+	private CustomAutoComplete<LedgerModel> _firstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _transfersCartGridContextMenuItems =
@@ -73,8 +73,8 @@ public partial class OMCCardMoneyTransferPage
 
 		await SaveTransactionFile();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()

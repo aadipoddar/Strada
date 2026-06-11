@@ -35,7 +35,7 @@ public partial class ProfitAndLossPage : IAsyncDisposable
 
 	private SfGrid<TrialBalanceModel> _incomeGrid;
 	private SfGrid<TrialBalanceModel> _expenseGrid;
-	private CustomDateRangePicker _sfFirstFocus;
+	private CustomDateRangePicker _firstFocus;
 	private ToastNotification _toastNotification;
 
 	#region Load Data
@@ -61,8 +61,8 @@ public partial class ProfitAndLossPage : IAsyncDisposable
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()

@@ -36,7 +36,7 @@ public partial class AuditTrailReport : IAsyncDisposable
 	private List<AuditTrailModel> _auditTrails = [];
 
 	private SfGrid<AuditTrailModel> _sfGrid;
-	private CustomDateRangePicker _sfFirstFocus;
+	private CustomDateRangePicker _firstFocus;
 	private ToastNotification _toastNotification;
 
 	#region Load Data
@@ -64,8 +64,8 @@ public partial class AuditTrailReport : IAsyncDisposable
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadAuditTrails()

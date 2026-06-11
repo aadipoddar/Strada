@@ -5,7 +5,7 @@
 <PageTitle>User Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _sfFirstFocus.FocusAsync()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus.FocusAsync()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster(true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster()" Disabled="@_isProcessing" />
@@ -51,71 +51,47 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<CustomTextField @ref="_sfFirstFocus"
-											 @bind-Value="_transactionUser.Name"
-											 Label="Name (Ctrl + F)"
-											 Placeholder="Enter User Name" />
+							<CustomTextField @ref="_firstFocus" @bind-Value="_transactionUser.Name" Label="Name (Ctrl + F)" Placeholder="Enter User Name" />
 						</div>
 
 						<div class="form-field">
-							<CustomTextField @bind-Value="_transactionUser.Phone"
-											 Label="Phone"
-											 Placeholder="Enter 10-digit phone number"
-											 MaxLength="10" />
+							<CustomTextField @bind-Value="_transactionUser.Phone" Label="Phone" Placeholder="Enter 10-digit phone number" MaxLength="10" />
 						</div>
 
 						<div class="form-field">
-							<CustomTextField @bind-Value="_transactionUser.Email"
-											 Label="Email"
-											 Placeholder="Enter email (optional)"
-											 Required="false" />
+							<CustomTextField @bind-Value="_transactionUser.Email" Label="Email" Placeholder="Enter email (optional)" Required="false" />
 						</div>
 
 						<div class="form-field">
-							<CustomTextField @bind-Value="_transactionUser.Password"
-											 Label="Password"
-											 Placeholder="Enter password"
-											 InputType="MudBlazor.InputType.Password" />
+							<CustomTextField @bind-Value="_transactionUser.Password" Label="Password" Placeholder="Enter password" InputType="MudBlazor.InputType.Password" />
 						</div>
 
 						<div class="form-field">
 							<div class="checkbox-wrapper">
-								<CustomCheckBox @bind-Value="_transactionUser.Accounts"
-												Label="Accounts"
-												AriaLabel="Accounts permission" />
+								<CustomCheckBox @bind-Value="_transactionUser.Accounts" Label="Accounts" AriaLabel="Accounts permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
 							<div class="checkbox-wrapper">
-								<CustomCheckBox @bind-Value="_transactionUser.Fleet"
-												Label="Fleet"
-												AriaLabel="Fleet permission" />
+								<CustomCheckBox @bind-Value="_transactionUser.Fleet" Label="Fleet" AriaLabel="Fleet permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
 							<div class="checkbox-wrapper">
-								<CustomCheckBox @bind-Value="_transactionUser.Reports"
-												Label="Reports"
-												AriaLabel="Reports permission" />
+								<CustomCheckBox @bind-Value="_transactionUser.Reports" Label="Reports" AriaLabel="Reports permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
 							<div class="checkbox-wrapper">
-								<CustomCheckBox @bind-Value="_transactionUser.Admin"
-												Label="Admin"
-												AriaLabel="Admin permission" />
+								<CustomCheckBox @bind-Value="_transactionUser.Admin" Label="Admin" AriaLabel="Admin permission" />
 							</div>
 						</div>
 
 						<div class="form-field">
-							<CustomTextField @bind-Value="_transactionUser.Remarks"
-											 Label="Remarks"
-											 Placeholder="Enter remarks (optional)"
-											 Required="false"
-											 Lines="2" />
+							<CustomTextField @bind-Value="_transactionUser.Remarks" Label="Remarks" Placeholder="Enter remarks (optional)" Required="false" Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -132,8 +108,8 @@ else
 					</div>
 				</div>
 				<div class="section-body grid-body">
-					<SfGrid @ref="_sfGrid" DataSource="@_users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
+					<SfGrid @ref="_sfGrid" DataSource="@_users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })"
+							ContextMenuItems="@_gridContextMenuItems">
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
 						<GridEvents TValue="UserModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
@@ -147,7 +123,7 @@ else
 							<GridColumn Field="@nameof(UserModel.Fleet)" HeaderText="Fleet" Width="110" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
 							<GridColumn Field="@nameof(UserModel.Reports)" HeaderText="Reports" Width="110" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
 							<GridColumn Field="@nameof(UserModel.Admin)" HeaderText="Admin" Width="110" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
-							
+
 							<GridColumn Field="@nameof(UserModel.Remarks)" HeaderText="Remarks" Width="220" />
 							<GridColumn Field="@nameof(UserModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
@@ -167,8 +143,7 @@ else
 	</div>
 }
 
-<ConfirmationDialog @ref="_confirmationDialog" Title="@_confirmTitle" Message="@_confirmMessage"
-					OnConfirm="OnConfirmed" OnCancel="OnCancelled" />
+<ConfirmationDialog @ref="_confirmationDialog" Title="@_confirmTitle" Message="@_confirmMessage" OnConfirm="OnConfirmed" OnCancel="OnCancelled" />
 
 <ToastNotification @ref="_toastNotification" />
 

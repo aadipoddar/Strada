@@ -47,7 +47,7 @@ public partial class OMCCardMoneyTransferReport : IAsyncDisposable
 	];
 
 	private SfGrid<OMCCardMoneyTransferOverviewModel> _sfGrid;
-	private CustomDateRangePicker _sfFirstFocus;
+	private CustomDateRangePicker _firstFocus;
 	private ToastNotification _toastNotification;
 	private ConfirmationDialog _confirmationDialog;
 
@@ -78,8 +78,8 @@ public partial class OMCCardMoneyTransferReport : IAsyncDisposable
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()

@@ -33,7 +33,7 @@ public partial class OMCCardPage
 	];
 
 	private SfGrid<OMCCardModel> _sfGrid;
-	private CustomTextField _sfFirstFocus;
+	private CustomTextField _firstFocus;
 	private ToastNotification _toastNotification;
 	private ConfirmationDialog _confirmationDialog;
 
@@ -75,8 +75,8 @@ public partial class OMCCardPage
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -132,7 +132,7 @@ public partial class OMCCardPage
 		_selectedOMC = _omcs.FirstOrDefault(omc => omc.Id == _omcCard.OMCId);
 		_selectedLedger = _ledgers.FirstOrDefault(ledger => ledger.Id == _omcCard.LedgerId);
 		StateHasChanged();
-		await _sfFirstFocus.FocusAsync();
+		await _firstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverTransaction(int id, bool isRecover)

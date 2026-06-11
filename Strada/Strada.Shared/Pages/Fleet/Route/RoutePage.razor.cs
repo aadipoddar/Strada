@@ -31,7 +31,7 @@ public partial class RoutePage
 	];
 
 	private SfGrid<RouteModel> _sfGrid;
-	private CustomAutoComplete<LocationModel> _sfFirstFocus;
+	private CustomAutoComplete<LocationModel> _firstFocus;
 	private ToastNotification _toastNotification;
 	private ConfirmationDialog _confirmationDialog;
 
@@ -69,8 +69,8 @@ public partial class RoutePage
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 	#endregion
 
@@ -126,7 +126,7 @@ public partial class RoutePage
 		_selectedFromLocation = _locations.FirstOrDefault(rl => rl.Id == _route.FromLocationId);
 		_selectedToLocation = _locations.FirstOrDefault(rl => rl.Id == _route.ToLocationId);
 		StateHasChanged();
-		await _sfFirstFocus.FocusAsync();
+		await _firstFocus.FocusAsync();
 	}
 
 	private async Task DeleteRecoverTransaction(int id, bool isRecover)

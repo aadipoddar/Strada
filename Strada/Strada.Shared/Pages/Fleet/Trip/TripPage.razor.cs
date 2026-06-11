@@ -61,7 +61,7 @@ public partial class TripPage
 	private SfGrid<TripExpensesCartModel> _sfExpensesCartGrid;
 	private SfGrid<TripCardPaymentsCartModel> _sfCardPaymentsCartGrid;
 	private SfGrid<TripLedgerPaymentsCartModel> _sfLedgerPaymentsCartGrid;
-	private CustomAutoComplete<VehicleModel> _sfFirstFocus;
+	private CustomAutoComplete<VehicleModel> _firstFocus;
 	private ToastNotification _toastNotification;
 
 	private readonly List<ContextMenuItemModel> _expensesCartGridContextMenuItems =
@@ -110,8 +110,8 @@ public partial class TripPage
 
 		await SaveTransactionFile();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()

@@ -41,7 +41,7 @@ public partial class FinancialAccountingPage
 		new() { Text = "Delete (Del)", Id = "DeleteCart", IconCss = "e-icons e-trash", Target = ".e-content" }
 	];
 
-	private CustomAutoComplete<CompanyModel> _sfFirstFocus;
+	private CustomAutoComplete<CompanyModel> _firstFocus;
 	private CustomAutoComplete<LedgerModel> _sfLedgerAutoComplete;
 	private SfGrid<FinancialAccountingLedgerCartModel> _sfCartGrid;
 
@@ -75,8 +75,8 @@ public partial class FinancialAccountingPage
 
 		await SaveTransactionFile();
 
-		if (_sfFirstFocus is not null)
-			await _sfFirstFocus.FocusAsync();
+		if (_firstFocus is not null)
+			await _firstFocus.FocusAsync();
 	}
 
 	private async Task ResolveTransaction()
