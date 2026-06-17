@@ -5,7 +5,7 @@
 <PageTitle>Ledger Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus.FocusAsync()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus?.FocusAsync()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster(true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster()" Disabled="@_isProcessing" />
@@ -171,8 +171,7 @@ else
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 
 						<GridColumns>
-							<GridColumn Field="@nameof(LedgerModel.Id)" HeaderText="ID" Width="80"
-										TextAlign="TextAlign.Center" />
+							<GridColumn Field="@nameof(LedgerModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(LedgerModel.Name)" HeaderText="Ledger Name" Width="250" />
 							<GridColumn Field="@nameof(LedgerModel.Code)" HeaderText="Code" Width="120" />
 							<GridColumn Field="@nameof(LedgerModel.GroupId)" HeaderText="Group" Width="120">
@@ -202,8 +201,7 @@ else
 							<GridColumn Field="@nameof(LedgerModel.PANNo)" HeaderText="PAN No" Width="150" />
 							<GridColumn Field="@nameof(LedgerModel.Address)" HeaderText="Address" Width="150" />
 							<GridColumn Field="@nameof(LedgerModel.Remarks)" HeaderText="Remarks" Width="150" />
-							<GridColumn Field="@nameof(LedgerModel.Status)" HeaderText="Status" Width="110"
-										TextAlign="TextAlign.Center" Visible="_showDeleted">
+							<GridColumn Field="@nameof(LedgerModel.Status)" HeaderText="Status" Width="110" TextAlign="TextAlign.Center" Visible="_showDeleted">
 								<Template>
 									@{
 										var item = (context as LedgerModel);

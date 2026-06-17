@@ -6,7 +6,7 @@
 <PageTitle>Vehicle Driver Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus.FocusAsync()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus?.FocusAsync()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster(true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster()" Disabled="@_isProcessing" />
@@ -47,46 +47,24 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<CustomAutoComplete @ref="_firstFocus" T="VehicleModel"
-												@bind-Value="_selectedVehicle"
-												DataSource="@_vehicles"
-												Placeholder="Select Vehicle"
-												Label="Vehicle (Ctrl + F)"
-												FieldValue="@nameof(VehicleModel.Code)"
+							<CustomAutoComplete @ref="_firstFocus" T="VehicleModel" @bind-Value="_selectedVehicle" DataSource="@_vehicles" Placeholder="Select Vehicle" Label="Vehicle (Ctrl + F)" FieldValue="@nameof(VehicleModel.Code)"
 												AddNewRoute="@PageRouteNames.VehicleMaster" />
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete T="DriverModel"
-												@bind-Value="_selectedDriver"
-												DataSource="@_drivers"
-												Placeholder="Select Driver"
-												Label="Driver"
-												FieldValue="@nameof(DriverModel.Name)"
-												AddNewRoute="@PageRouteNames.DriverMaster" />
+							<CustomAutoComplete T="DriverModel" @bind-Value="_selectedDriver" DataSource="@_drivers" Placeholder="Select Driver" Label="Driver" FieldValue="@nameof(DriverModel.Name)" AddNewRoute="@PageRouteNames.DriverMaster" />
 						</div>
 
 						<div class="form-field">
-							<CustomDatePicker @bind-Value="_vehicleDriver.StartDateTime"
-											  Label="Start Date"
-											  ShowFinancialYear="false"
-											  AddNewRoute="@(null)" />
+							<CustomDatePicker @bind-Value="_vehicleDriver.StartDateTime" Label="Start Date" ShowFinancialYear="false" AddNewRoute="@(null)" />
 						</div>
 
 						<div class="form-field">
-							<CustomDatePicker @bind-Value="_endDateTime"
-											  Label="End Date (optional)"
-											  Required="false"
-											  ShowFinancialYear="false"
-											  AddNewRoute="@(null)" />
+							<CustomDatePicker @bind-Value="_endDateTime" Label="End Date (optional)" Required="false" ShowFinancialYear="false" AddNewRoute="@(null)" />
 						</div>
 
 						<div class="form-field">
-							<CustomTextField @bind-Value="_vehicleDriver.Remarks"
-											 Label="Remarks"
-											 Placeholder="Enter remarks (optional)"
-											 Required="false"
-											 Lines="2" />
+							<CustomTextField @bind-Value="_vehicleDriver.Remarks" Label="Remarks" Placeholder="Enter remarks (optional)" Required="false" Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -98,11 +76,8 @@ else
 				</div>
 
 				<div class="section-body grid-body">
-					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDrivers"
-							AllowPaging="true" AllowSorting="true" AllowResizing="true"
-							AllowFiltering="true" AllowReordering="true" AllowGrouping="true" ShowColumnChooser="true"
-							GridLines="GridLine.Horizontal" ContextMenuItems="@_gridContextMenuItems" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "ColumnChooser", "Search" })">
+					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDrivers" AllowPaging="true" AllowSorting="true" AllowResizing="true" AllowFiltering="true" AllowReordering="true" AllowGrouping="true" ShowColumnChooser="true"
+							GridLines="GridLine.Horizontal" ContextMenuItems="@_gridContextMenuItems" CssClass="professional-grid" Toolbar="@(new List<string>() { "ColumnChooser", "Search" })">
 
 						<GridEvents TValue="VehicleDriverModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
@@ -141,8 +116,7 @@ else
 	</div>
 }
 
-<ConfirmationDialog @ref="_confirmationDialog" Title="@_confirmTitle" Message="@_confirmMessage"
-					OnConfirm="OnConfirmed" OnCancel="OnCancelled" />
+<ConfirmationDialog @ref="_confirmationDialog" Title="@_confirmTitle" Message="@_confirmMessage" OnConfirm="OnConfirmed" OnCancel="OnCancelled" />
 
 <ToastNotification @ref="_toastNotification" />
 

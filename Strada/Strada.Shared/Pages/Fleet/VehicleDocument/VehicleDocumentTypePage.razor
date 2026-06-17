@@ -5,7 +5,7 @@
 <PageTitle>Vehicle Document Type Management - Strada</PageTitle>
 
 <MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="ResetPage" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus.FocusAsync()" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus?.FocusAsync()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyS KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="SaveTransaction" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster(true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => ExportMaster()" Disabled="@_isProcessing" />
@@ -48,34 +48,19 @@ else
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
-							<CustomTextField @ref="_firstFocus"
-											 @bind-Value="_vehicleDocumentType.Name"
-											 Label="Name (Ctrl + F)"
-											 Placeholder="Enter Document Type Name" />
+							<CustomTextField @ref="_firstFocus" @bind-Value="_vehicleDocumentType.Name" Label="Name (Ctrl + F)" Placeholder="Enter Document Type Name" />
 						</div>
 
 						<div class="form-field">
-							<CustomTextField @bind-Value="_vehicleDocumentType.Code"
-											 Label="Code"
-											 Placeholder="Auto-generated"
-											 ReadOnly="true"
-											 TabIndex="-1" />
+							<CustomTextField @bind-Value="_vehicleDocumentType.Code" Label="Code" Placeholder="Auto-generated" ReadOnly="true" TabIndex="-1" />
 						</div>
 
 						<div class="form-field">
-							<CustomNumericField T="decimal"
-												@bind-Value="_vehicleDocumentType.Rate"
-												Label="Rate"
-												Placeholder="Enter rate"
-												Min="0" />
+							<CustomNumericField T="decimal" @bind-Value="_vehicleDocumentType.Rate" Label="Rate" Placeholder="Enter rate" Min="0" />
 						</div>
 
 						<div class="form-field">
-							<CustomTextField @bind-Value="_vehicleDocumentType.Remarks"
-											 Label="Remarks"
-											 Placeholder="Enter remarks (optional)"
-											 Required="false"
-											 Lines="2" />
+							<CustomTextField @bind-Value="_vehicleDocumentType.Remarks" Label="Remarks" Placeholder="Enter remarks (optional)" Required="false" Lines="2" />
 						</div>
 					</div>
 				</div>
@@ -87,11 +72,8 @@ else
 				</div>
 
 				<div class="section-body grid-body">
-					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDocumentTypes"
-							AllowPaging="true" AllowSorting="true" AllowResizing="true"
-							AllowFiltering="true" AllowReordering="true" AllowGrouping="true" ShowColumnChooser="true"
-							GridLines="GridLine.Horizontal" ContextMenuItems="@_gridContextMenuItems" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "ColumnChooser", "Search" })">
+					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDocumentTypes" AllowPaging="true" AllowSorting="true" AllowResizing="true" AllowFiltering="true" AllowReordering="true" AllowGrouping="true" ShowColumnChooser="true"
+							GridLines="GridLine.Horizontal" ContextMenuItems="@_gridContextMenuItems" CssClass="professional-grid" Toolbar="@(new List<string>() { "ColumnChooser", "Search" })">
 
 						<GridEvents TValue="VehicleDocumentTypeModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
 						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
@@ -121,8 +103,7 @@ else
 	</div>
 }
 
-<ConfirmationDialog @ref="_confirmationDialog" Title="@_confirmTitle" Message="@_confirmMessage"
-					OnConfirm="OnConfirmed" OnCancel="OnCancelled" />
+<ConfirmationDialog @ref="_confirmationDialog" Title="@_confirmTitle" Message="@_confirmMessage" OnConfirm="OnConfirmed" OnCancel="OnCancelled" />
 
 <ToastNotification @ref="_toastNotification" />
 

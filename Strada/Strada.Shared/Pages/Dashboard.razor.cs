@@ -7,14 +7,9 @@ namespace Strada.Shared.Pages;
 public partial class Dashboard
 {
 	#region Device Info
-	private string Factor =>
-		FormFactor.GetFormFactor();
-
-	private string Platform =>
-		FormFactor.GetPlatform();
-
-	private static string AppVersion =>
-		Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0";
+	private string Factor => FormFactor.GetFormFactor();
+	private string Platform => FormFactor.GetPlatform();
+	private static string AppVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0";
 	#endregion
 
 	#region Updating
@@ -57,7 +52,7 @@ public partial class Dashboard
 			InvokeAsync(StateHasChanged);
 		});
 
-		await UpdateService.UpdateAppAsync("aadipoddar", "Strada", "Strada", progress, forceUpdate);
+		await UpdateService.UpdateAppAsync("aadipoddar", Secrets.DatabaseName, Secrets.DatabaseName, progress, forceUpdate);
 
 		_isUpdating = false;
 		StateHasChanged();
@@ -92,7 +87,7 @@ public partial class Dashboard
 
 			if (shouldCheckUpdate)
 			{
-				var hasUpdate = await UpdateService.CheckForUpdatesAsync("aadipoddar", "Strada", "Strada", AppVersion);
+				var hasUpdate = await UpdateService.CheckForUpdatesAsync("aadipoddar", Secrets.DatabaseName, Secrets.DatabaseName, AppVersion);
 				if (hasUpdate)
 					await StartUpdateProcess();
 			}
