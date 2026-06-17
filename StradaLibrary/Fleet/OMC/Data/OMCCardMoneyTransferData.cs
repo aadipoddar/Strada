@@ -22,6 +22,16 @@ public static class OMCCardMoneyTransferData
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertOMCCardMoneyTransferDetails, oMCCardMoneyTransferDetails, sqlDataAccessTransaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert OMC Card Money Transfer Detail.");
 
+	internal static async Task UpdateFinancialAccountingId(int financialAccountingId, int? newFinancialAccountingId, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var omcMoneyTransfers = await CommonData.LoadTableDataByFinancialAccountingId<OMCCardMoneyTransferModel>(FleetNames.OMCCardMoneyTransfer, financialAccountingId, sqlDataAccessTransaction);
+		foreach (var omcCardMoneyTransfer in omcMoneyTransfers)
+		{
+			omcCardMoneyTransfer.FinancialAccountingId = newFinancialAccountingId;
+			await InsertOMCCardMoneyTransfer(omcCardMoneyTransfer, sqlDataAccessTransaction);
+		}
+	}
+
 	public static List<OMCCardMoneyTransferDetailsModel> ConvertTransfersCartToDetails(List<OMCCardMoneyTransferDetailsCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new OMCCardMoneyTransferDetailsModel
 		{
@@ -32,16 +42,6 @@ public static class OMCCardMoneyTransferData
 			Remarks = item.Remarks,
 			Status = true
 		})];
-
-	internal static async Task UpdateFinancialAccountingId(int financialAccountingId, int? newFinancialAccountingId, SqlDataAccessTransaction sqlDataAccessTransaction = null)
-	{
-		var omcMoneyTransfers = await CommonData.LoadTableDataByFinancialAccountingId<OMCCardMoneyTransferModel>(FleetNames.OMCCardMoneyTransfer, financialAccountingId, sqlDataAccessTransaction);
-		foreach (var omcCardMoneyTransfer in omcMoneyTransfers)
-		{
-			omcCardMoneyTransfer.FinancialAccountingId = newFinancialAccountingId;
-			await InsertOMCCardMoneyTransfer(omcCardMoneyTransfer, sqlDataAccessTransaction);
-		}
-	}
 
 	#region Delete
 	public static async Task DeleteTransaction(OMCCardMoneyTransferModel omcCardMoneyTransfer, SqlDataAccessTransaction sqlDataAccessTransaction = null)
@@ -72,7 +72,10 @@ public static class OMCCardMoneyTransferData
 
 	private static async Task DeleteAccounting(OMCCardMoneyTransferModel omcCardMoneyTransfer, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
-		var existingAccounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, omcCardMoneyTransfer.FinancialAccountingId ?? 0, sqlDataAccessTransaction)
+		if (omcCardMoneyTransfer.FinancialAccountingId is null || omcCardMoneyTransfer.FinancialAccountingId <= 0)
+			return;
+
+		var existingAccounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, omcCardMoneyTransfer.FinancialAccountingId.Value, sqlDataAccessTransaction)
 			?? throw new InvalidOperationException("The associated financial accounting transaction for the OMC Card Money Transfer does not exist.");
 
 		existingAccounting.Status = false;
@@ -93,7 +96,6 @@ public static class OMCCardMoneyTransferData
 			await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
 		}
 	}
-	#endregion
 
 	public static async Task RecoverTransaction(OMCCardMoneyTransferModel omcCardMoneyTransfer)
 	{
@@ -104,6 +106,7 @@ public static class OMCCardMoneyTransferData
 
 		await OMCCardMoneyTransferNotify.Notify(omcCardMoneyTransfer.Id, NotifyType.Recovered);
 	}
+	#endregion
 
 	#region Saving
 	private static async Task<OMCCardMoneyTransferModel> ValidateTransaction(OMCCardMoneyTransferModel oMCCardMoneyTransfer, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
@@ -187,7 +190,7 @@ public static class OMCCardMoneyTransferData
 
 		oMCCardMoneyTransfer.Id = await InsertOMCCardMoneyTransfer(oMCCardMoneyTransfer, sqlDataAccessTransaction);
 		await SaveTransferDetail(oMCCardMoneyTransfer, transferDetails, update, sqlDataAccessTransaction);
-		await SaveAccounting(oMCCardMoneyTransfer, update, sqlDataAccessTransaction);
+		await SaveAccounting(oMCCardMoneyTransfer, sqlDataAccessTransaction);
 		await SaveOMCCardBalance(transferDetails, update, previousTransferDetails, sqlDataAccessTransaction);
 		await SaveAuditTrail(oMCCardMoneyTransfer, update, recover, previousTransfer, previousTransferDetails, sqlDataAccessTransaction);
 
@@ -213,22 +216,9 @@ public static class OMCCardMoneyTransferData
 		}
 	}
 
-	private static async Task SaveAccounting(OMCCardMoneyTransferModel oMCCardMoneyTransfer, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
+	private static async Task SaveAccounting(OMCCardMoneyTransferModel oMCCardMoneyTransfer, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
-		if (update)
-		{
-			var oMCCardMoneyTransferVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCardMoneyTransferVoucherId, sqlDataAccessTransaction);
-			var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(oMCCardMoneyTransferVoucher.Value), oMCCardMoneyTransfer.Id, oMCCardMoneyTransfer.TransactionNo, sqlDataAccessTransaction);
-			if (existingAccounting is not null && existingAccounting.Id > 0)
-			{
-				existingAccounting.Status = false;
-				existingAccounting.LastModifiedBy = oMCCardMoneyTransfer.LastModifiedBy;
-				existingAccounting.LastModifiedAt = oMCCardMoneyTransfer.LastModifiedAt;
-				existingAccounting.LastModifiedFromPlatform = oMCCardMoneyTransfer.LastModifiedFromPlatform;
-
-				await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
-			}
-		}
+		await DeleteAccounting(oMCCardMoneyTransfer, sqlDataAccessTransaction);
 
 		var omcCardMoneyTransferOverview = await CommonData.LoadTableDataById<OMCCardMoneyTransferOverviewModel>(FleetNames.OMCCardMoneyTransferOverview, oMCCardMoneyTransfer.Id, sqlDataAccessTransaction);
 		if (omcCardMoneyTransferOverview is null || omcCardMoneyTransferOverview.TotalAmount == 0)

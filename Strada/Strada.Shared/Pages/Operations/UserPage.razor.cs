@@ -112,6 +112,7 @@ public partial class UserPage
 			await _toastNotification.ShowAsync("Error while Editing", "Transaction Not Found.", ToastType.Error);
 			return;
 		}
+		_transactionUser.Password = string.Empty;
 
 		StateHasChanged();
 		await _firstFocus.FocusAsync();

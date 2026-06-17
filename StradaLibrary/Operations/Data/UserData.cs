@@ -14,6 +14,18 @@ public static class UserData
 		(await SqlDataAccess.LoadData<UserModel, dynamic>(OperationNames.LoadUserByPhoneEmail, new { PhoneEmail })).FirstOrDefault()
 			is var user and not null ? user : throw new Exception("User not found with the provided phone or email.");
 
+	public static async Task ResetInsertUser(UserModel user)
+	{
+		user.Status = true;
+		user.FailedAttempts = 0;
+		user.CodeResends = 0;
+		user.LastCodeDateTime = null;
+		user.LastCode = null;
+		user.LastCodeDeviceId = null;
+
+		await InsertUser(user);
+	}
+
 	public static async Task DeleteTransaction(UserModel user, int userId, string platform) =>
 		await SqlDataAccessTransaction.Run(async transaction =>
 		{
@@ -80,6 +92,8 @@ public static class UserData
 			user.LastCodeDateTime = null;
 		}
 
+		user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
 		var allUsers = await CommonData.LoadTableData<UserModel>(OperationNames.User);
 
 		var existingByPhone = allUsers.FirstOrDefault(existingUser =>
@@ -125,39 +139,5 @@ public static class UserData
 			}, transaction);
 			return id;
 		});
-	}
-
-	private static UserModel GetAuditUser(UserModel user)
-	{
-		if (user is null)
-			return null;
-
-		return new()
-		{
-			Id = user.Id,
-			Name = user.Name,
-			Phone = user.Phone,
-			Email = user.Email,
-			Accounts = user.Accounts,
-			Fleet = user.Fleet,
-			Reports = user.Reports,
-			Admin = user.Admin,
-			Remarks = user.Remarks,
-			Status = user.Status,
-			CodeResends = user.CodeResends,
-			FailedAttempts = user.FailedAttempts
-		};
-	}
-
-	public static async Task ResetInsertUser(UserModel user)
-	{
-		user.Status = true;
-		user.FailedAttempts = 0;
-		user.CodeResends = 0;
-		user.LastCodeDateTime = null;
-		user.LastCode = null;
-		user.LastCodeDeviceId = null;
-
-		await InsertUser(user);
 	}
 }

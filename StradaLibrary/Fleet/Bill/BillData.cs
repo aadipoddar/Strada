@@ -24,6 +24,16 @@ public static class BillData
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertBillLedgerPayments, billLedgerPayments, sqlDataAccessTransaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Bill Ledger Payment.");
 
+	internal static async Task UpdateFinancialAccountingId(int financialAccountingId, int? newFinancialAccountingId, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	{
+		var bills = await CommonData.LoadTableDataByFinancialAccountingId<BillModel>(FleetNames.Bill, financialAccountingId, sqlDataAccessTransaction);
+		foreach (var bill in bills)
+		{
+			bill.FinancialAccountingId = newFinancialAccountingId;
+			await InsertBill(bill, sqlDataAccessTransaction);
+		}
+	}
+
 	public static List<BillLedgerPaymentsModel> ConvertLedgerPaymentCartToDetails(List<BillLedgerPaymentsCartModel> cart, int masterId = 0) =>
 		[.. cart.Select(item => new BillLedgerPaymentsModel
 		{
@@ -34,16 +44,6 @@ public static class BillData
 			Remarks = item.Remarks,
 			Status = true
 		})];
-
-	internal static async Task UpdateFinancialAccountingId(int financialAccountingId, int? newFinancialAccountingId, SqlDataAccessTransaction sqlDataAccessTransaction = null)
-	{
-		var bills = await CommonData.LoadTableDataByFinancialAccountingId<BillModel>(FleetNames.Bill, financialAccountingId, sqlDataAccessTransaction);
-		foreach (var bill in bills)
-		{
-			bill.FinancialAccountingId = newFinancialAccountingId;
-			await InsertBill(bill, sqlDataAccessTransaction);
-		}
-	}
 
 	#region Delete
 	public static async Task DeleteTransaction(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
@@ -93,7 +93,10 @@ public static class BillData
 
 	private static async Task DeleteAccounting(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
-		var existingAccounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, bill.FinancialAccountingId ?? 0, sqlDataAccessTransaction)
+		if (bill.FinancialAccountingId is null || bill.FinancialAccountingId <= 0)
+			return;
+
+		var existingAccounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, bill.FinancialAccountingId.Value, sqlDataAccessTransaction)
 			?? throw new InvalidOperationException("The associated financial accounting transaction for the bill does not exist.");
 
 		existingAccounting.Status = false;
@@ -230,7 +233,7 @@ public static class BillData
 		bill.Id = await InsertBill(bill, sqlDataAccessTransaction);
 		await SaveLedgerPaymentDetail(bill, ledgerPayments, update, sqlDataAccessTransaction);
 		await SaveTripsBillNo(bill, trips, update, sqlDataAccessTransaction);
-		await SaveAccounting(bill, update, sqlDataAccessTransaction);
+		await SaveAccounting(bill, sqlDataAccessTransaction);
 		await SaveAuditTrail(bill, update, previousBill, previousLedgerPayments, previousTrips, sqlDataAccessTransaction);
 
 		return bill.Id;
@@ -287,22 +290,9 @@ public static class BillData
 		}
 	}
 
-	private static async Task SaveAccounting(BillModel bill, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
+	private static async Task SaveAccounting(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction)
 	{
-		if (update)
-		{
-			var billVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.BillVoucherId, sqlDataAccessTransaction);
-			var existingAccounting = await FinancialAccountingData.LoadFinancialAccountingByVoucherReference(int.Parse(billVoucher.Value), bill.Id, bill.TransactionNo, sqlDataAccessTransaction);
-			if (existingAccounting is not null && existingAccounting.Id > 0)
-			{
-				existingAccounting.Status = false;
-				existingAccounting.LastModifiedBy = bill.LastModifiedBy;
-				existingAccounting.LastModifiedAt = bill.LastModifiedAt;
-				existingAccounting.LastModifiedFromPlatform = bill.LastModifiedFromPlatform;
-
-				await FinancialAccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
-			}
-		}
+		await DeleteAccounting(bill, sqlDataAccessTransaction);
 
 		var billOverview = await CommonData.LoadTableDataById<BillOverviewModel>(FleetNames.BillOverview, bill.Id, sqlDataAccessTransaction);
 		if (billOverview is null || billOverview.TotalLedgerPaymentAmount == 0)

@@ -38,20 +38,12 @@ else
 		</Header>
 
 		<div class="page-container">
+
 			<div class="section-card">
 				<div class="section-header">
-					<div class="section-title-wrapper">
-						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-							 stroke-linejoin="round">
-							<path d="M10 17h4V5H2v12h3" />
-							<path d="M14 9h4l4 4v4h-3" />
-							<circle cx="7.5" cy="17.5" r="2.5" />
-							<circle cx="17.5" cy="17.5" r="2.5" />
-						</svg>
-						<h2 class="section-title">Vehicle Driver Details</h2>
-					</div>
+					<h2 class="section-title">Master Details</h2>
 				</div>
+
 				<div class="section-body">
 					<div class="form-grid">
 						<div class="form-field">
@@ -102,23 +94,20 @@ else
 
 			<div class="section-card">
 				<div class="section-header">
-					<div class="section-title-wrapper">
-						<svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-							 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-							 stroke-linejoin="round">
-							<path d="M9 11l3 3L22 4" />
-							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-						</svg>
-						<h2 class="section-title">Vehicle Drivers List</h2>
-					</div>
+					<h2 class="section-title">Master List</h2>
 				</div>
+
 				<div class="section-body grid-body">
-					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDrivers" AllowPaging="true" AllowSorting="true"
-							AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
-							Toolbar="@(new List<string>() { "Search" })" ContextMenuItems="@_gridContextMenuItems">
-						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
+					<SfGrid @ref="_sfGrid" DataSource="@_vehicleDrivers"
+							AllowPaging="true" AllowSorting="true" AllowResizing="true"
+							AllowFiltering="true" AllowReordering="true" AllowGrouping="true" ShowColumnChooser="true"
+							GridLines="GridLine.Horizontal" ContextMenuItems="@_gridContextMenuItems" CssClass="professional-grid"
+							Toolbar="@(new List<string>() { "ColumnChooser", "Search" })">
+
 						<GridEvents TValue="VehicleDriverModel" ContextMenuItemClicked="OnGridContextMenuItemClicked" />
+						<GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
 						<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
 						<GridColumns>
 							<GridColumn Field="@nameof(VehicleDriverModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
 							<GridColumn Field="@nameof(VehicleDriverModel.VehicleId)" HeaderText="Vehicle" Width="200">
