@@ -28,12 +28,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Strada.Models\Strada.Models.csproj" />
     <ProjectReference Include="..\..\StradaLibrary\StradaLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="Strada.Models.Common" />
     <Using Include="Strada.Shared.Services" />
-    <Using Include="StradaLibrary.Common" />
     <Using Include="StradaLibrary.DataAccess" />
   </ItemGroup>
 

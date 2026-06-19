@@ -1,7 +1,7 @@
+using StradaLibrary.DataAccess;
+
 using System.Globalization;
 using System.Text.Json;
-
-using StradaLibrary.DataAccess;
 
 namespace StradaLibrary.APIService;
 

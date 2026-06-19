@@ -1,4 +1,4 @@
-using StradaLibrary.Fleet.Tyre.Models;
+using Strada.Models.Fleet.Tyre;
 
 using StradaLibrary.Common;
 using StradaLibrary.Utils.ExportUtils;

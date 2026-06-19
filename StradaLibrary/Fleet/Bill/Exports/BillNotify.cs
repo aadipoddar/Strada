@@ -1,5 +1,7 @@
+using Strada.Models.Common;
+using Strada.Models.Fleet.Bill;
+
 using StradaLibrary.Common;
-using StradaLibrary.Fleet.Bill.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Utils.MailUtils;

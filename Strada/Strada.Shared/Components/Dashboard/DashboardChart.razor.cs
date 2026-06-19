@@ -1,5 +1,7 @@
 using MudBlazor;
 
+using Strada.Models.Fleet.Analysis;
+
 using StradaLibrary.Fleet.Analysis;
 
 namespace Strada.Shared.Components.Dashboard;
@@ -79,7 +81,7 @@ public partial class DashboardChart
 		finally { StateHasChanged(); }
 	}
 
-	private void BuildMonthlyTrend(List<MonthlyTrendModel> rows, DateTime thisMonthStart)
+	private void BuildMonthlyTrend(List<AnalysisMonthlyTrendModel> rows, DateTime thisMonthStart)
 	{
 		var buckets = Enumerable.Range(0, 12)
 			.Select(i => thisMonthStart.AddMonths(-11 + i))
@@ -101,7 +103,7 @@ public partial class DashboardChart
 		_expenseSeries = [new ChartSeries<double> { Name = "Expense", Data = expense }];
 	}
 
-	private void BuildTopVehicles(List<VehicleProfitModel> rows)
+	private void BuildTopVehicles(List<AnalysisVehicleProfitModel> rows)
 	{
 		_vehicleLabels = [.. rows.Select(v => v.VehicleCode)];
 		var profitData = rows.Select(v => (double)v.Profit).ToArray();
@@ -110,7 +112,7 @@ public partial class DashboardChart
 			: [new ChartSeries<double> { Name = "Profit", Data = profitData }];
 	}
 
-	private void BuildExpenseBreakdown(List<ExpenseTypeModel> rows)
+	private void BuildExpenseBreakdown(List<AnalysisExpenseTypeModel> rows)
 	{
 		// Keep top 7 slices, bucket the rest into "Other" so the donut stays readable.
 		const int topN = 7;

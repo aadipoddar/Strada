@@ -1,6 +1,8 @@
+using Strada.Models.Common;
+using Strada.Models.Operations;
+
 using StradaLibrary.Common;
 using StradaLibrary.DataAccess;
-using StradaLibrary.Operations.Models;
 
 using System.Reflection;
 using System.Text;

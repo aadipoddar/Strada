@@ -1,4 +1,6 @@
-using StradaLibrary.Accounts.FinancialAccounting.Models;
+using Strada.Models.Accounts.FinancialAccounting;
+using Strada.Models.Common;
+
 using StradaLibrary.Common;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Utils.ExportUtils;

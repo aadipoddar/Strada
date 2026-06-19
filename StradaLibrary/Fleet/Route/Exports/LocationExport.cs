@@ -1,5 +1,6 @@
+using Strada.Models.Fleet.Route;
+
 using StradaLibrary.Common;
-using StradaLibrary.Fleet.Route.Models;
 using StradaLibrary.Utils.ExportUtils;
 
 namespace StradaLibrary.Fleet.Route.Exports;

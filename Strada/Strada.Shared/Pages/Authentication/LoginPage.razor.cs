@@ -1,10 +1,10 @@
 using Microsoft.JSInterop;
 
+using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
 
 using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Pages.Authentication;
 

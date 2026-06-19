@@ -1,5 +1,7 @@
+using Strada.Models.Common;
+using Strada.Models.Fleet.Trip;
+
 using StradaLibrary.Common;
-using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Operations.Data;
 using StradaLibrary.Utils.ExportUtils;
 using StradaLibrary.Utils.MailUtils;

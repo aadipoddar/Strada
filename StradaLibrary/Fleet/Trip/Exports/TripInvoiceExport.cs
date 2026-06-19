@@ -1,6 +1,8 @@
-using StradaLibrary.Accounts.Masters.Models;
+using Strada.Models.Accounts.Masters;
+using Strada.Models.Common;
+using Strada.Models.Fleet.Trip;
+
 using StradaLibrary.Common;
-using StradaLibrary.Fleet.Trip.Models;
 using StradaLibrary.Utils.ExportUtils;
 
 namespace StradaLibrary.Fleet.Trip.Exports;

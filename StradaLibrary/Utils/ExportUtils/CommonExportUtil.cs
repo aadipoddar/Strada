@@ -1,4 +1,4 @@
-﻿using StradaLibrary.Accounts.Masters.Models;
+﻿using Strada.Models.Accounts.Masters;
 
 using Syncfusion.Drawing;
 

@@ -1,5 +1,6 @@
+using Strada.Models.Fleet.Vehicle;
+
 using StradaLibrary.Common;
-using StradaLibrary.Fleet.Vehicle.Models;
 using StradaLibrary.Utils.ExportUtils;
 
 namespace StradaLibrary.Fleet.Vehicle.Exports;

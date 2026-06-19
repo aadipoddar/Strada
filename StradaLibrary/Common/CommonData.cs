@@ -1,4 +1,6 @@
-﻿using StradaLibrary.DataAccess;
+﻿using Strada.Models.Common;
+
+using StradaLibrary.DataAccess;
 
 namespace StradaLibrary.Common;
 

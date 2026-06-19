@@ -1,5 +1,6 @@
-using StradaLibrary.Accounts.FinancialAccounting.Models;
-using StradaLibrary.Accounts.Masters.Models;
+using Strada.Models.Accounts.FinancialAccounting;
+using Strada.Models.Accounts.Masters;
+
 using StradaLibrary.Utils.ExportUtils;
 
 namespace StradaLibrary.Accounts.FinancialAccounting.Exports;

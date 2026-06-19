@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Components;
 
+using Strada.Models.Operations;
 using Strada.Shared.Components.Input;
 
-using StradaLibrary.Operations.Models;
+using StradaLibrary.Common;
 
 using System.Reflection;
 

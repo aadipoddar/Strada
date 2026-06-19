@@ -1,8 +1,10 @@
+using Strada.Models.Common;
+using Strada.Models.Fleet.OMC;
+using Strada.Models.Operations;
+
 using StradaLibrary.Common;
 using StradaLibrary.DataAccess;
-using StradaLibrary.Fleet.OMC.Models;
 using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
 
 namespace StradaLibrary.Fleet.OMC.Data;
 

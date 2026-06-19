@@ -1,5 +1,7 @@
 ﻿using NumericWordsConversion;
 
+using Strada.Models.Common;
+
 using StradaLibrary.Common;
 
 using Syncfusion.Drawing;
