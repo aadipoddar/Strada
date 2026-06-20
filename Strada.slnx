@@ -16,8 +16,8 @@
     </Project>
   </Folder>
   <Folder Name="/Library/">
-    <Project Path="Strada.Models/Strada.Models.csproj" Id="fcbc2f44-76cd-4aa2-8601-6cc46d9445b1" />
-    <Project Path="StradaLibrary/StradaLibrary.csproj" />
+    <Project Path="Library/Strada.Data/Strada.Data.csproj" />
+    <Project Path="Library/Strada.Models/Strada.Models.csproj" />
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Strada.Tools/Strada.Tools.csproj" />

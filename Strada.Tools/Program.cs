@@ -1,6 +1,6 @@
 ﻿using OfficeOpenXml;
 
-using StradaLibrary.DataAccess;
+using Strada.Data.DataAccess;
 
 SqlDataAccess.SetupConfiguration();
 

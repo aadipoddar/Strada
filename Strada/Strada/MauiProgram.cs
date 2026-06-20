@@ -5,11 +5,10 @@ using Microsoft.Extensions.Logging;
 using Strada.Services;
 using Strada.Shared.Services;
 
-using StradaLibrary.DataAccess;
-
 using Syncfusion.Blazor;
 
 using MudBlazor.Services;
+using Strada.Data.DataAccess;
 
 namespace Strada;
 

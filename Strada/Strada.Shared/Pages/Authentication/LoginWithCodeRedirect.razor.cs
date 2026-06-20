@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Components;
 
+using Strada.Data.Common;
+using Strada.Data.Operations.Data;
 using Strada.Models.Operations;
-
-using StradaLibrary.Common;
-using StradaLibrary.Operations.Data;
 
 namespace Strada.Shared.Pages.Authentication;
 

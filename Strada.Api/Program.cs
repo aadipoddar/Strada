@@ -2,7 +2,7 @@ using Carter;
 
 using Scalar.AspNetCore;
 
-using StradaLibrary.DataAccess;
+using Strada.Data.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
