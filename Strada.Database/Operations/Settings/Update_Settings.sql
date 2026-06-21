@@ -7,6 +7,8 @@ BEGIN
 
 	UPDATE Settings
 	SET [Value] = @Value
-	WHERE [Key] = @Key
+	WHERE [Key] = @Key;
+
+	SELECT @@ROWCOUNT AS RowsAffected;
 
 END

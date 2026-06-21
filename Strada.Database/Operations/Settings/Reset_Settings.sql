@@ -53,4 +53,6 @@ BEGIN
 	-- Notification Settings
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'NotificationEmail', N'ajay@ashokroadlines.com', N'Recipient email for transaction notifications; leave blank to disable emails')
 
+	SELECT 1 AS Success;
+
 END

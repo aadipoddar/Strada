@@ -14,24 +14,17 @@ public static class AuditTrailData
 		(await SqlDataAccess.LoadData<int, dynamic>(OperationNames.InsertAuditTrail, auditTrail, sqlDataAccessTransaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Audit Trail.");
 
-	public static async Task<AuditTrailModel> LoadLastAuditTrailByTableRecord(string TableName, string RecordNo) =>
+	internal static async Task<AuditTrailModel> LoadLastAuditTrailByTableRecord(string TableName, string RecordNo) =>
 		(await SqlDataAccess.LoadData<AuditTrailModel, dynamic>(OperationNames.LoadLastAuditTrailByTableRecord, new { TableName, RecordNo })).FirstOrDefault();
 
-	public static async Task SaveAuditTrail(AuditTrailModel auditTrail, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task SaveAuditTrail(AuditTrailModel auditTrail, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var user = await CommonData.LoadTableDataById<UserModel>(OperationNames.User, auditTrail.CreatedBy, sqlDataAccessTransaction);
 		auditTrail.CreatedByName = user.Name;
 		await InsertAuditTrail(auditTrail, sqlDataAccessTransaction);
 	}
 
-	private static readonly HashSet<string> _ignoredProperties = new(StringComparer.OrdinalIgnoreCase)
-	{
-		"Id", "MasterId", "Status", "MasterStatus",
-		"CreatedBy", "CreatedByName", "CreatedAt", "CreatedFromPlatform",
-		"LastModifiedBy", "LastModifiedByUserName", "LastModifiedAt", "LastModifiedFromPlatform"
-	};
-
-	public static string GetDifference<T>(T previous, T current)
+	internal static string GetDifference<T>(T previous, T current)
 	{
 		var lines = new List<string>();
 
@@ -49,7 +42,7 @@ public static class AuditTrailData
 		return lines.Count == 0 ? null : string.Join(Environment.NewLine, lines);
 	}
 
-	public static string GetDifference<T>(List<T> previous, List<T> current, Type masterType = null)
+	internal static string GetDifference<T>(List<T> previous, List<T> current, Type masterType = null)
 	{
 		previous ??= [];
 		current ??= [];
@@ -84,7 +77,7 @@ public static class AuditTrailData
 		return sections.Count == 0 ? null : string.Join(Environment.NewLine, sections);
 	}
 
-	public static string CombineDifferences(params (string Label, string Diff)[] sections)
+	internal static string CombineDifferences(params (string Label, string Diff)[] sections)
 	{
 		var blocks = sections
 			.Where(s => !string.IsNullOrWhiteSpace(s.Diff))
@@ -93,6 +86,13 @@ public static class AuditTrailData
 
 		return blocks.Count == 0 ? null : string.Join(Environment.NewLine + Environment.NewLine, blocks);
 	}
+
+	private static readonly HashSet<string> _ignoredProperties = new(StringComparer.OrdinalIgnoreCase)
+	{
+		"Id", "MasterId", "Status", "MasterStatus",
+		"CreatedBy", "CreatedByName", "CreatedAt", "CreatedFromPlatform",
+		"LastModifiedBy", "LastModifiedByUserName", "LastModifiedAt", "LastModifiedFromPlatform"
+	};
 
 	private static List<PropertyInfo> GetAuditableProperties(Type type, Type excludeFromType = null)
 	{

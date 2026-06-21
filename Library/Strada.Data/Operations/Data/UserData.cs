@@ -12,8 +12,7 @@ public static class UserData
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert User.");
 
 	public static async Task<UserModel> LoadUserByPhoneEmail(string PhoneEmail) =>
-		(await SqlDataAccess.LoadData<UserModel, dynamic>(OperationNames.LoadUserByPhoneEmail, new { PhoneEmail })).FirstOrDefault()
-			is var user and not null ? user : throw new Exception("User not found with the provided phone or email.");
+		(await SqlDataAccess.LoadData<UserModel, dynamic>(OperationNames.LoadUserByPhoneEmail, new { PhoneEmail })).FirstOrDefault();
 
 	public static async Task ResetInsertUser(UserModel user)
 	{

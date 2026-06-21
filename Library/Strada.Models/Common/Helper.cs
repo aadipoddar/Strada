@@ -4,6 +4,7 @@ namespace Strada.Models.Common;
 
 public static class Helper
 {
+	#region Formats
 	public static string RemoveSpace(this string str) =>
 		str.Replace(" ", "");
 
@@ -48,7 +49,9 @@ public static class Helper
 			_ => "same as last month"
 		};
 	}
+	#endregion
 
+	#region Validation
 	public static bool ValidatePhoneNumber(this string phoneNumber)
 	{
 		if (string.IsNullOrWhiteSpace(phoneNumber))
@@ -69,7 +72,13 @@ public static class Helper
 		}
 		catch { return false; }
 	}
+	#endregion
 
+	#region API
 	public static string SanitizeClassName(this string str) =>
 		str.Replace("Endpoint", "").Replace("Controller", "").Replace("Data", "");
+
+	public static string MakeRouteFromEndpointFunction(this string endpoint, string functionName) =>
+		$"{endpoint}/{functionName}";
+	#endregion
 }
