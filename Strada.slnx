@@ -16,6 +16,7 @@
     </Project>
   </Folder>
   <Folder Name="/Library/">
+    <Project Path="Library/Strada.Data.Client/Strada.Data.Client.csproj" />
     <Project Path="Library/Strada.Data/Strada.Data.csproj" />
     <Project Path="Library/Strada.Models/Strada.Models.csproj" />
   </Folder>

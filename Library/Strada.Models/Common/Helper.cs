@@ -22,6 +22,17 @@ public static class Helper
 	public static string FormatDecimalWithTwoDigits(this decimal value) =>
 		value.ToString("0.00", CultureInfo.InvariantCulture);
 
+	// shows integer if no decimal part otherwise shows 2 decimal places (2.0 -> "2", 2.05 -> "2.05", 2.5666 -> "2.57")
+	public static string FormatSmartDecimal(this decimal value)
+	{
+		decimal rounded = Math.Round(value, 2);
+
+		if (rounded == Math.Floor(rounded))
+			return rounded.ToString("0", CultureInfo.InvariantCulture);
+		else
+			return rounded.ToString("0.##", CultureInfo.InvariantCulture);
+	}
+
 	public static string FormatMonthlyTrend(decimal current, decimal previous)
 	{
 		if (previous == 0)
@@ -36,24 +47,6 @@ public static class Helper
 			< 0 => $"▼ {Math.Abs(change):0}% vs last month",
 			_ => "same as last month"
 		};
-	}
-
-	/// <summary>
-	/// Formats decimal smartly: shows integer if no decimal part (2.0 -> "2"), 
-	/// otherwise shows 2 decimal places (2.05 -> "2.05", 2.5666 -> "2.57")
-	/// </summary>
-	public static string FormatSmartDecimal(this decimal value)
-	{
-		// Round to 2 decimal places
-		decimal rounded = Math.Round(value, 2);
-
-		// Check if the decimal part is zero
-		if (rounded == Math.Floor(rounded))
-			// No decimal part, show as integer
-			return rounded.ToString("0", CultureInfo.InvariantCulture);
-		else
-			// Has decimal part, show 2 decimal places
-			return rounded.ToString("0.##", CultureInfo.InvariantCulture);
 	}
 
 	public static bool ValidatePhoneNumber(this string phoneNumber)
@@ -76,4 +69,7 @@ public static class Helper
 		}
 		catch { return false; }
 	}
+
+	public static string SanitizeClassName(this string str) =>
+		str.Replace("Endpoint", "").Replace("Controller", "").Replace("Data", "");
 }

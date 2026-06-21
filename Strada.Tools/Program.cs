@@ -1,23 +1,17 @@
-﻿using OfficeOpenXml;
+﻿//SqlDataAccess.SetupConfiguration();
 
-using Strada.Data.DataAccess;
+//FileInfo fileInfo = new(@"C:\Others\document.xlsx");
 
-SqlDataAccess.SetupConfiguration();
+//ExcelPackage.License.SetNonCommercialPersonal("AadiSoft");
 
-FileInfo fileInfo = new(@"C:\Others\document.xlsx");
+//using var package = new ExcelPackage(fileInfo);
 
-ExcelPackage.License.SetNonCommercialPersonal("AadiSoft");
+//await package.LoadAsync(fileInfo);
 
-using var package = new ExcelPackage(fileInfo);
-
-await package.LoadAsync(fileInfo);
-
-var worksheet1 = package.Workbook.Worksheets[0];
+//var worksheet1 = package.Workbook.Worksheets[0];
 // var worksheet2 = package.Workbook.Worksheets[1];
 
-
 Console.WriteLine("Finished importing Items.");
-Console.ReadLine();
 
 #region Unused
 
@@ -243,4 +237,40 @@ static async Task ImportVehicleDocuments(ExcelWorksheet worksheet1)
 }
 
  */
+#endregion
+
+#region API
+
+/*
+
+// Test-only: accept the local ASP.NET Core dev cert without trust fuss.
+var handler = new HttpClientHandler
+{
+	ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+};
+
+// Point at the running Strada.Api (https profile). Run Strada.Api first, then this.
+Api.Init(new HttpClient(handler) { BaseAddress = new("https://localhost:7078/") });
+
+var json = new JsonSerializerOptions { WriteIndented = true };
+
+Console.Write("Phone/email to look up: ");
+var phoneEmail = Console.ReadLine() ?? "";
+
+try
+{
+	var user = await UserData.LoadUserByPhoneEmail(phoneEmail);
+	Console.WriteLine(user is null
+	? "No user found."
+	: JsonSerializer.Serialize(user, json));
+
+}
+catch (Exception ex)
+{
+	Console.WriteLine(ex.Message);
+}
+
+Console.ReadLine();
+
+*/
 #endregion
