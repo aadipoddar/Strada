@@ -2,13 +2,13 @@ using Strada.Data.Accounts.FinancialAccounting.Exports;
 using Strada.Data.Accounts.Masters.Data;
 using Strada.Data.Common;
 using Strada.Data.DataAccess;
-using Strada.Data.Fleet.Bill;
+using Strada.Data.Fleet.Bill.Data;
 using Strada.Data.Fleet.OMC.Data;
 using Strada.Data.Operations.Data;
-using Strada.Data.Utils.ExportUtils;
 using Strada.Data.Utils.MailUtils;
 using Strada.Models.Accounts.FinancialAccounting;
 using Strada.Models.Common;
+using Strada.Models.Exports;
 using Strada.Models.Operations;
 
 namespace Strada.Data.Accounts.FinancialAccounting.Data;
@@ -28,23 +28,6 @@ public static class FinancialAccountingData
 
 	public static async Task<List<TrialBalanceModel>> LoadTrialBalanceByCompanyDate(int CompanyId, DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<TrialBalanceModel, dynamic>(AccountNames.LoadTrialBalanceByCompanyDate, new { CompanyId, StartDate, EndDate });
-
-	public static List<FinancialAccountingLedgerModel> ConvertCartToDetails(List<FinancialAccountingLedgerCartModel> cart, int masterId = 0) =>
-		[.. cart.Select(item => new FinancialAccountingLedgerModel
-		{
-			Id = 0,
-			MasterId = masterId,
-			LedgerId = item.LedgerId,
-			Credit = item.Credit,
-			Debit = item.Debit,
-			ReferenceType = item.ReferenceType,
-			ReferenceId = item.ReferenceId,
-			ReferenceNo = item.ReferenceNo,
-			InstrumentNo = item.InstrumentNo,
-			InstrumentDate = item.InstrumentDate,
-			Remarks = item.Remarks,
-			Status = true
-		})];
 
 	public static async Task DeleteTransaction(FinancialAccountingModel accounting, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{

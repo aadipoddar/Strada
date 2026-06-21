@@ -3,6 +3,7 @@
 using Strada.Data.Common;
 using Strada.Models.Accounts.Masters;
 using Strada.Models.Common;
+using Strada.Models.Exports;
 
 using Syncfusion.Drawing;
 using Syncfusion.Pdf;
@@ -14,11 +15,11 @@ using System.Text.RegularExpressions;
 
 namespace Strada.Data.Utils.ExportUtils;
 
-public static class PDFInvoiceExportUtil
+internal static class PDFInvoiceExportUtil
 {
 	private static PdfLayoutFormat _layoutFormat;
 
-	#region Public Methods
+	#region Internal Methods
 
 	/// <summary>
 	/// Export invoice to PDF with professional layout (unified method for all transaction types)
@@ -30,7 +31,7 @@ public static class PDFInvoiceExportUtil
 	/// <param name="columnOrder">Optional: Custom column order for line items table</param>
 	/// <param name="summaryFields">Optional: Custom summary fields to display (key=label, value=formatted value)</param>
 	/// <returns>MemoryStream containing the PDF file</returns>
-	public static async Task<MemoryStream> ExportInvoiceToPdf<T>(
+	internal static async Task<MemoryStream> ExportInvoiceToPdf<T>(
 		InvoiceData invoiceData,
 		List<T> lineItems,
 		List<InvoiceColumnSetting> columnSettings = null,

@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Library\Strada.Data\Strada.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Carter" />
+  </ItemGroup>
+
 </Project>

@@ -1,25 +1,14 @@
 ﻿using Strada.Models.Accounts.Masters;
+using Strada.Models.Exports;
 
 using Syncfusion.Drawing;
 
 namespace Strada.Data.Utils.ExportUtils;
 
-public enum InvoiceExportType
-{
-	PDF,
-	Excel
-}
-
-public enum ReportExportType
-{
-	PDF,
-	Excel
-}
-
 /// <summary>
 /// Generic invoice header data that works with any transaction type
 /// </summary>
-public class InvoiceData
+internal class InvoiceData
 {
 	public string TransactionNo { get; set; } = string.Empty;
 	public DateTime TransactionDateTime { get; set; }
@@ -38,7 +27,7 @@ public class InvoiceData
 	public string OCM { get; set; } = string.Empty;
 }
 
-public enum CellAlignment
+internal enum CellAlignment
 {
 	Left,
 	Center,
@@ -48,7 +37,7 @@ public enum CellAlignment
 /// <summary>
 /// Column configuration for invoice line items table
 /// </summary>
-public class InvoiceColumnSetting(string propertyName, string displayName, InvoiceExportType exportType, CellAlignment alignment = CellAlignment.Right,
+internal class InvoiceColumnSetting(string propertyName, string displayName, InvoiceExportType exportType, CellAlignment alignment = CellAlignment.Right,
 	double? pdfWidth = null, double? excelWidth = null, string format = null, bool showOnlyIfHasValue = true)
 {
 	public string PropertyName { get; set; } = propertyName;
@@ -64,7 +53,7 @@ public class InvoiceColumnSetting(string propertyName, string displayName, Invoi
 /// <summary>
 /// Column configuration for report exports (unified for PDF and Excel)
 /// </summary>
-public class ReportColumnSetting
+internal class ReportColumnSetting
 {
 	public string DisplayName { get; set; }
 	public CellAlignment Alignment { get; set; } = CellAlignment.Right;
@@ -81,7 +70,7 @@ public class ReportColumnSetting
 /// <summary>
 /// Format information for report cell formatting
 /// </summary>
-public class ReportFormatInfo
+internal class ReportFormatInfo
 {
 	public Color? FontColor { get; set; }
 	public bool Bold { get; set; }

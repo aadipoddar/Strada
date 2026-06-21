@@ -13,36 +13,6 @@ public static class FinancialYearData
 		(await SqlDataAccess.LoadData<int, dynamic>(AccountNames.InsertFinancialYear, financialYear, transaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Financial Year.");
 
-	public static async Task DeleteTransaction(FinancialYearModel financialYear, int userId, string platform) =>
-		await SqlDataAccessTransaction.Run(async transaction =>
-		{
-			financialYear.Status = false;
-			await InsertFinancialYear(financialYear, transaction);
-			await AuditTrailData.SaveAuditTrail(new()
-			{
-				Action = AuditTrailActionTypes.Delete.ToString(),
-				TableName = AccountNames.FinancialYear,
-				RecordNo = $"FY{financialYear.YearNo}",
-				CreatedBy = userId,
-				CreatedFromPlatform = platform
-			}, transaction);
-		});
-
-	public static async Task RecoverTransaction(FinancialYearModel financialYear, int userId, string platform) =>
-		await SqlDataAccessTransaction.Run(async transaction =>
-		{
-			financialYear.Status = true;
-			await InsertFinancialYear(financialYear, transaction);
-			await AuditTrailData.SaveAuditTrail(new()
-			{
-				Action = AuditTrailActionTypes.Recover.ToString(),
-				TableName = AccountNames.FinancialYear,
-				RecordNo = $"FY{financialYear.YearNo}",
-				CreatedBy = userId,
-				CreatedFromPlatform = platform
-			}, transaction);
-		});
-
 	public static async Task<FinancialYearModel> LoadFinancialYearByDateTime(DateTime TransactionDateTime, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<FinancialYearModel, dynamic>(AccountNames.LoadFinancialYearByDateTime, new { TransactionDateTime }, sqlDataAccessTransaction)).FirstOrDefault();
 
@@ -56,61 +26,6 @@ public static class FinancialYearData
 
 		if (!financialYear.Status)
 			throw new InvalidOperationException("The financial year for the given date is inactive.");
-	}
-
-	private static async Task ValidateTransaction(FinancialYearModel item)
-	{
-		item.Remarks = string.IsNullOrWhiteSpace(item.Remarks) ? null : item.Remarks.Trim();
-		item.Status = true;
-
-		if (item.StartDate == default)
-			throw new Exception("Start date is required. Please select a valid start date.");
-
-		if (item.EndDate == default)
-			throw new Exception("End date is required. Please select a valid end date.");
-
-		if (item.EndDate <= item.StartDate)
-			throw new Exception("End date must be after start date. Please select a valid end date.");
-
-		if (item.YearNo <= 0)
-			throw new Exception("Year number must be greater than 0. Please enter a valid year number.");
-
-		var allFinancialYears = await CommonData.LoadTableData<FinancialYearModel>(AccountNames.FinancialYear);
-
-		var overlapping = allFinancialYears.FirstOrDefault(x =>
-			x.Id != item.Id &&
-			((x.StartDate <= item.StartDate && x.EndDate >= item.StartDate) ||
-			 (x.StartDate <= item.EndDate && x.EndDate >= item.EndDate) ||
-			 (item.StartDate <= x.StartDate && item.EndDate >= x.EndDate)));
-
-		if (overlapping is not null)
-			throw new Exception($"Date range overlaps with existing financial year ({overlapping.StartDate:dd-MMM-yyyy} to {overlapping.EndDate:dd-MMM-yyyy}).");
-	}
-
-	public static async Task<int> SaveTransaction(FinancialYearModel financialYear, int userId, string platform)
-	{
-		await ValidateTransaction(financialYear);
-
-		var isUpdate = financialYear.Id > 0;
-		var previous = isUpdate
-			? await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, financialYear.Id)
-			: null;
-
-		return await SqlDataAccessTransaction.Run(async transaction =>
-		{
-			var id = await InsertFinancialYear(financialYear, transaction);
-			var diff = AuditTrailData.GetDifference(previous, financialYear);
-			await AuditTrailData.SaveAuditTrail(new()
-			{
-				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
-				TableName = AccountNames.FinancialYear,
-				RecordNo = $"FY{financialYear.YearNo}",
-				RecordValue = isUpdate ? diff : null,
-				CreatedBy = userId,
-				CreatedFromPlatform = platform
-			}, transaction);
-			return id;
-		});
 	}
 
 	public static async Task<(DateTime FromDate, DateTime ToDate)> GetDateRange(DateRangeType rangeType, DateTime referenceFromDate, DateTime referenceToDate)
@@ -203,5 +118,90 @@ public static class FinancialYearData
 		}
 
 		return (newFromDate, newToDate);
+	}
+
+	public static async Task DeleteTransaction(FinancialYearModel financialYear, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			financialYear.Status = false;
+			await InsertFinancialYear(financialYear, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Delete.ToString(),
+				TableName = AccountNames.FinancialYear,
+				RecordNo = $"FY{financialYear.YearNo}",
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	public static async Task RecoverTransaction(FinancialYearModel financialYear, int userId, string platform) =>
+		await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			financialYear.Status = true;
+			await InsertFinancialYear(financialYear, transaction);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = AuditTrailActionTypes.Recover.ToString(),
+				TableName = AccountNames.FinancialYear,
+				RecordNo = $"FY{financialYear.YearNo}",
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+		});
+
+	private static async Task ValidateTransaction(FinancialYearModel item)
+	{
+		item.Remarks = string.IsNullOrWhiteSpace(item.Remarks) ? null : item.Remarks.Trim();
+		item.Status = true;
+
+		if (item.StartDate == default)
+			throw new Exception("Start date is required. Please select a valid start date.");
+
+		if (item.EndDate == default)
+			throw new Exception("End date is required. Please select a valid end date.");
+
+		if (item.EndDate <= item.StartDate)
+			throw new Exception("End date must be after start date. Please select a valid end date.");
+
+		if (item.YearNo <= 0)
+			throw new Exception("Year number must be greater than 0. Please enter a valid year number.");
+
+		var allFinancialYears = await CommonData.LoadTableData<FinancialYearModel>(AccountNames.FinancialYear);
+
+		var overlapping = allFinancialYears.FirstOrDefault(x =>
+			x.Id != item.Id &&
+			((x.StartDate <= item.StartDate && x.EndDate >= item.StartDate) ||
+			 (x.StartDate <= item.EndDate && x.EndDate >= item.EndDate) ||
+			 (item.StartDate <= x.StartDate && item.EndDate >= x.EndDate)));
+
+		if (overlapping is not null)
+			throw new Exception($"Date range overlaps with existing financial year ({overlapping.StartDate:dd-MMM-yyyy} to {overlapping.EndDate:dd-MMM-yyyy}).");
+	}
+
+	public static async Task<int> SaveTransaction(FinancialYearModel financialYear, int userId, string platform)
+	{
+		await ValidateTransaction(financialYear);
+
+		var isUpdate = financialYear.Id > 0;
+		var previous = isUpdate
+			? await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, financialYear.Id)
+			: null;
+
+		return await SqlDataAccessTransaction.Run(async transaction =>
+		{
+			var id = await InsertFinancialYear(financialYear, transaction);
+			var diff = AuditTrailData.GetDifference(previous, financialYear);
+			await AuditTrailData.SaveAuditTrail(new()
+			{
+				Action = isUpdate ? AuditTrailActionTypes.Update.ToString() : AuditTrailActionTypes.Insert.ToString(),
+				TableName = AccountNames.FinancialYear,
+				RecordNo = $"FY{financialYear.YearNo}",
+				RecordValue = isUpdate ? diff : null,
+				CreatedBy = userId,
+				CreatedFromPlatform = platform
+			}, transaction);
+			return id;
+		});
 	}
 }

@@ -5,15 +5,15 @@ using Strada.Data.DataAccess;
 using Strada.Data.Fleet.Bill.Exports;
 using Strada.Data.Fleet.Trip;
 using Strada.Data.Operations.Data;
-using Strada.Data.Utils.ExportUtils;
 using Strada.Data.Utils.MailUtils;
 using Strada.Models.Accounts.FinancialAccounting;
 using Strada.Models.Common;
+using Strada.Models.Exports;
 using Strada.Models.Fleet.Bill;
 using Strada.Models.Fleet.Trip;
 using Strada.Models.Operations;
 
-namespace Strada.Data.Fleet.Bill;
+namespace Strada.Data.Fleet.Bill.Data;
 
 public static class BillData
 {
@@ -350,7 +350,7 @@ public static class BillData
 			Status = true
 		};
 
-		var ledgers = FinancialAccountingData.ConvertCartToDetails(accountingCart, accounting.Id);
+		var ledgers = accountingCart.ConvertCartToDetails(accounting.Id);
 		accounting.Id = await FinancialAccountingData.SaveTransaction(accounting, ledgers, false, sqlDataAccessTransaction);
 
 		bill.FinancialAccountingId = accounting.Id;

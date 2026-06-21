@@ -3,6 +3,7 @@
 using Strada.Data.Common;
 using Strada.Models.Accounts.Masters;
 using Strada.Models.Common;
+using Strada.Models.Exports;
 
 using Syncfusion.Drawing;
 using Syncfusion.XlsIO;
@@ -12,7 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace Strada.Data.Utils.ExportUtils;
 
-public static class ExcelInvoiceExportUtil
+internal static class ExcelInvoiceExportUtil
 {
 	#region Color Definitions
 
@@ -26,7 +27,7 @@ public static class ExcelInvoiceExportUtil
 
 	#endregion
 
-	#region Public Methods
+	#region Internal Methods
 
 	/// <summary>
 	/// Export invoice to Excel with professional layout (unified method for all transaction types)
@@ -38,7 +39,7 @@ public static class ExcelInvoiceExportUtil
 	/// <param name="columnOrder">Optional: Custom column order for line items table</param>
 	/// <param name="summaryFields">Optional: Custom summary fields to display (key=label, value=formatted value)</param>
 	/// <returns>MemoryStream containing the Excel file</returns>
-	public static async Task<MemoryStream> ExportInvoiceToExcel<T>(
+	internal static async Task<MemoryStream> ExportInvoiceToExcel<T>(
 		InvoiceData invoiceData,
 		List<T> lineItems,
 		List<InvoiceColumnSetting> columnSettings = null,

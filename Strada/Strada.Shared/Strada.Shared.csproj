@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <Using Include="Strada.Models.Common" />
+    <Using Include="Strada.Models.Exports" />
     <Using Include="Strada.Shared.Services" />
   </ItemGroup>
 

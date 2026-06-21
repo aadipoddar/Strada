@@ -3,6 +3,7 @@ using Strada.Data.Fleet.Trip;
 using Strada.Data.Utils.ExportUtils;
 using Strada.Models.Accounts.Masters;
 using Strada.Models.Common;
+using Strada.Models.Exports;
 using Strada.Models.Fleet.Bill;
 using Strada.Models.Fleet.Trip;
 

@@ -4,10 +4,10 @@ using Strada.Data.Common;
 using Strada.Data.DataAccess;
 using Strada.Data.Fleet.OMC.Exports;
 using Strada.Data.Operations.Data;
-using Strada.Data.Utils.ExportUtils;
 using Strada.Data.Utils.MailUtils;
 using Strada.Models.Accounts.FinancialAccounting;
 using Strada.Models.Common;
+using Strada.Models.Exports;
 using Strada.Models.Fleet.OMC;
 using Strada.Models.Operations;
 
@@ -271,7 +271,7 @@ public static class OMCCardMoneyTransferData
 			Status = true
 		};
 
-		var ledgers = FinancialAccountingData.ConvertCartToDetails(accountingCart, accounting.Id);
+		var ledgers = accountingCart.ConvertCartToDetails(accounting.Id);
 		accounting.Id = await FinancialAccountingData.SaveTransaction(accounting, ledgers, false, sqlDataAccessTransaction);
 
 		oMCCardMoneyTransfer.FinancialAccountingId = accounting.Id;

@@ -1,5 +1,3 @@
-using Carter;
-
 using Strada.Data.Common;
 using Strada.Models.Common;
 

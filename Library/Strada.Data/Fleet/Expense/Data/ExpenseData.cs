@@ -3,9 +3,9 @@ using Strada.Data.Common;
 using Strada.Data.DataAccess;
 using Strada.Data.Fleet.Expense.Exports;
 using Strada.Data.Operations.Data;
-using Strada.Data.Utils.ExportUtils;
 using Strada.Data.Utils.MailUtils;
 using Strada.Models.Common;
+using Strada.Models.Exports;
 using Strada.Models.Fleet.Expense;
 using Strada.Models.Operations;
 

@@ -1,5 +1,6 @@
 using Strada.Data.Common;
 using Strada.Data.Utils.ExportUtils;
+using Strada.Models.Exports;
 using Strada.Models.Fleet.Vehicle;
 
 namespace Strada.Data.Fleet.Vehicle.Exports;
