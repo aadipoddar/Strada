@@ -57,8 +57,12 @@ public static class Api
 			return string.Empty;
 
 		var pairs = query.GetType().GetProperties()
-			.Select(p => $"{p.Name}={Uri.EscapeDataString(p.GetValue(query)?.ToString() ?? string.Empty)}");
+			.Select(p => (p.Name, Value: p.GetValue(query)))
+			.Where(p => p.Value is not null)   // omit nulls so optional API params bind as null, not ""
+			.Select(p => $"{p.Name}={Uri.EscapeDataString(p.Value.ToString())}");
 
-		return "?" + string.Join("&", pairs);
+		var queryString = string.Join("&", pairs);
+
+		return queryString.Length == 0 ? string.Empty : "?" + queryString;
 	}
 }
