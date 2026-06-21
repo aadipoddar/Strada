@@ -455,7 +455,7 @@ public partial class ExpensePage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var expenses = ExpenseData.ConvertExpensesCartToDetails(_expensesCart, _expense.Id);
+			var expenses = _expensesCart.ConvertExpensesCartToDetails(_expense.Id);
 			_expense.Id = await ExpenseData.SaveTransaction(_expense, expenses);
 			_expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, _expense.Id);
 

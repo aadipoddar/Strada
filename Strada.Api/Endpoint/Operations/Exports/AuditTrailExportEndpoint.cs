@@ -20,7 +20,7 @@ public class AuditTrailExportEndpoint : ICarterModule
 			bool showAllColumns) =>
 		{
 			var (stream, fileName) = await AuditTrailExport.ExportReport(data, exportType, dateRangeStart, dateRangeEnd, showAllColumns);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

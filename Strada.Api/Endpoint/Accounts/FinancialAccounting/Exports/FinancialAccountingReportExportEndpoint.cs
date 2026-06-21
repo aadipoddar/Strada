@@ -18,7 +18,7 @@ public class FinancialAccountingReportExportEndpoint : ICarterModule
 			var (stream, fileName) = await FinancialAccountingReportExport.ExportReport(
 				request.Data, request.ExportType, request.DateRangeStart, request.DateRangeEnd,
 				request.ShowAllColumns, request.ShowDeleted, request.Company, request.Voucher);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 
 		group.MapPost(nameof(FinancialAccountingReportExport.ExportLedgerReport), async (FinancialAccountingLedgerReportRequest request) =>
@@ -26,7 +26,7 @@ public class FinancialAccountingReportExportEndpoint : ICarterModule
 			var (stream, fileName) = await FinancialAccountingReportExport.ExportLedgerReport(
 				request.Data, request.ExportType, request.DateRangeStart, request.DateRangeEnd,
 				request.ShowAllColumns, request.ShowDeleted, request.Company, request.Ledger, request.TrialBalance);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 

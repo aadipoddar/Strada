@@ -15,7 +15,7 @@ public class GroupExportEndpoint : ICarterModule
 		group.MapPost(nameof(GroupExport.ExportMaster), async (IEnumerable<GroupModel> groupData, ReportExportType exportType) =>
 		{
 			var (stream, fileName) = await GroupExport.ExportMaster(groupData, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

@@ -17,14 +17,14 @@ public class ProfitAndLossReportExportEndpoint : ICarterModule
 		{
 			var (stream, fileName) = await ProfitAndLossReportExport.ExportIncomeReport(
 				request.Data, request.ExportType, request.DateRangeStart, request.DateRangeEnd, request.ShowAllColumns, request.Company);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 
 		group.MapPost(nameof(ProfitAndLossReportExport.ExportExpenseReport), async (ProfitAndLossReportRequest request) =>
 		{
 			var (stream, fileName) = await ProfitAndLossReportExport.ExportExpenseReport(
 				request.Data, request.ExportType, request.DateRangeStart, request.DateRangeEnd, request.ShowAllColumns, request.Company);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 

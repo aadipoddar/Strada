@@ -15,7 +15,7 @@ public class FinancialYearExportEndpoint : ICarterModule
 		group.MapPost(nameof(FinancialYearExport.ExportMaster), async (IEnumerable<FinancialYearModel> financialYearData, ReportExportType exportType) =>
 		{
 			var (stream, fileName) = await FinancialYearExport.ExportMaster(financialYearData, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

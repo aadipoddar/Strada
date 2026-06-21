@@ -415,7 +415,7 @@ public partial class OMCCardMoneyTransferPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var transfers = OMCCardMoneyTransferData.ConvertTransfersCartToDetails(_transfersCart, _transfer.Id);
+			var transfers = _transfersCart.ConvertTransfersCartToDetails(_transfer.Id);
 			_transfer.Id = await OMCCardMoneyTransferData.SaveTransaction(_transfer, transfers);
 			_transfer = await CommonData.LoadTableDataById<OMCCardMoneyTransferModel>(FleetNames.OMCCardMoneyTransfer, _transfer.Id);
 

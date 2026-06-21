@@ -18,7 +18,7 @@ public class TrialBalanceReportExportEndpoint : ICarterModule
 			var (stream, fileName) = await TrialBalanceReportExport.ExportReport(
 				request.Data, request.ExportType, request.DateRangeStart, request.DateRangeEnd,
 				request.ShowAllColumns, request.Company, request.Group, request.AccountType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 

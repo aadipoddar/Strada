@@ -15,7 +15,7 @@ public class AccountTypeExportEndpoint : ICarterModule
 		group.MapPost(nameof(AccountTypeExport.ExportMaster), async (IEnumerable<AccountTypeModel> accountTypeData, ReportExportType exportType) =>
 		{
 			var (stream, fileName) = await AccountTypeExport.ExportMaster(accountTypeData, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

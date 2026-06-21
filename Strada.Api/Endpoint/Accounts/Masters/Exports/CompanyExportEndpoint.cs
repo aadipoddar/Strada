@@ -15,7 +15,7 @@ public class CompanyExportEndpoint : ICarterModule
 		group.MapPost(nameof(CompanyExport.ExportMaster), async (IEnumerable<CompanyModel> companyData, ReportExportType exportType) =>
 		{
 			var (stream, fileName) = await CompanyExport.ExportMaster(companyData, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

@@ -15,7 +15,7 @@ public class VoucherExportEndpoint : ICarterModule
 		group.MapPost(nameof(VoucherExport.ExportMaster), async (IEnumerable<VoucherModel> voucherData, ReportExportType exportType) =>
 		{
 			var (stream, fileName) = await VoucherExport.ExportMaster(voucherData, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

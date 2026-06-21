@@ -587,7 +587,7 @@ public partial class BillPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var ledgerPayments = BillData.ConvertLedgerPaymentCartToDetails(_ledgerPaymentsCart, _bill.Id);
+			var ledgerPayments = _ledgerPaymentsCart.ConvertLedgerPaymentCartToDetails(_bill.Id);
 			_bill.Id = await BillData.SaveTransaction(_bill, ledgerPayments, _tripCart);
 			_bill = await CommonData.LoadTableDataById<BillModel>(FleetNames.Bill, _bill.Id);
 

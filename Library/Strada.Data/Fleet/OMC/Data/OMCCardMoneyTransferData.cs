@@ -33,17 +33,6 @@ public static class OMCCardMoneyTransferData
 		}
 	}
 
-	public static List<OMCCardMoneyTransferDetailsModel> ConvertTransfersCartToDetails(List<OMCCardMoneyTransferDetailsCartModel> cart, int masterId = 0) =>
-		[.. cart.Select(item => new OMCCardMoneyTransferDetailsModel
-		{
-			Id = 0,
-			MasterId = masterId,
-			OMCCardId = item.OMCCardId,
-			Amount = item.Amount,
-			Remarks = item.Remarks,
-			Status = true
-		})];
-
 	#region Delete
 	public static async Task DeleteTransaction(OMCCardMoneyTransferModel omcCardMoneyTransfer, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{

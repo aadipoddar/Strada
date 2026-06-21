@@ -824,9 +824,9 @@ public partial class TripPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var expenses = TripData.ConvertExpensesCartToDetails(_expensesCart, _trip.Id);
-			var cardPayments = TripData.ConvertCardPaymentCartToDetails(_cardPaymentsCart, _trip.Id);
-			var ledgerPayments = TripData.ConvertLedgerPaymentCartToDetails(_ledgerPaymentsCart, _trip.Id);
+			var expenses = _expensesCart.ConvertExpensesCartToDetails(_trip.Id);
+			var cardPayments = _cardPaymentsCart.ConvertCardPaymentCartToDetails(_trip.Id);
+			var ledgerPayments = _ledgerPaymentsCart.ConvertLedgerPaymentCartToDetails(_trip.Id);
 			_trip.Id = await TripData.SaveTransaction(_trip, expenses, cardPayments, ledgerPayments);
 			_trip = await CommonData.LoadTableDataById<TripModel>(FleetNames.Trip, _trip.Id);
 

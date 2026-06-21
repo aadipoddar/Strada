@@ -21,19 +21,6 @@ public static class ExpenseData
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertExpenseDetails, expenseDetails, sqlDataAccessTransaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Expense Detail.");
 
-	public static List<ExpenseDetailsModel> ConvertExpensesCartToDetails(List<ExpenseDetailsCartModel> cart, int masterId = 0) =>
-		[.. cart.Select(item => new ExpenseDetailsModel
-		{
-			Id = 0,
-			MasterId = masterId,
-			ExpenseTypeId = item.ExpenseTypeId,
-			LedgerId = item.LedgerId,
-			Amount = item.Amount,
-			IdentificationNo = item.IdentificationNo,
-			Remarks = item.Remarks,
-			Status = true
-		})];
-
 	public static async Task DeleteTransaction(ExpenseModel expense, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		if (sqlDataAccessTransaction is null)

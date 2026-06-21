@@ -15,7 +15,7 @@ public class StateUTExportEndpoint : ICarterModule
 		group.MapPost(nameof(StateUTExport.ExportMaster), async (IEnumerable<StateUTModel> stateUTData, ReportExportType exportType) =>
 		{
 			var (stream, fileName) = await StateUTExport.ExportMaster(stateUTData, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

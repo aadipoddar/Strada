@@ -17,14 +17,14 @@ public class BalanceSheetReportExportEndpoint : ICarterModule
 		{
 			var (stream, fileName) = await BalanceSheetReportExport.ExportAssetsReport(
 				request.Data, request.ExportType, request.DateRangeStart, request.DateRangeEnd, request.ShowAllColumns, request.Company);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 
 		group.MapPost(nameof(BalanceSheetReportExport.ExportLiabilitiesReport), async (BalanceSheetReportRequest request) =>
 		{
 			var (stream, fileName) = await BalanceSheetReportExport.ExportLiabilitiesReport(
 				request.Data, request.ExportType, request.DateRangeStart, request.DateRangeEnd, request.ShowAllColumns, request.Company);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 

@@ -15,7 +15,7 @@ public class LedgerExportEndpoint : ICarterModule
 		group.MapPost(nameof(LedgerExport.ExportMaster), async (IEnumerable<LedgerModel> ledgerData, ReportExportType exportType) =>
 		{
 			var (stream, fileName) = await LedgerExport.ExportMaster(ledgerData, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }

@@ -35,17 +35,6 @@ public static class BillData
 		}
 	}
 
-	public static List<BillLedgerPaymentsModel> ConvertLedgerPaymentCartToDetails(List<BillLedgerPaymentsCartModel> cart, int masterId = 0) =>
-		[.. cart.Select(item => new BillLedgerPaymentsModel
-		{
-			Id = 0,
-			MasterId = masterId,
-			LedgerId = item.LedgerId,
-			Amount = item.Amount,
-			Remarks = item.Remarks,
-			Status = true
-		})];
-
 	#region Delete
 	public static async Task DeleteTransaction(BillModel bill, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{

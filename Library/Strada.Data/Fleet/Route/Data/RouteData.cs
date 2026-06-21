@@ -13,6 +13,34 @@ public static class RouteData
 		(await SqlDataAccess.LoadData<int, dynamic>(FleetNames.InsertRoute, route, transaction)).FirstOrDefault()
 			is var id and > 0 ? id : throw new InvalidOperationException("Failed to Insert Route.");
 
+	public static async Task<List<RouteOverviewModel>> LoadRouteOverview()
+	{
+		var routes = await CommonData.LoadTableData<RouteModel>(FleetNames.Route);
+		routes = [.. routes.Where(r => r.Status)];
+		var locations = await CommonData.LoadTableData<LocationModel>(FleetNames.Location);
+		List<RouteOverviewModel> routeLocations = [];
+
+		foreach (var route in routes)
+			routeLocations.Add(new()
+			{
+				Id = route.Id,
+				FromLocationId = route.FromLocationId,
+				FromLocationName = locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name ?? string.Empty,
+				ToLocationId = route.ToLocationId,
+				ToLocationName = locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name ?? string.Empty,
+				RouteDisplay = $"{locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name ?? route.FromLocationId.ToString()} - {locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name ?? route.ToLocationId.ToString()}",
+				Code = route.Code,
+				EstimatedHours = route.EstimatedHours,
+				EstimatedDistance = route.EstimatedDistance,
+				EstimatedFuelConsumption = route.EstimatedFuelConsumption,
+				EstimatedCost = route.EstimatedCost,
+				Remarks = route.Remarks,
+				Status = route.Status
+			});
+
+		return routeLocations;
+	}
+
 	public static async Task DeleteTransaction(RouteModel route, int userId, string platform) =>
 		await SqlDataAccessTransaction.Run(async transaction =>
 		{
@@ -42,34 +70,6 @@ public static class RouteData
 				CreatedFromPlatform = platform
 			}, transaction);
 		});
-
-	public static async Task<List<RouteOverviewModel>> LoadRouteOverview()
-	{
-		var routes = await CommonData.LoadTableData<RouteModel>(FleetNames.Route);
-		routes = [.. routes.Where(r => r.Status)];
-		var locations = await CommonData.LoadTableData<LocationModel>(FleetNames.Location);
-		List<RouteOverviewModel> routeLocations = [];
-
-		foreach (var route in routes)
-			routeLocations.Add(new()
-			{
-				Id = route.Id,
-				FromLocationId = route.FromLocationId,
-				FromLocationName = locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name ?? string.Empty,
-				ToLocationId = route.ToLocationId,
-				ToLocationName = locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name ?? string.Empty,
-				RouteDisplay = $"{locations.FirstOrDefault(l => l.Id == route.FromLocationId)?.Name ?? route.FromLocationId.ToString()} - {locations.FirstOrDefault(l => l.Id == route.ToLocationId)?.Name ?? route.ToLocationId.ToString()}",
-				Code = route.Code,
-				EstimatedHours = route.EstimatedHours,
-				EstimatedDistance = route.EstimatedDistance,
-				EstimatedFuelConsumption = route.EstimatedFuelConsumption,
-				EstimatedCost = route.EstimatedCost,
-				Remarks = route.Remarks,
-				Status = route.Status
-			});
-
-		return routeLocations;
-	}
 
 	private static async Task ValidateTransaction(RouteModel route)
 	{

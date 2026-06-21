@@ -37,39 +37,6 @@ public static class TripData
 	public static async Task<TripOverviewModel> LoadTripBySlNoFinancialYear(string SlNo, int FinancialYearId, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
 		(await SqlDataAccess.LoadData<TripOverviewModel, dynamic>(FleetNames.LoadTripBySlNoFinancialYear, new { SlNo, FinancialYearId }, sqlDataAccessTransaction)).FirstOrDefault();
 
-	public static List<TripExpensesModel> ConvertExpensesCartToDetails(List<TripExpensesCartModel> cart, int masterId = 0) =>
-		[.. cart.Select(item => new TripExpensesModel
-		{
-			Id = 0,
-			MasterId = masterId,
-			ExpenseTypeId = item.ExpenseTypeId,
-			Amount = item.Amount,
-			Remarks = item.Remarks,
-			Status = true
-		})];
-
-	public static List<TripCardPaymentsModel> ConvertCardPaymentCartToDetails(List<TripCardPaymentsCartModel> cart, int masterId = 0) =>
-		[.. cart.Select(item => new TripCardPaymentsModel
-		{
-			Id = 0,
-			MasterId = masterId,
-			OMCCardId = item.OMCCardId,
-			Amount = item.Amount,
-			Remarks = item.Remarks,
-			Status = true
-		})];
-
-	public static List<TripLedgerPaymentsModel> ConvertLedgerPaymentCartToDetails(List<TripLedgerPaymentsCartModel> cart, int masterId = 0) =>
-		[.. cart.Select(item => new TripLedgerPaymentsModel
-		{
-			Id = 0,
-			MasterId = masterId,
-			LedgerId = item.LedgerId,
-			Amount = item.Amount,
-			Remarks = item.Remarks,
-			Status = true
-		})];
-
 	#region Delete
 	public static async Task DeleteTransaction(TripModel trip, SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
@@ -109,7 +76,6 @@ public static class TripData
 			await OMCCardData.InsertOMCCard(omcCard, sqlDataAccessTransaction);
 		}
 	}
-	#endregion
 
 	public static async Task RecoverTransaction(TripModel trip)
 	{
@@ -121,6 +87,7 @@ public static class TripData
 
 		await TripNotify.Notify(trip.Id, NotifyType.Recovered);
 	}
+	#endregion
 
 	#region Save
 	private static async Task<TripModel> ValidateTransaction(TripModel trip, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)

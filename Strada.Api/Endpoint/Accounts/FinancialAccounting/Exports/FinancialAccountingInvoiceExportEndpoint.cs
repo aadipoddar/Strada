@@ -14,7 +14,7 @@ public class FinancialAccountingInvoiceExportEndpoint : ICarterModule
 		group.MapPost(nameof(FinancialAccountingInvoiceExport.ExportInvoice), async (int transactionId, InvoiceExportType exportType) =>
 		{
 			var (stream, fileName) = await FinancialAccountingInvoiceExport.ExportInvoice(transactionId, exportType);
-			return TypedResults.File(stream.ToArray(), "application/octet-stream", fileName);
+			return TypedResults.File(stream.ToArray(), Helper.ExportContentType, fileName);
 		});
 	}
 }
