@@ -1,0 +1,54 @@
+@page "/users"
+@using Strada.Data.Common
+@using Strada.Models.Common
+@using Strada.Models.Operations
+
+<PageTitle>Users</PageTitle>
+
+<h1>Users (via Strada.Api over WASM)</h1>
+
+@if (_error is not null)
+{
+    <p style="color:red">Error: @_error</p>
+}
+else if (_users is null)
+{
+    <p><em>Loading…</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr><th>Id</th><th>Name</th><th>Phone</th><th>Email</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var u in _users)
+            {
+                <tr>
+                    <td>@u.Id</td>
+                    <td>@u.Name</td>
+                    <td>@u.Phone</td>
+                    <td>@u.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p>@_users.Count user(s) loaded from the database.</p>
+}
+
+@code {
+    private List<UserModel>? _users;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _users = await CommonData.LoadTableData<UserModel>(OperationNames.User);
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+}

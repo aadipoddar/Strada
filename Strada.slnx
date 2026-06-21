@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/App/">
     <Project Path="Strada/Strada.Shared/Strada.Shared.csproj" />
+    <Project Path="Strada/Strada.Wasm/Strada.Wasm.csproj" Id="a5df8379-16b7-49ff-b8d1-c01122ff00c1" />
     <Project Path="Strada/Strada.Web/Strada.Web.csproj" />
     <Project Path="Strada/Strada/Strada.csproj">
       <Deploy />
