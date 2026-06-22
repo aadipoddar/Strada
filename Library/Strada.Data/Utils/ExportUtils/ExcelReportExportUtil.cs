@@ -1,7 +1,5 @@
 ﻿using Strada.Data.Common;
 
-using Strada.Data.DataAccess;
-
 using Syncfusion.Drawing;
 using Syncfusion.XlsIO;
 
@@ -405,7 +403,7 @@ internal static class ExcelReportExportUtil
 		// Company Name
 		IRange companyRange = worksheet.Range[$"A{currentRow}:{colLetter}{currentRow}"];
 		companyRange.Merge();
-		companyRange.Text = Secrets.DatabaseName;
+		companyRange.Text = Helper.DatabaseName;
 		companyRange.CellStyle.Font.Size = 14;
 		companyRange.CellStyle.Font.FontName = "Calibri";
 		companyRange.CellStyle.Font.Bold = true;

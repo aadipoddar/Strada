@@ -137,7 +137,7 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{transactionPrefix}00001", 5, CodeType.FinancialAccounting, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateLedgerCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateLedgerCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<LedgerModel>(AccountNames.Ledger, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.LedgerCodePrefix, sqlDataAccessTransaction)).Value;
@@ -280,7 +280,7 @@ public static class GenerateCodes
 	#endregion
 
 	#region Route
-	public static async Task<string> GenerateLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateLocationCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<LocationModel>(FleetNames.Location, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.LocationCodePrefix, sqlDataAccessTransaction)).Value;
@@ -303,7 +303,7 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{transactionPrefix}00001", 5, CodeType.Location, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateRouteCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateRouteCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<RouteModel>(FleetNames.Route, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.RouteCodePrefix, sqlDataAccessTransaction)).Value;
@@ -326,7 +326,7 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{transactionPrefix}00001", 5, CodeType.Route, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateDriverCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<DriverModel>(FleetNames.Driver, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.DriverCodePrefix, sqlDataAccessTransaction)).Value;
@@ -351,7 +351,7 @@ public static class GenerateCodes
 	#endregion
 
 	#region Tyre
-	public static async Task<string> GenerateTyreCompanyCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateTyreCompanyCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<TyreCompanyModel>(FleetNames.TyreCompany, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.TyreCompanyCodePrefix, sqlDataAccessTransaction)).Value;
@@ -376,7 +376,7 @@ public static class GenerateCodes
 	#endregion
 
 	#region OMC
-	public static async Task<string> GenerateOMCCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateOMCCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<OMCModel>(FleetNames.OMC, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCodePrefix, sqlDataAccessTransaction)).Value;
@@ -399,7 +399,7 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{transactionPrefix}00001", 5, CodeType.OMC, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateOMCCardCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateOMCCardCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<OMCCardModel>(FleetNames.OMCCard, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.OMCCardCodePrefix, sqlDataAccessTransaction)).Value;
@@ -424,7 +424,7 @@ public static class GenerateCodes
 	#endregion
 
 	#region Vehicle
-	public static async Task<string> GenerateVehicleTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateVehicleTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<VehicleTypeModel>(FleetNames.VehicleType, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTypeCodePrefix, sqlDataAccessTransaction)).Value;
@@ -447,7 +447,7 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{transactionPrefix}00001", 5, CodeType.VehicleType, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateVehicleDocumentTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateVehicleDocumentTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<VehicleDocumentTypeModel>(FleetNames.VehicleDocumentType, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.DocumentTypeCodePrefix, sqlDataAccessTransaction)).Value;
@@ -470,7 +470,7 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{transactionPrefix}00001", 5, CodeType.VehicleDocumentType, sqlDataAccessTransaction);
 	}
 
-	public static async Task<string> GenerateExpenseTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
+	internal static async Task<string> GenerateExpenseTypeCode(SqlDataAccessTransaction sqlDataAccessTransaction = null)
 	{
 		var items = await CommonData.LoadTableData<ExpenseTypeModel>(FleetNames.ExpenseType, sqlDataAccessTransaction);
 		var transactionPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ExpenseTypeCodePrefix, sqlDataAccessTransaction)).Value;

@@ -1,5 +1,4 @@
-﻿using Strada.Data.DataAccess;
-using Strada.Models.Operations;
+﻿using Strada.Models.Operations;
 
 using System.Reflection;
 
@@ -53,7 +52,7 @@ public partial class Dashboard
 			InvokeAsync(StateHasChanged);
 		});
 
-		await UpdateService.UpdateAppAsync("aadipoddar", Secrets.DatabaseName, Secrets.DatabaseName, progress, forceUpdate);
+		await UpdateService.UpdateAppAsync("aadipoddar", Helper.DatabaseName, Helper.DatabaseName, progress, forceUpdate);
 
 		_isUpdating = false;
 		StateHasChanged();
@@ -88,7 +87,7 @@ public partial class Dashboard
 
 			if (shouldCheckUpdate)
 			{
-				var hasUpdate = await UpdateService.CheckForUpdatesAsync("aadipoddar", Secrets.DatabaseName, Secrets.DatabaseName, AppVersion);
+				var hasUpdate = await UpdateService.CheckForUpdatesAsync("aadipoddar", Helper.DatabaseName, Helper.DatabaseName, AppVersion);
 				if (hasUpdate)
 					await StartUpdateProcess();
 			}

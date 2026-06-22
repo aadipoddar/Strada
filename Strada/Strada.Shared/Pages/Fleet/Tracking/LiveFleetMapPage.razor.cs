@@ -2,6 +2,7 @@ using Microsoft.JSInterop;
 
 using Strada.Models.Operations;
 using Strada.Data.APIService;
+using Strada.Models.APIService;
 
 namespace Strada.Shared.Pages.Fleet.Tracking;
 

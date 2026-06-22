@@ -4,6 +4,8 @@
 
 <PageTitle>404 - Not Found</PageTitle>
 
+<MudBlazor.MudHotkey Key=JsKey.KeyD KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => NavigationManager.NavigateTo(PageRouteNames.Dashboard)" />
+
 <div class="page_404">
     <div class="container">
         <div class="row">
@@ -41,7 +43,7 @@
     <div class="footer-section">
         <p class="copyright">
             &copy; @DateTime.Now.Year A Product By
-            <a href="@Secrets.AadiSoftWebsite" target="_blank" rel="noopener noreferrer"
+            <a href="@Helper.AadiSoftWebsite" target="_blank" rel="noopener noreferrer"
                class="footer-link">AadiSoft</a>.
             All rights reserved.
         </p>

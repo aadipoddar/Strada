@@ -28,8 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Library\Strada.Data\Strada.Data.csproj" />
     <ProjectReference Include="..\..\Library\Strada.Models\Strada.Models.csproj" />
+    <ProjectReference Include="..\..\Library\Strada.Data.Client\Strada.Data.Client.csproj" Condition="'$(UseDataClient)' == 'true'" />
+    <ProjectReference Include="..\..\Library\Strada.Data\Strada.Data.csproj" Condition="'$(UseDataClient)' != 'true'" />
   </ItemGroup>
 
   <ItemGroup>

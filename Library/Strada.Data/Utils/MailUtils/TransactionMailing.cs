@@ -107,9 +107,9 @@ internal static class TransactionMailing
 		var typeLower = data.TransactionType.ToLower();
 		var intro = data.Action switch
 		{
-			NotifyType.Created => $"A new {typeLower} has been recorded in {Secrets.DatabaseName}. A summary is provided below.",
+			NotifyType.Created => $"A new {typeLower} has been recorded in {Helper.DatabaseName}. A summary is provided below.",
 			NotifyType.Updated => $"An existing {typeLower} has been updated. The changes and current details are summarised below.",
-			NotifyType.Deleted => $"A {typeLower} has been deleted from {Secrets.DatabaseName}. The details are retained below for your records.",
+			NotifyType.Deleted => $"A {typeLower} has been deleted from {Helper.DatabaseName}. The details are retained below for your records.",
 			NotifyType.Recovered => $"A previously deleted {typeLower} has been restored. A summary is provided below.",
 			_ => $"A {typeLower} has been modified. A summary is provided below."
 		};
@@ -184,7 +184,7 @@ internal static class TransactionMailing
                     <!-- Header -->
                     <tr>
                         <td class=""pad-header"" style=""padding: 26px 32px; text-align: center; border-bottom: 1px solid #eef0f2;"">
-                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""{Secrets.DatabaseName}"" style=""max-width: 280px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
+                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""{Helper.DatabaseName}"" style=""max-width: 280px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
                         </td>
                     </tr>
 
@@ -217,7 +217,7 @@ internal static class TransactionMailing
                             <table role=""presentation"" style=""border-collapse: collapse; margin: 4px 0 8px 0;"">
                                 <tr>
                                     <td style=""border-radius: 6px; background-color: #111827;"">
-                                        <a href=""{Secrets.AppWebsite}"" style=""display: inline-block; padding: 11px 22px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600;"">Open in {Secrets.DatabaseName}</a>
+                                        <a href=""{Secrets.AppWebsite}"" style=""display: inline-block; padding: 11px 22px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600;"">Open in {Helper.DatabaseName}</a>
                                     </td>
                                 </tr>
                             </table>
@@ -229,10 +229,10 @@ internal static class TransactionMailing
                     <tr>
                         <td style=""padding: 22px 32px; background-color: #fafafa; border-top: 1px solid #eef0f2;"">
                             <p style=""margin: 0 0 6px 0; color: #9ca3af; font-size: 12px; line-height: 1.6;"">
-                                This is an automated notification from {Secrets.DatabaseName}. Please do not reply to this email.
+                                This is an automated notification from {Helper.DatabaseName}. Please do not reply to this email.
                             </p>
                             <p style=""margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.6;"">
-                                © {DateTime.Now.Year} {Secrets.DatabaseName} · Powered by <a href=""{Secrets.AadiSoftWebsite}"" style=""color: #6b7280; text-decoration: none; font-weight: 600;"">AadiSoft</a>
+                                © {DateTime.Now.Year} {Helper.DatabaseName} · Powered by <a href=""{Helper.AadiSoftWebsite}"" style=""color: #6b7280; text-decoration: none; font-weight: 600;"">AadiSoft</a>
                             </p>
                         </td>
                     </tr>

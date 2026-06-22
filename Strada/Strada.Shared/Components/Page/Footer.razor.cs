@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
 
-using Strada.Data.DataAccess;
-
 using System.Reflection;
 
 namespace Strada.Shared.Components.Page;
@@ -21,5 +19,5 @@ public partial class Footer
 		Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0";
 
 	private static string CopyrightUrl =>
-		Secrets.AadiSoftWebsite;
+		Helper.AadiSoftWebsite;
 }

@@ -3,6 +3,7 @@
 using MimeKit;
 
 using Strada.Data.DataAccess;
+using Strada.Models.Common;
 using Strada.Models.Operations;
 
 namespace Strada.Data.Utils.MailUtils;
@@ -11,7 +12,7 @@ public static class AuthenticationMailing
 {
 	public static async Task SendLoginCodeEmail(UserModel user, string code, string redirectLink, int codeExpiryMinutes)
 	{
-		var subject = $"Your Login Code for {Secrets.DatabaseName}";
+		var subject = $"Your Login Code for {Helper.DatabaseName}";
 		var htmlBody = GenerateLoginCodeEmailHtml(user, code, codeExpiryMinutes, redirectLink);
 		await SendEmailToUser(user.Name, user.Email, subject, htmlBody);
 	}
@@ -66,7 +67,7 @@ public static class AuthenticationMailing
                     <!-- Header -->
                     <tr>
                         <td class=""header-padding"" style=""padding: 30px; text-align: center; background-color: transparent; border-radius: 12px 12px 0 0;"">
-                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""{Secrets.DatabaseName}"" style=""max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
+                            <img src=""{Secrets.OnlineFullLogoPath}"" alt=""{Helper.DatabaseName}"" style=""max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;"" />
                         </td>
                     </tr>
                     
@@ -75,7 +76,7 @@ public static class AuthenticationMailing
                         <td class=""content-padding"" style=""padding: 40px;"">
                             <h2 style=""margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;"">Hello {user.Name},</h2>
                             <p style=""margin: 0 0 30px 0; color: #666666; font-size: 16px; line-height: 1.6;"">
-                                You've requested a login code for your {Secrets.DatabaseName} account. Use the code below to complete your sign-in:
+                                You've requested a login code for your {Helper.DatabaseName} account. Use the code below to complete your sign-in:
                             </p>
                             
                             <!-- Code Box -->
@@ -95,7 +96,7 @@ public static class AuthenticationMailing
                             <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 20px 0;"">
                                 <tr>
                                     <td align=""center"">
-                                        <a href=""{redirectLink}"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);"">Go to {Secrets.DatabaseName} Login</a>
+                                        <a href=""{redirectLink}"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);"">Go to {Helper.DatabaseName} Login</a>
                                     </td>
                                 </tr>
                             </table>
@@ -122,7 +123,7 @@ public static class AuthenticationMailing
                             </p>
                             <p style=""margin: 20px 0 0 0; color: #999999; font-size: 12px; line-height: 1.6;"">
                                 This is an automated message, please do not reply to this email.<br>
-                                <a href=""{Secrets.AadiSoftWebsite}"" style=""color: #2563eb; text-decoration: none;"">Visit our website</a>
+                                <a href=""{Helper.AadiSoftWebsite}"" style=""color: #2563eb; text-decoration: none;"">Visit our website</a>
                             </p>
                         </td>
                     </tr>

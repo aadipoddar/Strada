@@ -83,4 +83,9 @@ public static class Helper
 	public static string MakeRouteFromEndpointFunction(this string endpoint, string functionName) =>
 		$"{endpoint}/{functionName}";
 	#endregion
+
+	#region Constants
+	public static readonly string DatabaseName = "Strada";
+	public static readonly string AadiSoftWebsite = "https://aadisoft.vercel.app";
+	#endregion
 }

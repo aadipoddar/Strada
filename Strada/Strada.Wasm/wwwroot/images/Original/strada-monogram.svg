@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Strada">
+  <title>Strada</title>
+  <g>
+    <path d="M 188 60 C 188 26 68 26 68 110 C 68 124 188 138 188 152 C 188 196 68 196 68 176" fill="none" stroke="#1A1614" stroke-width="22" stroke-linecap="round"/>
+    <path d="M 188 60 C 188 26 68 26 68 110 C 68 124 188 138 188 152 C 188 196 68 196 68 176" fill="none" stroke="#C26B3C" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="8 10"/>
+  </g>
+</svg>
