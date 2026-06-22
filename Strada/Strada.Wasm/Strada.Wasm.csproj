@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Strada.Shared\Strada.Shared.csproj" AdditionalProperties="UseDataClient=true" />
+    <ProjectReference Include="..\..\Library\Strada.Data.Client\Strada.Data.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

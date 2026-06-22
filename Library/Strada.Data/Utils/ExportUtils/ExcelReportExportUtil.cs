@@ -1,4 +1,5 @@
 ﻿using Strada.Data.Common;
+using Strada.Models.Common;
 
 using Syncfusion.Drawing;
 using Syncfusion.XlsIO;

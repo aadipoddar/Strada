@@ -42,6 +42,23 @@ public static class Api
 		return (new MemoryStream(bytes), fileName);
 	}
 
+	public static async Task<T> Upload<T>(string route, Stream file, string fileName, object query = null)
+	{
+		using var content = new MultipartFormDataContent { { new StreamContent(file), "file", fileName } };
+		var response = await _http.PostAsync(route + ToQuery(query), content);
+		await EnsureSuccess(response);
+		return await response.Content.ReadFromJsonAsync<T>(_json);
+	}
+
+	public static async Task<(MemoryStream stream, string contentType)> GetForFile(string route, object query = null)
+	{
+		var response = await _http.GetAsync(route + ToQuery(query));
+		await EnsureSuccess(response);
+
+		var bytes = await response.Content.ReadAsByteArrayAsync();
+		return (new MemoryStream(bytes), response.Content.Headers.ContentType?.ToString());
+	}
+
 	#endregion
 
 	#region Helpers

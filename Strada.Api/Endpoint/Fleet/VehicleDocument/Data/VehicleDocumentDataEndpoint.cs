@@ -12,7 +12,6 @@ public class VehicleDocumentDataEndpoint : ICarterModule
 
 		group.MapPost(nameof(VehicleDocumentData.DeleteTransaction), VehicleDocumentData.DeleteTransaction);
 		group.MapPost(nameof(VehicleDocumentData.RecoverTransaction), VehicleDocumentData.RecoverTransaction);
-
-		// SaveTransaction (file upload) pending the multipart pattern.
+		group.MapPost(nameof(VehicleDocumentData.SaveTransaction), VehicleDocumentData.SaveTransaction);
 	}
 }

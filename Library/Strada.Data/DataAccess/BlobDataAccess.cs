@@ -1,6 +1,8 @@
 ﻿using Azure.Storage;
 using Azure.Storage.Blobs;
 
+using Strada.Models.Common;
+
 namespace Strada.Data.DataAccess;
 
 public static class BlobStorageAccess
@@ -65,10 +67,4 @@ public static class BlobStorageAccess
 
 		return (memoryStream, downloadResponse.Value.Details.ContentType);
 	}
-}
-
-public enum BlobStorageContainers
-{
-	vehicledocument,
-	driverlicense
 }

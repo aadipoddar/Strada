@@ -13,5 +13,8 @@ public static class VehicleDocumentData
 	public static Task RecoverTransaction(VehicleDocumentModel vehicleDocument) =>
 		Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(RecoverTransaction)), vehicleDocument);
 
-	// TODO: SaveTransaction has a Stream (file upload to blob storage) — needs the multipart-upload pattern.
+	// The page uploads the document to blob storage separately (BlobStorageAccess) and passes
+	// only the model here, so this is a plain model post — the real method's Stream overload params default to null.
+	public static Task<int> SaveTransaction(VehicleDocumentModel vehicleDocument) =>
+		Api.Post<int>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(SaveTransaction)), vehicleDocument);
 }

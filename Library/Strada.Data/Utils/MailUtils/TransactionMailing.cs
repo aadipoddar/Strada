@@ -4,6 +4,7 @@ using MimeKit;
 
 using Strada.Data.DataAccess;
 using Strada.Data.Operations.Data;
+using Strada.Models.Common;
 using Strada.Models.Operations;
 
 namespace Strada.Data.Utils.MailUtils;
