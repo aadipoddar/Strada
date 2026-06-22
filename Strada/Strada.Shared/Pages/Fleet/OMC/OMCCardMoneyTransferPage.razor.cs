@@ -70,10 +70,9 @@ public partial class OMCCardMoneyTransferPage
 		_isLoading = false;
 		StateHasChanged();
 
-		await SaveTransactionFile();
+		await SaveTransactionFile(true);
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -335,7 +334,7 @@ public partial class OMCCardMoneyTransferPage
 	#endregion
 
 	#region Saving
-	private async Task UpdateFinancialDetails()
+	private void UpdateFinancialDetails()
 	{
 		foreach (var item in _transfersCart.ToList())
 			if (item.Amount <= 0)
@@ -345,14 +344,15 @@ public partial class OMCCardMoneyTransferPage
 		_transfer.LedgerId = _selectedLedger.Id;
 		_transfer.TotalItems = _transfersCart.Count;
 		_transfer.TotalAmount = _transfersCart.Sum(s => s.Amount);
+	}
 
-		#region Financial Year
+	private async Task PrepareSave()
+	{
 		_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_transfer.TransactionDateTime);
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_transfer.FinancialYearId = _selectedFinancialYear.Id;
 		else
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-		#endregion
 
 		if (Id is null)
 			_transfer.TransactionNo = await GenerateCodes.GenerateOMCCardMoneyTransferTransactionNo(_transfer);
@@ -368,7 +368,7 @@ public partial class OMCCardMoneyTransferPage
 		_transfer.LastModifiedBy = _user.Id;
 	}
 
-	private async Task SaveTransactionFile()
+	private async Task SaveTransactionFile(bool prepareSave = false)
 	{
 		if (_isProcessing || _isLoading)
 			return;
@@ -377,7 +377,8 @@ public partial class OMCCardMoneyTransferPage
 		{
 			_isProcessing = true;
 
-			await UpdateFinancialDetails();
+			UpdateFinancialDetails();
+			if (prepareSave) await PrepareSave();
 
 			if (_transfersCart.Count == 0 || _transfer.Id > 0)
 			{
@@ -394,8 +395,7 @@ public partial class OMCCardMoneyTransferPage
 		}
 		finally
 		{
-			if (_sfTransfersCartGrid is not null)
-				await _sfTransfersCartGrid.Refresh();
+			if (_sfTransfersCartGrid is not null) await _sfTransfersCartGrid.Refresh();
 
 			_isProcessing = false;
 			StateHasChanged();
@@ -409,7 +409,7 @@ public partial class OMCCardMoneyTransferPage
 
 		try
 		{
-			await SaveTransactionFile();
+			await SaveTransactionFile(true);
 			_isProcessing = true;
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);

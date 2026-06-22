@@ -1,4 +1,4 @@
 # Strada
 Fleet Software for Ashok Roadlines
 
-Latest Version = 1.0.3.7
+Latest Version = 1.0.3.8

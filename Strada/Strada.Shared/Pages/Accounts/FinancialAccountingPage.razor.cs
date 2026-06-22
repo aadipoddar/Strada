@@ -72,10 +72,9 @@ public partial class FinancialAccountingPage
 		_isLoading = false;
 		StateHasChanged();
 
-		await SaveTransactionFile();
+		await SaveTransactionFile(true);
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 
 	private async Task ResolveTransaction()
@@ -503,7 +502,7 @@ public partial class FinancialAccountingPage
 	#endregion
 
 	#region Saving
-	private async Task UpdateFinancialDetails()
+	private void UpdateFinancialDetails()
 	{
 		foreach (var item in _cart.ToList())
 		{
@@ -541,14 +540,15 @@ public partial class FinancialAccountingPage
 		_accounting.CompanyId = _selectedCompany.Id;
 		_accounting.VoucherId = _selectedVoucher.Id;
 		_accounting.CreatedBy = _user.Id;
+	}
 
-		#region Financial Year
+	private async Task PrepareSave()
+	{
 		_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_accounting.TransactionDateTime);
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_accounting.FinancialYearId = _selectedFinancialYear.Id;
 		else
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-		#endregion
 
 		if (Id is null)
 			_accounting.TransactionNo = await GenerateCodes.GenerateFinancialAccountingTransactionNo(_accounting);
@@ -564,7 +564,7 @@ public partial class FinancialAccountingPage
 		_accounting.LastModifiedBy = _user.Id;
 	}
 
-	private async Task SaveTransactionFile()
+	private async Task SaveTransactionFile(bool prepareSave = false)
 	{
 		if (_isProcessing || _isLoading)
 			return;
@@ -573,7 +573,8 @@ public partial class FinancialAccountingPage
 		{
 			_isProcessing = true;
 
-			await UpdateFinancialDetails();
+			UpdateFinancialDetails();
+			if (prepareSave) await PrepareSave();
 
 			if (_cart.Count == 0 || _accounting.Id > 0)
 			{
@@ -590,8 +591,7 @@ public partial class FinancialAccountingPage
 		}
 		finally
 		{
-			if (_sfCartGrid is not null)
-				await _sfCartGrid?.Refresh();
+			if (_sfCartGrid is not null) await _sfCartGrid.Refresh();
 
 			_isProcessing = false;
 			StateHasChanged();
@@ -605,7 +605,7 @@ public partial class FinancialAccountingPage
 
 		try
 		{
-			await SaveTransactionFile();
+			await SaveTransactionFile(true);
 			_isProcessing = true;
 			StateHasChanged();
 

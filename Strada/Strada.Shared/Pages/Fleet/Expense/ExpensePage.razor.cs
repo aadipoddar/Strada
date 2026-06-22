@@ -73,10 +73,9 @@ public partial class ExpensePage
 		_isLoading = false;
 		StateHasChanged();
 
-		await SaveTransactionFile();
+		await SaveTransactionFile(true);
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -375,7 +374,7 @@ public partial class ExpensePage
 	#endregion
 
 	#region Saving
-	private async Task UpdateFinancialDetails()
+	private void UpdateFinancialDetails()
 	{
 		foreach (var item in _expensesCart.ToList())
 			if (item.Amount <= 0)
@@ -385,14 +384,15 @@ public partial class ExpensePage
 		_expense.VehicleId = _selectedVehicle.Id;
 		_expense.TotalItems = _expensesCart.Count;
 		_expense.TotalExpense = _expensesCart.Sum(s => s.Amount);
+	}
 
-		#region Financial Year
+	private async Task PrepareSave()
+	{
 		_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_expense.TransactionDateTime);
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_expense.FinancialYearId = _selectedFinancialYear.Id;
 		else
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-		#endregion
 
 		if (Id is null)
 			_expense.TransactionNo = await GenerateCodes.GenerateExpenseTransactionNo(_expense);
@@ -408,7 +408,7 @@ public partial class ExpensePage
 		_expense.LastModifiedBy = _user.Id;
 	}
 
-	private async Task SaveTransactionFile()
+	private async Task SaveTransactionFile(bool prepareSave = false)
 	{
 		if (_isProcessing || _isLoading)
 			return;
@@ -417,7 +417,8 @@ public partial class ExpensePage
 		{
 			_isProcessing = true;
 
-			await UpdateFinancialDetails();
+			UpdateFinancialDetails();
+			if (prepareSave) await PrepareSave();
 
 			if (_expensesCart.Count == 0 || _expense.Id > 0)
 			{
@@ -434,8 +435,7 @@ public partial class ExpensePage
 		}
 		finally
 		{
-			if (_sfExpensesCartGrid is not null)
-				await _sfExpensesCartGrid.Refresh();
+			if (_sfExpensesCartGrid is not null) await _sfExpensesCartGrid.Refresh();
 
 			_isProcessing = false;
 			StateHasChanged();
@@ -449,7 +449,7 @@ public partial class ExpensePage
 
 		try
 		{
-			await SaveTransactionFile();
+			await SaveTransactionFile(true);
 			_isProcessing = true;
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);

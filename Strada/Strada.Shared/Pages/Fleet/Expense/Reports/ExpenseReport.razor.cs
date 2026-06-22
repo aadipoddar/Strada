@@ -77,8 +77,7 @@ public partial class ExpenseReport : IAsyncDisposable
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -343,10 +342,8 @@ public partial class ExpenseReport : IAsyncDisposable
 	private async Task ToggleDetailsView()
 	{
 		_showAllColumns = !_showAllColumns;
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
 	}
 
 	private async Task ToggleDeleted()

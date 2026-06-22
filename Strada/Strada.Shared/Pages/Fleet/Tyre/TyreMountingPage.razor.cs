@@ -62,14 +62,11 @@ public partial class TyreMountingPage
 		_selectedTyreCompany = _tyreCompanies.FirstOrDefault(tc => tc.Id == _tyreMounting.TyreCompanyId);
 		_selectedVehicle = _vehicles.FirstOrDefault(v => v.Id == _tyreMounting.VehicleId);
 
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
-
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 	#endregion
 

@@ -62,8 +62,7 @@ public partial class TrialBalancePage : IAsyncDisposable
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -119,8 +118,7 @@ public partial class TrialBalancePage : IAsyncDisposable
 
 		_trialBalance = [.. query.OrderBy(t => t.LedgerName)];
 
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
 	}
 	#endregion
@@ -200,10 +198,8 @@ public partial class TrialBalancePage : IAsyncDisposable
 	private async Task ToggleDetailsView()
 	{
 		_showAllColumns = !_showAllColumns;
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		StateHasChanged();
-
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
 	}
 
 	private async Task StartAutoRefresh()

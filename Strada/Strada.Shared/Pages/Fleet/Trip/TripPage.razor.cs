@@ -108,10 +108,9 @@ public partial class TripPage
 		_isLoading = false;
 		StateHasChanged();
 
-		await SaveTransactionFile();
+		await SaveTransactionFile(true);
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -718,7 +717,7 @@ public partial class TripPage
 	#endregion
 
 	#region Saving
-	private async Task UpdateFinancialDetails()
+	private void UpdateFinancialDetails()
 	{
 		foreach (var item in _expensesCart.ToList())
 			if (item.Amount <= 0)
@@ -746,14 +745,15 @@ public partial class TripPage
 			_cardPaymentsCart.Clear();
 			_ledgerPaymentsCart.Clear();
 		}
+	}
 
-		#region Financial Year
+	private async Task PrepareSave()
+	{
 		_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_trip.TransactionDateTime);
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_trip.FinancialYearId = _selectedFinancialYear.Id;
 		else
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-		#endregion
 
 		if (Id is null)
 			_trip.TransactionNo = await GenerateCodes.GenerateTripTransactionNo(_trip);
@@ -769,7 +769,7 @@ public partial class TripPage
 		_trip.LastModifiedBy = _user.Id;
 	}
 
-	private async Task SaveTransactionFile()
+	private async Task SaveTransactionFile(bool prepareSave = false)
 	{
 		if (_isProcessing || _isLoading)
 			return;
@@ -778,7 +778,8 @@ public partial class TripPage
 		{
 			_isProcessing = true;
 
-			await UpdateFinancialDetails();
+			UpdateFinancialDetails();
+			if (prepareSave) await PrepareSave();
 
 			if (_expensesCart.Count == 0 || _trip.Id > 0)
 			{
@@ -797,14 +798,9 @@ public partial class TripPage
 		}
 		finally
 		{
-			if (_sfExpensesCartGrid is not null)
-				await _sfExpensesCartGrid.Refresh();
-
-			if (_sfCardPaymentsCartGrid is not null)
-				await _sfCardPaymentsCartGrid.Refresh();
-
-			if (_sfLedgerPaymentsCartGrid is not null)
-				await _sfLedgerPaymentsCartGrid.Refresh();
+			if (_sfExpensesCartGrid is not null) await _sfExpensesCartGrid.Refresh();
+			if (_sfCardPaymentsCartGrid is not null) await _sfCardPaymentsCartGrid.Refresh();
+			if (_sfLedgerPaymentsCartGrid is not null) await _sfLedgerPaymentsCartGrid.Refresh();
 
 			_isProcessing = false;
 			StateHasChanged();
@@ -818,7 +814,7 @@ public partial class TripPage
 
 		try
 		{
-			await SaveTransactionFile();
+			await SaveTransactionFile(true);
 			_isProcessing = true;
 			StateHasChanged();
 

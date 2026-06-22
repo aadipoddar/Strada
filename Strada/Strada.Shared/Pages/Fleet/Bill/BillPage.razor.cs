@@ -93,10 +93,9 @@ public partial class BillPage
 		_isLoading = false;
 		StateHasChanged();
 
-		await SaveTransactionFile();
+		await SaveTransactionFile(true);
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 
 	private async Task LoadData()
@@ -478,7 +477,7 @@ public partial class BillPage
 	#endregion
 
 	#region Saving
-	private async Task UpdateFinancialDetails()
+	private void UpdateFinancialDetails()
 	{
 		foreach (var item in _ledgerPaymentsCart.ToList())
 			if (item.Amount <= 0)
@@ -500,24 +499,19 @@ public partial class BillPage
 		_bill.TotalNetAmount = _tripCart.Sum(s => s.NetAmount) ?? 0;
 		_bill.TotalLedgerPaymentAmount = _ledgerPaymentsCart.Sum(s => s.Amount);
 
-		if (_bill.TotalGrossAmount - _bill.TotalPenaltyAmount != _bill.TotalNetAmount)
-		{
-			_tripCart.Clear();
-			await _toastNotification.ShowAsync("Inconsistent trip amounts detected", "Transaction data has been reset. Please review the trip details and try saving again.", ToastType.Error);
-		}
-
 		_pendingTrips = [.. _allPendingTrips
 			.Where(s => !_tripCart.Any(c => c.Id == s.Id))
 			.Where (s => s.CompanyId == _selectedCompany.Id)
 			.OrderBy(s => s.TransactionDateTime)];
+	}
 
-		#region Financial Year
+	private async Task PrepareSave()
+	{
 		_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_bill.TransactionDateTime);
 		if (_selectedFinancialYear is not null && !_selectedFinancialYear.Locked)
 			_bill.FinancialYearId = _selectedFinancialYear.Id;
 		else
 			await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
-		#endregion
 
 		if (Id is null)
 			_bill.TransactionNo = await GenerateCodes.GenerateBillTransactionNo(_bill);
@@ -533,7 +527,7 @@ public partial class BillPage
 		_bill.LastModifiedBy = _user.Id;
 	}
 
-	private async Task SaveTransactionFile()
+	private async Task SaveTransactionFile(bool prepareSave = false)
 	{
 		if (_isProcessing || _isLoading)
 			return;
@@ -542,7 +536,8 @@ public partial class BillPage
 		{
 			_isProcessing = true;
 
-			await UpdateFinancialDetails();
+			UpdateFinancialDetails();
+			if (prepareSave) await PrepareSave();
 
 			if (_tripCart.Count == 0 || _bill.Id > 0)
 			{
@@ -560,14 +555,9 @@ public partial class BillPage
 		}
 		finally
 		{
-			if (_sfLedgerPaymentsCartGrid is not null)
-				await _sfLedgerPaymentsCartGrid.Refresh();
-
-			if (_sfPendingTripGrid is not null)
-				await _sfPendingTripGrid.Refresh();
-
-			if (_sfTripCartGrid is not null)
-				await _sfTripCartGrid.Refresh();
+			if (_sfLedgerPaymentsCartGrid is not null) await _sfLedgerPaymentsCartGrid.Refresh();
+			if (_sfPendingTripGrid is not null) await _sfPendingTripGrid.Refresh();
+			if (_sfTripCartGrid is not null) await _sfTripCartGrid.Refresh();
 
 			_isProcessing = false;
 			StateHasChanged();
@@ -581,7 +571,7 @@ public partial class BillPage
 
 		try
 		{
-			await SaveTransactionFile();
+			await SaveTransactionFile(true);
 			_isProcessing = true;
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);

@@ -63,14 +63,11 @@ public partial class VehicleDriverPage
 		_selectedVehicle = _vehicles.FirstOrDefault(v => v.Id == _vehicleDriver.VehicleId);
 		_selectedDriver = _drivers.FirstOrDefault(d => d.Id == _vehicleDriver.DriverId);
 
-		if (_sfGrid is not null)
-			await _sfGrid.Refresh();
-
+		if (_sfGrid is not null) await _sfGrid.Refresh();
 		_isLoading = false;
 		StateHasChanged();
 
-		if (_firstFocus is not null)
-			await _firstFocus.FocusAsync();
+		if (_firstFocus is not null) await _firstFocus.FocusAsync();
 	}
 	#endregion
 
