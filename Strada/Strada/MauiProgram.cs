@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using Strada.Services;
 using Strada.Shared.Services;
 
+using StradaLibrary.DataAccess;
+
 using Syncfusion.Blazor;
 
 using MudBlazor.Services;
@@ -15,7 +17,7 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
-		Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JHaF5cWWdCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdlWXxfeHVUQmVYWUF1XEBWYEo=");
+		SqlDataAccess.SetupConfiguration();
 
 		var builder = MauiApp.CreateBuilder();
 		builder

@@ -1,9 +1,10 @@
 using Microsoft.JSInterop;
 
-using Strada.Data.Operations.Data;
-using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Pages.Authentication;
 
@@ -82,7 +83,7 @@ public partial class LoginPage
 			if (!user.Status)
 				throw new Exception("This account is inactive. Please contact support.");
 
-			if (!await UserData.VerifyPassword(_password, user.Password))
+			if (!BCrypt.Net.BCrypt.Verify(_password, user.Password))
 			{
 				user.FailedAttempts++;
 

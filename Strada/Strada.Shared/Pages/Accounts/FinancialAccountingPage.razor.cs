@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Components;
 
-using Strada.Data.Accounts.FinancialAccounting.Data;
-using Strada.Data.Accounts.Masters.Data;
-using Strada.Data.Common;
-using Strada.Data.Operations.Data;
-using Strada.Models.Accounts.FinancialAccounting;
-using Strada.Models.Accounts.Masters;
-using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
+using StradaLibrary.Accounts.FinancialAccounting.Data;
+using StradaLibrary.Accounts.FinancialAccounting.Models;
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -612,7 +612,7 @@ public partial class FinancialAccountingPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var ledgers = _cart.ConvertCartToDetails(_accounting.Id);
+			var ledgers = FinancialAccountingData.ConvertCartToDetails(_cart, _accounting.Id);
 			_accounting.Id = await FinancialAccountingData.SaveTransaction(_accounting, ledgers);
 			_accounting = await CommonData.LoadTableDataById<FinancialAccountingModel>(AccountNames.FinancialAccounting, _accounting.Id);
 

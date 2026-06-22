@@ -2,7 +2,7 @@
 
 using MudBlazor;
 
-using Strada.Models.Accounts.Masters;
+using StradaLibrary.Accounts.Masters.Models;
 
 namespace Strada.Shared.Components.Input;
 

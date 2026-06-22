@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-using Strada.Data.Common;
-using Strada.Models.Operations;
+using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Services;
 

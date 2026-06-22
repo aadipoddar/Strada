@@ -19,5 +19,5 @@ public partial class Footer
 		Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0";
 
 	private static string CopyrightUrl =>
-		Helper.AadiSoftWebsite;
+		Secrets.AadiSoftWebsite;
 }

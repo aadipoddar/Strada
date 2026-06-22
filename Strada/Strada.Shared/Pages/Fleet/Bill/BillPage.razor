@@ -1,10 +1,10 @@
-@using Strada.Models.Accounts.Masters
-@using Strada.Models.Fleet.Bill
-@using Strada.Models.Fleet.OMC
-@using Strada.Models.Fleet.Trip
-
 @attribute [Route(PageRouteNames.Bill)]
 @attribute [Route(PageRouteNames.Bill + "/{Id:int}")]
+
+@using StradaLibrary.Accounts.Masters.Models
+@using StradaLibrary.Fleet.OMC.Models
+@using StradaLibrary.Fleet.Trip.Models
+@using StradaLibrary.Fleet.Bill.Models
 
 <PageTitle>Bill - Strada</PageTitle>
 

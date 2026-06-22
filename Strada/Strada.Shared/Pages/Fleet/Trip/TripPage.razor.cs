@@ -1,17 +1,18 @@
 using Microsoft.AspNetCore.Components;
 
-using Strada.Data.Accounts.Masters.Data;
-using Strada.Data.Common;
-using Strada.Data.Fleet.Route.Data;
-using Strada.Data.Fleet.Trip.Data;
-using Strada.Models.Accounts.Masters;
-using Strada.Models.Fleet.OMC;
-using Strada.Models.Fleet.Route;
-using Strada.Models.Fleet.Trip;
-using Strada.Models.Fleet.Vehicle;
-using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.Expense.Models;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Fleet.Route.Data;
+using StradaLibrary.Fleet.Route.Models;
+using StradaLibrary.Fleet.Trip.Data;
+using StradaLibrary.Fleet.Trip.Models;
+using StradaLibrary.Fleet.Vehicle.Models;
+using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -121,7 +122,7 @@ public partial class TripPage
 		_omcs = await CommonData.LoadTableDataByStatus<OMCModel>(FleetNames.OMC);
 		_drivers = await DriverData.LoadDriverOverview();
 		_vehicleDrivers = await VehicleDriverData.LoadVehicleDriverOverview();
-		_routes = await Data.Fleet.Route.Data.RouteData.LoadRouteOverview();
+		_routes = await StradaLibrary.Fleet.Route.Data.RouteData.LoadRouteOverview();
 		_expenseTypes = await CommonData.LoadTableDataByStatus<ExpenseTypeModel>(FleetNames.ExpenseType);
 		_omcCards = await CommonData.LoadTableDataByStatus<OMCCardModel>(FleetNames.OMCCard);
 		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(AccountNames.Ledger);
@@ -824,9 +825,9 @@ public partial class TripPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var expenses = _expensesCart.ConvertExpensesCartToDetails(_trip.Id);
-			var cardPayments = _cardPaymentsCart.ConvertCardPaymentCartToDetails(_trip.Id);
-			var ledgerPayments = _ledgerPaymentsCart.ConvertLedgerPaymentCartToDetails(_trip.Id);
+			var expenses = TripData.ConvertExpensesCartToDetails(_expensesCart, _trip.Id);
+			var cardPayments = TripData.ConvertCardPaymentCartToDetails(_cardPaymentsCart, _trip.Id);
+			var ledgerPayments = TripData.ConvertLedgerPaymentCartToDetails(_ledgerPaymentsCart, _trip.Id);
 			_trip.Id = await TripData.SaveTransaction(_trip, expenses, cardPayments, ledgerPayments);
 			_trip = await CommonData.LoadTableDataById<TripModel>(FleetNames.Trip, _trip.Id);
 

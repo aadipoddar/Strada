@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Components;
 
-using Strada.Data.Accounts.Masters.Data;
-using Strada.Data.Common;
-using Strada.Data.Fleet.Bill.Data;
-using Strada.Data.Fleet.Trip.Data;
-using Strada.Data.Operations.Data;
-using Strada.Models.Accounts.Masters;
-using Strada.Models.Fleet.Bill;
-using Strada.Models.Fleet.OMC;
-using Strada.Models.Fleet.Trip;
-using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.Bill.Data;
+using StradaLibrary.Fleet.Bill.Models;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Fleet.Trip.Data;
+using StradaLibrary.Fleet.Trip.Models;
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -587,7 +587,7 @@ public partial class BillPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var ledgerPayments = _ledgerPaymentsCart.ConvertLedgerPaymentCartToDetails(_bill.Id);
+			var ledgerPayments = BillData.ConvertLedgerPaymentCartToDetails(_ledgerPaymentsCart, _bill.Id);
 			_bill.Id = await BillData.SaveTransaction(_bill, ledgerPayments, _tripCart);
 			_bill = await CommonData.LoadTableDataById<BillModel>(FleetNames.Bill, _bill.Id);
 

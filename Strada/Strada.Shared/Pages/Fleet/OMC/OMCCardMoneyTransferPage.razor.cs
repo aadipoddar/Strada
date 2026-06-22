@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Components;
 
-using Strada.Data.Accounts.Masters.Data;
-using Strada.Data.Common;
-using Strada.Data.Fleet.OMC.Data;
-using Strada.Models.Accounts.Masters;
-using Strada.Models.Fleet.OMC;
-using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.OMC.Data;
+using StradaLibrary.Fleet.OMC.Models;
+using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -415,7 +415,7 @@ public partial class OMCCardMoneyTransferPage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var transfers = _transfersCart.ConvertTransfersCartToDetails(_transfer.Id);
+			var transfers = OMCCardMoneyTransferData.ConvertTransfersCartToDetails(_transfersCart, _transfer.Id);
 			_transfer.Id = await OMCCardMoneyTransferData.SaveTransaction(_transfer, transfers);
 			_transfer = await CommonData.LoadTableDataById<OMCCardMoneyTransferModel>(FleetNames.OMCCardMoneyTransfer, _transfer.Id);
 

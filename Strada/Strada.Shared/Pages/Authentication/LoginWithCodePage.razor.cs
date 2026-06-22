@@ -1,9 +1,9 @@
-using Strada.Data.Common;
-using Strada.Data.Operations.Data;
-using Strada.Data.Utils.MailUtils;
-using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
+using StradaLibrary.Operations.Data;
+using StradaLibrary.Operations.Models;
+using StradaLibrary.Utils.MailUtils;
 
 using Syncfusion.Blazor.Inputs;
 
@@ -208,7 +208,7 @@ public partial class LoginWithCodePage
 				}
 
 				user.Password = _newPassword;
-				user.Password = await UserData.EncryptPassword(user.Password);
+				user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
 			}
 
 			await UserData.ResetInsertUser(user);

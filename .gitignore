@@ -422,4 +422,5 @@ FodyWeavers.xsd
 
 *.local_secrets.cs
 .claude
+AGENTS.md
 CLAUDE.md

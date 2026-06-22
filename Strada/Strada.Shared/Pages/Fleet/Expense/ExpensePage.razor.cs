@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Components;
 
-using Strada.Data.Accounts.Masters.Data;
-using Strada.Data.Common;
-using Strada.Data.Fleet.Expense.Data;
-using Strada.Models.Accounts.Masters;
-using Strada.Models.Fleet.Expense;
-using Strada.Models.Fleet.Vehicle;
-using Strada.Models.Operations;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
+
+using StradaLibrary.Accounts.Masters.Data;
+using StradaLibrary.Accounts.Masters.Models;
+using StradaLibrary.Fleet.Expense.Data;
+using StradaLibrary.Fleet.Expense.Models;
+using StradaLibrary.Fleet.Vehicle.Models;
+using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -455,7 +455,7 @@ public partial class ExpensePage
 
 			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-			var expenses = _expensesCart.ConvertExpensesCartToDetails(_expense.Id);
+			var expenses = ExpenseData.ConvertExpensesCartToDetails(_expensesCart, _expense.Id);
 			_expense.Id = await ExpenseData.SaveTransaction(_expense, expenses);
 			_expense = await CommonData.LoadTableDataById<ExpenseModel>(FleetNames.Expense, _expense.Id);
 

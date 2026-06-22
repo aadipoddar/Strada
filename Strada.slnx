@@ -1,32 +1,13 @@
 <Solution>
-  <Configurations>
-    <BuildType Name="Debug" />
-    <BuildType Name="Release" />
-    <BuildType Name="Wasm" />
-  </Configurations>
-  <Folder Name="/Api/">
-    <Project Path="Strada.Api/Strada.Api.csproj" Id="b2e11017-bbc4-425b-a3a4-1ed3f2d69f4b" />
-  </Folder>
-  <Folder Name="/App/">
-    <Project Path="Strada/Strada.Shared/Strada.Shared.csproj" />
-    <Project Path="Strada/Strada.Wasm/Strada.Wasm.csproj" Id="a5df8379-16b7-49ff-b8d1-c01122ff00c1" />
-    <Project Path="Strada/Strada.Web/Strada.Web.csproj" />
-    <Project Path="Strada/Strada/Strada.csproj">
-      <Deploy />
-    </Project>
-  </Folder>
-  <Folder Name="/Database/">
-    <Project Path="Strada.Database/Strada.Database.sqlproj" Id="9670a550-f96b-4c47-86ad-aeb06eedd8bc">
-      <Build />
-      <Deploy />
-    </Project>
-  </Folder>
-  <Folder Name="/Library/">
-    <Project Path="Library/Strada.Data.Client/Strada.Data.Client.csproj" />
-    <Project Path="Library/Strada.Data/Strada.Data.csproj" />
-    <Project Path="Library/Strada.Models/Strada.Models.csproj" />
-  </Folder>
-  <Folder Name="/Tools/">
-    <Project Path="Strada.Tools/Strada.Tools.csproj" />
-  </Folder>
+  <Project Path="DBStrada/DBStrada.sqlproj" Id="9670a550-f96b-4c47-86ad-aeb06eedd8bc">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="ExcelImport/ExcelImport.csproj" Id="516e3792-3957-46c8-bac0-136644883afa" />
+  <Project Path="Strada/Strada.Shared/Strada.Shared.csproj" />
+  <Project Path="Strada/Strada.Web/Strada.Web.csproj" />
+  <Project Path="Strada/Strada/Strada.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="StradaLibrary/StradaLibrary.csproj" />
 </Solution>

@@ -4,18 +4,22 @@ using Strada.Shared.Services;
 using Strada.Web.Components;
 using Strada.Web.Services;
 
+using StradaLibrary.DataAccess;
+
 using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JHaF5cWWdCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdlWXxfeHVUQmVYWUF1XEBWYEo=");
+SqlDataAccess.SetupConfiguration();
 
+// Add services to the container.
 builder.Services
 	.AddSyncfusionBlazor()
 	.AddMudServices()
 	.AddRazorComponents()
 	.AddInteractiveServerComponents();
 
+// Add device-specific services used by the Strada.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 builder.Services.AddSingleton<IUpdateService, UpdateService>();
 builder.Services.AddSingleton<IVibrationService, VibrationService>();
@@ -29,12 +33,13 @@ builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Error", createScopeForErrors: true);
+	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
-
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
@@ -46,7 +51,5 @@ app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode()
 	.AddAdditionalAssemblies(
 		typeof(Strada.Shared._Imports).Assembly);
-
-Strada.Data.Api.Init(new HttpClient { BaseAddress = new Uri("https://localhost:7078/") });
 
 app.Run();
