@@ -156,7 +156,7 @@ internal static class PDFInvoiceExportUtil
 		// Try to load logo from embedded resources
 		try
 		{
-			const string logoResourceName = "StradaLibrary.Utils.Resources.logo_full.png";
+			const string logoResourceName = "Strada.Library.Utils.Resources.logo_full.png";
 			using Stream imageStream = typeof(PDFInvoiceExportUtil).Assembly.GetManifestResourceStream(logoResourceName);
 
 			if (imageStream is not null)

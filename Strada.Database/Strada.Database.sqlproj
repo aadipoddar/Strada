@@ -11,8 +11,8 @@
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>DBStrada</RootNamespace>
-    <AssemblyName>DBStrada</AssemblyName>
+    <RootNamespace>Strada.Database</RootNamespace>
+    <AssemblyName>Strada.Database</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>

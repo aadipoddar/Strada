@@ -6,10 +6,14 @@
       <Deploy />
     </Project>
   </Folder>
-  <Project Path="Strada.Database/Strada.Database.sqlproj" Id="9670a550-f96b-4c47-86ad-aeb06eedd8bc">
-    <Build />
-    <Deploy />
-  </Project>
-  <Project Path="Strada.Library/Strada.Library.csproj" />
-  <Project Path="Strada.Tools/Strda.Tools.csproj" />
+  <Folder Name="/Data/">
+    <Project Path="Strada.Database/Strada.Database.sqlproj" Id="9670a550-f96b-4c47-86ad-aeb06eedd8bc">
+      <Build />
+      <Deploy />
+    </Project>
+    <Project Path="Strada.Library/Strada.Library.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Strada.Tools/Strda.Tools.csproj" />
+  </Folder>
 </Solution>

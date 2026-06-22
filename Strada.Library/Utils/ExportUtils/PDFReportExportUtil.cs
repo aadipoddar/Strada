@@ -308,7 +308,7 @@ internal static class PDFReportExportUtil
 		// Try to load and draw company logo from embedded resources
 		try
 		{
-			const string logoResourceName = "StradaLibrary.Utils.Resources.logo_full.png";
+			const string logoResourceName = "Strada.Library.Utils.Resources.logo_full.png";
 			using Stream imageStream = typeof(PDFReportExportUtil).Assembly.GetManifestResourceStream(logoResourceName);
 
 			if (imageStream is not null)

@@ -67,11 +67,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Strada.csproj.lscache" />
-    <None Remove="Strada.csproj.lscache.tmp" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.71" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="10.0.71" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.9" />

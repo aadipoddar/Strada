@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Utils\Resources\logo_full.png" />
-    <None Remove="StradaLibrary.csproj.lscache" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Utils\Resources\logo_full.png">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

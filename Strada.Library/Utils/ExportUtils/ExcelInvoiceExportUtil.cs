@@ -126,7 +126,7 @@ internal static class ExcelInvoiceExportUtil
 		// Try to load and insert logo from embedded resources
 		try
 		{
-			const string logoResourceName = "StradaLibrary.Utils.Resources.logo_full.png";
+			const string logoResourceName = "Strada.Library.Utils.Resources.logo_full.png";
 			using Stream imageStream = typeof(ExcelInvoiceExportUtil).Assembly.GetManifestResourceStream(logoResourceName);
 
 			if (imageStream is not null)

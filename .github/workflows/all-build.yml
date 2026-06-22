@@ -28,8 +28,8 @@ jobs:
     - name: Build ExcelImport
       run: dotnet build ExcelImport/ExcelImport.csproj --no-restore --configuration Release    
 
-    - name: Build StradaLibrary
-      run: dotnet build StradaLibrary/StradaLibrary.csproj --no-restore --configuration Release
+    - name: Build Strada.Library
+      run: dotnet build Strada.Library/Strada.Library.csproj --no-restore --configuration Release
     
     - name: Build Strada.Shared
       run: dotnet build Strada/Strada.Shared/Strada.Shared.csproj --no-restore --configuration Release
@@ -47,4 +47,4 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     
     - name: Build SQL Server Database Project
-      run: msbuild DBStrada/DBStrada.sqlproj /p:Configuration=Release /p:Platform="Any CPU"
+      run: msbuild Strada.Database/Strada.Database.sqlproj /p:Configuration=Release /p:Platform="Any CPU"

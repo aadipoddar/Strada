@@ -5,7 +5,7 @@ namespace Strada.Library.Common;
 public static class CommonData
 {
 	public static async Task<List<T>> LoadTableData<T>(string TableName, SqlDataAccessTransaction sqlDataAccessTransaction = null) where T : new() =>
-			await SqlDataAccess.LoadData<T, dynamic>(CommonNames.LoadTableData, new { TableName }, sqlDataAccessTransaction);
+		await SqlDataAccess.LoadData<T, dynamic>(CommonNames.LoadTableData, new { TableName }, sqlDataAccessTransaction);
 
 	public static async Task<T> LoadTableDataById<T>(string TableName, int Id, SqlDataAccessTransaction sqlDataAccessTransaction = null) where T : new() =>
 		(await SqlDataAccess.LoadData<T, dynamic>(CommonNames.LoadTableDataById, new { TableName, Id }, sqlDataAccessTransaction)).FirstOrDefault();

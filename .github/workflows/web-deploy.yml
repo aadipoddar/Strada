@@ -25,8 +25,8 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - name: Restore StradaLibrary
-        run: dotnet restore StradaLibrary/StradaLibrary.csproj
+      - name: Restore Strada.Library
+        run: dotnet restore Strada.Library/Strada.Library.csproj
 
       - name: Restore Strada.Shared
         run: dotnet restore Strada/Strada.Shared/Strada.Shared.csproj
@@ -37,7 +37,7 @@ jobs:
       - name: Create Secrets.local_secrets.cs
         run: |
           $secretsContent = @"
-          namespace StradaLibrary.DataAccess;
+          namespace Strada.Library.DataAccess;
 
           public static partial class Secrets
           {
@@ -54,11 +54,11 @@ jobs:
               }
           }
           "@
-          Set-Content -Path "StradaLibrary/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
+          Set-Content -Path "Strada.Library/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
         shell: pwsh
 
-      - name: Build StradaLibrary
-        run: dotnet build StradaLibrary/StradaLibrary.csproj --configuration Release --no-restore
+      - name: Build Strada.Library
+        run: dotnet build Strada.Library/Strada.Library.csproj --configuration Release --no-restore
 
       - name: Build Strada.Shared
         run: dotnet build Strada/Strada.Shared/Strada.Shared.csproj --configuration Release --no-restore
