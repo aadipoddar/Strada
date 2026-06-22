@@ -14,6 +14,12 @@ public static class UserData
 	public static async Task<UserModel> LoadUserByPhoneEmail(string PhoneEmail) =>
 		(await SqlDataAccess.LoadData<UserModel, dynamic>(OperationNames.LoadUserByPhoneEmail, new { PhoneEmail })).FirstOrDefault();
 
+	public static async Task<string> EncryptPassword(string password) =>
+		BCrypt.Net.BCrypt.HashPassword(password);
+
+	public static async Task<bool> VerifyPassword(string password, string hashedPassword) =>
+		BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+
 	public static async Task ResetInsertUser(UserModel user)
 	{
 		user.Status = true;
@@ -92,7 +98,7 @@ public static class UserData
 			user.LastCodeDateTime = null;
 		}
 
-		user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+		user.Password = await EncryptPassword(user.Password);
 
 		var allUsers = await CommonData.LoadTableData<UserModel>(OperationNames.User);
 

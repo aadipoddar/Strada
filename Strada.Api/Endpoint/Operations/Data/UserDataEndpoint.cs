@@ -18,10 +18,19 @@ public class UserDataEndpoint : ICarterModule
 		// TODO: strip Password (and LastCode* auth fields) before returning (security)
 		group.MapGet(nameof(UserData.LoadUserByPhoneEmail), UserData.LoadUserByPhoneEmail);
 
+		group.MapPost(nameof(UserData.EncryptPassword),
+			(EncryptPasswordRequest request) => UserData.EncryptPassword(request.Password));
+
+		group.MapPost(nameof(UserData.VerifyPassword),
+			(VerifyPasswordRequest request) => UserData.VerifyPassword(request.Password, request.HashedPassword));
+
 		group.MapPost(nameof(UserData.ResetInsertUser), UserData.ResetInsertUser);
 
 		group.MapPost(nameof(UserData.DeleteTransaction), UserData.DeleteTransaction);
 		group.MapPost(nameof(UserData.RecoverTransaction), UserData.RecoverTransaction);
 		group.MapPost(nameof(UserData.SaveTransaction), UserData.SaveTransaction);
 	}
+
+	private sealed record EncryptPasswordRequest(string Password);
+	private sealed record VerifyPasswordRequest(string Password, string HashedPassword);
 }

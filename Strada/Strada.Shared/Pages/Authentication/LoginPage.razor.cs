@@ -82,7 +82,7 @@ public partial class LoginPage
 			if (!user.Status)
 				throw new Exception("This account is inactive. Please contact support.");
 
-			if (!BCrypt.Net.BCrypt.Verify(_password, user.Password))
+			if (!await UserData.VerifyPassword(_password, user.Password))
 			{
 				user.FailedAttempts++;
 

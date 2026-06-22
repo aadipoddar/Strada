@@ -1,4 +1,9 @@
 <Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="Wasm" />
+  </Configurations>
   <Folder Name="/Api/">
     <Project Path="Strada.Api/Strada.Api.csproj" Id="b2e11017-bbc4-425b-a3a4-1ed3f2d69f4b" />
   </Folder>

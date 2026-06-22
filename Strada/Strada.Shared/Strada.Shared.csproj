@@ -5,6 +5,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyVersion>1.0.3.7</AssemblyVersion>
+	<Configurations>Debug;Release;Wasm</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,8 +30,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Library\Strada.Models\Strada.Models.csproj" />
-    <ProjectReference Include="..\..\Library\Strada.Data.Client\Strada.Data.Client.csproj" Condition="'$(UseDataClient)' == 'true'" />
-    <ProjectReference Include="..\..\Library\Strada.Data\Strada.Data.csproj" Condition="'$(UseDataClient)' != 'true'" />
+    <ProjectReference Include="..\..\Library\Strada.Data.Client\Strada.Data.Client.csproj" Condition="'$(Configuration)' == 'Wasm'" />
+    <ProjectReference Include="..\..\Library\Strada.Data\Strada.Data.csproj" Condition="'$(Configuration)' != 'Wasm'" />
   </ItemGroup>
 
   <ItemGroup>

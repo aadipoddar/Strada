@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>Strada.Data</RootNamespace>
+    <Configurations>Debug;Release;Wasm</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Strada.Data;
 
@@ -10,7 +11,11 @@ public static class Api
 
 	private static HttpClient _http;
 
-	private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web) { IncludeFields = true };
+	private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web)
+	{
+		IncludeFields = true,
+		Converters = { new DateOnlyJsonConverter(), new TimeOnlyJsonConverter() }
+	};
 
 	public static void Init(HttpClient http) => _http = http;
 
@@ -118,4 +123,49 @@ public static class Api
 	}
 
 	#endregion
+}
+
+public class DateOnlyJsonConverter : JsonConverter<DateOnly>
+{
+	public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	{
+		var value = reader.GetString();
+		if (string.IsNullOrWhiteSpace(value))
+			return default;
+
+		if (DateOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+			return date;
+
+		if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
+			return DateOnly.FromDateTime(dateTime);
+
+		return default;
+	}
+
+	public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions options) =>
+		writer.WriteStringValue(value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+}
+
+public class TimeOnlyJsonConverter : JsonConverter<TimeOnly>
+{
+	public override TimeOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	{
+		var value = reader.GetString();
+		if (string.IsNullOrWhiteSpace(value))
+			return default;
+
+		if (TimeOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var time))
+			return time;
+
+		if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var span))
+			return TimeOnly.FromTimeSpan(span);
+
+		if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
+			return TimeOnly.FromDateTime(dateTime);
+
+		return default;
+	}
+
+	public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options) =>
+		writer.WriteStringValue(value.ToString("HH:mm:ss", CultureInfo.InvariantCulture));
 }

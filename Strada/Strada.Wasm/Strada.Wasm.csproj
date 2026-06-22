@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+	<Configurations>Debug;Release;Wasm</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,9 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Strada.Shared\Strada.Shared.csproj" AdditionalProperties="UseDataClient=true" />
+    <ProjectReference Include="..\Strada.Shared\Strada.Shared.csproj" />
     <ProjectReference Include="..\..\Library\Strada.Data.Client\Strada.Data.Client.csproj" />
   </ItemGroup>
+
+  <Target Name="EnsureWasmConfiguration" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' != 'Wasm'">
+    <Error Text="Build Strada.Wasm with the 'Wasm' configuration so Strada.Shared uses the HTTP mirror, not the real SQL data layer. Use 'dotnet run/build/publish ... -c Wasm', or select 'Wasm' in Visual Studio." />
+  </Target>
 
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />

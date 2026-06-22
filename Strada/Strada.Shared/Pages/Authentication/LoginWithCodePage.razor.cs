@@ -208,7 +208,7 @@ public partial class LoginWithCodePage
 				}
 
 				user.Password = _newPassword;
-				user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+				user.Password = await UserData.EncryptPassword(user.Password);
 			}
 
 			await UserData.ResetInsertUser(user);

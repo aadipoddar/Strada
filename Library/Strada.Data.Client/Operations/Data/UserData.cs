@@ -13,6 +13,12 @@ public static class UserData
 	public static Task<UserModel> LoadUserByPhoneEmail(string phoneEmail) =>
 		Api.Get<UserModel>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(LoadUserByPhoneEmail)), new { phoneEmail });
 
+	public static Task<string> EncryptPassword(string password) =>
+		Api.Post<string>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(EncryptPassword)), new { password });
+
+	public static Task<bool> VerifyPassword(string password, string hashedPassword) =>
+		Api.Post<bool>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(VerifyPassword)), new { password, hashedPassword });
+
 	public static Task ResetInsertUser(UserModel user) =>
 		Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ResetInsertUser)), user);
 
