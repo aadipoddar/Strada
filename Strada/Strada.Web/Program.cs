@@ -1,6 +1,5 @@
 using MudBlazor.Services;
 
-using Strada.Data.DataAccess;
 using Strada.Shared.Services;
 using Strada.Web.Components;
 using Strada.Web.Services;
@@ -9,7 +8,7 @@ using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-SqlDataAccess.SetupConfiguration();
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JHaF5cWWdCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdlWXxfeHVUQmVYWUF1XEBWYEo=");
 
 builder.Services
 	.AddSyncfusionBlazor()
@@ -47,5 +46,7 @@ app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode()
 	.AddAdditionalAssemblies(
 		typeof(Strada.Shared._Imports).Assembly);
+
+Strada.Data.Api.Init(new HttpClient { BaseAddress = new Uri("https://localhost:7078/") });
 
 app.Run();

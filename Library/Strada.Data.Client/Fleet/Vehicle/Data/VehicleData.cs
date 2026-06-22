@@ -7,12 +7,12 @@ public static class VehicleData
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(VehicleData));
 
-	public static Task DeleteTransaction(VehicleModel vehicle, int userId, string platform) =>
-		Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(DeleteTransaction)), vehicle, new { userId, platform });
+	public static async Task DeleteTransaction(VehicleModel vehicle, int userId, string platform) =>
+		await Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(DeleteTransaction)), vehicle, new { userId, platform });
 
-	public static Task RecoverTransaction(VehicleModel vehicle, int userId, string platform) =>
-		Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(RecoverTransaction)), vehicle, new { userId, platform });
+	public static async Task RecoverTransaction(VehicleModel vehicle, int userId, string platform) =>
+		await Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(RecoverTransaction)), vehicle, new { userId, platform });
 
-	public static Task<int> SaveTransaction(VehicleModel vehicle, int userId, string platform) =>
-		Api.Post<int>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(SaveTransaction)), vehicle, new { userId, platform });
+	public static async Task<int> SaveTransaction(VehicleModel vehicle, int userId, string platform) =>
+		await Api.Post<int>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(SaveTransaction)), vehicle, new { userId, platform });
 }

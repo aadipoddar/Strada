@@ -96,8 +96,8 @@ public class SqlDataAccessTransaction : IDisposable
 		}
 	}
 
-	public static Task Run(Func<SqlDataAccessTransaction, Task> body) =>
-		Run<object>(async transaction => { await body(transaction); return null; });
+	public static async Task Run(Func<SqlDataAccessTransaction, Task> body) =>
+		await Run<object>(async transaction => { await body(transaction); return null; });
 }
 
 public class DateOnlyTypeHandler : SqlMapper.TypeHandler<DateOnly>

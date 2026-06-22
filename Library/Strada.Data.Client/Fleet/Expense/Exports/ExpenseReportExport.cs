@@ -10,11 +10,11 @@ public static class ExpenseReportExport
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(ExpenseReportExport));
 
-	public static Task<(MemoryStream stream, string fileName)> ExportReport(IEnumerable<ExpenseOverviewModel> expenseData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, bool showDeleted = false, CompanyModel company = null, VehicleModel vehicle = null) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportReport)),
+	public static async Task<(MemoryStream stream, string fileName)> ExportReport(IEnumerable<ExpenseOverviewModel> expenseData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, bool showDeleted = false, CompanyModel company = null, VehicleModel vehicle = null) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportReport)),
 			new { data = expenseData, exportType, dateRangeStart, dateRangeEnd, showAllColumns, showDeleted, company, vehicle });
 
-	public static Task<(MemoryStream stream, string fileName)> ExportExpensesReport(IEnumerable<ExpenseDetailsOverviewModel> expensesData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, bool showDeleted = false, ExpenseTypeModel expenseType = null, CompanyModel company = null, VehicleModel vehicle = null) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportExpensesReport)),
+	public static async Task<(MemoryStream stream, string fileName)> ExportExpensesReport(IEnumerable<ExpenseDetailsOverviewModel> expensesData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, bool showDeleted = false, ExpenseTypeModel expenseType = null, CompanyModel company = null, VehicleModel vehicle = null) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportExpensesReport)),
 			new { data = expensesData, exportType, dateRangeStart, dateRangeEnd, showAllColumns, showDeleted, expenseType, company, vehicle });
 }

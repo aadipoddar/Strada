@@ -3,7 +3,7 @@ using Strada.Data.Accounts.Masters.Data;
 using Strada.Data.Common;
 using Strada.Data.DataAccess;
 using Strada.Data.Fleet.Bill.Exports;
-using Strada.Data.Fleet.Trip;
+using Strada.Data.Fleet.Trip.Data;
 using Strada.Data.Operations.Data;
 using Strada.Data.Utils.MailUtils;
 using Strada.Models.Accounts.FinancialAccounting;

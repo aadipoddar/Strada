@@ -8,6 +8,6 @@ public static class TyreMountingExport
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(TyreMountingExport));
 
-	public static Task<(MemoryStream stream, string fileName)> ExportTransaction(IEnumerable<TyreMountingModel> tyreMountingData, ReportExportType exportType) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportTransaction)), tyreMountingData, new { exportType });
+	public static async Task<(MemoryStream stream, string fileName)> ExportTransaction(IEnumerable<TyreMountingModel> tyreMountingData, ReportExportType exportType) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportTransaction)), tyreMountingData, new { exportType });
 }

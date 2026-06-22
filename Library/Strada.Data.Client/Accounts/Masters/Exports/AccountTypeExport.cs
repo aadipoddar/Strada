@@ -8,6 +8,6 @@ public static class AccountTypeExport
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(AccountTypeExport));
 
-	public static Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<AccountTypeModel> accountTypeData, ReportExportType exportType) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportMaster)), accountTypeData, new { exportType });
+	public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<AccountTypeModel> accountTypeData, ReportExportType exportType) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportMaster)), accountTypeData, new { exportType });
 }

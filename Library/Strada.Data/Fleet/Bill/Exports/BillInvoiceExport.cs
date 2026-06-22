@@ -1,5 +1,5 @@
 ﻿using Strada.Data.Common;
-using Strada.Data.Fleet.Trip;
+using Strada.Data.Fleet.Trip.Data;
 using Strada.Data.Utils.ExportUtils;
 using Strada.Models.Accounts.Masters;
 using Strada.Models.Common;

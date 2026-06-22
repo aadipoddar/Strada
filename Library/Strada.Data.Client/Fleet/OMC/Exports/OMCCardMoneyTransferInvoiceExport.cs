@@ -7,6 +7,6 @@ public static class OMCCardMoneyTransferInvoiceExport
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(OMCCardMoneyTransferInvoiceExport));
 
-	public static Task<(MemoryStream stream, string fileName)> ExportInvoice(int transactionId, InvoiceExportType exportType) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportInvoice)), new { }, new { transactionId, exportType });
+	public static async Task<(MemoryStream stream, string fileName)> ExportInvoice(int transactionId, InvoiceExportType exportType) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportInvoice)), new { }, new { transactionId, exportType });
 }

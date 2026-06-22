@@ -1,5 +1,5 @@
 ﻿using Strada.Data.DataAccess;
-using Strada.Data.Fleet.Trip;
+using Strada.Data.Fleet.Trip.Data;
 using Strada.Data.Operations.Data;
 using Strada.Models.Accounts.FinancialAccounting;
 using Strada.Models.Accounts.Masters;

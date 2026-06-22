@@ -9,11 +9,11 @@ public static class ProfitAndLossReportExport
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(ProfitAndLossReportExport));
 
-	public static Task<(MemoryStream stream, string fileName)> ExportIncomeReport(IEnumerable<TrialBalanceModel> incomeData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, CompanyModel company = null) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportIncomeReport)),
+	public static async Task<(MemoryStream stream, string fileName)> ExportIncomeReport(IEnumerable<TrialBalanceModel> incomeData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, CompanyModel company = null) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportIncomeReport)),
 			new { data = incomeData, exportType, dateRangeStart, dateRangeEnd, showAllColumns, company });
 
-	public static Task<(MemoryStream stream, string fileName)> ExportExpenseReport(IEnumerable<TrialBalanceModel> expenseData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, CompanyModel company = null) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportExpenseReport)),
+	public static async Task<(MemoryStream stream, string fileName)> ExportExpenseReport(IEnumerable<TrialBalanceModel> expenseData, ReportExportType exportType, DateOnly? dateRangeStart = null, DateOnly? dateRangeEnd = null, bool showAllColumns = true, CompanyModel company = null) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportExpenseReport)),
 			new { data = expenseData, exportType, dateRangeStart, dateRangeEnd, showAllColumns, company });
 }

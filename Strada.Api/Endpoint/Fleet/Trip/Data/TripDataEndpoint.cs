@@ -1,4 +1,4 @@
-using Strada.Data.Fleet.Trip;
+using Strada.Data.Fleet.Trip.Data;
 using Strada.Models.Common;
 using Strada.Models.Fleet.Trip;
 

@@ -1,7 +1,7 @@
 using Strada.Data.Accounts.Masters.Data;
 using Strada.Data.Common;
 using Strada.Data.Fleet.Route.Data;
-using Strada.Data.Fleet.Trip;
+using Strada.Data.Fleet.Trip.Data;
 using Strada.Data.Fleet.Trip.Exports;
 using Strada.Data.Operations.Data;
 using Strada.Models.Accounts.Masters;

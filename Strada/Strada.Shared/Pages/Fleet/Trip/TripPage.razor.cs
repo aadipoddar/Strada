@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Strada.Data.Accounts.Masters.Data;
 using Strada.Data.Common;
 using Strada.Data.Fleet.Route.Data;
-using Strada.Data.Fleet.Trip;
+using Strada.Data.Fleet.Trip.Data;
 using Strada.Models.Accounts.Masters;
 using Strada.Models.Fleet.OMC;
 using Strada.Models.Fleet.Route;

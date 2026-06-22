@@ -8,6 +8,6 @@ public static class OMCCardExport
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(OMCCardExport));
 
-	public static Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<OMCCardModel> omcCardData, ReportExportType exportType) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportMaster)), omcCardData, new { exportType });
+	public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<OMCCardModel> omcCardData, ReportExportType exportType) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportMaster)), omcCardData, new { exportType });
 }

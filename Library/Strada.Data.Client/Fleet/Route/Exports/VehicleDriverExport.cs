@@ -8,6 +8,6 @@ public static class VehicleDriverExport
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(VehicleDriverExport));
 
-	public static Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<VehicleDriverModel> vehicleDriver, ReportExportType exportType) =>
-		Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportMaster)), vehicleDriver, new { exportType });
+	public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<VehicleDriverModel> vehicleDriver, ReportExportType exportType) =>
+		await Api.PostForFile(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(ExportMaster)), vehicleDriver, new { exportType });
 }

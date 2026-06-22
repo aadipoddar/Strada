@@ -7,12 +7,12 @@ public static class OMCData
 {
 	private static readonly string _endpoint = Helper.SanitizeClassName(nameof(OMCData));
 
-	public static Task DeleteTransaction(OMCModel omc, int userId, string platform) =>
-		Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(DeleteTransaction)), omc, new { userId, platform });
+	public static async Task DeleteTransaction(OMCModel omc, int userId, string platform) =>
+		await Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(DeleteTransaction)), omc, new { userId, platform });
 
-	public static Task RecoverTransaction(OMCModel omc, int userId, string platform) =>
-		Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(RecoverTransaction)), omc, new { userId, platform });
+	public static async Task RecoverTransaction(OMCModel omc, int userId, string platform) =>
+		await Api.Post(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(RecoverTransaction)), omc, new { userId, platform });
 
-	public static Task<int> SaveTransaction(OMCModel omc, int userId, string platform) =>
-		Api.Post<int>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(SaveTransaction)), omc, new { userId, platform });
+	public static async Task<int> SaveTransaction(OMCModel omc, int userId, string platform) =>
+		await Api.Post<int>(Helper.MakeRouteFromEndpointFunction(_endpoint, nameof(SaveTransaction)), omc, new { userId, platform });
 }

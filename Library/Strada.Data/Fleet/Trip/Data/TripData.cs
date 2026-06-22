@@ -11,7 +11,7 @@ using Strada.Models.Fleet.OMC;
 using Strada.Models.Fleet.Trip;
 using Strada.Models.Operations;
 
-namespace Strada.Data.Fleet.Trip;
+namespace Strada.Data.Fleet.Trip.Data;
 
 public static class TripData
 {
