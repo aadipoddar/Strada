@@ -1,4 +1,4 @@
-@attribute [Route(PageRouteNames.Dashboard)]
+@attribute [Route(OperationRouteNames.Dashboard)]
 
 <PageTitle>Dashboard - Strada</PageTitle>
 
@@ -82,7 +82,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Entry Pages</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Financial Accounting" Subtitle="Record journal entries and transactions" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting)">
+							<FioriTile Title="Financial Accounting" Subtitle="Record journal entries and transactions" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.FinancialAccounting)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<line x1="12" y1="1" x2="12" y2="23" />
@@ -99,7 +99,7 @@ else
 						<div class="launchpad-section">
 							<h2 class="launchpad-section-title">Financial Reports</h2>
 							<div class="dashboard-grid">
-								<FioriTile Title="Financial Accounting Report" Subtitle="View accounting transaction history" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FinancialAccountingReport)">
+								<FioriTile Title="Financial Accounting Report" Subtitle="View accounting transaction history" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.FinancialAccountingReport)">
 									<IconContent>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 											<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -107,7 +107,7 @@ else
 									</IconContent>
 								</FioriTile>
 
-								<FioriTile Title="Ledger Report" Subtitle="View detailed ledger transactions" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AccountingLedgerReport)">
+								<FioriTile Title="Ledger Report" Subtitle="View detailed ledger transactions" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.AccountingLedgerReport)">
 									<IconContent>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 											<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
@@ -116,7 +116,7 @@ else
 									</IconContent>
 								</FioriTile>
 
-								<FioriTile Title="Bank Reconciliation" Subtitle="Reconcile bank ledgers & clearing dates" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.BankReconciliation)">
+								<FioriTile Title="Bank Reconciliation" Subtitle="Reconcile bank ledgers & clearing dates" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.BankReconciliation)">
 									<IconContent>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 											<line x1="3" y1="21" x2="21" y2="21" />
@@ -130,7 +130,7 @@ else
 									</IconContent>
 								</FioriTile>
 
-								<FioriTile Title="Trial Balance" Subtitle="View trial balance summary" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TrialBalanceReport)">
+								<FioriTile Title="Trial Balance" Subtitle="View trial balance summary" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.TrialBalanceReport)">
 									<IconContent>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 											<rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
@@ -143,7 +143,7 @@ else
 									</IconContent>
 								</FioriTile>
 
-								<FioriTile Title="Profit & Loss" Subtitle="View income and expense summary" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ProfitAndLossReport)">
+								<FioriTile Title="Profit & Loss" Subtitle="View income and expense summary" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.ProfitAndLossReport)">
 									<IconContent>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 											<line x1="12" y1="1" x2="12" y2="23" />
@@ -152,7 +152,7 @@ else
 									</IconContent>
 								</FioriTile>
 
-								<FioriTile Title="Balance Sheet" Subtitle="View assets, liabilities & equity" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.BalanceSheetReport)">
+								<FioriTile Title="Balance Sheet" Subtitle="View assets, liabilities & equity" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.BalanceSheetReport)">
 									<IconContent>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 											<line x1="12" y1="3" x2="12" y2="21" />
@@ -171,7 +171,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Master Data</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Ledgers" Subtitle="Manage ledger accounts" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.LedgerMaster)">
+							<FioriTile Title="Ledgers" Subtitle="Manage ledger accounts" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.LedgerMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -183,7 +183,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Group" Subtitle="Manage account groups" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.GroupMaster)">
+							<FioriTile Title="Group" Subtitle="Manage account groups" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.GroupMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -194,7 +194,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Account Type" Subtitle="Manage account types" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AccountTypeMaster)">
+							<FioriTile Title="Account Type" Subtitle="Manage account types" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.AccountTypeMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
@@ -203,7 +203,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Voucher" Subtitle="Manage voucher types" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VoucherMaster)">
+							<FioriTile Title="Voucher" Subtitle="Manage voucher types" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.VoucherMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -214,7 +214,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Financial Years" Subtitle="Manage financial year periods" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FinancialYearMaster)">
+							<FioriTile Title="Financial Years" Subtitle="Manage financial year periods" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.FinancialYearMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -225,7 +225,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="States" Subtitle="Manage state/UT information" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.StateUTMaster)">
+							<FioriTile Title="States" Subtitle="Manage state/UT information" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.StateUTMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="12" cy="12" r="10" />
@@ -235,7 +235,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Company" Subtitle="Manage company settings" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.CompanyMaster)">
+							<FioriTile Title="Company" Subtitle="Manage company settings" OnClick="() => NavigationManager.NavigateTo(AccountRouteNames.CompanyMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -255,7 +255,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Live Tracking</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Live Fleet Map" Subtitle="Track all trucks live on a map" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.LiveFleetMap)">
+							<FioriTile Title="Live Fleet Map" Subtitle="Track all trucks live on a map" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.LiveFleetMap)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
@@ -270,7 +270,7 @@ else
 					<!-- Daily Entries -->
 					<div class="launchpad-section">
 						<div class="dashboard-grid">
-							<FioriTile Title="Trip" Subtitle="Record a new trip with route, driver and trip expenses" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Trip)">
+							<FioriTile Title="Trip" Subtitle="Record a new trip with route, driver and trip expenses" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.Trip)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="1" y="3" width="15" height="13" />
@@ -281,7 +281,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Bill" Subtitle="Generate and manage billing for completed trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Bill)">
+							<FioriTile Title="Bill" Subtitle="Generate and manage billing for completed trips" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.Bill)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="2" y="3" width="20" height="18" rx="2" />
@@ -293,7 +293,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Expense" Subtitle="Log repair, fuel and other expenses" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Expense)">
+							<FioriTile Title="Expense" Subtitle="Log repair, fuel and other expenses" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.Expense)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M4 2h13l3 3v17a1 1 0 0 1-1.5.87L17 22l-2 .87L13 22l-2 .87L9 22l-2 .87L5 22l-1.5.87A1 1 0 0 1 2 22V4a2 2 0 0 1 2-2z" />
@@ -304,7 +304,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="OMC Card Money Transfer" Subtitle="Record money loaded onto OMC fuel cards" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMoneyTransfer)">
+							<FioriTile Title="OMC Card Money Transfer" Subtitle="Record money loaded onto OMC fuel cards" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.OMCCardMoneyTransfer)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="2" y="4" width="20" height="13" rx="2" ry="2" />
@@ -328,7 +328,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Vehicle Register</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Vehicle Register" Subtitle="Complete register of all fleet vehicles with type and registration details" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleRegisterReport)">
+							<FioriTile Title="Vehicle Register" Subtitle="Complete register of all fleet vehicles with type and registration details" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleRegisterReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M10 17h4V5H2v12h3" />
@@ -345,7 +345,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Trip Reports</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Trip Report" Subtitle="Summary of all trips filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripReport)">
+							<FioriTile Title="Trip Report" Subtitle="Summary of all trips filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TripReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -356,7 +356,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Trip Expenses Report" Subtitle="Itemised breakdown of all expenses recorded against trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripExpensesReport)">
+							<FioriTile Title="Trip Expenses Report" Subtitle="Itemised breakdown of all expenses recorded against trips" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TripExpensesReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -367,7 +367,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Trip OMC Card Payments" Subtitle="OMC card payments collected against trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripCardPaymentsReport)">
+							<FioriTile Title="Trip OMC Card Payments" Subtitle="OMC card payments collected against trips" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TripCardPaymentsReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
@@ -377,7 +377,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Trip Ledger Payments" Subtitle="Ledger settlements collected against trips" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripLedgerPaymentsReport)">
+							<FioriTile Title="Trip Ledger Payments" Subtitle="Ledger settlements collected against trips" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TripLedgerPaymentsReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M4 2h13l3 3v17a1 1 0 0 1-1.5.87L17 22l-2 .87L13 22l-2 .87L9 22l-2 .87L5 22l-1.5.87A1 1 0 0 1 2 22V4a2 2 0 0 1 2-2z" />
@@ -395,7 +395,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Billing Reports</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Bill Report" Subtitle="Summary of all Bills filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.BillReport)">
+							<FioriTile Title="Bill Report" Subtitle="Summary of all Bills filtered by date range and vehicle" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.BillReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -407,7 +407,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Bill Ledger Payments" Subtitle="Ledger settlements recorded against Bills" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.BillLedgerPaymentsReport)">
+							<FioriTile Title="Bill Ledger Payments" Subtitle="Ledger settlements recorded against Bills" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.BillLedgerPaymentsReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M4 2h13l3 3v17a1 1 0 0 1-1.5.87L17 22l-2 .87L13 22l-2 .87L9 22l-2 .87L5 22l-1.5.87A1 1 0 0 1 2 22V4a2 2 0 0 1 2-2z" />
@@ -425,7 +425,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Expense Reports</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Expense Report" Subtitle="Summary of expense transactions grouped by vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ExpenseReport)">
+							<FioriTile Title="Expense Report" Subtitle="Summary of expense transactions grouped by vehicle" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.ExpenseReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -436,7 +436,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Expense Details Report" Subtitle="Line-item breakdown of every expense entry by vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ExpenseDetailsReport)">
+							<FioriTile Title="Expense Details Report" Subtitle="Line-item breakdown of every expense entry by vehicle" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.ExpenseDetailsReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="11" cy="11" r="8" />
@@ -453,7 +453,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">OMC Card Money Transfer Reports</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="OMC Card Money Transfer Report" Subtitle="Summary of money transferred onto OMC cards by date range" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMoneyTransferReport)">
+							<FioriTile Title="OMC Card Money Transfer Report" Subtitle="Summary of money transferred onto OMC cards by date range" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.OMCCardMoneyTransferReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -464,7 +464,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="OMC Card Money Transfer Details Report" Subtitle="Card-wise breakdown of every OMC money transfer entry" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMoneyTransferDetailsReport)">
+							<FioriTile Title="OMC Card Money Transfer Details Report" Subtitle="Card-wise breakdown of every OMC money transfer entry" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.OMCCardMoneyTransferDetailsReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="11" cy="11" r="8" />
@@ -481,7 +481,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Document Reports</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Document Renewal Report" Subtitle="Latest document status per vehicle with expiry tracking" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentRenewalReport)">
+							<FioriTile Title="Document Renewal Report" Subtitle="Latest document status per vehicle with expiry tracking" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleDocumentRenewalReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -504,7 +504,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Routes & Drivers</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Route" Subtitle="Manage routes between source and destination locations" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.RouteMaster)">
+							<FioriTile Title="Route" Subtitle="Manage routes between source and destination locations" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.RouteMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="6" cy="19" r="3" />
@@ -514,7 +514,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Location" Subtitle="Pickup and drop locations used across routes" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.LocationMaster)">
+							<FioriTile Title="Location" Subtitle="Pickup and drop locations used across routes" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.LocationMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M12 21s-6-4.35-6-10a6 6 0 0 1 12 0c0 5.65-6 10-6 10z" />
@@ -523,7 +523,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Driver" Subtitle="Manage drivers assigned to your fleet" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.DriverMaster)">
+							<FioriTile Title="Driver" Subtitle="Manage drivers assigned to your fleet" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.DriverMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -532,7 +532,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Vehicle Driver" Subtitle="Assign drivers to vehicles for a period of time" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDriverMaster)">
+							<FioriTile Title="Vehicle Driver" Subtitle="Assign drivers to vehicles for a period of time" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleDriverMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M10 17h4V5H2v12h3" />
@@ -550,7 +550,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Tyre</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Tyre Company" Subtitle="Manage tyre manufacturers and suppliers" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TyreCompanyMaster)">
+							<FioriTile Title="Tyre Company" Subtitle="Manage tyre manufacturers and suppliers" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TyreCompanyMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="12" cy="12" r="9" />
@@ -559,7 +559,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Tyre Mounting" Subtitle="Track tyres mounted on and dismounted from vehicles" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TyreMounting)">
+							<FioriTile Title="Tyre Mounting" Subtitle="Track tyres mounted on and dismounted from vehicles" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TyreMounting)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="12" cy="12" r="9" />
@@ -575,7 +575,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">OMC</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="OMC" Subtitle="Manage oil marketing company list" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCMaster)">
+							<FioriTile Title="OMC" Subtitle="Manage oil marketing company list" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.OMCMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M3 21h18" />
@@ -588,7 +588,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="OMC Card" Subtitle="Manage fuel cards issued by oil marketing companies" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.OMCCardMaster)">
+							<FioriTile Title="OMC Card" Subtitle="Manage fuel cards issued by oil marketing companies" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.OMCCardMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
@@ -604,7 +604,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Documents</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Vehicle Document" Subtitle="Upload and track compliance documents per vehicle" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocument)">
+							<FioriTile Title="Vehicle Document" Subtitle="Upload and track compliance documents per vehicle" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleDocument)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -615,7 +615,7 @@ else
 							</FioriTile>
 
 							<!-- Document Reports -->
-							<FioriTile Title="Document Renewal Report" Subtitle="Latest document status per vehicle with expiry tracking" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentRenewalReport)">
+							<FioriTile Title="Document Renewal Report" Subtitle="Latest document status per vehicle with expiry tracking" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleDocumentRenewalReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -627,7 +627,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Document Type" Subtitle="Manage document categories like RC, insurance and PUC" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentTypeMaster)">
+							<FioriTile Title="Document Type" Subtitle="Manage document categories like RC, insurance and PUC" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleDocumentTypeMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -645,7 +645,7 @@ else
 					<div class="launchpad-section">
 						<h2 class="launchpad-section-title">Vehicle Masters</h2>
 						<div class="dashboard-grid">
-							<FioriTile Title="Vehicle" Subtitle="Manage your fleet of vehicles" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleMaster)">
+							<FioriTile Title="Vehicle" Subtitle="Manage your fleet of vehicles" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M10 17h4V5H2v12h3" />
@@ -656,7 +656,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Vehicle Type" Subtitle="Categorise vehicles by class &mdash; truck, tanker, trailer" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleTypeMaster)">
+							<FioriTile Title="Vehicle Type" Subtitle="Categorise vehicles by class &mdash; truck, tanker, trailer" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleTypeMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M3 7h18" />
@@ -668,7 +668,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Expense Type" Subtitle="Define expense categories used during data entry" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ExpenseTypeMaster)">
+							<FioriTile Title="Expense Type" Subtitle="Define expense categories used during data entry" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.ExpenseTypeMaster)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -687,7 +687,7 @@ else
 					<!-- Users & Settings -->
 					<div class="launchpad-section">
 						<div class="dashboard-grid">
-							<FioriTile Title="User" Subtitle="Manage user accounts and access roles" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.User)">
+							<FioriTile Title="User" Subtitle="Manage user accounts and access roles" OnClick="() => NavigationManager.NavigateTo(OperationRouteNames.User)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -698,7 +698,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Audit Trail" Subtitle="Review system activity and change history" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AuditTrailReport)">
+							<FioriTile Title="Audit Trail" Subtitle="Review system activity and change history" OnClick="() => NavigationManager.NavigateTo(OperationRouteNames.AuditTrailReport)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -710,7 +710,7 @@ else
 								</IconContent>
 							</FioriTile>
 
-							<FioriTile Title="Settings" Subtitle="Manage system settings and global preferences" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Settings)">
+							<FioriTile Title="Settings" Subtitle="Manage system settings and global preferences" OnClick="() => NavigationManager.NavigateTo(OperationRouteNames.Settings)">
 								<IconContent>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="12" cy="12" r="3" />

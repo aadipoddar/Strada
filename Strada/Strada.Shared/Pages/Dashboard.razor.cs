@@ -1,4 +1,4 @@
-﻿using StradaLibrary.Operations.Models;
+﻿using Strada.Library.Operations.Models;
 
 using System.Reflection;
 
@@ -64,7 +64,7 @@ public partial class Dashboard
 			return;
 
 		if (Factor.Contains("Web"))
-			NavigationManager.NavigateTo(PageRouteNames.Dashboard, true);
+			NavigationManager.NavigateTo(OperationRouteNames.Dashboard, true);
 
 		else
 			await StartUpdateProcess(true);

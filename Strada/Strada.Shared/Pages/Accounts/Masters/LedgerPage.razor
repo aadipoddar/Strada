@@ -1,6 +1,6 @@
-@using StradaLibrary.Accounts.Masters.Models
+@using Strada.Library.Accounts.Masters.Models
 
-@attribute [Route(PageRouteNames.LedgerMaster)]
+@attribute [Route(AccountRouteNames.LedgerMaster)]
 
 <PageTitle>Ledger Management - Strada</PageTitle>
 
@@ -69,7 +69,7 @@ else
 												Placeholder="Select Group"
 												Label="Group"
 												FieldValue="@nameof(GroupModel.Name)"
-												AddNewRoute="@PageRouteNames.GroupMaster" />
+												AddNewRoute="@AccountRouteNames.GroupMaster" />
 						</div>
 
 						<div class="form-field">
@@ -79,7 +79,7 @@ else
 												Placeholder="Select Account Type"
 												Label="Account Type"
 												FieldValue="@nameof(AccountTypeModel.Name)"
-												AddNewRoute="@PageRouteNames.AccountTypeMaster" />
+												AddNewRoute="@AccountRouteNames.AccountTypeMaster" />
 						</div>
 
 						<div class="form-field">
@@ -89,7 +89,7 @@ else
 												Placeholder="Select State/UT"
 												Label="State/UT"
 												FieldValue="@nameof(StateUTModel.Name)"
-												AddNewRoute="@PageRouteNames.StateUTMaster" />
+												AddNewRoute="@AccountRouteNames.StateUTMaster" />
 						</div>
 
 						<div class="form-field">

@@ -1,7 +1,7 @@
-@attribute [Route(PageRouteNames.VehicleDriverMaster)]
+@attribute [Route(FleetRouteNames.VehicleDriverMaster)]
 
-@using StradaLibrary.Fleet.Route.Models
-@using StradaLibrary.Fleet.Vehicle.Models
+@using Strada.Library.Fleet.Route.Models
+@using Strada.Library.Fleet.Vehicle.Models
 
 <PageTitle>Vehicle Driver Management - Strada</PageTitle>
 
@@ -48,11 +48,11 @@ else
 					<div class="form-grid">
 						<div class="form-field">
 							<CustomAutoComplete @ref="_firstFocus" T="VehicleModel" @bind-Value="_selectedVehicle" DataSource="@_vehicles" Placeholder="Select Vehicle" Label="Vehicle (Ctrl + F)" FieldValue="@nameof(VehicleModel.Code)"
-												AddNewRoute="@PageRouteNames.VehicleMaster" />
+												AddNewRoute="@FleetRouteNames.VehicleMaster" />
 						</div>
 
 						<div class="form-field">
-							<CustomAutoComplete T="DriverModel" @bind-Value="_selectedDriver" DataSource="@_drivers" Placeholder="Select Driver" Label="Driver" FieldValue="@nameof(DriverModel.Name)" AddNewRoute="@PageRouteNames.DriverMaster" />
+							<CustomAutoComplete T="DriverModel" @bind-Value="_selectedDriver" DataSource="@_drivers" Placeholder="Select Driver" Label="Driver" FieldValue="@nameof(DriverModel.Name)" AddNewRoute="@FleetRouteNames.DriverMaster" />
 						</div>
 
 						<div class="form-field">

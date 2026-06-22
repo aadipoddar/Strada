@@ -1,9 +1,9 @@
-@attribute [Route(PageRouteNames.Expense)]
-@attribute [Route(PageRouteNames.Expense + "/{Id:int}")]
+@attribute [Route(FleetRouteNames.Expense)]
+@attribute [Route(FleetRouteNames.Expense + "/{Id:int}")]
 
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.Vehicle.Models
-@using StradaLibrary.Fleet.Expense.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.Vehicle.Models
+@using Strada.Library.Fleet.Expense.Models
 
 <PageTitle>Expense - Strada</PageTitle>
 
@@ -16,7 +16,7 @@
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction(true)" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(FleetRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedExpensesCartItem" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="RemoveSelectedExpensesCartItem" Disabled="@_isProcessing" />
 
@@ -41,8 +41,8 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="Expense Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Expense Details Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseDetailsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Expense Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Expense Details Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.ExpenseDetailsReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 			</LeftContent>
 			<RightContent>
@@ -69,7 +69,7 @@ else
 												Label="Vehicle (Ctrl + F)"
 												ValueChanged="OnVehicleChanged"
 												FieldValue="@nameof(VehicleModel.Code)"
-												AddNewRoute="@PageRouteNames.VehicleMaster" />
+												AddNewRoute="@FleetRouteNames.VehicleMaster" />
 						</div>
 
 						<!-- Company -->
@@ -81,7 +81,7 @@ else
 												Label="Company"
 												ValueChanged="OnCompanyChanged"
 												FieldValue="@nameof(CompanyModel.Name)"
-												AddNewRoute="@PageRouteNames.CompanyMaster" />
+												AddNewRoute="@AccountRouteNames.CompanyMaster" />
 						</div>
 
 						<!-- Transaction Date -->
@@ -139,7 +139,7 @@ else
 												ValueChanged="OnExpensesTypeChanged"
 												OpenOnFocus="false"
 												Label="Expense Type (Ctrl + G)"
-												AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+												AddNewRoute="@FleetRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Ledger -->
@@ -149,7 +149,7 @@ else
 												DataSource="@_ledgers" Placeholder="Select Ledger"
 												ValueChanged="OnLedgerChanged"
 												OpenOnFocus="false" Required="false"
-												Label="Ledger" AddNewRoute="@PageRouteNames.LedgerMaster" />
+												Label="Ledger" AddNewRoute="@AccountRouteNames.LedgerMaster" />
 						</div>
 
 						<!-- Amount -->

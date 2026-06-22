@@ -1,11 +1,10 @@
+using Strada.Library.Accounts.Masters.Data;
+using Strada.Library.Accounts.Masters.Exports;
+using Strada.Library.Accounts.Masters.Models;
+using Strada.Library.Operations.Models;
+using Strada.Library.Utils.ExportUtils;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
-
-using StradaLibrary.Accounts.Masters.Data;
-using StradaLibrary.Accounts.Masters.Exports;
-using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -47,7 +46,7 @@ public partial class FinancialYearPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Accounts]);
 			await LoadData();
 		}
-		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
+		catch { NavigationManager.NavigateTo(OperationRouteNames.Dashboard); }
 	}
 
 	private async Task LoadData()

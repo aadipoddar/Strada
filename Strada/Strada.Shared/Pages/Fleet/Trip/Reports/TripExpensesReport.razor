@@ -1,16 +1,16 @@
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.Expense.Models
-@using StradaLibrary.Fleet.OMC.Models
-@using StradaLibrary.Fleet.Route.Models
-@using StradaLibrary.Fleet.Trip.Models
-@using StradaLibrary.Fleet.Vehicle.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.Expense.Models
+@using Strada.Library.Fleet.OMC.Models
+@using Strada.Library.Fleet.Route.Models
+@using Strada.Library.Fleet.Trip.Models
+@using Strada.Library.Fleet.Vehicle.Models
 
-@attribute [Route(PageRouteNames.TripExpensesReport)]
+@attribute [Route(FleetRouteNames.TripExpensesReport)]
 
 <PageTitle>Trip Expenses Report - Strada</PageTitle>
 
-<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.Trip, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(FleetRouteNames.Trip, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus?.FocusAsync()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
@@ -33,7 +33,7 @@ else
 		<Header Title="Trip Expenses Report">
 			<LeftContent>
 				<MudBlazor.MudMenu Label="File" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="New Transaction (Ctrl + N)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.Trip, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="New Transaction (Ctrl + N)" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.Trip, FormFactor, JSRuntime, NavigationManager)" />
 					<MudBlazor.MudMenuItem Label="Refresh Data (Ctrl + R / F5)" OnClick="LoadTransactionOverviews" />
 					<MudBlazor.MudMenuItem Label="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" OnClick="ToggleDeleted" />
 					<MudBlazor.MudMenuItem Label="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")" OnClick="ToggleDetailsView" />
@@ -43,9 +43,9 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="Trip Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Card Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Trip Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Card Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Periods" Dense="true" Disabled="_isProcessing">
@@ -97,7 +97,7 @@ else
 												Label="Expense Type" Required="false"
 												ValueChanged="OnExpenseTypeChanged"
 												FieldValue="@nameof(ExpenseTypeModel.Name)"
-												AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+												AddNewRoute="@FleetRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Company -->
@@ -109,7 +109,7 @@ else
 												Label="Company" Required="false"
 												ValueChanged="OnCompanyChanged"
 												FieldValue="@nameof(CompanyModel.Name)"
-												AddNewRoute="@PageRouteNames.CompanyMaster" />
+												AddNewRoute="@AccountRouteNames.CompanyMaster" />
 						</div>
 
 						<!-- OMC -->
@@ -121,7 +121,7 @@ else
 												Label="OMC" Required="false"
 												ValueChanged="OnOMCChanged"
 												FieldValue="@nameof(OMCModel.Name)"
-												AddNewRoute="@PageRouteNames.OMCMaster" />
+												AddNewRoute="@FleetRouteNames.OMCMaster" />
 						</div>
 
 						<!-- Vehicle -->
@@ -133,7 +133,7 @@ else
 												Label="Vehicle" Required="false"
 												ValueChanged="OnVehicleChanged"
 												FieldValue="@nameof(VehicleModel.Code)"
-												AddNewRoute="@PageRouteNames.VehicleMaster" />
+												AddNewRoute="@FleetRouteNames.VehicleMaster" />
 						</div>
 
 						<!-- Route -->
@@ -145,7 +145,7 @@ else
 												Label="Route" Required="false"
 												ValueChanged="OnRouteChanged"
 												FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
-												AddNewRoute="@PageRouteNames.RouteMaster" />
+												AddNewRoute="@FleetRouteNames.RouteMaster" />
 						</div>
 
 						<!-- Driver -->
@@ -157,7 +157,7 @@ else
 												Label="Driver" Required="false"
 												ValueChanged="OnDriverChanged"
 												FieldValue="@nameof(DriverOverviewModel.DisplayName)"
-												AddNewRoute="@PageRouteNames.DriverMaster" />
+												AddNewRoute="@FleetRouteNames.DriverMaster" />
 						</div>
 
 						<!-- Vehicle Empty -->

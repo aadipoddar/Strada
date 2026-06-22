@@ -1,8 +1,7 @@
+using Strada.Library.Accounts.Masters.Models;
+using Strada.Library.Operations.Data;
+using Strada.Library.Operations.Models;
 using Strada.Shared.Components.Dialog;
-
-using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Pages.Operations;
 
@@ -99,7 +98,7 @@ public partial class SettingsPage
 			_isLoading = false;
 			StateHasChanged();
 		}
-		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
+		catch { NavigationManager.NavigateTo(OperationRouteNames.Dashboard); }
 	}
 
 	private async Task LoadData()

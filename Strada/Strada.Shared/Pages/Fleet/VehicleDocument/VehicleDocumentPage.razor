@@ -1,7 +1,7 @@
-@using StradaLibrary.Fleet.Vehicle.Models
-@using StradaLibrary.Fleet.VehicleDocument.Models
+@using Strada.Library.Fleet.Vehicle.Models
+@using Strada.Library.Fleet.VehicleDocument.Models
 
-@attribute [Route(PageRouteNames.VehicleDocument)]
+@attribute [Route(FleetRouteNames.VehicleDocument)]
 
 <PageTitle>Vehicle Document Management - Strada</PageTitle>
 
@@ -70,7 +70,7 @@ else
 												Placeholder="Select Document Type"
 												Label="Document Type"
 												FieldValue="@nameof(VehicleDocumentTypeModel.Name)"
-												AddNewRoute="@PageRouteNames.VehicleDocumentTypeMaster" />
+												AddNewRoute="@FleetRouteNames.VehicleDocumentTypeMaster" />
 						</div>
 
 						<div class="form-field">
@@ -80,7 +80,7 @@ else
 												Placeholder="Select Vehicle"
 												Label="Vehicle"
 												FieldValue="@nameof(VehicleModel.Code)"
-												AddNewRoute="@PageRouteNames.VehicleMaster" />
+												AddNewRoute="@FleetRouteNames.VehicleMaster" />
 						</div>
 
 						<div class="form-field">

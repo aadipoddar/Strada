@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
+using Strada.Library.Operations.Data;
+using Strada.Library.Operations.Models;
 
 namespace Strada.Shared.Pages.Authentication;
 
@@ -19,7 +19,7 @@ public partial class LoginWithCodeRedirect
 		{
 			if (string.IsNullOrWhiteSpace(Id) || string.IsNullOrWhiteSpace(Code))
 			{
-				NavigationManager.NavigateTo(PageRouteNames.Login, true);
+				NavigationManager.NavigateTo(OperationRouteNames.Login, true);
 				return;
 			}
 
@@ -28,7 +28,7 @@ public partial class LoginWithCodeRedirect
 
 			if (!isLoginWithCodeEnabled)
 			{
-				NavigationManager.NavigateTo(PageRouteNames.Login, true);
+				NavigationManager.NavigateTo(OperationRouteNames.Login, true);
 				return;
 			}
 
@@ -43,17 +43,17 @@ public partial class LoginWithCodeRedirect
 				user.LastCodeDeviceId is null ||
 				user.LastCodeDeviceId != deviceId)
 			{
-				NavigationManager.NavigateTo(PageRouteNames.Login, true);
+				NavigationManager.NavigateTo(OperationRouteNames.Login, true);
 				return;
 			}
 
 			await UserData.ResetInsertUser(user);
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
-			NavigationManager.NavigateTo(PageRouteNames.Dashboard, true);
+			NavigationManager.NavigateTo(OperationRouteNames.Dashboard, true);
 		}
 		catch
 		{
-			NavigationManager.NavigateTo(PageRouteNames.Login, true);
+			NavigationManager.NavigateTo(OperationRouteNames.Login, true);
 		}
 	}
 }

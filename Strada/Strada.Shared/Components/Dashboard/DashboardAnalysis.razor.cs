@@ -1,12 +1,12 @@
-using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Fleet.Expense.Models;
-using StradaLibrary.Fleet.OMC.Models;
-using StradaLibrary.Fleet.Trip.Data;
-using StradaLibrary.Fleet.Trip.Models;
-using StradaLibrary.Fleet.Vehicle.Models;
-using StradaLibrary.Fleet.VehicleDocument.Models;
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
+using Strada.Library.Accounts.Masters.Models;
+using Strada.Library.Fleet.Expense.Models;
+using Strada.Library.Fleet.OMC.Models;
+using Strada.Library.Fleet.Trip.Data;
+using Strada.Library.Fleet.Trip.Models;
+using Strada.Library.Fleet.Vehicle.Models;
+using Strada.Library.Fleet.VehicleDocument.Models;
+using Strada.Library.Operations.Data;
+using Strada.Library.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -191,25 +191,25 @@ public partial class DashboardAnalysis
 	private void OnGridContextMenuItemClicked(ContextMenuClickEventArgs<VehicleDocumentRenewalOverviewModel> args)
 	{
 		if (args.Item.Id == "Renew")
-			NavigationManager.NavigateTo(PageRouteNames.VehicleDocument);
+			NavigationManager.NavigateTo(FleetRouteNames.VehicleDocument);
 	}
 
 	private void OnTripsContextMenuItemClicked(ContextMenuClickEventArgs<TripOverviewModel> args)
 	{
 		if (args.Item.Id == "Bill")
-			NavigationManager.NavigateTo(PageRouteNames.Bill);
+			NavigationManager.NavigateTo(FleetRouteNames.Bill);
 	}
 
 	private void OnLossContextMenuItemClicked(ContextMenuClickEventArgs<TripOverviewModel> args)
 	{
 		if (args.Item.Id == "ViewTrip")
-			NavigationManager.NavigateTo(PageRouteNames.Trip);
+			NavigationManager.NavigateTo(FleetRouteNames.Trip);
 	}
 
 	private void OnIdleContextMenuItemClicked(ContextMenuClickEventArgs<VehicleModel> args)
 	{
 		if (args.Item.Id == "ViewVehicle")
-			NavigationManager.NavigateTo(PageRouteNames.VehicleMaster);
+			NavigationManager.NavigateTo(FleetRouteNames.VehicleMaster);
 	}
 	#endregion
 }

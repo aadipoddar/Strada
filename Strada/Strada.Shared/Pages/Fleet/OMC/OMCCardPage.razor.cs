@@ -1,12 +1,11 @@
+using Strada.Library.Accounts.Masters.Models;
+using Strada.Library.Fleet.OMC.Data;
+using Strada.Library.Fleet.OMC.Exports;
+using Strada.Library.Fleet.OMC.Models;
+using Strada.Library.Operations.Models;
+using Strada.Library.Utils.ExportUtils;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
-
-using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Fleet.OMC.Data;
-using StradaLibrary.Fleet.OMC.Exports;
-using StradaLibrary.Fleet.OMC.Models;
-using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -52,7 +51,7 @@ public partial class OMCCardPage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 			await LoadData();
 		}
-		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
+		catch { NavigationManager.NavigateTo(OperationRouteNames.Dashboard); }
 	}
 
 	private async Task LoadData()

@@ -1,10 +1,10 @@
-@attribute [Route(PageRouteNames.VehicleRegisterReport)]
+@attribute [Route(FleetRouteNames.VehicleRegisterReport)]
 
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.OMC.Models
-@using StradaLibrary.Fleet.Vehicle.Models
-@using StradaLibrary.Fleet.Trip.Models
-@using StradaLibrary.Fleet.Expense.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.OMC.Models
+@using Strada.Library.Fleet.Vehicle.Models
+@using Strada.Library.Fleet.Trip.Models
+@using Strada.Library.Fleet.Expense.Models
 
 <PageTitle>Vehicle Register - Strada</PageTitle>
 
@@ -33,9 +33,9 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="Trip Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Expense Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Bill Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Trip Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Expense Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.ExpenseReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Bill Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Periods" Dense="true" Disabled="_isProcessing">
@@ -75,14 +75,14 @@ else
 												Value="_selectedCompany" DataSource="@_companies"
 												Placeholder="All Companies" Label="Company" Required="false"
 												ValueChanged="OnCompanyChanged" FieldValue="@nameof(CompanyModel.Name)"
-												AddNewRoute="@PageRouteNames.CompanyMaster" />
+												AddNewRoute="@AccountRouteNames.CompanyMaster" />
 						</div>
 						<div class="form-field">
 							<CustomAutoComplete T="OMCModel"
 												Value="_selectedOMC" DataSource="@_omcs"
 												Placeholder="All OMCs" Label="OMC" Required="false"
 												ValueChanged="OnOMCChanged" FieldValue="@nameof(OMCModel.Name)"
-												AddNewRoute="@PageRouteNames.OMCMaster" />
+												AddNewRoute="@FleetRouteNames.OMCMaster" />
 						</div>
 					</div>
 				</div>

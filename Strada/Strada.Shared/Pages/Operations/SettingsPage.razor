@@ -1,6 +1,6 @@
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Operations.Models
-@attribute [Route(PageRouteNames.Settings)]
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Operations.Models
+@attribute [Route(OperationRouteNames.Settings)]
 
 <PageTitle>Settings - Strada</PageTitle>
 
@@ -40,7 +40,7 @@ else
 												Label="Primary Company"
 												ValueChanged="OnCompanyChange"
 												FieldValue="@nameof(CompanyModel.Name)"
-												AddNewRoute="@PageRouteNames.CompanyMaster" />
+												AddNewRoute="@AccountRouteNames.CompanyMaster" />
 						</div>
 					</div>
 				</div>
@@ -243,7 +243,7 @@ else
 												Label="Cash Ledger"
 												ValueChanged="OnCashLedgerChange"
 												FieldValue="@nameof(LedgerModel.Name)"
-												AddNewRoute="@PageRouteNames.LedgerMaster" />
+												AddNewRoute="@AccountRouteNames.LedgerMaster" />
 						</div>
 
 						<div class="form-field">
@@ -254,7 +254,7 @@ else
 												Label="GST Ledger"
 												ValueChanged="OnGSTLedgerChange"
 												FieldValue="@nameof(LedgerModel.Name)"
-												AddNewRoute="@PageRouteNames.LedgerMaster" />
+												AddNewRoute="@AccountRouteNames.LedgerMaster" />
 						</div>
 
 						<div class="form-field">
@@ -265,7 +265,7 @@ else
 												Label="Bill Ledger"
 												ValueChanged="OnBillLedgerChange"
 												FieldValue="@nameof(LedgerModel.Name)"
-												AddNewRoute="@PageRouteNames.LedgerMaster" />
+												AddNewRoute="@AccountRouteNames.LedgerMaster" />
 						</div>
 
 						<div class="form-field">
@@ -276,7 +276,7 @@ else
 												Label="OMC Card Money Transfer Ledger"
 												ValueChanged="OnOMCCardMoneyTransferLedgerChange"
 												FieldValue="@nameof(LedgerModel.Name)"
-												AddNewRoute="@PageRouteNames.LedgerMaster" />
+												AddNewRoute="@AccountRouteNames.LedgerMaster" />
 						</div>
 					</div>
 				</div>
@@ -297,7 +297,7 @@ else
 												Label="Bank Account Type"
 												ValueChanged="OnBankAccountTypeChange"
 												FieldValue="@nameof(AccountTypeModel.Name)"
-												AddNewRoute="@PageRouteNames.AccountTypeMaster" />
+												AddNewRoute="@AccountRouteNames.AccountTypeMaster" />
 						</div>
 					</div>
 				</div>
@@ -318,7 +318,7 @@ else
 												Label="Default Voucher for Accounting Transactions"
 												ValueChanged="OnDefaultVoucherChange"
 												FieldValue="@nameof(VoucherModel.Name)"
-												AddNewRoute="@PageRouteNames.VoucherMaster" />
+												AddNewRoute="@AccountRouteNames.VoucherMaster" />
 						</div>
 
 						<div class="form-field">
@@ -329,7 +329,7 @@ else
 												Label="Bill Voucher"
 												ValueChanged="OnBillVoucherChange"
 												FieldValue="@nameof(VoucherModel.Name)"
-												AddNewRoute="@PageRouteNames.VoucherMaster" />
+												AddNewRoute="@AccountRouteNames.VoucherMaster" />
 						</div>
 
 						<div class="form-field">
@@ -340,7 +340,7 @@ else
 												Label="OMC Card Money Transfer Voucher"
 												ValueChanged="OnOMCCardMoneyTransferVoucherChange"
 												FieldValue="@nameof(VoucherModel.Name)"
-												AddNewRoute="@PageRouteNames.VoucherMaster" />
+												AddNewRoute="@AccountRouteNames.VoucherMaster" />
 						</div>
 					</div>
 				</div>

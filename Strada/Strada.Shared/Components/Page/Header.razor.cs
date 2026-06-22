@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Components;
 
+using Strada.Library.Operations.Models;
 using Strada.Shared.Components.Input;
-
-using StradaLibrary.Operations.Models;
 
 using System.Reflection;
 
@@ -38,8 +37,16 @@ public partial class Header
 			x.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
 	}
 
-	private void LoadRoutes() => _searchItems = [.. typeof(PageRouteNames)
-			.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+
+	private static readonly Type[] _routeNameTypes =
+	[
+		typeof(OperationRouteNames),
+		typeof(AccountRouteNames),
+		typeof(FleetRouteNames)
+	];
+
+	private void LoadRoutes() => _searchItems = [.. _routeNameTypes
+			.SelectMany(t => t.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy))
 			.Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
 			.Select(f => new GlobalSearchItem
 			{
@@ -47,6 +54,7 @@ public partial class Header
 				FriendlyName = string.Join(" ", System.Text.RegularExpressions.Regex.Split(f.Name, @"(?<!^)(?=[A-Z])")),
 				Route = f.GetRawConstantValue() as string ?? string.Empty
 			})
+			.DistinctBy(x => x.Route)
 			.Select(x =>
 			{
 				x.DisplayText = x.FriendlyName.Equals(x.Name, StringComparison.Ordinal)
@@ -178,7 +186,7 @@ public partial class Header
 	}
 
 	private void NavigateToHome() =>
-		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
+		NavigationManager.NavigateTo(OperationRouteNames.Dashboard);
 
 	private async Task Logout() =>
 		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);

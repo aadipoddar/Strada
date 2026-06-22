@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-using StradaLibrary.Operations.Models;
+using Strada.Library.Operations.Models;
 
 namespace Strada.Shared.Services;
 
@@ -50,7 +50,7 @@ public static class AuthenticationService
 	{
 		await dataStorageService.SecureRemoveAll();
 		vibrationService.VibrateWithTime(500);
-		navigationManager.NavigateTo(PageRouteNames.Login);
+		navigationManager.NavigateTo(OperationRouteNames.Login);
 	}
 
 	public static Func<string, bool> OpenRouteInNewWindow { get; set; }

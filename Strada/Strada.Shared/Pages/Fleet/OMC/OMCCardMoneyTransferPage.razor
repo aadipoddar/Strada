@@ -1,8 +1,8 @@
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.OMC.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.OMC.Models
 
-@attribute [Route(PageRouteNames.OMCCardMoneyTransfer)]
-@attribute [Route(PageRouteNames.OMCCardMoneyTransfer + "/{Id:int}")]
+@attribute [Route(FleetRouteNames.OMCCardMoneyTransfer)]
+@attribute [Route(FleetRouteNames.OMCCardMoneyTransfer + "/{Id:int}")]
 
 <PageTitle>OMC Card Money Transfer - Strada</PageTitle>
 
@@ -15,7 +15,7 @@
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction(true)" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(FleetRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedTransfersCartItem" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="RemoveSelectedTransfersCartItem" Disabled="@_isProcessing" />
 
@@ -40,8 +40,8 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="OMC Card Money Transfer Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="OMC Card Money Transfer Details Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.OMCCardMoneyTransferDetailsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="OMC Card Money Transfer Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.OMCCardMoneyTransferReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="OMC Card Money Transfer Details Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.OMCCardMoneyTransferDetailsReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 			</LeftContent>
 			<RightContent>
@@ -68,7 +68,7 @@ else
 												Label="Ledger (Ctrl + F)"
 												ValueChanged="OnLedgerChanged"
 												FieldValue="@nameof(LedgerModel.Name)"
-												AddNewRoute="@PageRouteNames.LedgerMaster" />
+												AddNewRoute="@AccountRouteNames.LedgerMaster" />
 						</div>
 
 						<!-- Company -->
@@ -80,7 +80,7 @@ else
 												Label="Company"
 												ValueChanged="OnCompanyChanged"
 												FieldValue="@nameof(CompanyModel.Name)"
-												AddNewRoute="@PageRouteNames.CompanyMaster" />
+												AddNewRoute="@AccountRouteNames.CompanyMaster" />
 						</div>
 
 						<!-- Transaction Date -->
@@ -138,7 +138,7 @@ else
 												ValueChanged="OnOMCCardChanged"
 												OpenOnFocus="false"
 												Label="OMC Card (Ctrl + G)"
-												AddNewRoute="@PageRouteNames.OMCCardMaster" />
+												AddNewRoute="@FleetRouteNames.OMCCardMaster" />
 						</div>
 
 						<!-- Amount -->

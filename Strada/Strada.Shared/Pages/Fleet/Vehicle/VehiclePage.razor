@@ -1,8 +1,8 @@
-@attribute [Route(PageRouteNames.VehicleMaster)]
+@attribute [Route(FleetRouteNames.VehicleMaster)]
 
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.OMC.Models
-@using StradaLibrary.Fleet.Vehicle.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.OMC.Models
+@using Strada.Library.Fleet.Vehicle.Models
 
 <PageTitle>Vehicle - Strada</PageTitle>
 
@@ -83,7 +83,7 @@ else
 												Placeholder="Select vehicle type"
 												FieldValue="@nameof(VehicleTypeModel.Name)"
 												Label="Vehicle Type"
-												AddNewRoute="@PageRouteNames.VehicleTypeMaster" />
+												AddNewRoute="@FleetRouteNames.VehicleTypeMaster" />
 						</div>
 
 						<div class="form-field">
@@ -93,7 +93,7 @@ else
 												Placeholder="Select company"
 												FieldValue="@nameof(CompanyModel.Name)"
 												Label="Company"
-												AddNewRoute="@PageRouteNames.CompanyMaster" />
+												AddNewRoute="@AccountRouteNames.CompanyMaster" />
 						</div>
 
 						<div class="form-field">
@@ -103,7 +103,7 @@ else
 												Placeholder="Select OMC"
 												FieldValue="@nameof(OMCModel.Name)"
 												Label="OMC" Required="false"
-												AddNewRoute="@PageRouteNames.OMCMaster" />
+												AddNewRoute="@FleetRouteNames.OMCMaster" />
 						</div>
 
 						<div class="form-field">

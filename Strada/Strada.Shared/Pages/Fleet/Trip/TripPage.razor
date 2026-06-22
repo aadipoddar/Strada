@@ -1,12 +1,12 @@
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.Expense.Models
-@using StradaLibrary.Fleet.OMC.Models
-@using StradaLibrary.Fleet.Route.Models
-@using StradaLibrary.Fleet.Trip.Models
-@using StradaLibrary.Fleet.Vehicle.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.Expense.Models
+@using Strada.Library.Fleet.OMC.Models
+@using Strada.Library.Fleet.Route.Models
+@using Strada.Library.Fleet.Trip.Models
+@using Strada.Library.Fleet.Vehicle.Models
 
-@attribute [Route(PageRouteNames.Trip)]
-@attribute [Route(PageRouteNames.Trip + "/{Id:int}")]
+@attribute [Route(FleetRouteNames.Trip)]
+@attribute [Route(FleetRouteNames.Trip + "/{Id:int}")]
 
 <PageTitle>Trip - Strada</PageTitle>
 
@@ -21,7 +21,7 @@
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction(true)" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="EditSelectedExpensesCartItem" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="RemoveSelectedExpensesCartItem" Disabled="@_isProcessing" />
 
@@ -46,10 +46,10 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="Trip Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Expenses Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripExpensesReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Card Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Trip Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Expenses Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripExpensesReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Card Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripCardPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.TripLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 			</LeftContent>
 			<RightContent>
@@ -79,7 +79,7 @@ else
 													Label="Vehicle (Ctrl + F)"
 													ValueChanged="OnVehicleChanged"
 													FieldValue="@nameof(VehicleModel.Code)"
-													AddNewRoute="@PageRouteNames.VehicleMaster" />
+													AddNewRoute="@FleetRouteNames.VehicleMaster" />
 							</div>
 
 							<!-- Sl No -->
@@ -106,7 +106,7 @@ else
 													Label="Route"
 													ValueChanged="OnRouteChanged"
 													FieldValue="@nameof(RouteOverviewModel.RouteDisplay)"
-													AddNewRoute="@PageRouteNames.RouteMaster" />
+													AddNewRoute="@FleetRouteNames.RouteMaster" />
 							</div>
 
 							<!-- Driver -->
@@ -118,7 +118,7 @@ else
 													Label="Driver"
 													ValueChanged="OnDriverChanged"
 													FieldValue="@nameof(DriverOverviewModel.DisplayName)"
-													AddNewRoute="@PageRouteNames.DriverMaster" />
+													AddNewRoute="@FleetRouteNames.DriverMaster" />
 							</div>
 
 							<!-- Company -->
@@ -130,7 +130,7 @@ else
 													Label="Company"
 													ValueChanged="OnCompanyChanged"
 													FieldValue="@nameof(CompanyModel.Name)"
-													AddNewRoute="@PageRouteNames.CompanyMaster" />
+													AddNewRoute="@AccountRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- OMC -->
@@ -142,7 +142,7 @@ else
 													Label="OMC"
 													ValueChanged="OnOMCChanged"
 													FieldValue="@nameof(OMCModel.Name)"
-													AddNewRoute="@PageRouteNames.OMCMaster" />
+													AddNewRoute="@FleetRouteNames.OMCMaster" />
 							</div>
 
 							<!-- Empty -->
@@ -274,7 +274,7 @@ else
 													FieldValue="@nameof(OMCCardModel.CardNumber)" Value="_selectedOMCCard"
 													DataSource="@_omcCards" Placeholder="Select OMC Card"
 													ValueChanged="OnCardPaymentsTypeChanged" OpenOnFocus="false"
-													Label="Card (Ctrl + Shift + F)" AddNewRoute="@PageRouteNames.OMCCardMaster" />
+													Label="Card (Ctrl + Shift + F)" AddNewRoute="@FleetRouteNames.OMCCardMaster" />
 							</div>
 
 							<!-- Amount -->
@@ -368,7 +368,7 @@ else
 													FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
 													DataSource="@_ledgers" Placeholder="Select a Ledger"
 													ValueChanged="OnLedgerPaymentsTypeChanged" OpenOnFocus="false"
-													Label="Ledger (Ctrl + Shift + G)" AddNewRoute="@PageRouteNames.LedgerMaster" />
+													Label="Ledger (Ctrl + Shift + G)" AddNewRoute="@AccountRouteNames.LedgerMaster" />
 							</div>
 
 							<div class="cart-field cart-field-wide">
@@ -462,7 +462,7 @@ else
 												FieldValue="@nameof(ExpenseTypeModel.Name)" Value="_selectedExpenseType"
 												DataSource="@_expenseTypes" Placeholder="Select Expense Type"
 												ValueChanged="OnExpensesTypeChanged" OpenOnFocus="false"
-												Label="Expense Type (Ctrl + G)" AddNewRoute="@PageRouteNames.ExpenseTypeMaster" />
+												Label="Expense Type (Ctrl + G)" AddNewRoute="@FleetRouteNames.ExpenseTypeMaster" />
 						</div>
 
 						<!-- Amount -->

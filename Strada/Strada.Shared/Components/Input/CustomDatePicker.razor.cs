@@ -2,7 +2,7 @@
 
 using MudBlazor;
 
-using StradaLibrary.Accounts.Masters.Models;
+using Strada.Library.Accounts.Masters.Models;
 
 namespace Strada.Shared.Components.Input;
 
@@ -26,7 +26,7 @@ public partial class CustomDatePicker
 	[Parameter] public string Label { get; set; } = "Transaction Date";
 	[Parameter] public bool Required { get; set; } = true;
 	[Parameter] public bool ShowFinancialYear { get; set; } = true;
-	[Parameter] public string AddNewRoute { get; set; } = PageRouteNames.FinancialYearMaster;
+	[Parameter] public string AddNewRoute { get; set; } = AccountRouteNames.FinancialYearMaster;
 
 	// MudDatePicker always needs DateTime? internally
 	private DateTime? DateValue => Required

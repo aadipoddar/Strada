@@ -1,6 +1,6 @@
-﻿@using StradaLibrary.DataAccess
+﻿@using Strada.Library.DataAccess
 
-@attribute [Route(PageRouteNames.LoginWithCode)]
+@attribute [Route(OperationRouteNames.LoginWithCode)]
 
 <PageTitle>Login with Code - Strada</PageTitle>
 
@@ -85,7 +85,7 @@
 			<!-- Back to Login Link -->
 			<div class="forgot-password-section" style="margin-top: 8px;">
 				<a class="forgot-password-link"
-				   @onclick="() => NavigationManager.NavigateTo(PageRouteNames.Login, true)">
+				   @onclick="() => NavigationManager.NavigateTo(OperationRouteNames.Login, true)">
 					Back to Login
 				</a>
 			</div>

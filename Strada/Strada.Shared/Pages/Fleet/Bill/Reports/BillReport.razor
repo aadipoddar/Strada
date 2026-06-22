@@ -1,12 +1,12 @@
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.OMC.Models
-@using StradaLibrary.Fleet.Bill.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.OMC.Models
+@using Strada.Library.Fleet.Bill.Models
 
-@attribute [Route(PageRouteNames.BillReport)]
+@attribute [Route(FleetRouteNames.BillReport)]
 
 <PageTitle>Bill Report - Strada</PageTitle>
 
-<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.Bill, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyN KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(FleetRouteNames.Bill, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyF KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => _firstFocus?.FocusAsync()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.F5 OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyR KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="LoadTransactionOverviews" Disabled="@_isProcessing" />
@@ -29,7 +29,7 @@ else
 		<Header Title="Bill Report">
 			<LeftContent>
 				<MudBlazor.MudMenu Label="File" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="New Transaction (Ctrl + N)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.Bill, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="New Transaction (Ctrl + N)" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.Bill, FormFactor, JSRuntime, NavigationManager)" />
 					<MudBlazor.MudMenuItem Label="Refresh Data (Ctrl + R / F5)" OnClick="LoadTransactionOverviews" />
 					<MudBlazor.MudMenuItem Label="@(_showDeleted ? "Hide Deleted (Ctrl + Delete)" : "Show Deleted (Ctrl + Delete)")" OnClick="() => ToggleDeleted()" />
 					<MudBlazor.MudMenuItem Label="@(_showAllColumns ? "Hide Details (Ctrl + Q)" : "Show Details (Ctrl + Q)")" OnClick="() => ToggleDetailsView()" />
@@ -39,7 +39,7 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Periods" Dense="true" Disabled="_isProcessing">
@@ -92,7 +92,7 @@ else
 												Label="Company" Required="false"
 												ValueChanged="OnCompanyChanged"
 												FieldValue="@nameof(CompanyModel.Name)"
-												AddNewRoute="@PageRouteNames.CompanyMaster" />
+												AddNewRoute="@AccountRouteNames.CompanyMaster" />
 						</div>
 
 						<!-- OMC -->
@@ -104,7 +104,7 @@ else
 												Label="OMC" Required="false"
 												ValueChanged="OnOMCChanged"
 												FieldValue="@nameof(OMCModel.Name)"
-												AddNewRoute="@PageRouteNames.OMCMaster" />
+												AddNewRoute="@FleetRouteNames.OMCMaster" />
 						</div>
 					</div>
 				</div>

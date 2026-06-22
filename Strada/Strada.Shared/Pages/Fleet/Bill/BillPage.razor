@@ -1,10 +1,10 @@
-@attribute [Route(PageRouteNames.Bill)]
-@attribute [Route(PageRouteNames.Bill + "/{Id:int}")]
+@attribute [Route(FleetRouteNames.Bill)]
+@attribute [Route(FleetRouteNames.Bill + "/{Id:int}")]
 
-@using StradaLibrary.Accounts.Masters.Models
-@using StradaLibrary.Fleet.OMC.Models
-@using StradaLibrary.Fleet.Trip.Models
-@using StradaLibrary.Fleet.Bill.Models
+@using Strada.Library.Accounts.Masters.Models
+@using Strada.Library.Fleet.OMC.Models
+@using Strada.Library.Fleet.Trip.Models
+@using Strada.Library.Fleet.Bill.Models
 
 <PageTitle>Bill - Strada</PageTitle>
 
@@ -17,7 +17,7 @@
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction(true)" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(FleetRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
 
 @if (_isLoading || _user is null)
 {
@@ -40,8 +40,8 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="Bill Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Bill Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.BillReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Ledger Payments Report" OnClick="() => AuthenticationService.NavigateToRoute(FleetRouteNames.BillLedgerPaymentsReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 			</LeftContent>
 			<RightContent>
@@ -72,7 +72,7 @@ else
 													Label="Company (Ctrl + F)"
 													ValueChanged="OnCompanyChanged"
 													FieldValue="@nameof(CompanyModel.Name)"
-													AddNewRoute="@PageRouteNames.CompanyMaster" />
+													AddNewRoute="@AccountRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Transaction Date -->
@@ -97,7 +97,7 @@ else
 													Label="OMC"
 													ValueChanged="OnOMCChanged"
 													FieldValue="@nameof(OMCModel.Name)"
-													AddNewRoute="@PageRouteNames.OMCMaster" />
+													AddNewRoute="@FleetRouteNames.OMCMaster" />
 							</div>
 
 							<!-- Remarks -->
@@ -182,7 +182,7 @@ else
 													FieldValue="@nameof(LedgerModel.Name)" Value="_selectedLedger"
 													DataSource="@_ledgers" Placeholder="Select a Ledger"
 													ValueChanged="OnLedgerPaymentsTypeChanged" OpenOnFocus="false"
-													Label="Ledger (Ctrl + Shift + G)" AddNewRoute="@PageRouteNames.LedgerMaster" />
+													Label="Ledger (Ctrl + Shift + G)" AddNewRoute="@AccountRouteNames.LedgerMaster" />
 							</div>
 
 							<div class="cart-field cart-field-wide">

@@ -1,8 +1,8 @@
-@using StradaLibrary.Accounts.FinancialAccounting.Models
-@using StradaLibrary.Accounts.Masters.Models
+@using Strada.Library.Accounts.FinancialAccounting.Models
+@using Strada.Library.Accounts.Masters.Models
 
-@attribute [Route(PageRouteNames.FinancialAccounting)]
-@attribute [Route(PageRouteNames.FinancialAccounting + "/{Id:int}")]
+@attribute [Route(AccountRouteNames.FinancialAccounting)]
+@attribute [Route(AccountRouteNames.FinancialAccounting + "/{Id:int}")]
 
 <PageTitle>Financial Accounting - Strada</PageTitle>
 
@@ -15,7 +15,7 @@
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => SaveTransaction(saveExcel: true)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyP KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.KeyE KeyModifiers=[JsKeyModifier.AltLeft] OnHotkeyPressed="() => ExportSelectedTransaction(true)" Disabled="@_isProcessing" />
-<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
+<MudBlazor.MudHotkey Key=JsKey.KeyH KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => AuthenticationService.NavigateToRoute(AccountRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager)" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Insert OnHotkeyPressed="() => EditSelectedCartItem()" Disabled="@_isProcessing" />
 <MudBlazor.MudHotkey Key=JsKey.Delete OnHotkeyPressed="() => RemoveSelectedCartItem()" Disabled="@_isProcessing" />
 
@@ -40,12 +40,12 @@ else
 				</MudBlazor.MudMenu>
 
 				<MudBlazor.MudMenu Label="Open" Dense="true" Disabled="_isProcessing">
-					<MudBlazor.MudMenuItem Label="Accounting Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Ledger Report" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Bank Reconciliation" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.BankReconciliation, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Trial Balance" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Profit & Loss" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager)" />
-					<MudBlazor.MudMenuItem Label="Balance Sheet" OnClick="() => AuthenticationService.NavigateToRoute(PageRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Accounting Report (Ctrl + H)" OnClick="() => AuthenticationService.NavigateToRoute(AccountRouteNames.FinancialAccountingReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Ledger Report" OnClick="() => AuthenticationService.NavigateToRoute(AccountRouteNames.AccountingLedgerReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Bank Reconciliation" OnClick="() => AuthenticationService.NavigateToRoute(AccountRouteNames.BankReconciliation, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Trial Balance" OnClick="() => AuthenticationService.NavigateToRoute(AccountRouteNames.TrialBalanceReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Profit & Loss" OnClick="() => AuthenticationService.NavigateToRoute(AccountRouteNames.ProfitAndLossReport, FormFactor, JSRuntime, NavigationManager)" />
+					<MudBlazor.MudMenuItem Label="Balance Sheet" OnClick="() => AuthenticationService.NavigateToRoute(AccountRouteNames.BalanceSheetReport, FormFactor, JSRuntime, NavigationManager)" />
 				</MudBlazor.MudMenu>
 			</LeftContent>
 		</Header>
@@ -71,7 +71,7 @@ else
 													Label="Company (Ctrl + F)"
 													ValueChanged="OnCompanyChanged"
 													FieldValue="@nameof(CompanyModel.Name)"
-													AddNewRoute="@PageRouteNames.CompanyMaster" />
+													AddNewRoute="@AccountRouteNames.CompanyMaster" />
 							</div>
 
 							<!-- Voucher -->
@@ -83,7 +83,7 @@ else
 													Label="Voucher"
 													ValueChanged="OnVoucherChanged"
 													FieldValue="@nameof(VoucherModel.Name)"
-													AddNewRoute="@PageRouteNames.VoucherMaster" />
+													AddNewRoute="@AccountRouteNames.VoucherMaster" />
 							</div>
 
 							<!-- Transaction Date -->
@@ -199,7 +199,7 @@ else
 													Label="Ledger (Ctrl + G)"
 													ValueChanged="OnItemChanged" OpenOnFocus="false"
 													FieldValue="@nameof(LedgerModel.Name)"
-													AddNewRoute="@PageRouteNames.LedgerMaster" />
+													AddNewRoute="@AccountRouteNames.LedgerMaster" />
 
 								<div class="reference-actions">
 									<IconButton Icon="IconType.Get" Variant="ButtonVariant.Get" Size="ButtonSize.Small"

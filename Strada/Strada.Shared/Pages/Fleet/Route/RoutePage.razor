@@ -1,6 +1,6 @@
-@attribute [Route(PageRouteNames.RouteMaster)]
+@attribute [Route(FleetRouteNames.RouteMaster)]
 
-@using StradaLibrary.Fleet.Route.Models
+@using Strada.Library.Fleet.Route.Models
 
 <PageTitle>Route - Strada</PageTitle>
 
@@ -54,7 +54,7 @@ else
 												Placeholder="Select From Location"
 												Label="From Location (Ctrl + F)"
 												FieldValue="@nameof(LocationModel.Name)"
-												AddNewRoute="@PageRouteNames.LocationMaster" />
+												AddNewRoute="@FleetRouteNames.LocationMaster" />
 						</div>
 
 						<div class="form-field">
@@ -64,7 +64,7 @@ else
 												Placeholder="Select To Location"
 												Label="To Location"
 												FieldValue="@nameof(LocationModel.Name)"
-												AddNewRoute="@PageRouteNames.LocationMaster" />
+												AddNewRoute="@FleetRouteNames.LocationMaster" />
 						</div>
 
 						<div class="form-field">

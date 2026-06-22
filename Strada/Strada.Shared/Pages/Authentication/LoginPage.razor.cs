@@ -1,10 +1,9 @@
 using Microsoft.JSInterop;
 
+using Strada.Library.Operations.Data;
+using Strada.Library.Operations.Models;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
-
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
 
 namespace Strada.Shared.Pages.Authentication;
 
@@ -103,7 +102,7 @@ public partial class LoginPage
 			await UserData.ResetInsertUser(user);
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
 			VibrationService.VibrateWithTime(500);
-			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
+			NavigationManager.NavigateTo(OperationRouteNames.Dashboard);
 		}
 		catch (Exception ex)
 		{
@@ -120,6 +119,6 @@ public partial class LoginPage
 		if (!_isLoginWithCodeEnabled)
 			return;
 
-		NavigationManager.NavigateTo(PageRouteNames.LoginWithCode);
+		NavigationManager.NavigateTo(OperationRouteNames.LoginWithCode);
 	}
 }

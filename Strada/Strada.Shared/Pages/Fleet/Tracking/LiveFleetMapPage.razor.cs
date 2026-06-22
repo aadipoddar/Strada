@@ -1,7 +1,7 @@
 using Microsoft.JSInterop;
 
-using StradaLibrary.APIService;
-using StradaLibrary.Operations.Models;
+using Strada.Library.APIService;
+using Strada.Library.Operations.Models;
 
 namespace Strada.Shared.Pages.Fleet.Tracking;
 
@@ -31,7 +31,7 @@ public partial class LiveFleetMapPage : IAsyncDisposable
 				_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 				await LoadData();
 			}
-			catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
+			catch { NavigationManager.NavigateTo(OperationRouteNames.Dashboard); }
 			return;
 		}
 

@@ -1,7 +1,7 @@
-@attribute [Route(PageRouteNames.TyreMounting)]
+@attribute [Route(FleetRouteNames.TyreMounting)]
 
-@using StradaLibrary.Fleet.Tyre.Models
-@using StradaLibrary.Fleet.Vehicle.Models
+@using Strada.Library.Fleet.Tyre.Models
+@using Strada.Library.Fleet.Vehicle.Models
 
 <PageTitle>Tyre Mounting - Strada</PageTitle>
 
@@ -60,7 +60,7 @@ else
 												Placeholder="Select Tyre Company"
 												Label="Tyre Company"
 												FieldValue="@nameof(TyreCompanyModel.Name)"
-												AddNewRoute="@PageRouteNames.TyreCompanyMaster" />
+												AddNewRoute="@FleetRouteNames.TyreCompanyMaster" />
 						</div>
 
 						<div class="form-field">
@@ -77,7 +77,7 @@ else
 												Placeholder="Select Vehicle"
 												Label="Vehicle"
 												FieldValue="@nameof(VehicleModel.Code)"
-												AddNewRoute="@PageRouteNames.VehicleMaster" />
+												AddNewRoute="@FleetRouteNames.VehicleMaster" />
 						</div>
 
 						<div class="form-field">

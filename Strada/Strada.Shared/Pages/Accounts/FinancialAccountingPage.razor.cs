@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Components;
 
+using Strada.Library.Accounts.FinancialAccounting.Data;
+using Strada.Library.Accounts.FinancialAccounting.Models;
+using Strada.Library.Accounts.Masters.Data;
+using Strada.Library.Accounts.Masters.Models;
+using Strada.Library.Operations.Data;
+using Strada.Library.Operations.Models;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
-
-using StradaLibrary.Accounts.FinancialAccounting.Data;
-using StradaLibrary.Accounts.FinancialAccounting.Models;
-using StradaLibrary.Accounts.Masters.Data;
-using StradaLibrary.Accounts.Masters.Models;
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
 
 using Syncfusion.Blazor.Grids;
 
@@ -107,7 +106,7 @@ public partial class FinancialAccountingPage
 		if (_accounting is null || _accounting.Id == 0)
 		{
 			await _toastNotification.ShowAsync("Transaction Not Found", "The requested transaction could not be found.", ToastType.Error);
-			NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting, true);
+			NavigationManager.NavigateTo(AccountRouteNames.FinancialAccounting, true);
 		}
 
 		return true;

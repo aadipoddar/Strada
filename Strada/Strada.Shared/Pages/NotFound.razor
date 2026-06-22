@@ -1,8 +1,10 @@
-﻿@page "/not-found"
+﻿@using Strada.Library.DataAccess
 
-@using StradaLibrary.DataAccess
+@page "/not-found"
 
 <PageTitle>404 - Not Found</PageTitle>
+
+<MudBlazor.MudHotkey Key=JsKey.KeyD KeyModifiers=[JsKeyModifier.ControlLeft] OnHotkeyPressed="() => NavigationManager.NavigateTo(OperationRouteNames.Dashboard)" />
 
 <div class="page_404">
     <div class="container">

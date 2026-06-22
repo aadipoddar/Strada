@@ -1,9 +1,8 @@
+using Strada.Library.Operations.Data;
+using Strada.Library.Operations.Models;
+using Strada.Library.Utils.MailUtils;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
-
-using StradaLibrary.Operations.Data;
-using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.MailUtils;
 
 using Syncfusion.Blazor.Inputs;
 
@@ -51,7 +50,7 @@ public partial class LoginWithCodePage
 			_isLoginWithCodeEnabled = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableLoginWithCode)).Value);
 
 			if (!_isLoginWithCodeEnabled)
-				NavigationManager.NavigateTo(PageRouteNames.Login, true);
+				NavigationManager.NavigateTo(OperationRouteNames.Login, true);
 
 			_isEnabledUsersResetPassword = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableUsersToResetPassword)).Value);
 			_maxLoginAttempts = int.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.MaxLoginAttempts)).Value);
@@ -110,7 +109,7 @@ public partial class LoginWithCodePage
 				user.LastCodeDeviceId = guid;
 				await UserData.InsertUser(user);
 
-				var redirectLink = NavigationManager.BaseUri + PageRouteNames.LoginWithCodeRedirect + $"/{user.Id}/{_verificationCode}";
+				var redirectLink = NavigationManager.BaseUri + OperationRouteNames.LoginWithCodeRedirect + $"/{user.Id}/{_verificationCode}";
 
 				await AuthenticationMailing.SendLoginCodeEmail(user, _verificationCode.ToString(), redirectLink, _codeExpiryMinutes);
 				_codeSentTime = await CommonData.LoadCurrentDateTime();
@@ -213,7 +212,7 @@ public partial class LoginWithCodePage
 
 			await UserData.ResetInsertUser(user);
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
-			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
+			NavigationManager.NavigateTo(OperationRouteNames.Dashboard);
 		}
 		catch (Exception ex)
 		{

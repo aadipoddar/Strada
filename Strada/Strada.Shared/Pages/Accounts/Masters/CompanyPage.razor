@@ -1,6 +1,6 @@
-@using StradaLibrary.Accounts.Masters.Models
+@using Strada.Library.Accounts.Masters.Models
 
-@attribute [Route(PageRouteNames.CompanyMaster)]
+@attribute [Route(AccountRouteNames.CompanyMaster)]
 
 <PageTitle>Company Management - Strada</PageTitle>
 
@@ -67,7 +67,7 @@ else
 												Placeholder="Select State/UT"
 												Label="State/UT"
 												FieldValue="@nameof(StateUTModel.Name)"
-												AddNewRoute="@PageRouteNames.StateUTMaster" />
+												AddNewRoute="@AccountRouteNames.StateUTMaster" />
 						</div>
 
 						<div class="form-field">

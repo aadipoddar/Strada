@@ -1,14 +1,14 @@
-﻿@using StradaLibrary.Fleet.OMC.Models
-@using StradaLibrary.Fleet.Trip.Models
-@using StradaLibrary.Fleet.Vehicle.Models
-@using StradaLibrary.Fleet.VehicleDocument.Models
+﻿@using Strada.Library.Fleet.OMC.Models
+@using Strada.Library.Fleet.Trip.Models
+@using Strada.Library.Fleet.Vehicle.Models
+@using Strada.Library.Fleet.VehicleDocument.Models
 
 <!-- KPI -->
 <div class="launchpad-section">
 	<h2 class="launchpad-section-title">Key Figures</h2>
 	<div class="dashboard-grid">
 
-		<FioriTile Title="Unbilled Trips" Subtitle="Trips not yet added to a bill" KPI="@_unbilledTripsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Bill)">
+		<FioriTile Title="Unbilled Trips" Subtitle="Trips not yet added to a bill" KPI="@_unbilledTripsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.Bill)">
 			<IconContent>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<rect x="1" y="3" width="15" height="13" />
@@ -19,7 +19,7 @@
 			</IconContent>
 		</FioriTile>
 
-		<FioriTile Title="Trips This Month" Subtitle="@_thisMonthTripsTrend" KPI="@_thisMonthTripsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripReport)">
+		<FioriTile Title="Trips This Month" Subtitle="@_thisMonthTripsTrend" KPI="@_thisMonthTripsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TripReport)">
 			<IconContent>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<rect x="1" y="3" width="15" height="13" />
@@ -30,7 +30,7 @@
 			</IconContent>
 		</FioriTile>
 
-		<FioriTile Title="Revenue This Month" Subtitle="@_thisMonthRevenueTrend" KPI="@_thisMonthRevenue" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripReport)">
+		<FioriTile Title="Revenue This Month" Subtitle="@_thisMonthRevenueTrend" KPI="@_thisMonthRevenue" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TripReport)">
 			<IconContent>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
@@ -39,7 +39,7 @@
 			</IconContent>
 		</FioriTile>
 
-		<FioriTile Title="Expense This Month" Subtitle="@_thisMonthExpenseTrend" KPI="@_thisMonthExpense" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.TripExpensesReport)">
+		<FioriTile Title="Expense This Month" Subtitle="@_thisMonthExpenseTrend" KPI="@_thisMonthExpense" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.TripExpensesReport)">
 			<IconContent>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
@@ -48,7 +48,7 @@
 			</IconContent>
 		</FioriTile>
 
-		<FioriTile Title="Profit / Loss This Month" Subtitle="@_thisMonthProfitTrend" KPI="@_thisMonthProfit" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleRegisterReport)">
+		<FioriTile Title="Profit / Loss This Month" Subtitle="@_thisMonthProfitTrend" KPI="@_thisMonthProfit" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleRegisterReport)">
 			<IconContent>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<line x1="12" y1="20" x2="12" y2="10" />
@@ -58,7 +58,7 @@
 			</IconContent>
 		</FioriTile>
 
-		<FioriTile Title="Active Vehicles" Subtitle="@_activeVehiclesNote" KPI="@_activeVehiclesCount.ToString()" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleMaster)">
+		<FioriTile Title="Active Vehicles" Subtitle="@_activeVehiclesNote" KPI="@_activeVehiclesCount.ToString()" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleMaster)">
 			<IconContent>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M10 17h4V5H2v12h3" />
@@ -69,7 +69,7 @@
 			</IconContent>
 		</FioriTile>
 
-		<FioriTile Title="Documents Due Soon" Subtitle="@_dueDocumentsNote" KPI="@_dueDocumentsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.VehicleDocumentRenewalReport)">
+		<FioriTile Title="Documents Due Soon" Subtitle="@_dueDocumentsNote" KPI="@_dueDocumentsCount.ToString()" OnClick="() => NavigationManager.NavigateTo(FleetRouteNames.VehicleDocumentRenewalReport)">
 			<IconContent>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />

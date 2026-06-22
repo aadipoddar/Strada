@@ -1,6 +1,6 @@
 using MudBlazor;
 
-using StradaLibrary.Fleet.Analysis;
+using Strada.Library.Fleet.Analysis;
 
 namespace Strada.Shared.Components.Dashboard;
 

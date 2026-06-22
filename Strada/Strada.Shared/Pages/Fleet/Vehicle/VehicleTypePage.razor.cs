@@ -1,11 +1,10 @@
+using Strada.Library.Fleet.Vehicle.Data;
+using Strada.Library.Fleet.Vehicle.Exports;
+using Strada.Library.Fleet.Vehicle.Models;
+using Strada.Library.Operations.Models;
+using Strada.Library.Utils.ExportUtils;
 using Strada.Shared.Components.Dialog;
 using Strada.Shared.Components.Input;
-
-using StradaLibrary.Fleet.Vehicle.Data;
-using StradaLibrary.Fleet.Vehicle.Exports;
-using StradaLibrary.Fleet.Vehicle.Models;
-using StradaLibrary.Operations.Models;
-using StradaLibrary.Utils.ExportUtils;
 
 using Syncfusion.Blazor.Grids;
 
@@ -47,7 +46,7 @@ public partial class VehicleTypePage
 			_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, [UserRoles.Fleet]);
 			await LoadData();
 		}
-		catch { NavigationManager.NavigateTo(PageRouteNames.Dashboard); }
+		catch { NavigationManager.NavigateTo(OperationRouteNames.Dashboard); }
 	}
 
 	private async Task LoadData()
