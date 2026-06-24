@@ -25,8 +25,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore Strada.slnx
 
-    - name: Build ExcelImport
-      run: dotnet build ExcelImport/ExcelImport.csproj --no-restore --configuration Release    
+    - name: Build Strada.Tools
+      run: dotnet build Strada.Tools/Strada.Tools.csproj --no-restore --configuration Release    
 
     - name: Build Strada.Library
       run: dotnet build Strada.Library/Strada.Library.csproj --no-restore --configuration Release

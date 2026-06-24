@@ -170,28 +170,19 @@ public partial class FinancialAccountingPage
 	private async Task LoadSelections()
 	{
 		if (_accounting.CompanyId > 0)
-			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _accounting.CompanyId) ?? _companies.FirstOrDefault() ?? new();
+			_selectedCompany = _companies.FirstOrDefault(s => s.Id == _accounting.CompanyId) ?? _companies.FirstOrDefault();
 		else
-		{
-			var mainCompanyId = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
-			_selectedCompany = _companies.FirstOrDefault(s => s.Id.ToString() == mainCompanyId.Value) ?? _companies.FirstOrDefault() ?? new();
-		}
-		_accounting.CompanyId = _selectedCompany.Id;
+			_selectedCompany = _companies.FirstOrDefault();
 
 		if (_accounting.VoucherId > 0)
 			_selectedVoucher = _vouchers.FirstOrDefault(s => s.Id == _accounting.VoucherId) ?? _vouchers.FirstOrDefault() ?? new();
 		else
 			_selectedVoucher = _vouchers.FirstOrDefault() ?? new();
+
+		_accounting.CompanyId = _selectedCompany.Id;
 		_accounting.VoucherId = _selectedVoucher.Id;
 
-		if (_accounting.FinancialYearId > 0)
-			_selectedFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, _accounting.FinancialYearId);
-
-		if (_selectedFinancialYear is null || _selectedFinancialYear.Id <= 0)
-			_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_accounting.TransactionDateTime);
-
-		if (_selectedFinancialYear is not null)
-			_accounting.FinancialYearId = _selectedFinancialYear.Id;
+		_selectedFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(AccountNames.FinancialYear, _accounting.FinancialYearId);
 	}
 
 	private async Task LoadCart()

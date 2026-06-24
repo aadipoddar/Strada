@@ -218,7 +218,7 @@
     <Build Include="Fleet\OMC\Load\OMCCardMoneyTransferDetails_Overview.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PublishLocations\LocalStrada.publish.xml" />
-    <None Include="PublishLocations\AzureStrada.publish.xml" />
+    <None Include="PublishLocations\AzureDB.publish.xml" />
+    <None Include="PublishLocations\LocalDB.publish.xml" />
   </ItemGroup>
 </Project>
